@@ -1,0 +1,45 @@
+<template name='tree'>
+  <block>
+    <!-- 视图 -->
+    <view a:if="{{ type === 'view' }}" key="{{ key }}" style="{{ style }}" class="{{ class }}" catchTap="onClick" id="{{ id }}">
+      <block a:if="{{ childNodes }}">
+        <template a:for="{{ childNodes }}" data="{{ ...item }}" is="tree"></template>
+      </block>
+    </view>
+    <!-- 文本 -->
+    <text a:elif="{{ type === 'text' }}" key="{{ key }}" style="{{ style }}" class="{{ class }}" catchTap="onClick" id="{{ id }}">
+      <block a:if="{{ childNodes }}">
+        {{ childNodes }}
+      </block>
+    </text>
+    <!-- 按钮 -->
+    <button a:elif="{{ type === 'button' }}" key="{{ key }}" style="{{ style }}" class="{{ class }}" catchTap="onClick" id="{{ id }}">
+      <block a:if="{{ childNodes }}">
+        <template a:for="{{ childNodes }}" data="{{ ...item }}" is="tree"></template>
+      </block>
+    </button>
+    <!-- 图片 -->
+    <image a:elif="{{ type === 'image' }}" key="{{ key }}" style="{{ style }}" src="{{src}}" class="{{ class }}" catchTap="onClick" 
+      id="{{ id }}" />
+    <!-- 滑块视图容器 -->
+    <swiper a:elif="{{ type === 'swiper' }}" key="{{ key }}" style="{{ style }}" class="{{ class }}" previousMargin="{{ previousMargin }}" 
+      nextMargin="{{ nextMargin }}" indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" vertical="{{vertical}}" interval="{{interval}}" 
+      circular="{{circular}}" duration="{{duration}}" catchTap="onClick">
+      <block a:if="{{ childNodes }}">
+        <template a:for="{{ childNodes }}" data="{{ ...item }}" is="tree"></template>
+      </block>
+    </swiper>
+    <!-- 滑块视图item-->
+    <swiper-item a:elif="{{ type === 'swiper-item' }}" key="{{ key }}" style="{{ style }}" class="{{ class }}" catchTap="onClick">
+      <block a:if="{{ childNodes }}">
+        <template a:for="{{ childNodes }}" data="{{ ...item }}" is="tree"></template>
+      </block>
+    </swiper-item>
+    <!-- 视频组件 -->
+    <video a:elif="{{ type === 'video' }}" key="{{ key }}" style="{{ style }}" class="{{ class }}" id="{{ id }}" src="{{src}}" 
+      controls="{{showAllControls}}" loop="{{isLooping}}" muted="{{muteWhenPlaying}}" show-fullscreen-btn="{{showFullScreenButton}}" 
+      show-play-btn="{{showPlayButton}}" show-center-play-btn="{{showCenterButton}}" object-fit="{{objectFit}}" autoplay="{{autoPlay}}" 
+      direction="{{directionWhenFullScreen}}" initial-time="{{initTime}}" mobilenet-hint-type="{{mobilenetHintType}}" catchTap="onClick" />
+  </block>
+</template>
+<template is="tree" data="{{ ...item }}"></template>

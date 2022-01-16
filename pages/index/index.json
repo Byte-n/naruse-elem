@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "caro": "../../caro/dist/component"
+  }
+}
