@@ -1,19 +1,10 @@
-
-import { clickEventBus, initVnodeTree } from "../../caro";
-import testVnode from '../template/output';
-
-Component({
-  props: {
-    render: {},
-  },
+import item from '../template/output.js'
+Page({
   data: {
-    item: initVnodeTree(testVnode)
+    item,
   },
-  methods: {
-    /** 所有元素的点击事件都会通过这里进行分发 */
-    onClick(event) {
-      const item = clickEventBus(event, this.data.item);
-      this.setData({ item })
-    },
-  }
-});
+  onLoad(query) {
+    console.log('page onLoad', query)
+  },
+  onShow() {}
+})

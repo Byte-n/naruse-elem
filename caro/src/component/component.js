@@ -23,7 +23,7 @@ Component({
     methods: {
         onClick(t) {
             // taro内无法传参直接调用page内的函数
-            const e = clickEventBus(t, this.data.item, this.$page.$component.customEvents);
+            const e = clickEventBus(t, this.data.item, this.$page.$component ? this.$page.$component.customEvents : this.state.customEvents);
             this.setData({
                 item: e
             })
