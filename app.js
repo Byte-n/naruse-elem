@@ -3,6 +3,7 @@ App({
     // 第一次打开
     // options.query == {number:1}
     console.info('App onLaunch');
+    
   },
   onShow(options) {
     console.log(123)

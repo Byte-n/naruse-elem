@@ -4,7 +4,9 @@ Page({
     item,
   },
   onLoad(query) {
+
     console.log('page onLoad', query)
   },
-  onShow() {}
+  onShow() {
+  }
 })
