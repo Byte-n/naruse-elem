@@ -1,4 +1,4 @@
- export default {
+export default {
   "type": "view",
   "style": {
     "position": "relative",
@@ -84,7 +84,7 @@
             "padding": "0 20rpx",
             "fontSize": "30rpx",
             "marginTop": "40rpx",
-            "fontWeight": "500"
+            "fontWeight": "bold"
           },
           "childNodes": [
             {
@@ -100,18 +100,30 @@
                 "fontSize": "12px",
                 "textDecoration": "underline"
               },
-              "onClick": [
-                {
-                  "type": "gotoWebPage",
-                  "props": {
-                    "url": "miniapp:///pages/titleOptimize/index"
-                  }
-                }
-              ],
               "childNodes": [
                 {
                   "type": "text",
-                  "childNodes": "点击前往>"
+                  "childNodes": "点击前往>",
+                  "onClick": [
+                    {
+                      "type": "gotoWebPage",
+                      "props": {
+                        "url": "miniapp:///pages/titleOptimize/index"
+                      }
+                    },
+                    {
+                      "type": "beacon",
+                      "props": {
+                        "type": "sensorbeacon",
+                        "props": [
+                          "ButtonClick",
+                          {
+                            "button_name": "优化标题-点击前往"
+                          }
+                        ]
+                      }
+                    }
+                  ]
                 }
               ]
             }
@@ -140,7 +152,7 @@
             "padding": "0 20rpx",
             "fontSize": "30rpx",
             "marginTop": "40rpx",
-            "fontWeight": "500"
+            "fontWeight": "bold"
           },
           "childNodes": [
             {
@@ -156,29 +168,30 @@
                 "fontSize": "12px",
                 "textDecoration": "underline"
               },
-              "onClick": [
-                {
-                  "type": "gotoWebPage",
-                  "props": {
-                    "url": "pages/detailTemplate/index"
-                  }
-                },
-                {
-                  "type": "sensorbeacon",
-                  "props": {
-                    "props": [
-                      "ButtonClick",
-                      {
-                        "button_name": "做主图视频、手机详情页-点击前往"
-                      }
-                    ]
-                  }
-                }
-              ],
               "childNodes": [
                 {
                   "type": "text",
-                  "childNodes": "点击前往>"
+                  "childNodes": "点击前往>",
+                  "onClick": [
+                    {
+                      "type": "gotoWebPage",
+                      "props": {
+                        "url": "miniapp:///pages/newDescMobile/index"
+                      }
+                    },
+                    {
+                      "type": "beacon",
+                      "props": {
+                        "type": "sensorbeacon",
+                        "props": [
+                          "ButtonClick",
+                          {
+                            "button_name": "做主图视频、手机详情页-点击前往"
+                          }
+                        ]
+                      }
+                    }
+                  ]
                 }
               ]
             }
@@ -207,7 +220,7 @@
             "padding": "0 20rpx",
             "fontSize": "30rpx",
             "marginTop": "40rpx",
-            "fontWeight": "500"
+            "fontWeight": "bold"
           },
           "childNodes": [
             {
@@ -222,32 +235,7 @@
                 "color": "#2D6EFF",
                 "fontSize": "12px",
                 "textDecoration": "underline"
-              },
-              "onClick": [
-                {
-                  "type": "gotoWebPage",
-                  "props": {
-                    "url": "miniapp:///pages/detailTemplate/index"
-                  }
-                },
-                {
-                  "type": "sensorbeacon",
-                  "props": {
-                    "props": [
-                      "ButtonClick",
-                      {
-                        "button_name": "写微淘-点击前往"
-                      }
-                    ]
-                  }
-                }
-              ],
-              "childNodes": [
-                {
-                  "type": "text",
-                  "childNodes": "点击前往>"
-                }
-              ]
+              }
             }
           ]
         },
@@ -274,7 +262,7 @@
             "padding": "0 20rpx",
             "fontSize": "30rpx",
             "marginTop": "40rpx",
-            "fontWeight": "500"
+            "fontWeight": "bold"
           },
           "childNodes": [
             {
@@ -290,29 +278,30 @@
                 "fontSize": "12px",
                 "textDecoration": "underline"
               },
-              "onClick": [
-                {
-                  "type": "gotoWebPage",
-                  "props": {
-                    "url": "miniapp:///pages/autoMaticMounting/index"
-                  }
-                },
-                {
-                  "type": "sensorbeacon",
-                  "props": {
-                    "props": [
-                      "ButtonClick",
-                      {
-                        "button_name": "商品需要频繁上下架-点击前往"
-                      }
-                    ]
-                  }
-                }
-              ],
               "childNodes": [
                 {
                   "type": "text",
-                  "childNodes": "点击前往>"
+                  "childNodes": "点击前往>",
+                  "onClick": [
+                    {
+                      "type": "gotoWebPage",
+                      "props": {
+                        "url": "miniapp:///pages/autoMaticMounting/index"
+                      }
+                    },
+                    {
+                      "type": "beacon",
+                      "props": {
+                        "type": "sensorbeacon",
+                        "props": [
+                          "ButtonClick",
+                          {
+                            "button_name": "商品需要频繁上下架-点击前往"
+                          }
+                        ]
+                      }
+                    }
+                  ]
                 }
               ]
             }
@@ -389,29 +378,30 @@
                 "fontSize": "12px",
                 "textDecoration": "underline"
               },
-              "onClick": [
-                {
-                  "type": "gotoWebPage",
-                  "props": {
-                    "url": "miniapp:///pages/waterMark/index"
-                  }
-                },
-                {
-                  "type": "sensorbeacon",
-                  "props": {
-                    "props": [
-                      "ButtonClick",
-                      {
-                        "button_name": "促销水印加起来-点击前往"
-                      }
-                    ]
-                  }
-                }
-              ],
               "childNodes": [
                 {
                   "type": "text",
-                  "childNodes": "点击前往>"
+                  "childNodes": "点击前往>",
+                  "onClick": [
+                    {
+                      "type": "gotoWebPage",
+                      "props": {
+                        "url": "miniapp:///pages/waterMark/index"
+                      }
+                    },
+                    {
+                      "type": "beacon",
+                      "props": {
+                        "type": "sensorbeacon",
+                        "props": [
+                          "ButtonClick",
+                          {
+                            "button_name": "促销水印加起来-点击前往"
+                          }
+                        ]
+                      }
+                    }
+                  ]
                 }
               ]
             }
@@ -456,29 +446,30 @@
                 "fontSize": "12px",
                 "textDecoration": "underline"
               },
-              "onClick": [
-                {
-                  "type": "gotoWebPage",
-                  "props": {
-                    "url": "miniapp:///pages/promotionalList/index"
-                  }
-                },
-                {
-                  "type": "sensorbeacon",
-                  "props": {
-                    "props": [
-                      "ButtonClick",
-                      {
-                        "button_name": "店铺打折活动必不可少-点击前往"
-                      }
-                    ]
-                  }
-                }
-              ],
               "childNodes": [
                 {
                   "type": "text",
-                  "childNodes": "点击前往>"
+                  "childNodes": "点击前往>",
+                  "onClick": [
+                    {
+                      "type": "gotoWebPage",
+                      "props": {
+                        "url": "miniapp:///pages/promotionalList/index"
+                      }
+                    },
+                    {
+                      "type": "beacon",
+                      "props": {
+                        "type": "sensorbeacon",
+                        "props": [
+                          "ButtonClick",
+                          {
+                            "button_name": "店铺打折活动必不可少-点击前往"
+                          }
+                        ]
+                      }
+                    }
+                  ]
                 }
               ]
             }
@@ -527,9 +518,9 @@
           },
           "onClick": [
             {
-              "type": "gotoWebPage",
+              "type": "contactWW",
               "props": {
-                "url": "https://c.tb.cn/Y4.7RsE0"
+                "text": "亲，我要订购高级版https://c.tb.cn/Y4.SwO8i"
               }
             }
           ]
