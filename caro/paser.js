@@ -1,6 +1,8 @@
 const { transform } = require("@babel/core");
 const fs = require("fs");
 
+const skipFucType = ['sensorbeacon', 'aybeacon'];
+
 
 global.h = (type, props, ...childNodes) => {
   if (props && props.onClick) {
@@ -11,12 +13,21 @@ global.h = (type, props, ...childNodes) => {
       delete event.targetId;
       delete event.type;
       newEvent.props = { ...event };
+      if (skipFucType.includes(newEvent.type)) {
+        newEvent.props.type = newEvent.type;
+        newEvent.type = 'beacon';
+      }
       return newEvent;
     })
   }
   childNodes = childNodes.flat(1);
   childNodes = childNodes.map(child => {
-    if (typeof child === "string") return { type: 'text', childNodes: child };
+    if (typeof child === "string") {
+      if (props?.onClick) {
+        return { type: 'text', childNodes: child , onClick: props.onClick}
+      }
+      return { type: 'text', childNodes: child };
+    };
     // 动态变量
     if (child.type === 'dynamicText') {
       child.childNodes = child.childNodes[0].childNodes;
