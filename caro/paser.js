@@ -23,7 +23,7 @@ global.h = (type, props, ...childNodes) => {
   childNodes = childNodes.flat(1);
   childNodes = childNodes.map(child => {
     if (typeof child === "string") {
-      if (props?.onClick) {
+      if (props &&  props.onClick) {
         return { type: 'text', childNodes: child , onClick: props.onClick}
       }
       return { type: 'text', childNodes: child };
