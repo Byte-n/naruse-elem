@@ -7,16 +7,17 @@ const baseUrl = 'https://q.aiyongtech.com/trade/web/images/';
     <view style={{color:'#333333',padding:'0 20rpx', fontSize:'30rpx',marginTop:'40rpx',fontWeight: '500'}}>1.找亲朋好友贡献流量</view>
     <view style={{color:'#333333',padding:'0 20rpx', fontSize:'30rpx',marginTop:'20rpx',lineHeight:'50rpx'}}>开好店铺后首先得找亲朋好友做第一波访客，记得浏览商品在3分钟以上哦，然后可和客服聊天， 再下单评论。 订单量突破零增加官方流量权重。</view>
     <view style={{color:'#333333',padding:'0 20rpx', fontSize:'30rpx',marginTop:'40rpx',fontWeight: '500'}}>2.优化标题
-      <view style={{display: 'inline-block',marginLeft: '20rpx',color: '#2D6EFF',fontSize: '12px',textDecoration: 'underline'}}
+    <view style={{display: 'inline-block',marginLeft: '20rpx',color: '#2D6EFF',fontSize: '12px',textDecoration: 'underline'}}
       onClick={[
-        <gotoWebPage url={`miniapp:///pages/titleOptimize/index`}/>
+        <gotoWebPage url={`miniapp:///pages/titleOptimize/index`}/>,
+        <beacon type='sensorbeacon' props={['ButtonClick',{button_name:'优化标题-点击前往'}]}/>
       ]}>点击前往></view>
     </view>
     <view style={{color:'#333333',padding:'0 20rpx', fontSize:'30rpx',marginTop:'20rpx',lineHeight:'50rpx'}}>这个很重要！据官方统计，目前50%以上的订单是 买家通过搜索关键词后下单的。取好商品的名字对 于搜索至关重要。主标题+副标题+行业热词+促销 词，搭配起来搜索起飞！</view>
     <view style={{color:'#333333',padding:'0 20rpx', fontSize:'30rpx',marginTop:'40rpx',fontWeight: '500'}}>3.做主图视频、手机详情页
       <view style={{display: 'inline-block',marginLeft: '20rpx',color: '#2D6EFF',fontSize: '12px',textDecoration: 'underline'}}
       onClick={[
-        <gotoWebPage url={`pages/detailTemplate/index`} />,
+        <gotoWebPage url={`miniapp:///pages/newDescMobile/index`} />,
         <beacon type='sensorbeacon' props={['ButtonClick',{button_name:'做主图视频、手机详情页-点击前往'}]}/>
       ]}>点击前往></view>
     </view>
@@ -62,7 +63,7 @@ const baseUrl = 'https://q.aiyongtech.com/trade/web/images/';
   <view style={{position: 'relative',paddingTop:'132rpx',textAlign:'center',backgroundImage:'url(https://q.aiyongtech.com/trade/web/images/softTextPay1.png)',height:'894rpx',backgroundRepeat: 'no-repeat',backgroundSize:'contain',boxSizing: 'border-box',marginTop:'72rpx'}}>
   <image src={`${baseUrl}softTextPay3.png`} style={{display:'block', width: '430rpx', height: '130rpx' ,margin: '0 auto' }} 
   onClick={[
-    <gotoWebPage url={`https://c.tb.cn/Y4.7RsE0`} />,
+    <gotoWebPage url={`http://fuwu.taobao.com/ser/confirmOrder1.htm?commonParams=activityCode%3AACT_877021141_220214185628%3BagentId%3Afuwu.taobao.com%7Cmarketing-Order-0%3BmarketKey%3AFWSPP_MARKETING_URL%3BpromIds%3A%5B1007928885%5D&subParams=cycleNum%3A12%2CcycleUnit%3A2%2CitemCode%3AFW_GOODS-1828810-v2&sign=C14D134B215C40A50DA3CD287F472904&spm=a313p.266.ei5lud.1365537578774&short_name=Y4.7RsE0`} />,
   ]}/>
   </view>
 </view>

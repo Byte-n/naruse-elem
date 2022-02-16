@@ -2,263 +2,406 @@
   "type": "view",
   "style": {
     "position": "relative",
-    "width": "100%"
+    "backgroundColor": "#FCD0AB"
   },
   "childNodes": [
     {
-      "type": "view",
-      "style": {
-        "maxWidth": "100%",
-        "background": "#F4C856",
-        "borderRadius": "1rpx",
-        "padding": "28rpx"
-      },
-      "childNodes": [
-        {
-          "type": "view",
-          "id": "剩余事件",
-          "style": {
-            "display": "flex",
-            "alignItems": "center",
-            "justifyContent": "space-between",
-            "fontSize": "32rpx",
-            "fontFamily": "PingFangSC-Medium, PingFang SC",
-            "fontWeight": 500,
-            "color": "#ED3C23"
-          },
-          "childNodes": [
-            {
-              "type": "view",
-              "childNodes": [
-                {
-                  "type": "text",
-                  "childNodes": "您的试用模式剩余"
-                },
-                {
-                  "isDynamicText": true,
-                  "type": "text",
-                  "childNodes": "赠送剩余过期天数"
-                },
-                {
-                  "type": "text",
-                  "childNodes": "天"
-                }
-              ]
-            },
-            {
-              "type": "image",
-              "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/图标.png",
-              "style": {
-                "width": "220rpx",
-                "height": "40rpx"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
       "type": "image",
-      "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/特权.png",
+      "src": "https://q.aiyongtech.com/trade/web/images/softTextPay2.png",
       "style": {
-        "width": "100%",
-        "height": "665rpx",
-        "marginTop": "36rpx"
+        "width": "750rpx",
+        "height": "403rpx",
+        "marginBottom": "60rpx"
       }
     },
     {
       "type": "view",
       "style": {
-        "position": "relative"
+        "margin": "25rpx 25rpx 110rpx",
+        "backgroundColor": "#fff",
+        "position": "relative",
+        "paddingTop": "30rpx"
       },
       "childNodes": [
         {
-          "type": "image",
-          "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/自由选择.png",
-          "style": {
-            "width": "450rpx",
-            "height": "40rpx",
-            "marginLeft": "150rpx",
-            "marginTop": "36rpx"
-          }
-        },
-        {
           "type": "view",
           "style": {
-            "width": "508rpx",
             "position": "absolute",
-            "bottom": "110rpx",
-            "fontSize": "28rpx",
-            "color": "#B58535",
-            "left": "50%",
-            "transform": "translateX(-50%)"
+            "top": "-30rpx",
+            "display": "inline-block",
+            "backgroundColor": "#943622",
+            "fontSize": "40rpx",
+            "fontWeight": "500",
+            "color": "#fff",
+            "padding": "18rpx",
+            "borderRadius": "12rpx",
+            "borderBottomLeftRadius": "0",
+            "marginTop": "-20rpx"
           },
           "childNodes": [
             {
               "type": "text",
-              "childNodes": "累计已有 3,129,847 个卖家选择爱用商品"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "view",
-      "style": {
-        "width": "100%",
-        "height": "300rpx",
-        "display": "flex",
-        "justifyContent": "center",
-        "alignItems": "center"
-      },
-      "childNodes": [
-        {
-          "type": "image",
-          "id": "selectBtn-季度未选中",
-          "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/季度未选中.png",
-          "style": {
-            "width": "210rpx",
-            "height": "250rpx",
-            "marginLeft": "14rpx",
-            "marginRight": "14rpx"
-          },
-          "onClick": [
-            {
-              "type": "changeDom",
-              "targetId": "bottomBtn",
-              "props": {
-                "onClick": [
-                  {
-                    "type": "gotoWebPage",
-                    "props": {
-                      "url": "https://fuwu.taobao.com/ser/confirmOrder1.htm?commonParams=activityCode%3AACT_877021141_210520165254%3BagentId%3Afuwu.taobao.com%7Cmarketing-Order-0%3BmarketKey%3AFWSPP_MARKETING_URL%3BpromIds%3A%5B1007049474%5D&subParams=cycleNum%3A3%2CcycleUnit%3A2%2CitemCode%3AFW_GOODS-1828810-v2&sign=792D9F1FD3404BFE05AAC79EC2C51A25",
-                      "isShopLink": true
-                    }
-                  }
-                ],
-                "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/季度按钮.png"
-              }
-            },
-            {
-              "type": "changeDom",
-              "targetId": "selectBtn-季度未选中",
-              "props": {
-                "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/季度选中.png"
-              }
-            },
-            {
-              "type": "changeDom",
-              "targetId": "selectBtn-半年选中",
-              "props": {
-                "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/半年未选中.png"
-              }
-            },
-            {
-              "type": "changeDom",
-              "targetId": "selectBtn-一年未选中",
-              "props": {
-                "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/一年未选中.png"
-              }
+              "childNodes": "获取免费流量"
             }
           ]
         },
         {
-          "type": "image",
-          "id": "selectBtn-半年选中",
-          "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/半年选中.png",
+          "type": "view",
           "style": {
-            "width": "210rpx",
-            "height": "250rpx",
-            "marginLeft": "14rpx",
-            "marginRight": "14rpx"
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "40rpx",
+            "fontWeight": "500"
           },
-          "onClick": [
+          "childNodes": [
             {
-              "type": "changeDom",
-              "targetId": "bottomBtn",
-              "props": {
-                "onClick": [
-                  {
-                    "type": "gotoWebPage",
-                    "props": {
-                      "url": "https://fuwu.taobao.com/ser/confirmOrder1.htm?commonParams=activityCode%3AACT_877021141_210520165254%3BagentId%3Afuwu.taobao.com%7Cmarketing-Order-0%3BmarketKey%3AFWSPP_MARKETING_URL%3BpromIds%3A%5B1007049474%5D&subParams=cycleNum%3A6%2CcycleUnit%3A2%2CitemCode%3AFW_GOODS-1828810-v2&sign=C093214C834DB95FDE3BBCEE9085C0ED",
-                      "isShopLink": true
-                    }
-                  }
-                ],
-                "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/半年按钮.png"
-              }
-            },
-            {
-              "type": "changeDom",
-              "targetId": "selectBtn-半年选中",
-              "props": {
-                "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/半年选中.png"
-              }
-            },
-            {
-              "type": "changeDom",
-              "targetId": "selectBtn-季度未选中",
-              "props": {
-                "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/季度未选中.png"
-              }
-            },
-            {
-              "type": "changeDom",
-              "targetId": "selectBtn-一年未选中",
-              "props": {
-                "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/一年未选中.png"
-              }
+              "type": "text",
+              "childNodes": "1.找亲朋好友贡献流量"
             }
           ]
         },
         {
-          "type": "image",
-          "id": "selectBtn-一年未选中",
-          "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/一年未选中.png",
+          "type": "view",
           "style": {
-            "width": "210rpx",
-            "height": "250rpx",
-            "marginLeft": "14rpx",
-            "marginRight": "14rpx"
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "20rpx",
+            "lineHeight": "50rpx"
           },
-          "onClick": [
+          "childNodes": [
             {
-              "type": "changeDom",
-              "targetId": "bottomBtn",
-              "props": {
-                "onClick": [
-                  {
-                    "type": "gotoWebPage",
-                    "props": {
-                      "url": "https://fuwu.taobao.com/ser/confirmOrder1.htm?commonParams=activityCode%3AACT_877021141_210520165254%3BagentId%3Afuwu.taobao.com%7Cmarketing-Order-0%3BmarketKey%3AFWSPP_MARKETING_URL%3BpromIds%3A%5B1007049474%5D&subParams=cycleNum%3A12%2CcycleUnit%3A2%2CitemCode%3AFW_GOODS-1828810-v2&sign=3C4469CCF2C31583D06B5D14B61BF043",
-                      "isShopLink": true
-                    }
+              "type": "text",
+              "childNodes": "开好店铺后首先得找亲朋好友做第一波访客，记得浏览商品在3分钟以上哦，然后可和客服聊天， 再下单评论。 订单量突破零增加官方流量权重。"
+            }
+          ]
+        },
+        {
+          "type": "view",
+          "style": {
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "40rpx",
+            "fontWeight": "500"
+          },
+          "childNodes": [
+            {
+              "type": "text",
+              "childNodes": "2.优化标题"
+            },
+            {
+              "type": "view",
+              "style": {
+                "display": "inline-block",
+                "marginLeft": "20rpx",
+                "color": "#2D6EFF",
+                "fontSize": "12px",
+                "textDecoration": "underline"
+              },
+              "onClick": [
+                {
+                  "type": "gotoWebPage",
+                  "props": {
+                    "url": "miniapp:///pages/titleOptimize/index"
                   }
-                ],
-                "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/年按钮.png"
-              }
+                }
+              ],
+              "childNodes": [
+                {
+                  "type": "text",
+                  "childNodes": "点击前往>",
+                  "onClick": [
+                    {
+                      "type": "gotoWebPage",
+                      "props": {
+                        "url": "miniapp:///pages/titleOptimize/index"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "view",
+          "style": {
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "20rpx",
+            "lineHeight": "50rpx"
+          },
+          "childNodes": [
+            {
+              "type": "text",
+              "childNodes": "这个很重要！据官方统计，目前50%以上的订单是 买家通过搜索关键词后下单的。取好商品的名字对 于搜索至关重要。主标题+副标题+行业热词+促销 词，搭配起来搜索起飞！"
+            }
+          ]
+        },
+        {
+          "type": "view",
+          "style": {
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "40rpx",
+            "fontWeight": "500"
+          },
+          "childNodes": [
+            {
+              "type": "text",
+              "childNodes": "3.做主图视频、手机详情页"
             },
             {
-              "type": "changeDom",
-              "targetId": "selectBtn-一年未选中",
-              "props": {
-                "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/一年选中.png"
-              }
+              "type": "view",
+              "style": {
+                "display": "inline-block",
+                "marginLeft": "20rpx",
+                "color": "#2D6EFF",
+                "fontSize": "12px",
+                "textDecoration": "underline"
+              },
+              "onClick": [
+                {
+                  "type": "gotoWebPage",
+                  "props": {
+                    "url": "miniapp:///pages/newDescMobile/index"
+                  }
+                },
+                {
+                  "type": "beacon",
+                  "props": {
+                    "props": [
+                      "ButtonClick",
+                      {
+                        "button_name": "做主图视频、手机详情页-点击前往"
+                      }
+                    ],
+                    "type": "sensorbeacon"
+                  }
+                }
+              ],
+              "childNodes": [
+                {
+                  "type": "text",
+                  "childNodes": "点击前往>",
+                  "onClick": [
+                    {
+                      "type": "gotoWebPage",
+                      "props": {
+                        "url": "miniapp:///pages/newDescMobile/index"
+                      }
+                    },
+                    {
+                      "type": "beacon",
+                      "props": {
+                        "props": [
+                          "ButtonClick",
+                          {
+                            "button_name": "做主图视频、手机详情页-点击前往"
+                          }
+                        ],
+                        "type": "sensorbeacon"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "view",
+          "style": {
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "20rpx",
+            "lineHeight": "50rpx"
+          },
+          "childNodes": [
+            {
+              "type": "text",
+              "childNodes": "淘宝的官方规则是商品有主图视频和手机详情页的 会多给流量，那么为什么不蹭呢！"
+            }
+          ]
+        },
+        {
+          "type": "view",
+          "style": {
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "40rpx",
+            "fontWeight": "500"
+          },
+          "childNodes": [
+            {
+              "type": "text",
+              "childNodes": "4.写微淘"
             },
             {
-              "type": "changeDom",
-              "targetId": "selectBtn-季度未选中",
-              "props": {
-                "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/季度未选中.png"
-              }
+              "type": "view",
+              "style": {
+                "display": "inline-block",
+                "marginLeft": "20rpx",
+                "color": "#2D6EFF",
+                "fontSize": "12px",
+                "textDecoration": "underline"
+              },
+              "onClick": [
+                {
+                  "type": "gotoWebPage",
+                  "props": {
+                    "url": "miniapp:///pages/detailTemplate/index"
+                  }
+                },
+                {
+                  "type": "beacon",
+                  "props": {
+                    "props": [
+                      "ButtonClick",
+                      {
+                        "button_name": "写微淘-点击前往"
+                      }
+                    ],
+                    "type": "sensorbeacon"
+                  }
+                }
+              ],
+              "childNodes": [
+                {
+                  "type": "text",
+                  "childNodes": "点击前往>",
+                  "onClick": [
+                    {
+                      "type": "gotoWebPage",
+                      "props": {
+                        "url": "miniapp:///pages/detailTemplate/index"
+                      }
+                    },
+                    {
+                      "type": "beacon",
+                      "props": {
+                        "props": [
+                          "ButtonClick",
+                          {
+                            "button_name": "写微淘-点击前往"
+                          }
+                        ],
+                        "type": "sensorbeacon"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "view",
+          "style": {
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "20rpx",
+            "lineHeight": "50rpx"
+          },
+          "childNodes": [
+            {
+              "type": "text",
+              "childNodes": "很多卖家不愿意写文案发微淘，毕竟写东西是很痛 苦的事情，但是微淘可是在淘宝的首页中，流量口 是很大的，此“堡垒”不能有失。"
+            }
+          ]
+        },
+        {
+          "type": "view",
+          "style": {
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "40rpx",
+            "fontWeight": "500"
+          },
+          "childNodes": [
+            {
+              "type": "text",
+              "childNodes": "5.商品需要频繁上下架"
             },
             {
-              "type": "changeDom",
-              "targetId": "selectBtn-半年选中",
-              "props": {
-                "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/半年未选中.png"
-              }
+              "type": "view",
+              "style": {
+                "display": "inline-block",
+                "marginLeft": "20rpx",
+                "color": "#2D6EFF",
+                "fontSize": "12px",
+                "textDecoration": "underline"
+              },
+              "onClick": [
+                {
+                  "type": "gotoWebPage",
+                  "props": {
+                    "url": "miniapp:///pages/autoMaticMounting/index"
+                  }
+                },
+                {
+                  "type": "beacon",
+                  "props": {
+                    "props": [
+                      "ButtonClick",
+                      {
+                        "button_name": "商品需要频繁上下架-点击前往"
+                      }
+                    ],
+                    "type": "sensorbeacon"
+                  }
+                }
+              ],
+              "childNodes": [
+                {
+                  "type": "text",
+                  "childNodes": "点击前往>",
+                  "onClick": [
+                    {
+                      "type": "gotoWebPage",
+                      "props": {
+                        "url": "miniapp:///pages/autoMaticMounting/index"
+                      }
+                    },
+                    {
+                      "type": "beacon",
+                      "props": {
+                        "props": [
+                          "ButtonClick",
+                          {
+                            "button_name": "商品需要频繁上下架-点击前往"
+                          }
+                        ],
+                        "type": "sensorbeacon"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "view",
+          "style": {
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "20rpx",
+            "lineHeight": "50rpx"
+          },
+          "childNodes": [
+            {
+              "type": "text",
+              "childNodes": "官方会在商品下架的前一段时间内给很多流量，因 此钻他漏洞做好频繁上下架。"
             }
           ]
         }
@@ -267,45 +410,244 @@
     {
       "type": "view",
       "style": {
-        "marginLeft": "36rpx",
-        "marginTop": "10rpx",
-        "fontSize": "24rpx",
-        "color": "#333333"
+        "margin": "25rpx",
+        "backgroundColor": "#fff",
+        "position": "relative",
+        "paddingTop": "30rpx"
       },
       "childNodes": [
         {
-          "type": "text",
-          "childNodes": "购买后七天无理由退钱"
+          "type": "view",
+          "style": {
+            "position": "absolute",
+            "top": "-30rpx",
+            "display": "inline-block",
+            "backgroundColor": "#943622",
+            "fontSize": "40rpx",
+            "fontWeight": "500",
+            "color": "#fff",
+            "padding": "18rpx",
+            "borderRadius": "12rpx 12rpx 12prx 0",
+            "marginTop": "-20rpx"
+          },
+          "childNodes": [
+            {
+              "type": "text",
+              "childNodes": "有了流量就要勾住他们下单了"
+            }
+          ]
+        },
+        {
+          "type": "view",
+          "style": {
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "40rpx",
+            "fontWeight": "500"
+          },
+          "childNodes": [
+            {
+              "type": "text",
+              "childNodes": "1.促销水印加起来"
+            },
+            {
+              "type": "view",
+              "style": {
+                "display": "inline-block",
+                "marginLeft": "20rpx",
+                "color": "#2D6EFF",
+                "fontSize": "12px",
+                "textDecoration": "underline"
+              },
+              "onClick": [
+                {
+                  "type": "gotoWebPage",
+                  "props": {
+                    "url": "miniapp:///pages/waterMark/index"
+                  }
+                },
+                {
+                  "type": "beacon",
+                  "props": {
+                    "props": [
+                      "ButtonClick",
+                      {
+                        "button_name": "促销水印加起来-点击前往"
+                      }
+                    ],
+                    "type": "sensorbeacon"
+                  }
+                }
+              ],
+              "childNodes": [
+                {
+                  "type": "text",
+                  "childNodes": "点击前往>",
+                  "onClick": [
+                    {
+                      "type": "gotoWebPage",
+                      "props": {
+                        "url": "miniapp:///pages/waterMark/index"
+                      }
+                    },
+                    {
+                      "type": "beacon",
+                      "props": {
+                        "props": [
+                          "ButtonClick",
+                          {
+                            "button_name": "促销水印加起来-点击前往"
+                          }
+                        ],
+                        "type": "sensorbeacon"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "view",
+          "style": {
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "20rpx",
+            "lineHeight": "50rpx"
+          },
+          "childNodes": [
+            {
+              "type": "text",
+              "childNodes": "跟紧官方每季一大促每月一小促的节奏，在我们的 商品图片中打上各种促销文案，这样才能在繁杂的 商品中脱颖而出，促进买家下单。"
+            }
+          ]
+        },
+        {
+          "type": "view",
+          "style": {
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "40rpx",
+            "fontWeight": "500"
+          },
+          "childNodes": [
+            {
+              "type": "text",
+              "childNodes": "2.店铺打折活动必不可少"
+            },
+            {
+              "type": "view",
+              "style": {
+                "display": "inline-block",
+                "marginLeft": "20rpx",
+                "color": "#2D6EFF",
+                "fontSize": "12px",
+                "textDecoration": "underline"
+              },
+              "onClick": [
+                {
+                  "type": "gotoWebPage",
+                  "props": {
+                    "url": "miniapp:///pages/promotionalList/index"
+                  }
+                },
+                {
+                  "type": "beacon",
+                  "props": {
+                    "props": [
+                      "ButtonClick",
+                      {
+                        "button_name": "店铺打折活动必不可少-点击前往"
+                      }
+                    ],
+                    "type": "sensorbeacon"
+                  }
+                }
+              ],
+              "childNodes": [
+                {
+                  "type": "text",
+                  "childNodes": "点击前往>",
+                  "onClick": [
+                    {
+                      "type": "gotoWebPage",
+                      "props": {
+                        "url": "miniapp:///pages/promotionalList/index"
+                      }
+                    },
+                    {
+                      "type": "beacon",
+                      "props": {
+                        "props": [
+                          "ButtonClick",
+                          {
+                            "button_name": "店铺打折活动必不可少-点击前往"
+                          }
+                        ],
+                        "type": "sensorbeacon"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "view",
+          "style": {
+            "color": "#333333",
+            "padding": "0 20rpx",
+            "fontSize": "30rpx",
+            "marginTop": "20rpx",
+            "lineHeight": "50rpx"
+          },
+          "childNodes": [
+            {
+              "type": "text",
+              "childNodes": "满减活动、新用户大额券、第二件半价等都要创建 起来，用低价吸引买家下单（宁可首单不赚钱）， 这样才会有后续流量。"
+            }
+          ]
         }
       ]
     },
     {
       "type": "view",
       "style": {
-        "height": "120rpx"
-      }
-    },
-    {
-      "type": "image",
-      "id": "bottomBtn",
-      "onClick": [
+        "position": "relative",
+        "paddingTop": "132rpx",
+        "textAlign": "center",
+        "backgroundImage": "url(https://q.aiyongtech.com/trade/web/images/softTextPay1.png)",
+        "height": "894rpx",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "contain",
+        "boxSizing": "border-box",
+        "marginTop": "72rpx"
+      },
+      "childNodes": [
         {
-          "type": "gotoWebPage",
-          "props": {
-            "url": "https://c.tb.cn/Y4.SvhWK",
-            "isShopLink": true
-          }
+          "type": "image",
+          "src": "https://q.aiyongtech.com/trade/web/images/softTextPay3.png",
+          "style": {
+            "display": "block",
+            "width": "430rpx",
+            "height": "130rpx",
+            "margin": "0 auto"
+          },
+          "onClick": [
+            {
+              "type": "gotoWebPage",
+              "props": {
+                "url": "http://fuwu.taobao.com/ser/confirmOrder1.htm?commonParams=activityCode%3AACT_877021141_220214185628%3BagentId%3Afuwu.taobao.com%7Cmarketing-Order-0%3BmarketKey%3AFWSPP_MARKETING_URL%3BpromIds%3A%5B1007928885%5D&subParams=cycleNum%3A12%2CcycleUnit%3A2%2CitemCode%3AFW_GOODS-1828810-v2&sign=C14D134B215C40A50DA3CD287F472904&spm=a313p.266.ei5lud.1365537578774&short_name=Y4.7RsE0"
+              }
+            }
+          ]
         }
-      ],
-      "src": "https://q.aiyongtech.com/trade/web/images/caro/testModal/半年按钮.png",
-      "style": {
-        "width": "100%",
-        "height": "110rpx",
-        "position": "fixed",
-        "bottom": 0,
-        "zIndex": 10,
-        "left": 0
-      }
+      ]
     }
   ]
 }
