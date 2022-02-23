@@ -1,11 +1,14 @@
-import item from '../template/output.js'
+import code from '../../dist';
 Page({
   data: {
-    item,
+    code,
   },
   onLoad(query) {
+<<<<<<< HEAD
 
     console.log('page onLoad', query)
+=======
+>>>>>>> temp1
   },
   onShow() {
   }

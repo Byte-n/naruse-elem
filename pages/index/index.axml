@@ -1,1 +1,1 @@
-<caro render="{{ item }}"></caro>
+<naruse code="{{ code }}" />

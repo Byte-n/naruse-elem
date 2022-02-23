@@ -1,3 +1,7 @@
+<<<<<<< HEAD
 <view>
+=======
+<view catchTap="qwer">
+>>>>>>> temp1
   new page
 </view>

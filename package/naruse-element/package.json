@@ -1,0 +1,12 @@
+{
+  "name": "naruse-element",
+  "version": "1.0.0",
+  "description": "这是一个提供小程序渲染能力给 naruse-render 使用的自定义组件。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC"
+}

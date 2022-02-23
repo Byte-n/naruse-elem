@@ -1,8 +1,28 @@
 {
-  "devDependencies": {
-    "@tarojs/shared": "^3.4.1",
-    "acorn": "^8.7.0",
-    "inversify": "^6.0.1",
-    "reflect-metadata": "^0.1.13"
-  }
+  "name": "naruse",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "@babel/core": "^7.16.7",
+    "@babel/plugin-transform-destructuring": "^7.17.3",
+    "@babel/preset-env": "^7.16.7",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Barrierml/Naruse.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Barrierml/Naruse/issues"
+  },
+  "homepage": "https://github.com/Barrierml/Naruse#readme"
 }
