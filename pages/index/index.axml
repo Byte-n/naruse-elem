@@ -1,2 +1,1 @@
-<button onTap="qwer" >123</button>
-<input onInput="qqqq" />
+<naruse code="{{ code }}" />

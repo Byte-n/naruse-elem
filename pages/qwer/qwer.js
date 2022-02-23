@@ -9,8 +9,8 @@ Page({
       console.log('事件触发');
     },
   method: {
-    qwer() {
-      console.log('事件触发');
+    qwer(e) {
+      console.log(e)
     }
   },
   onShow() {
