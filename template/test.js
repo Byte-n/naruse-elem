@@ -1,5 +1,4 @@
-
-export default class component {
+export default class component extends NaruseComponent {
     constructor() {
         this.state = {
             qwe: 1,

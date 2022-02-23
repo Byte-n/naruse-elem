@@ -1,22 +1,8 @@
-<<<<<<< HEAD
-const runtime = require("./runtime.esm")
-=======
-const ww = require('../qwer.js');
->>>>>>> temp1
+
 
 Page({
   data: {},
   onLoad(query) {
-<<<<<<< HEAD
-
-    
-    console.log('page onLoad', query)
-    
-  },
-  onShow() {
-    console.log(JSON)
-    my.runtime = runtime
-=======
     console.log('page onLoad', query)
   },
       qwer() {
@@ -29,6 +15,5 @@ Page({
   },
   onShow() {
     console.log(JSON)
->>>>>>> temp1
   }
 })
