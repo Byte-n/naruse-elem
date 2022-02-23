@@ -16,7 +16,12 @@ global.h = (type, props, ...childNodes) => {
   }
   childNodes = childNodes.flat(1);
   childNodes = childNodes.map(child => {
-    if (typeof child === "string") return { type: 'text', childNodes: child };
+    if (typeof child === "string") {
+      if (props &&  props.onClick) {
+        return { type: 'text', childNodes: child , onClick: props.onClick}
+      }
+      return { type: 'text', childNodes: child };
+    };
     // 动态变量
     if (child.type === 'dynamicText') {
       child.childNodes = child.childNodes[0].childNodes;
