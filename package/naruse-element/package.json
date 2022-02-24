@@ -1,12 +1,19 @@
 {
   "name": "naruse-element",
   "version": "1.0.0",
-  "description": "这是一个提供小程序渲染能力给 naruse-render 使用的自定义组件。",
+  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha all.test.js",
+    "start": "node paser.js",
+    "build": "webpack"
   },
-  "type": "module",
-  "author": "",
-  "license": "ISC"
+  "author": "CHC",
+  "license": "ISC",
+  "devDependencies": {
+    "copy-webpack-plugin": "^10.2.0",
+    "mocha": "^9.1.3",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
+  }
 }

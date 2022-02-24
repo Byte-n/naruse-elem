@@ -39,6 +39,16 @@ const createVnode = (type, props, ...childNodes) => {
     return node;
 }
 
+/**
+ * @description 拦截webpack的内置模块引入
+ * @author CHC
+ * @date 2022-02-24 16:02:55
+ * @param {*} path
+ */
+const naruseRequire = (path) => {
+    return require(path);
+}
+
 // 小程序组件默认minxs对象
 const naruseBehavior = {
     ...miniappEventBehavior,
@@ -48,6 +58,8 @@ const naruseBehavior = {
         // 获取动态运行代码的对象
         const component = run(this.props.code, {
             h: createVnode,
+            require: naruseRequire,
+            my: my,
         })
         // 创建虚拟react组件
         const reactRuntime = new fakeReactRuntime(component);
