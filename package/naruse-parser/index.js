@@ -621,7 +621,6 @@ const evaluate_map = {
     ContinueStatement: () => {
         return CONTINUE_SINGAL
     },
-
     IfStatement: (node, scope) => {
         if (evaluate(node.test, scope))
             return evaluate(node.consequent, scope)
@@ -751,9 +750,6 @@ const evaluate_map = {
             "<=": (a, b) => a <= b,
             ">": (a, b) => a > b,
             ">=": (a, b) => a >= b,
-            "<<": (a, b) => a << b,
-            ">>": (a, b) => a >> b,
-            ">>>": (a, b) => a >>> b,
             "+": (a, b) => a + b,
             "-": (a, b) => a - b,
             "*": (a, b) => a * b,

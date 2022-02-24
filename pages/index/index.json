@@ -1,5 +1,5 @@
 {
   "usingComponents": {
-    "naruse": "../../package/naruse-element/index"
+    "naruse": "../../package/naruse-element/component/index"
   }
 }

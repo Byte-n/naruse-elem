@@ -1,4 +1,5 @@
-import code from '../../dist';
+const code = require('../../dist');
+const ww = require('./qwer.js')
 Page({
   data: {
     code,
@@ -8,3 +9,8 @@ Page({
   onShow() {
   }
 })
+
+
+module.exports = {
+  q: 123
+};

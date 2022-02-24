@@ -125,8 +125,9 @@ export const eventCenter = function (event, nodeTree) {
     // 反射事件名称
     const responseFuc = eventNode[reflectedEventName];
     if (!(responseFuc && typeof responseFuc === 'function')) {
-        console.log('[naruse-element][debugger]', `元素${eventNode.naruseType}:没有绑定${reflectedEventName}事件`);
+        // console.log('[naruse-element][debugger]', `元素${eventNode.naruseType}:没有绑定${reflectedEventName}事件`);
     } else {
+        console.log('[naruse-element][debugger]', `元素${eventNode.naruseType}:触发${reflectedEventName}事件`);
         responseFuc.call(eventNode, event);
     }
     // 属于应该冒泡的节点类型
