@@ -28,6 +28,7 @@ const createVnode = (type, props, ...childNodes) => {
     if (vnodeSpecialMap[type]) {
         newNode = vnodeSpecialMap[type](props, childNodes)
     }
+    childNodes = childNodes.flat && childNodes.flat(1) || childNodes;
     childNodes = childNodes.map(child => {
         if (typeof child === "string" || typeof child === "number") {
             return { naruseType: 'text', content: child };
