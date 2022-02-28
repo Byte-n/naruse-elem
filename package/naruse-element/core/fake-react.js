@@ -62,7 +62,7 @@ class fakeReactRuntime {
     }
 
     _render() {
-        const vnode = this.render();
+        const vnode = this.render && this.render() || {};
         return [vnode, () => {
             this._isFristRender ? this.componentDidMount && this.componentDidMount() : this.componentDidUpdate && this.componentDidUpdate();
             this._isFristRender = false;
