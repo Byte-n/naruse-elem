@@ -6,13 +6,17 @@ module.exports = {
     mode: 'production',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'index.js'
+        filename: 'index.js',
+        libraryTarget: "module",
+    },
+    experiments: {
+        outputModule: true,
     },
     plugins: [
         new CopyWebpackPlugin({
             patterns: [
                 {
-                    from: "./component/*", to(props){
+                    from: "./component/*", to(props) {
                         return Promise.resolve(path.parse(props.absoluteFilename).base);
                     },
                 },

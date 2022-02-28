@@ -37,7 +37,7 @@ const events = new eventBus();
 const checkReactIntegrity = (obj, self) => {
     const types = Object.keys(obj);
     if (!types.includes('render')) {
-        throw new Error('naruse-fake-react-runtime 必须要一个render函数');
+        console.error('naruse-fake-react-runtime 必须要一个render函数');
     }
     types.forEach((key) => {
         if (key === 'constructor') {

@@ -1,6 +1,6 @@
 import { events, fakeReactRuntime } from './fake-react.js'
 import { miniappEventBehavior, initVnodeTree } from './events.js'
-import run from '../../naruse-parser/index.js'
+import run from '../../naruse-parser/index.js';
 
 /**
  * @description 虚拟dom创建特殊处理map
@@ -40,46 +40,66 @@ const createVnode = (type, props, ...childNodes) => {
 }
 
 /**
- * @description 拦截webpack的内置模块引入
- * @author CHC
- * @date 2022-02-24 16:02:55
- * @param {*} path
+ * @description 执行虚拟环境
  */
-const naruseRequire = (path) => {
-    return require(path);
-}
-
-// 小程序组件默认minxs对象
-const naruseBehavior = {
-    ...miniappEventBehavior,
-    // 组件初始化时运行
-    onInit() {
-        console.log('[naruse-element] onInit 初始化');
-        // 获取动态运行代码的对象
-        const component = run(this.props.code, {
-            h: createVnode,
-            require: naruseRequire,
-            my: my,
-        })
-        // 创建虚拟react组件
-        const reactRuntime = new fakeReactRuntime(component);
-        // 初始化渲染
+const createVmContext = function (prevProps, prevData) {
+    if (this.props.code === this.code) return;
+    console.log('[naruse-element] didUpdate 更新');
+    this.code = this.props.code;
+    const injectObject = this.$page.requireList || {};
+    // 获取动态运行代码的对象
+    const component = run(this.props.code, {
+        h: createVnode,
+        require: require,
+        my: my,
+        getApp: getApp,
+        ...injectObject,
+    })
+    // 创建虚拟react组件
+    const reactRuntime = new fakeReactRuntime(component);
+    // 初始化渲染
+    const [node, cb] = reactRuntime._render();
+    this.setData({
+        node: initVnodeTree(node, null)
+    }, () => {
+        cb();
+    })
+    // 监听setState然后重新渲染
+    events.on('update', () => {
+        console.log('[naruse-element] 重新渲染');
         const [node, cb] = reactRuntime._render();
         this.setData({
             node: initVnodeTree(node, null)
         }, (cb))
-        // 监听setState然后重新渲染
-        events.on('update', () => {
-            console.log('[naruse-element] 重新渲染');
-            const [node, cb] = reactRuntime._render();
-            this.setData({
-                node: initVnodeTree(node, null)
-            }, (cb))
-        })
-    },
+    })
+}
+
+const createBehavior = () => {
+    // 小程序组件默认minxs对象
+    const naruseBehavior = {
+        ...miniappEventBehavior,
+        didMount() {
+            console.log('[naruse-element] didMount 装载');
+            if (this.props.code) {
+                try {
+                    createVmContext.call(this);
+                } catch (error) {
+                    console.error('[naruse-element] 初始化失败', error);
+                }
+            }
+        },
+        // 组件初始化时运行
+        didUpdate() {
+            try {
+                createVmContext.call(this);
+            } catch (error) {
+                console.error('[naruse-element] 更新失败', error);
+            }
+        }
+    }
+    return naruseBehavior;
 }
 
 export {
-    createVnode,
-    naruseBehavior,
+    createBehavior,
 }
