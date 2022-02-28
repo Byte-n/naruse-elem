@@ -20,7 +20,7 @@ exports.render = function () {
   var _this = this;
 
   const qwe = this.state.qwe;
-  return h("view", null, h("view", null, qwe), h("view", null, "123"), h("button", {
+  return h('view', null, h('view', null, qwe), h('view', null, '123'), h('button', {
     onClick: function (e) {
       _newArrowCheck(this, _this);
 
@@ -29,9 +29,9 @@ exports.render = function () {
         qwe: qwe++
       });
     }.bind(this)
-  }, "修改"), h("image", {
+  }, '修改'), h('image', {
     src: 'https://q.aiyongtech.com/trade/web/images/operation_address_success.png'
-  }), h("input", {
+  }), h('input', {
     onChange: function (e) {
       _newArrowCheck(this, _this);
 
