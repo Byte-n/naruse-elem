@@ -39,6 +39,8 @@ const createVnode = (type, props, ...childNodes) => {
     return node;
 }
 
+let naruseComponentId = 1;
+
 /**
  * @description 执行虚拟环境
  */
@@ -55,23 +57,26 @@ const createVmContext = function (prevProps, prevData) {
         getApp: getApp,
         ...injectObject,
     })
+    // 更新id
+    this.naruseComponentId = naruseComponentId++;
     // 创建虚拟react组件
-    const reactRuntime = new fakeReactRuntime(component);
+    const reactRuntime = new fakeReactRuntime(component, this.naruseComponentId);
     // 初始化渲染
     const [node, cb] = reactRuntime._render();
     this.setData({
         node: initVnodeTree(node, null)
     }, () => {
         cb();
-    })
-    // 监听setState然后重新渲染
-    events.on('update', () => {
+    });
+    this.reRenderCallBack = () => {
         console.log('[naruse-element] 重新渲染');
         const [node, cb] = reactRuntime._render();
         this.setData({
             node: initVnodeTree(node, null)
-        }, (cb))
-    })
+        }, (cb));
+    };
+    // 监听setState然后重新渲染
+    events.on(`update-${this.naruseComponentId}`, this.reRenderCallBack);
 }
 
 const createBehavior = () => {
@@ -95,7 +100,11 @@ const createBehavior = () => {
             } catch (error) {
                 console.error('[naruse-element] 更新失败', error);
             }
-        }
+        },
+        didUnmount() {
+            console.log('[naruse-element] didUnmount 卸载');
+            events.off(`update-${this.naruseComponentId}`, this.reRenderCallBack);
+        },
     }
     return naruseBehavior;
 }
