@@ -247,7 +247,7 @@ class Parser {
     }
     parseExpressionStatement(node, expr) {
         node.expression = expr
-        this.eat(tt.semi) || this.next()
+        this.eat(tt.semi)
         return this.finishNode(node, "ExpressionStatement")
     }
     parseEmptyStatement(node) {
@@ -996,12 +996,11 @@ const run = (code, append_api = {}) => {
     }
     const $exports = {}
     scope.$const('exports', $exports)
-    const token = new Token(code);
+    const token = new Token(code)
     token.scan()
     const parser = new Parser(token.tokens)
-    // console.log(JSON.stringify(parser.parse(), null, 2))
     evaluate(parser.parse(), scope)
-    return $exports;
+    return $exports
 }
 
 export default run;

@@ -36,8 +36,9 @@ module.exports = function loader(source) {
     const output = generate(ast, {
         jsescOption: {
             minimal: true,
+            json: false,
+            quotes: 'single',
         },
-        quotes: 'single',
         comments: false,
     });
     console.log(new Date().toLocaleTimeString(), '【naruse-loader】【生成完毕】');
