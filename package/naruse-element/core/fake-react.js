@@ -53,8 +53,9 @@ const checkReactIntegrity = (obj, self) => {
 
 // 简易的react运行时
 class fakeReactRuntime {
-    constructor(entrance) {
+    constructor(entrance, componentId) {
         this.state = {};
+        this.componentId = componentId;
         checkReactIntegrity(entrance, this);
         entrance.constructor && entrance.constructor.call(this);
         this._isFristRender = true;
@@ -76,7 +77,7 @@ class fakeReactRuntime {
             ...newState
         };
         !this._isUpdating && Promise.resolve().then(() => {
-            events.emit('update');
+            events.emit(`update-${this.componentId}`);
             this._isUpdating = false
         })
         this._isUpdating = true
