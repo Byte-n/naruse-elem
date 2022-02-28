@@ -1,4 +1,4 @@
-import { naruseBehavior } from '../core/index.js'
+import { createBehavior } from '../core/index.js'
 Component({
-    mixins: [naruseBehavior],
+    mixins: [createBehavior()],
 })
