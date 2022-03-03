@@ -466,7 +466,7 @@ class Parser {
     }
     parseReturnStatement(node) {
         this.next()
-        if (this.eat(tt.semi) || this.eat(tt.braceR)) node.argument = null
+        if (this.eat(tt.semi) || this.type === tt.braceR) node.argument = null
         else node.argument = this.parseExpression();
         return this.finishNode(node, "ReturnStatement")
     }
