@@ -23,10 +23,9 @@ declare class NaruseComponent {
     render: () => any;
 }
 
-
 /**
- * 自定义广告的引入组件
- */
+* 自定义广告的引入组件
+*/
 declare interface $adImport {
     /** 广告内容 */
     adData: {
@@ -67,3 +66,54 @@ declare interface $adImport {
     callback: (parma: boolean) => void;
 }
 
+
+interface MappUtils {
+
+}
+
+interface openChat {
+
+}
+
+interface userInfoChanger {
+
+}
+
+interface env {
+
+}
+
+
+interface beacon {
+
+}
+
+interface sensorsBeacon {
+
+}
+
+interface adAction {
+
+}
+
+interface adUtils {
+
+}
+
+interface adFeedback {
+
+}
+
+interface tradePublicUtils {
+
+}
+
+interface moment {
+
+}
+
+declare var $adImport: $adImport;
+declare var MappUtils: MappUtils;
+declare var openChat: openChat;
+declare var userInfoChanger: userInfoChanger;
+declare var env: env;
