@@ -36,10 +36,10 @@ module.exports = function loader(source) {
     const output = generate(ast, {
         jsescOption: {
             minimal: true,
-            json: false,
             quotes: 'single',
         },
         comments: false,
+        minified: true,
     });
     console.log(new Date().toLocaleTimeString(), '【naruse-loader】【生成完毕】');
     return `export default \`${output.code}\``;
