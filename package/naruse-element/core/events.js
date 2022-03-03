@@ -110,6 +110,10 @@ const eventNameMap = {
  * @returns {*} 
  */
 export const eventCenter = function (event, nodeTree) {
+    let stopPropagetion = false;
+    event.stopPropagetion = () => {
+        stopPropagetion = true;
+    };
     // 空事件不响应
     if (!(event && event.target && event.target.id)) return;
     // 空节点不响应
@@ -130,8 +134,8 @@ export const eventCenter = function (event, nodeTree) {
         console.log('[naruse-element][debugger]', `元素${eventNode.naruseType}:触发${reflectedEventName}事件`);
         responseFuc.call(eventNode, event);
     }
-    // 属于应该冒泡的节点类型
-    if (popupNodeType.includes(eventNode.naruseType)) {
+    // 没有截断就继续冒泡
+    if (stopPropagetion) {
         console.log('[naruse-element][debugger]', `元素${eventNode.naruseType}: 冒泡${reflectedEventName}事件`);
         eventCenter({ ...event, target: { id: eventNode.parentId } }, nodeTree);
     }
