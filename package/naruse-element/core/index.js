@@ -39,6 +39,8 @@ const createVnode = (type, props, ...childNodes) => {
     return node;
 }
 
+const $createReg = (reg) => new RegExp(reg);
+
 let naruseComponentId = 1;
 
 /**
@@ -55,6 +57,7 @@ const createVmContext = function (prevProps, prevData) {
         require: require,
         my: my,
         getApp: getApp,
+        $createReg,
         ...injectObject,
     })
     // 更新id
