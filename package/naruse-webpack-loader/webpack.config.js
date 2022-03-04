@@ -33,7 +33,7 @@ module.exports = {
                 requireContext: false,
                 browserify: false,
                 requireJs: false,
-                node: false,
+                node: true,
             }
         }]
     }

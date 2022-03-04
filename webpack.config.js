@@ -1,18 +1,19 @@
 const path = require('path');
+const NaruseWebpackPlugin = require('./package/naruse-webpack-loader/naruse--webpack-plugin');
 
 const entry = './template/test.js';
 
 module.exports = {
     entry,
-    mode: 'none',
-    target: 'node',
+    mode: 'production',
     output: {
         path: path.resolve(__dirname, `./dist/`),
         filename: `index.js`,
         iife: false,
     },
     optimization: {
-        usedExports: false,
+        usedExports: true,
+        sideEffects: false,
         minimize: false,
     },
     watch: true,
@@ -21,8 +22,17 @@ module.exports = {
         noParse: /exports/,
         rules: [{
             test: /\.js|jsx$/,
+            exclude: /(node_modules|bower_components)/,
             use: {
-                loader: './package/naruse-webpack-loader/narusejs-loader.js',
+                loader: 'babel-loader',
+                options: {
+                    plugins: [
+                        [require('babel-plugin-transform-react-jsx'), {
+                            "pragma": "h"
+                        }],
+                        [require('@babel/plugin-transform-destructuring')],
+                    ]
+                }
             },
             parser: {
                 amd: false,
@@ -34,8 +44,11 @@ module.exports = {
                 requireContext: false,
                 browserify: false,
                 requireJs: false,
-                node: false,
+                node: true,
             }
         }]
-    }
+    },
+    plugins: [
+        new NaruseWebpackPlugin()
+    ]
 }

@@ -1,6 +1,8 @@
 const { parseSync, transformSync } = require('@babel/core');
 const { default: generate } = require('@babel/generator');
 const { declare } = require("@babel/helper-plugin-utils");
+const { clear } = require('console');
+const fs = require('fs');
 
 
 const noArrowFunction = declare((api) => {
@@ -20,29 +22,35 @@ const noArrowFunction = declare((api) => {
     };
 });
 
-
-module.exports = function loader(source) {
-    const { ast } = transformSync(source, {
+/** 获取转译后的ast */
+const getAst = (source) => {
+    return transformSync(source, {
         ast: true,
         plugins: [
             noArrowFunction,
-            [require('babel-plugin-transform-react-jsx'), {
-                "pragma": "h"
-            }],
-            [require('@babel/plugin-transform-destructuring')]
+            // [require('@babel/plugin-transform-classes')],
         ]
-    });
-    dealAst(ast);
-    const output = generate(ast, {
+    }).ast;
+}
+/** 生成代码 */
+const genCode = (ast, option) => {
+    return generate(ast, {
         jsescOption: {
             minimal: true,
             quotes: 'single',
         },
         comments: false,
-        minified: true,
+        minified: !!option.minified,
     });
-    console.log(new Date().toLocaleTimeString(), '【naruse-loader】【生成完毕】');
-    return `export default \`${output.code}\``;
+}
+
+
+module.exports = function NaruseLoader(source, option) {
+    const ast = getAst(source);
+    dealAst(ast);
+    const output = genCode(ast, option);
+    // console.log(new Date().toLocaleTimeString(), '【naruse-loader】【生成完毕】');
+    return clearCode(output.code);
 };
 const emptyFunctionDes = parseSync('function _newArrowCheck (){}').program.body[0];
 
@@ -89,8 +97,6 @@ const eatAst = (astBody, props, isEat = true) => {
     return classNode;
 }
 
-
-
 /**
  * @description 处理ast
  * @author CHC
@@ -98,27 +104,53 @@ const eatAst = (astBody, props, isEat = true) => {
  * @param {babel.ParseResult} ast
  */
 function dealAst(ast) {
-    // 确认默认导出
-    const exportNode = eatAst(ast.program, { type: 'ExportDefaultDeclaration' });
-    if (!exportNode) {
-        throw new Error('自定义模版需要一个默认导出')
+    dealDeaultExport(ast);
+    // 处理导入
+    dealImport(ast);
+    // 清除profill
+    clearProfill(ast);
+}
+
+
+
+function dealImport(ast) {
+    const node = eatAst(ast.program, { type: 'ImportDeclaration' });
+    while (node) {
+        const { source, specifiers } = node;
+        console.log(loadModule(source.value));
     }
-    const exportDefault = exportNode.declaration;
-    let classNode;
-    if (exportDefault.type === 'Identifier') {
-        classNode = eatAst(ast.program, { type: 'ClassDeclaration', id: { name: exportDefault.name } });
-        if (!classNode) {
-            throw new Error('默认导出必须是一个类')
-        }
-    }
-    if (exportDefault.type === 'ClassDeclaration') {
-        classNode = exportDefault;
+}
+
+
+function loadModule(path) {
+    return genCode(getAst(fs.readFileSync(path, 'utf-8')));
+}
+
+
+/**
+ * @description 处理默认导出
+ * @author CHC
+ * @date 2022-03-03 20:03:52
+ * @param {*} ast
+ */
+function dealDeaultExport(ast) {
+    classNode = eatAst(ast.program, { type: 'ClassDeclaration' });
+    if (!classNode) {
+        throw new Error('必须创建一个类！')
     }
     classNode.body.body.map((item) => {
         ast.program.body.push(createBaseExport(item.key.name, item));
     })
+}
 
-    // 清楚profill
+function clearProfill(ast) {
     eatAst(ast.program, { type: 'FunctionDeclaration', id: { name: '_newArrowCheck' } });
     ast.program.body.unshift(emptyFunctionDes);
+}
+
+function clearCode(code) {
+    return code.replace("var __webpack_exports__={};", '')
+        .replace("var __webpack_exports__ = {};", '')
+        .replace(/\s;\s/, '')
+        .replace('"use strict";', '');
 }

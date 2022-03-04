@@ -1,6 +1,17 @@
 import { events, fakeReactRuntime } from './fake-react.js'
 import { miniappEventBehavior, initVnodeTree } from './events.js'
 import run from '../../naruse-parser/index.js';
+import { _classCallCheck, _createClass, _defineProperties } from './uitl.js';
+
+/**
+ * 一些引擎不支持的方法
+ */
+const profill = {
+    _classCallCheck,
+    _defineProperties,
+    _createClass,
+}
+
 
 /**
  * @description 虚拟dom创建特殊处理map
@@ -53,6 +64,7 @@ const createVmContext = function (prevProps, prevData) {
     const injectObject = this.$page.requireList || {};
     // 获取动态运行代码的对象
     const component = run(this.props.code, {
+        ...profill,
         h: createVnode,
         require: require,
         my: my,

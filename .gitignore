@@ -1,4 +1,4 @@
 .history
 node_modules
 template/test.js
-dist/index.js
+dist
