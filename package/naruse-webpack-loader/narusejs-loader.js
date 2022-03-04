@@ -43,8 +43,12 @@ const genCode = (ast, option) => {
         minified: !!option.minified,
     });
 }
-
-
+/**
+ * 处理进程
+ * @param {*} source 
+ * @param {*} option 
+ * @returns 
+ */
 module.exports = function NaruseLoader(source, option) {
     const ast = getAst(source);
     dealAst(ast);
@@ -151,6 +155,7 @@ function clearProfill(ast) {
 function clearCode(code) {
     return code.replace("var __webpack_exports__={};", '')
         .replace("var __webpack_exports__ = {};", '')
-        .replace(/\s;\s/, '')
+        .replace(";;", ";")
+        .replace(/\s;\s/g, '')
         .replace('"use strict";', '');
 }

@@ -1,7 +1,7 @@
 const path = require('path');
-const NaruseWebpackPlugin = require('./package/naruse-webpack-loader/naruse--webpack-plugin');
+const NaruseWebpackPlugin = require('./package/naruse-webpack-loader/naruse-webpack-plugin');
 
-const entry = './template/test.js';
+const entry = './template/index.js';
 
 module.exports = {
     entry,
@@ -34,18 +34,6 @@ module.exports = {
                     ]
                 }
             },
-            parser: {
-                amd: false,
-                commonjs: false,
-                system: false,
-                harmony: false,
-                requireInclude: false,
-                requireEnsure: false,
-                requireContext: false,
-                browserify: false,
-                requireJs: false,
-                node: true,
-            }
         }]
     },
     plugins: [
