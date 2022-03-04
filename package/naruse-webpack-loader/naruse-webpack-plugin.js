@@ -17,7 +17,7 @@ NaruseWebpackPlugin.prototype.apply = function (compiler) {
             },
             (assets) => {
                 const code = compilation.assets['index.js'].source();
-                assets['index.js'] = new ConcatSource(narusejsLoader(code, { minified: false }))
+                assets['index.js'] = new ConcatSource(`export default \`${narusejsLoader(code, { minified: false })}\``)
                 assets['dist.js'] = new ConcatSource(narusejsLoader(code, { minified: true }))
                 console.log(new Date().toLocaleTimeString(), '【naruse-plugin】【生成完毕】');
                 Object.entries(assets).forEach(([pathname, source]) => {
