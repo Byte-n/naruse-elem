@@ -1,5 +1,5 @@
 const {imageSrcIos,imageSrcAndroid, isCodeBlock, isOneBtn, hotArrIos, hotArrAndroid} = $adImport.adData.result.user_define.body
-const pageName = MappUtils.getCurrentPageName();
+const pageName = $$mappUtils.getCurrentPageName();
 const isShown = my.getStorageSync({ key: $adImport.adData.result.creative_id + $adImport.adData.result.pid }).data;
 class component extends NaruseComponent {
     constructor() {
@@ -9,7 +9,7 @@ class component extends NaruseComponent {
         }
     }
     contactWW(text, nick){
-        openChat.contactCustomerService(text, nick);
+        $openChat.contactCustomerService(text, nick);
     }
     // 打开外链
     gotoWebPage (url, isShopLink) {
@@ -29,12 +29,12 @@ class component extends NaruseComponent {
         }else if(url.indexOf('miniapp:///') > -1){
             // miniapp:///pages/waterMark/index
             const suffix = url.substr(10,url.length)
-            MappUtils.navigateTo({ url: suffix });
+            $mappUtils.navigateTo({ url: suffix });
         }
     }
     beacon (props, packageName,amountPayable) {
         const { creative_id, creative_name, pid, pid_name, primary_class, secondary_class } = props;
-        sensorsBeacon.sensorsBeacon('YY_OrderNow',{
+        $sensorsBeacon.sensorsBeacon('YY_OrderNow',{
             primary_class:primary_class,
             secondary_class:secondary_class,
             cid: Number(creative_id),
@@ -54,7 +54,7 @@ class component extends NaruseComponent {
         }
         // 如果是有tabbar的页面，则隐藏tabbar。
         if(pageName === 'itemIndex' || pageName === 'itemList' || pageName === 'itemMy'){
-            MappUtils.hideTabBar()
+            $mappUtils.hideTabBar()
         }
         this.setState({
             show:true
@@ -69,7 +69,7 @@ class component extends NaruseComponent {
         console.log('我自由啦');
     }
     gethotArr(){
-        return MappUtils.isIOS() ? JSON.parse(hotArrIos) : JSON.parse(hotArrAndroid)
+        return $mappUtils.isIOS() ? JSON.parse(hotArrIos) : JSON.parse(hotArrAndroid)
     }
     render() {
         const { show, showAnimation } = this.state;
@@ -89,7 +89,7 @@ class component extends NaruseComponent {
                             this.beacon($adImport.adData.result,hotData[0].packageName,hotData[0].amountPayable)
                         }
                     }}
-                    src={MappUtils.isIOS() ? imageSrcIos : imageSrcAndroid} style="width:600rpx;height:700rpx;" />
+                    src={$mappUtils.isIOS() ? imageSrcIos : imageSrcAndroid} style="width:600rpx;height:700rpx;" />
                     {/* 按钮热区 */}
                     {
                         isOneBtn === 'false' ?
@@ -123,7 +123,7 @@ class component extends NaruseComponent {
                                     show:false
                                 })
                                 if(pageName === 'itemIndex' || pageName === 'itemList' || pageName === 'itemMy'){
-                                    MappUtils.showTabBar()
+                                    $mappUtils.showTabBar()
                                 }
                                 $adImport.callback(isCodeBlock);
                                 my.setStorageSync({ key: $adImport.adData.result.creative_id + $adImport.adData.result.pid , data: '1' });
