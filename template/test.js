@@ -1,5 +1,3 @@
-import { ww } from './qwer.js';
-
 const {imageSrcIos,imageSrcAndroid, isCodeBlock, isOneBtn, hotArrIos, hotArrAndroid} = $adImport.adData.result.user_define.body
 const pageName = MappUtils.getCurrentPageName();
 const isShown = my.getStorageSync({ key: $adImport.adData.result.creative_id + $adImport.adData.result.pid }).data;

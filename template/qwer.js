@@ -5,6 +5,6 @@ const qq = 123;
 
 const qwer = 321;
 
-const qwe = () => {
+const qwe = function() {
     console.log(123);
 }

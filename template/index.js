@@ -1,8 +1,7 @@
 import { ww } from './qwer';
-console.log(ww);
 
 class cscscs {
     render () {
-        return <view></view>;
+        return <view>123</view>
     }
 }
