@@ -1,7 +1,7 @@
 <!-- 视图组件 -->
 <template name="view">
     <view id="{{ id }}" class="{{className || ''}}" style="{{style || ''}}" disable-scroll="{{ disableScroll }}" hidden="{{ hidden }}" 
-        hover-class="{{ hoverClass }}" catchTap="{{ catchTap }}">
+        hover-class="{{ hoverClass }}" catchTap="onTap">
         <block a:if="{{ childNodes }}">
             <template a:for="{{ childNodes }}" data="{{ ...item }}" is="{{ item.naruseType }}"></template>
         </block>

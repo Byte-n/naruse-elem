@@ -1,5 +1,5 @@
 const {imageSrcIos,imageSrcAndroid, isCodeBlock, isOneBtn, hotArrIos, hotArrAndroid} = $adImport.adData.result.user_define.body
-const pageName = $$mappUtils.getCurrentPageName();
+const pageName = $mappUtils.getCurrentPageName();
 const isShown = my.getStorageSync({ key: $adImport.adData.result.creative_id + $adImport.adData.result.pid }).data;
 class component extends NaruseComponent {
     constructor() {
