@@ -99,21 +99,41 @@ interface adAction {
 interface adUtils {
 
 }
-
 interface adFeedback {
 
 }
-
+/** 交易公共模块 */
 interface tradePublicUtils {
 
 }
 
+/** 时间 */
 interface moment {
 
 }
 
+/** api请求 */
+interface api {
+
+}
+
+/** 用户信息 */
+interface userInfo {
+
+}
+
+
+declare var $mappUtils: MappUtils;
+declare var $openChat: openChat;
+declare var $userInfoChanger: userInfoChanger;
+declare var $env: env;
+declare var $beacon: beacon;
+declare var $sensorsBeacon: sensorsBeacon;
+declare var $adAction: adAction;
+declare var $adUtils: adUtils;
+declare var $adFeedback: adFeedback;
+declare var $tradePublicUtils: tradePublicUtils;
+declare var $moment: moment;
+declare var $ayApi: api;
+declare var $ayUserInfo: userInfo;
 declare var $adImport: $adImport;
-declare var MappUtils: MappUtils;
-declare var openChat: openChat;
-declare var userInfoChanger: userInfoChanger;
-declare var env: env;
