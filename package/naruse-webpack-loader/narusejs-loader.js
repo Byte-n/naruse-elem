@@ -29,6 +29,7 @@ const getAst = (source) => {
         plugins: [
             noArrowFunction,
             [require('@babel/plugin-proposal-object-rest-spread')],
+            [require('@babel/plugin-transform-shorthand-properties')],
         ]
     }).ast;
 }
