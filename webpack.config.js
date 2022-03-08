@@ -31,7 +31,7 @@ module.exports = {
                             "pragma": "h"
                         }],
                         [require('@babel/plugin-transform-destructuring')],
-                        [require("@babel/plugin-transform-arrow-functions"), { "spec": true }]
+                        [require('babel-plugin-transform-es2015-arrow-functions')]
                     ]
                 }
             },
