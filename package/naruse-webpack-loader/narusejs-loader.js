@@ -28,7 +28,7 @@ const getAst = (source) => {
         ast: true,
         plugins: [
             noArrowFunction,
-            // [require('@babel/plugin-transform-classes')],
+            [require('@babel/plugin-proposal-object-rest-spread')],
         ]
     }).ast;
 }
@@ -57,6 +57,7 @@ module.exports = function NaruseLoader(source, option) {
     return clearCode(output.code);
 };
 const emptyFunctionDes = parseSync('function _newArrowCheck (){}').program.body[0];
+const _objectSpreadDes = parseSync('const _objectSpread = Object.assign;').program.body[0];
 
 const createBaseExport = (name, right) => {
     const baseExport = parseSync('exports.qwer = function (){}').program.body[0];
@@ -148,8 +149,13 @@ function dealDeaultExport(ast) {
 }
 
 function clearProfill(ast) {
-    eatAst(ast.program, { type: 'FunctionDeclaration', id: { name: '_newArrowCheck' } });
-    ast.program.body.unshift(emptyFunctionDes);
+    const arrownode = eatAst(ast.program, { type: 'FunctionDeclaration', id: { name: '_newArrowCheck' } });
+    const node =  eatAst(ast.program, { type: 'FunctionDeclaration', id: { name: '_objectSpread' } });
+    eatAst(ast.program, { type: 'FunctionDeclaration', id: { name: '_defineProperty' } });
+    eatAst(ast.program, { type: 'FunctionDeclaration', id: { name: 'ownKeys' } });
+
+    arrownode && ast.program.body.unshift(emptyFunctionDes);
+    node && ast.program.body.unshift(_objectSpreadDes);
 }
 
 function clearCode(code) {
