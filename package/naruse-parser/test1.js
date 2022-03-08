@@ -1,4 +1,4 @@
-import * as dist from './dist.js';
+import run from './index.js';
 
 // const dd = run(
 //   `
@@ -9,4 +9,7 @@ import * as dist from './dist.js';
 //   cc
 // }
 //   )
-console.log(dist);
+console.log(run(`
+    exports.add = 4 / 2;
+
+`));
