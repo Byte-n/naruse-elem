@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "npx webpack",
+    "build": "mocha ./test/* && npx webpack",
     "test": "mocha ./test/*"
   },
   "devDependencies": {
