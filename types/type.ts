@@ -108,10 +108,6 @@ interface tradePublicUtils {
 
 }
 
-/** 时间 */
-interface moment {
-
-}
 
 /** api请求 */
 interface api {
@@ -135,7 +131,7 @@ declare global {
     var $adUtils: adUtils;
     var $adFeedback: adFeedback;
     var $tradePublicUtils: tradePublicUtils;
-    var $moment: moment;
+    var $moment: typeof moment;
     var $ayApi: api;
     var $ayUserInfo: userInfo;
     var $adImport: $adImport;
