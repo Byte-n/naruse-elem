@@ -10,7 +10,10 @@
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "webpack": "^5.69.1",
     "webpack-cli": "^4.9.2",
-    "babel-loader": "^8.2.3"
+    "babel-loader": "^8.2.3",
+    "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
+    "chalk": "^4.1.2",
+    "moment": "^2.29.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -25,9 +28,5 @@
   "bugs": {
     "url": "https://github.com/Barrierml/Naruse/issues"
   },
-  "homepage": "https://github.com/Barrierml/Naruse#readme",
-  "devDependencies": {
-    "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
-    "moment": "^2.29.1"
-  }
+  "homepage": "https://github.com/Barrierml/Naruse#readme"
 }
