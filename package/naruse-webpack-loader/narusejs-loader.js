@@ -1,7 +1,7 @@
 const { parseSync, transformSync } = require('@babel/core');
 const { default: generate } = require('@babel/generator');
 const { declare } = require("@babel/helper-plugin-utils");
-const { clear } = require('console');
+const chalk = require('chalk');
 const fs = require('fs');
 
 
@@ -142,7 +142,8 @@ function loadModule(path) {
 function dealDeaultExport(ast) {
     classNode = eatAst(ast.program, { type: 'ClassDeclaration' });
     if (!classNode) {
-        throw new Error('必须创建一个类！')
+        console.log(chalk.red('【naruse-loader】【没有找到class】，请检查代码'));
+        return;
     }
     classNode.body.body.map((item) => {
         ast.program.body.push(createBaseExport(item.key.name, item));

@@ -8,7 +8,7 @@ module.exports = {
     mode: 'production',
     output: {
         path: path.resolve(__dirname, `./dist/`),
-        filename: `index.js`,
+        filename: 'index.js',
         iife: false,
     },
     optimization: {
@@ -22,7 +22,7 @@ module.exports = {
         noParse: /exports/,
         rules: [{
             test: /\.js|jsx$/,
-            exclude: /(node_modules|bower_components)/,
+            exclude: /(node_modules)/,
             use: {
                 loader: 'babel-loader',
                 options: {
