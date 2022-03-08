@@ -2,3 +2,4 @@
 node_modules
 template/test.js
 dist
+.vscode
