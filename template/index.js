@@ -1,4 +1,3 @@
-import { ww } from './qwer';
 
 class cscscs {
     render () {

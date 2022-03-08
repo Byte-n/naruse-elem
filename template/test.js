@@ -1,7 +1,16 @@
-const { imageSrcIos, imageSrcAndroid, isCodeBlock, isOneBtn, hotArrIos, hotArrAndroid } = $adImport.adData.result.user_define.body;
-
+const { imageSrcIos, imageSrcAndroid, isCodeBlock, hotArrIos, hotArrAndroid } = $adImport.adData.result.user_define.body;
+/** 当前页面名称 */
 const pageName = $mappUtils.getCurrentPageName();
-const isShown = my.getStorageSync({ key: $adImport.adData.result.creative_id + $adImport.adData.result.pid }).data;
+/**
+ * 缓存的key
+ */
+const adCacheKey = $adImport.adData.result.creative_id + $adImport.adData.result.pid + $moment().format('YYYYMMDD');
+/**
+ * 是否需要展示
+ */
+const isShown = my.getStorageSync({ key: adCacheKey }).data;
+
+// 不展示则直接回调关闭
 if (isShown) {
     $adImport.callback(true);
 }
@@ -23,7 +32,7 @@ class component extends NaruseComponent {
             $mappUtils.showTabBar()
         }
         $adImport.callback(isCodeBlock);
-        my.setStorageSync({ key: $adImport.adData.result.creative_id + $adImport.adData.result.pid, data: '1' });
+        my.setStorageSync({ key: adCacheKey, data: '1' });
     }
     // 打开外链
     gotoWebPage(url, isShopLink) {
@@ -85,7 +94,7 @@ class component extends NaruseComponent {
                         <view style="width:600rpx;height:700rpx;position:relative;">
                             <image onClick={(e) => {
                                 const hotData = this.gethotArr()
-                                if (isOneBtn === 'true' || hotData.length === 1) {
+                                if (hotData.length === 1) {
                                     if (hotData[0].type === 'url') {
                                         this.gotoWebPage(hotData[0].url, hotData[0].isShopLink);
                                     } else {
@@ -98,27 +107,23 @@ class component extends NaruseComponent {
                                 src={$mappUtils.isIOS() ? imageSrcIos : imageSrcAndroid} style="width:600rpx;height:700rpx;" />
                             {/* 按钮热区 */}
                             {
-                                isOneBtn === 'false' ?
-                                    (
-                                        <view style="display:flex;flex:0 0 120rpx;justify-content:space-between;width:486rpx;position:absolute;bottom:30rpx;left:60rpx;height:80rpx;overflow:hidden;">
-                                            {
-
-                                                this.gethotArr().map((item, index) => {
-                                                    return <view style="width:220rpx;background:red;margin:0 10rpx;opacity:0;"
-                                                        onClick={(e) => {
-                                                            if (item.type === 'url') {
-                                                                this.gotoWebPage(item.url, item.isShopLink)
-                                                            } else {
-                                                                this.contactWW(item.text)
-                                                            }
-                                                            this.beacon($adImport.adData.result, item.packageName, item.amountPayable)
-                                                            this.close();
-                                                        }}>热区{index}</view>
-                                                })
-                                            }
-                                        </view>
-                                    )
-                                    : ''
+                                this.gethotArr() && this.gethotArr().length > 1 && (
+                                    <view style="display:flex;flex:0 0 120rpx;justify-content:space-between;width:486rpx;position:absolute;bottom:30rpx;left:60rpx;height:80rpx;overflow:hidden;">
+                                        {
+                                            this.gethotArr().map((item, index) => {
+                                                return <view style="width:220rpx;background:red;margin:0 10rpx;opacity:0;"
+                                                    onClick={(e) => {
+                                                        if (item.type === 'url') {
+                                                            this.gotoWebPage(item.url, item.isShopLink)
+                                                        } else {
+                                                            this.contactWW(item.text)
+                                                        }
+                                                        this.beacon($adImport.adData.result, item.packageName, item.amountPayable)
+                                                        this.close();
+                                                    }}>热区{index}</view>
+                                            })
+                                        }
+                                    </view>)
                             }
                             <view style="text-align:center;margin-top:50rpx;" >
                                 <image onClick={this.close} style="width:44rpx;height:44rpx;" src="https://q.aiyongtech.com/item/web/miniappimages/ad-close20220225.png" />
