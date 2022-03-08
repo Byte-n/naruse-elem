@@ -4,7 +4,7 @@ import moment from 'moment';
 /**
 * 伪react组件
 */
-declare class NaruseComponent {
+class NaruseComponent {
     state: {
         [key in string]: any;
     };
@@ -76,10 +76,6 @@ interface openChat {
 
 }
 
-interface userInfoChanger {
-
-}
-
 interface env {
 
 }
@@ -121,6 +117,7 @@ interface userInfo {
 
 
 declare global {
+    var NaruseComponent: NaruseComponent;
     var $mappUtils: MappUtils;
     var $openChat: openChat;
     var $userInfoChanger: typeof userInfoChanger;
