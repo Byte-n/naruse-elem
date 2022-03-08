@@ -110,9 +110,9 @@ const eventNameMap = {
  * @returns {*} 
  */
 export const eventCenter = function (event, nodeTree) {
-    let stopPropagetion = false;
+    let stopPropagetion = true;
     event.stopPropagetion = () => {
-        stopPropagetion = true;
+        stopPropagetion = false;
     };
     // 空事件不响应
     if (!(event && event.target && event.target.id)) return;
