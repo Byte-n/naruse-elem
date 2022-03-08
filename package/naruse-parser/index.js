@@ -26,6 +26,7 @@ const types = {
     prefix: "!/~",
     modulo: "%",
     star: "*",
+    slash: "/",
     assign: "_=",
     _break: "break",
     _continue: "continue",
@@ -56,6 +57,7 @@ const priority = {
     [tt.plusMin]: 9,
     [tt.modulo]: 10,
     [tt.star]: 10,
+    [tt.slash]: 10,
 }
 // 标记器
 class Token {
@@ -92,7 +94,7 @@ class Token {
             case 58: ++this.pos; return this.ftk(tt.colon)
             case 48: case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57: return this.readNumber(code)
             case 34: case 39: return this.readString(code)
-            case 37: case 42: return this.readToken_mult_modulo_exp(code)
+            case 37: case 42: case 47: return this.readToken_mult_modulo_exp(code)
             case 124: case 38: return this.readToken_pipe_amp(code)
             case 43: case 45: return this.readToken_plus_min(code)
             case 60: case 62: return this.readToken_lt_gt(code)
@@ -149,7 +151,8 @@ class Token {
     }
     readToken_mult_modulo_exp(code) {
         let next = this.gnc()
-        const tokentype = code === 42 ? tt.star : tt.modulo
+        let operator = String.fromCharCode(code)
+        const tokentype = priority[operator] && operator;
         if (next === 61) {
             pos++
             return this.finishOp(tt.assign, 2)

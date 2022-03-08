@@ -8,7 +8,7 @@ Page({
   onLoad(query) {
     this.requireList = {
       $userInfoChanger,
-      $momemt: momemt,
+      $moment: momemt,
     };
   },
   onShow() {
