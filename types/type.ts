@@ -1,5 +1,6 @@
 // 这是为了方便开发添加的全局类型声明
-
+import * as userInfoChanger from '../package/naurse-app-profill/userInfo'
+import moment from 'moment';
 /**
 * 伪react组件
 */
@@ -123,17 +124,19 @@ interface userInfo {
 }
 
 
-declare var $mappUtils: MappUtils;
-declare var $openChat: openChat;
-declare var $userInfoChanger: userInfoChanger;
-declare var $env: env;
-declare var $beacon: beacon;
-declare var $sensorsBeacon: sensorsBeacon;
-declare var $adAction: adAction;
-declare var $adUtils: adUtils;
-declare var $adFeedback: adFeedback;
-declare var $tradePublicUtils: tradePublicUtils;
-declare var $moment: moment;
-declare var $ayApi: api;
-declare var $ayUserInfo: userInfo;
-declare var $adImport: $adImport;
+declare global {
+    var $mappUtils: MappUtils;
+    var $openChat: openChat;
+    var $userInfoChanger: typeof userInfoChanger;
+    var $env: env;
+    var $beacon: beacon;
+    var $sensorsBeacon: sensorsBeacon;
+    var $adAction: adAction;
+    var $adUtils: adUtils;
+    var $adFeedback: adFeedback;
+    var $tradePublicUtils: tradePublicUtils;
+    var $moment: moment;
+    var $ayApi: api;
+    var $ayUserInfo: userInfo;
+    var $adImport: $adImport;
+}

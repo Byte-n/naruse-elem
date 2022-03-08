@@ -1,7 +1,7 @@
 const path = require('path');
 const NaruseWebpackPlugin = require('./package/naruse-webpack-loader/naruse-webpack-plugin');
 
-const entry = './template/test.js';
+const entry = './template/index.js';
 
 module.exports = {
     entry,
