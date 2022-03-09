@@ -1,5 +1,6 @@
 // 这是为了方便开发添加的全局类型声明
 import * as userInfoChanger from '../package/naurse-app-profill/userInfo'
+import * as adSensorsBeacon from '../package/naurse-app-profill/adSensorsBeacon'
 import moment from 'moment';
 /**
 * 伪react组件
@@ -132,4 +133,5 @@ declare global {
     var $ayApi: api;
     var $ayUserInfo: userInfo;
     var $adImport: $adImport;
+    var $adSensorsBeacon: typeof adSensorsBeacon;
 }

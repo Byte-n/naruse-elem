@@ -9,6 +9,10 @@ const adCacheKey = $adImport.adData.result.creative_id + $adImport.adData.result
  * 是否需要展示
  */
 const isShown = my.getStorageSync({ key: adCacheKey }).data;
+/**
+ * 广告数据
+ */
+const adData = $adImport.adData.results[0];
 
 // 不展示则直接回调关闭
 if (isShown) {
@@ -74,6 +78,8 @@ class component extends NaruseComponent {
         if (isShown) {
             return;
         }
+        // 发送初始化埋点
+        $adSensorsBeacon.adViewBeacon(adData, adData.pid);
         this.setState({
             show: true
         })
