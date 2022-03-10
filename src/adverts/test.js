@@ -1,4 +1,9 @@
 import { ww } from '@utils/common';
-console.log(ww);
 
-console.log($adImport);
+
+console.log('123321', ww);
+class qwe {
+    render() {
+        return '123';
+    }
+}
