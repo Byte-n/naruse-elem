@@ -1,5 +1,20 @@
 {
     "compilerOptions": {
-        "types": ["./types/*"]
-    }
+        "baseUrl": ".",
+        "rootDir": ".",
+        "types": [
+            "types/*"
+        ],
+        "paths": {
+            "@utils": [
+                "src/utils/*"
+            ],
+            "@components": [
+                "src/components/*"
+            ],
+            "@adverts": [
+                "src/adverts/*"
+            ],
+        }
+    },
 }

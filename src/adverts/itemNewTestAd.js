@@ -1,3 +1,4 @@
+// 商品新增运营位广告
 const { imageSrcIos, imageSrcAndroid, isCodeBlock, hotArrIos, hotArrAndroid } = $adImport.adData.result.user_define.body;
 /** 当前页面名称 */
 const pageName = $mappUtils.getCurrentPageName();
