@@ -1,13 +1,7 @@
 App({
   onLaunch(options) {
-    // 第一次打开
-    // options.query == {number:1}
-    console.info('App onLaunch');
-    
+    console.info('[naruse-app] onLaunch', options);
   },
   onShow(options) {
-    console.log(123)
-    // 从后台被 scheme 重新打开
-    // options.query == {number:1}
   },
 });

@@ -116,6 +116,7 @@ NaruseWebpackPlugin.prototype.apply = function (compiler) {
                 const compiledCode = narusejsLoader(code, { minified: false });
                 const reBuildCode = uglifyJs.minify(compiledCode, {
                     compress: compressOption,
+                    mangle: { toplevel: true },
                     output: {
                         beautify: true,
                     }
@@ -123,6 +124,7 @@ NaruseWebpackPlugin.prototype.apply = function (compiler) {
                 assets['index.js'] = new ConcatSource(`export default \`${clearViod(reBuildCode.code)}\``);
                 const minifiedCode = uglifyJs.minify(compiledCode, {
                     compress: compressOption,
+                    mangle: { toplevel: true },
                     output: { quote_style: 1 }
                 }).code;
                 assets['dist.js'] = new ConcatSource(minifiedCode);
