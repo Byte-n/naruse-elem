@@ -112,27 +112,25 @@ NaruseWebpackPlugin.prototype.apply = function (compiler) {
             },
             (assets) => {
                 clearConsole();
-                const code = compilation.assets['index.js'].source();
+                const code = compilation.assets['naruse.dev.debug.js'].source();
                 const compiledCode = narusejsLoader(code, { minified: false });
                 const reBuildCode = uglifyJs.minify(compiledCode, {
                     compress: compressOption,
                     mangle: { toplevel: true },
-                    output: {
-                        beautify: true,
-                    }
+                    output: { beautify: true },
                 });
-                assets['index.js'] = new ConcatSource(`export default \`${clearViod(reBuildCode.code)}\``);
                 const minifiedCode = uglifyJs.minify(compiledCode, {
-                    compress: compressOption,
+                    compress: { ...compressOption, ...{ drop_console: true } },
                     mangle: { toplevel: true },
                     output: { quote_style: 1 }
                 }).code;
-                assets['dist.js'] = new ConcatSource(minifiedCode);
-                assets['test.json'] = new ConcatSource(JSON.stringify(exampleJsonObj(minifiedCode)));
+                assets['naruse.min.js'] = new ConcatSource(minifiedCode);
+                assets['naruse.dev.debug.js'] = new ConcatSource(`export default \`${clearViod(reBuildCode.code)}\``);
+                assets['naruse.dev.debug.json'] = new ConcatSource(JSON.stringify(exampleJsonObj(reBuildCode.code)));
                 console.log(chalk.green(new Date().toLocaleTimeString(), '【naruse-plugin】【生成完毕】'));
-                console.log(chalk.gray(`— index.js: ${assets['index.js'].size()} bytes`), chalk.white('当前项目使用文件'));
-                console.log(chalk.gray(`— dist.js: ${assets['dist.js'].size()} bytes`, chalk.white('上传广告系统用')));
-                console.log(chalk.gray(`— test.json: ${assets['test.json'].size()} bytes`, chalk.white('本地调试用')));
+                console.log(chalk.white('广告系统用'), chalk.gray(`— naruse.min.js: ${assets['naruse.min.js'].size()} bytes`));
+                console.log(chalk.white('本地开发用'), chalk.gray(`— naruse.dev.debug.js: ${assets['naruse.dev.debug.js'].size()} bytes`));
+                console.log(chalk.white('本地缓存用'), chalk.gray(`— naruse.dev.debug.json: ${assets['naruse.dev.debug.json'].size()} bytes`));
             }
         );
     })
