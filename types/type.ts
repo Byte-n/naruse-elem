@@ -1,6 +1,8 @@
 // 这是为了方便开发添加的全局类型声明
 import * as userInfoChanger from '../package/naurse-app-profill/userInfo'
 import * as adSensorsBeacon from '../package/naurse-app-profill/adSensorsBeacon'
+import * as mappUtils from '../package/naurse-app-profill/mappUtils'
+import * as sensorsBeacon from '../package/naurse-app-profill/sensorsBeacon'
 import moment from 'moment';
 /**
 * 伪react组件
@@ -69,9 +71,6 @@ declare interface $adImport {
 }
 
 
-interface MappUtils {
-
-}
 
 interface openChat {
 
@@ -83,10 +82,6 @@ interface env {
 
 
 interface beacon {
-
-}
-
-interface sensorsBeacon {
 
 }
 
@@ -119,12 +114,12 @@ interface userInfo {
 
 declare global {
     var NaruseComponent: NaruseComponent;
-    var $mappUtils: MappUtils;
+    var $mappUtils: typeof mappUtils;
     var $openChat: openChat;
     var $userInfoChanger: typeof userInfoChanger;
     var $env: env;
     var $beacon: beacon;
-    var $sensorsBeacon: sensorsBeacon;
+    var $sensorsBeacon: typeof sensorsBeacon;
     var $adAction: adAction;
     var $adUtils: adUtils;
     var $adFeedback: adFeedback;

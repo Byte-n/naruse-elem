@@ -136,8 +136,8 @@ export const eventCenter = function (event, nodeTree) {
     }
     // 没有截断就继续冒泡
     if (stopPropagetion) {
-        console.log('[naruse-element][debugger]', `元素${eventNode.naruseType}: 冒泡${reflectedEventName}事件`);
-        eventCenter({ ...event, target: { id: eventNode.parentId } }, nodeTree);
+        // console.log('[naruse-element][debugger]', `元素${eventNode.naruseType}: 冒泡${reflectedEventName}事件`);
+        eventCenter({ ...event, target: { id: eventNode.parentId }, narusePropagetion: true }, nodeTree);
     }
 }
 
