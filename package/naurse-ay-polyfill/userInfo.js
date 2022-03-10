@@ -1,8 +1,11 @@
 let _userInfo = {
     showVipTime: '加载中',
-    vipFlag: 0,
+    vipFlag: 1,
     showPayBtn: '升级',
-    userNick: '老白你在哪',  
+    userNick: '老白你在哪',
+    tag:'newUserRenewTest',
+    promotion:'2022-03-10 20:11:34',
+    vipTime:'2022-03-10 '
 } 
 
 /**
