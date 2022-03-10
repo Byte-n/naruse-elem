@@ -2,8 +2,8 @@
     "compilerOptions": {
         "baseUrl": ".",
         "rootDir": ".",
-        "types": [
-            "types/*"
+        "typeRoots": [
+            "./types/*"
         ],
         "paths": {
             "@utils": [
@@ -17,4 +17,7 @@
             ],
         }
     },
+    "exclude": [
+        "node_modules"
+    ]
 }
