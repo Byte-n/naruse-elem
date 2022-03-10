@@ -1,7 +1,7 @@
 const path = require('path');
 const NaruseWebpackPlugin = require('./package/naruse-webpack-loader/naruse-webpack-plugin');
 
-const entry = './template/test.js';
+const entry = './src/adverts/test.js';
 
 module.exports = {
     entry,
@@ -18,6 +18,14 @@ module.exports = {
     },
     watch: true,
     stats: 'errors-only',
+    resolve: {
+        alias: {
+            "@": path.resolve(__dirname, 'src/'),
+            "@utils": path.resolve(__dirname, 'src/utils/'),
+            "@components": path.resolve(__dirname, 'src/components/'),
+            "@adverts": path.resolve(__dirname, 'src/adverts/'),
+        },
+    },
     module: {
         rules: [{
             test: /\.js|jsx$/,
