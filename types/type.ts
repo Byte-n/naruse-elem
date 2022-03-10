@@ -1,8 +1,8 @@
 // 这是为了方便开发添加的全局类型声明
-import * as userInfoChanger from '../package/naurse-app-profill/userInfo'
-import * as adSensorsBeacon from '../package/naurse-app-profill/adSensorsBeacon'
-import * as mappUtils from '../package/naurse-app-profill/mappUtils'
-import * as sensorsBeacon from '../package/naurse-app-profill/sensorsBeacon'
+import * as userInfoChanger from '../package/naurse-ay-polyfill/userInfo'
+import * as adSensorsBeacon from '../package/naurse-ay-polyfill/adSensorsBeacon'
+import * as mappUtils from '../package/naurse-ay-polyfill/mappUtils'
+import * as sensorsBeacon from '../package/naurse-ay-polyfill/sensorsBeacon'
 import moment from 'moment';
 /**
 * 伪react组件
