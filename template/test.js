@@ -18,6 +18,7 @@ const adData = $adImport.adData.results[0];
 if (isShown) {
     $adImport.callback(true);
 }
+
 class component extends NaruseComponent {
     constructor() {
         this.state = {
@@ -59,11 +60,11 @@ class component extends NaruseComponent {
             $mappUtils.navigateTo({ url: suffix });
         }
     }
-    beacon(props, packageName, amountPayable) {
-        const { creative_id, creative_name, pid, pid_name, primary_class, secondary_class } = props;
+    beacon(qwer, packageName, amountPayable) {
+        const { creative_id, creative_name, pid, pid_name, primary_class, secondary_class } = qwer;
         $sensorsBeacon.sensorsBeacon('YY_OrderNow', {
-            primary_class: primary_class,
-            secondary_class: secondary_class,
+            primary_class,
+            secondary_class,
             cid: Number(creative_id),
             pid: Number(pid),
             cname: creative_name || '兜底广告',
@@ -118,13 +119,16 @@ class component extends NaruseComponent {
                                         {
                                             this.gethotArr().map((item, index) => {
                                                 return <view style="width:220rpx;background:red;margin:0 10rpx;opacity:0;"
-                                                    onClick={(e) => {
+                                                    onClick={(ww) => {
+                                                        console.log(ww);
                                                         if (item.type === 'url') {
                                                             this.gotoWebPage(item.url, item.isShopLink)
                                                         } else {
                                                             this.contactWW(item.text)
                                                         }
+                                                        console.log('22');
                                                         this.beacon($adImport.adData.result, item.packageName, item.amountPayable)
+                                                        console.log('22');
                                                         this.close();
                                                     }}>热区{index}</view>
                                             })

@@ -17,4 +17,12 @@ describe('naruse-parser', () => {
         expect(exports.resDiv, '除法测试').to.equal(2);
         expect(exports.resMul, '乘法测试').to.equal(6);
     })
+
+    it('对象声明测试', () => {
+        const code = `
+        exports.array = { qq: 123, ww: 'cscsasd', dd: true, ee: null, ff: undefined };
+        `
+        const exports = run(code);
+        expect(exports.array, '基本类型测试').deep.equal({ qq: 123, ww: 'cscsasd', dd: true, ee: null, ff: undefined });
+    })
 })

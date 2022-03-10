@@ -14,7 +14,7 @@ const compressOption = {
     sequences: false,
     join_vars: false,
     assignments: false,
-    reduce_vars: true,
+    reduce_vars: false,
     spreads: false,
 }
 
