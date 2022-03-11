@@ -1,8 +1,7 @@
 module.exports = {
-    "root": true,
-    "extends": [
-        "eslint-config-ay",
-        "eslint-config-ay/import",
-        "eslint-config-ay/typescript"
-    ]
-}
+    root: true,
+    extends: [
+        'eslint-config-ay',
+        'eslint-config-ay/import',
+    ],
+};
