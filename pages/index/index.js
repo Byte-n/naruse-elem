@@ -1,4 +1,4 @@
-import code from '../../dist/index'
+import code from '../../dist/naruse.dev.debug'
 import { ayRequireList } from '../../package/naurse-ay-polyfill'
 
 Page({
