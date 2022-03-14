@@ -2,6 +2,9 @@
     "compilerOptions": {
         "baseUrl": ".",
         "rootDir": ".",
+        "allowJs": true,
+        "module": "ES6",
+        "moduleResolution": "node",
         "typeRoots": [
             "./types/*"
         ],
@@ -15,9 +18,10 @@
             "@adverts": [
                 "src/adverts/*"
             ],
-        }
+        },
     },
     "exclude": [
-        "node_modules"
-    ]
+        "node_modules",
+        "dist"
+    ],
 }

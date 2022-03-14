@@ -6,6 +6,7 @@
     "@babel/core": "^7.16.7",
     "@babel/plugin-transform-destructuring": "^7.17.3",
     "@babel/preset-env": "^7.16.7",
+    "@rollup/plugin-babel": "^5.3.1",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "chalk": "^4.1.2",
     "css-to-js-object": "^0.0.3",
@@ -13,8 +14,7 @@
     "prejss": "^1.4.0",
     "react-styling": "^1.6.4",
     "readline": "^1.3.0",
-    "uglify-js": "^3.15.2",
-    "webpack": "^5.69.1",
-    "webpack-cli": "^4.9.2"
+    "rollup": "^2.70.1",
+    "uglify-js": "^3.15.2"
   }
 }

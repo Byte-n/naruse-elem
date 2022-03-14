@@ -1,9 +1,11 @@
-import { ww } from '@utils/common';
+import { ww, navigateTo } from '@utils/common';
 
 
 console.log('123321', ww);
-class qwe {
-    render() {
-        return '123';
+
+export class qwerrr {
+    render () {
+        navigateTo(123);
+        console.log(ww);
     }
 }
