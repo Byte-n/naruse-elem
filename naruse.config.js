@@ -6,4 +6,6 @@ module.exports = {
     advertUserDefine: {
         test: 123,
     },
+    // 生成的代码是否删除console
+    dropConsole: true,
 };

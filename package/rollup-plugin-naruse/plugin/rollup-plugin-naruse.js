@@ -113,7 +113,7 @@ const main = (plugin, option = {}, chunks) => {
         output: { beautify: true },
     });
     const minifiedCode = uglifyJs.minify(compiledCode, {
-        compress: { ...compressOption, ...{ drop_console: true } },
+        compress: { ...compressOption, ...{ drop_console: option.dropConsole || false } },
         mangle: { toplevel: true },
         output: { quote_style: 1 },
     }).code;
