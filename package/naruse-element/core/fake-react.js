@@ -52,7 +52,7 @@ const checkReactIntegrity = (obj, self) => {
 }
 
 // 简易的react运行时
-class fakeReactRuntime {
+class FakeReactRuntime {
     constructor(entrance, componentId) {
         this.state = {};
         this.componentId = componentId;
@@ -85,5 +85,5 @@ class fakeReactRuntime {
 }
 export {
     events,
-    fakeReactRuntime,
-}
+    FakeReactRuntime,
+};
