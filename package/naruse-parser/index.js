@@ -950,8 +950,16 @@ class Scope {
 }
 
 const evaluate = (node, scope, arg) => {
-    const _evalute = evaluate_map[node.type] || ((node) => { console.log('不支持的node' + JSON.stringify(node, null, 2)) })
-    return _evalute(node, scope, arg)
+    const error = (err) => {
+        err && console.error('[naruse-element] 执行错误', err);
+        console.error('[naruse-element] 不支持的node' + JSON.stringify(node, null, 2));
+    };
+    const _evalute = evaluate_map[node.type] || error()
+    try {
+        return _evalute(node, scope, arg);
+    } catch(e) {
+        error(e);
+    }
 }
 // 导出默认对象
 const default_api = {
