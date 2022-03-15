@@ -19,7 +19,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "rollup -c ./rollup.config.js -w"
+    "start": "rollup -c ./rollup.config.js -w",
+    "dev:mb": "rollup -c ./rollup.config.js -w"
   },
   "repository": {
     "type": "git",

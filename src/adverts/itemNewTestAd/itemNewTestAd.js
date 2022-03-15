@@ -1,41 +1,39 @@
 // 商品新增运营位广告
 const { imageSrcIos, imageSrcAndroid, isCodeBlock, hotArrIos, hotArrAndroid } = $adImport.adData.result.user_define.body;
+console.log($adImport.adData.result.user_define.body);
 /** 当前页面名称 */
 const pageName = $mappUtils.getCurrentPageName();
-/**
- * 缓存的key
- */
-const adCacheKey = $adImport.adData.result.creative_id + $adImport.adData.result.pid + $moment().format('YYYYMMDD');
-/**
- * 是否需要展示
- */
-const isShown = my.getStorageSync({ key: adCacheKey }).data;
 /**
  * 广告数据
  */
 const adData = $adImport.adData.results[0];
+/**
+ * 缓存的key
+ */
+const adCacheKey = adData.creative_id + adData.pid + $moment().format('YYYYMMDD');
+/**
+ * 是否需要展示
+ */
+const isShown = my.getStorageSync({ key: adCacheKey }).data;
+
 
 // 不展示则直接回调关闭
 if (isShown) {
     $adImport.callback(true);
 }
 
-class component extends NaruseComponent {
+export class component extends NaruseComponent {
     constructor() {
-        this.state = {
-            show: false,
-        }
+        this.state = { show: false };
     }
     contactWW(text, nick) {
         $openChat.contactCustomerService(text, nick);
     }
 
     close() {
-        this.setState({
-            show: false
-        })
+        this.setState({ show: false });
         if (pageName === 'itemIndex' || pageName === 'itemList' || pageName === 'itemMy') {
-            $mappUtils.showTabBar()
+            $mappUtils.showTabBar();
         }
         $adImport.callback(isCodeBlock);
         my.setStorageSync({ key: adCacheKey, data: '1' });
@@ -43,7 +41,7 @@ class component extends NaruseComponent {
     // 打开外链
     gotoWebPage(url, isShopLink) {
         if (url.indexOf('http') > -1 || url.indexOf('https') > -1) {
-            my.qn.navigateToWebPage({ url: url });
+            my.qn.navigateToWebPage({ url });
             // 购物链接需要展示确认弹窗
             if (isShopLink === 'true') {
                 beforePayBeacon(marketing_getState().customAd);
@@ -51,13 +49,13 @@ class component extends NaruseComponent {
                     key: 'shopConfirmModal',
                     data: {
                         visible: true,
-                        payResultInfo: { url: url, type: 2 },
+                        payResultInfo: { url, type: 2 },
                     },
                 });
             }
         } else if (url.indexOf('miniapp:///') > -1) {
             // miniapp:///pages/waterMark/index
-            const suffix = url.substr(10, url.length)
+            const suffix = url.substr(10, url.length);
             $mappUtils.navigateTo({ url: suffix });
         }
     }
@@ -73,8 +71,8 @@ class component extends NaruseComponent {
             package_name: packageName,
             amount_payable: amountPayable,
             from_pid: Number(pid),
-            from_pname: pid_name
-        })
+            from_pname: pid_name,
+        });
     }
     componentDidMount() {
         if (isShown) {
@@ -82,16 +80,14 @@ class component extends NaruseComponent {
         }
         // 发送初始化埋点
         $adSensorsBeacon.adViewBeacon(adData, adData.pid);
-        this.setState({
-            show: true
-        })
+        this.setState({ show: true });
         // 如果是有tabbar的页面，则隐藏tabbar。
         if (pageName === 'itemIndex' || pageName === 'itemList' || pageName === 'itemMy') {
-            $mappUtils.hideTabBar()
+            $mappUtils.hideTabBar();
         }
     }
     gethotArr() {
-        return $mappUtils.isIOS() ? JSON.parse(hotArrIos) : JSON.parse(hotArrAndroid)
+        return $mappUtils.isIOS() ? JSON.parse(hotArrIos) : JSON.parse(hotArrAndroid);
     }
     render() {
         const { show } = this.state;
@@ -101,7 +97,7 @@ class component extends NaruseComponent {
                     <view style="background-color:rgba(0,0,0,.7);width:100%;height:100vh;display:flex;justify-content:center;align-items:center;">
                         <view style="width:600rpx;height:700rpx;position:relative;">
                             <image onClick={(e) => {
-                                const hotData = this.gethotArr()
+                                const hotData = this.gethotArr();
                                 if (hotData.length === 1) {
                                     if (hotData[0].type === 'url') {
                                         this.gotoWebPage(hotData[0].url, hotData[0].isShopLink);
@@ -123,15 +119,15 @@ class component extends NaruseComponent {
                                                     onClick={(ww) => {
                                                         console.log(ww);
                                                         if (item.type === 'url') {
-                                                            this.gotoWebPage(item.url, item.isShopLink)
+                                                            this.gotoWebPage(item.url, item.isShopLink);
                                                         } else {
-                                                            this.contactWW(item.text)
+                                                            this.contactWW(item.text);
                                                         }
                                                         console.log('22');
-                                                        this.beacon($adImport.adData.result, item.packageName, item.amountPayable)
+                                                        this.beacon($adImport.adData.result, item.packageName, item.amountPayable);
                                                         console.log('22');
                                                         this.close();
-                                                    }}>热区{index}</view>
+                                                    }}>热区{index}</view>;
                                             })
                                         }
                                     </view>)
@@ -143,6 +139,6 @@ class component extends NaruseComponent {
                     </view>
                 </view>
             </view>
-        )
+        );
     }
 }

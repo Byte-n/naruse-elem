@@ -1,21 +1,18 @@
-// 事件中心
-/**
- * 支持继续冒泡的node类型
-*/
-const popupNodeType = ['text']
+// naruse事件中心
 
 /**
  * @description 为元素生成随机id
  * @author CHC
  * @date 2022-02-23 09:02:25
  * @param {*} randomLength
- * @returns {*} 
+ * @returns {*}
  */
 const randomId = (randomLength) => {
-    let idStr = Date.now().toString(36)
-    idStr += (Math.random()).toString(36).slice(2, randomLength)
-    return idStr
-}
+    let idStr = Date.now().toString(36);
+    idStr += (Math.random()).toString(36)
+        .slice(2, randomLength);
+    return idStr;
+};
 
 
 /**
@@ -24,7 +21,7 @@ const randomId = (randomLength) => {
  * @date 2022-02-23 09:02:32
  * @param {*} id
  * @param {*} vnode
- * @returns {*} 
+ * @returns {*}
  */
 export const getPathById = function (id, vnode) {
     const path = [];
@@ -35,7 +32,7 @@ export const getPathById = function (id, vnode) {
         if (vnode.childNodes[i].id === id) {
             path.push(i);
             return path;
-        };
+        }
     }
     for (let i = 0; i < vnode.childNodes.length; i++) {
         const childPath = getPathById(id, vnode.childNodes[i]);
@@ -47,7 +44,7 @@ export const getPathById = function (id, vnode) {
             return path;
         }
     }
-}
+};
 
 /**
  * @description 获取节点
@@ -55,7 +52,7 @@ export const getPathById = function (id, vnode) {
  * @date 2022-02-23 09:02:02
  * @param {*} id
  * @param {*} vnode
- * @returns {*} 
+ * @returns {*}
  */
 export const getVnodeById = function (id, vnode) {
     const path = getPathById(id, vnode);
@@ -66,7 +63,7 @@ export const getVnodeById = function (id, vnode) {
         node = node.childNodes[index];
     });
     return node;
-}
+};
 
 /**
  * @description 初始化节点
@@ -75,7 +72,7 @@ export const getVnodeById = function (id, vnode) {
  * @param {*} vnode
  * @param {*} environments
  * @param {*} parentId
- * @returns {*} 
+ * @returns {*}
  */
 export const initVnodeTree = function (vnode, parentId) {
     const newNode = vnode;
@@ -88,7 +85,7 @@ export const initVnodeTree = function (vnode, parentId) {
         newNode.childNodes.forEach((node) => initVnodeTree(node, newNode.id));
     }
     return newNode;
-}
+};
 
 /**
  * 小程序事件映射表
@@ -99,7 +96,7 @@ const eventNameMap = {
     input: 'onChange',
     blur: 'onBlur',
     focus: 'onFocus',
-}
+};
 
 /**
  * @description 事件分发中心
@@ -107,7 +104,7 @@ const eventNameMap = {
  * @date 2022-02-23 09:02:22
  * @param {*} event
  * @param {*} nodeTree
- * @returns {*} 
+ * @returns {*}
  */
 export const eventCenter = function (event, nodeTree) {
     let stopPropagetion = true;
@@ -139,25 +136,30 @@ export const eventCenter = function (event, nodeTree) {
         // console.log('[naruse-element][debugger]', `元素${eventNode.naruseType}: 冒泡${reflectedEventName}事件`);
         eventCenter({ ...event, target: { id: eventNode.parentId }, narusePropagetion: true }, nodeTree);
     }
-}
+};
 
-function allEvents(props) { eventCenter(props, this.data.node) }
-/** 
+/**
+ * @description 事件中心
+ * @author CHC
+ * @date 2022-03-15 14:03:55
+ * @param {*} props
+ */
+const allEvents = function allEvents (props) {
+    eventCenter(props, this.data.node);
+};
+
+/**
  * @description 小程序组件事件绑定
- * @type {*} 
+ * @type {*}
  * */
 export const miniappEventBehavior = {
-    props: {
-        code: 'exports.render = function () { return h("view", null, "你好") }',
-    },
-    data: {
-        node: {},
-    },
+    props: { code: 'exports.render = function () { return h("view", null, "This is naruse-element") }' },
+    data: { node: {} },
     methods: {
         onTap: allEvents,
         onLongPress: allEvents,
         onInputInput: allEvents,
         onInputBlur: allEvents,
         onInputFocus: allEvents,
-    }
-}
+    },
+};
