@@ -27,6 +27,7 @@ module.exports = {
                 [require('@babel/plugin-transform-destructuring')],
                 [require('babel-plugin-transform-es2015-arrow-functions')],
                 [require('@babel/plugin-transform-parameters')],
+                [require('@babel/plugin-transform-template-literals')],
             ],
         }),
         alias({
