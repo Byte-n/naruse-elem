@@ -27,7 +27,7 @@ const funcNode = (type, props, childNodes) => {
  * @type {*}
  */
 const vnodeSpecialMap = {
-    text(props, childNodes) {
+    text (props, childNodes) {
         return { content: childNodes ? childNodes[0] : '' };
     },
 };
@@ -59,7 +59,12 @@ const createVnode = (type, props, ...childNodes) => {
     const node = ({ naruseType: type, ...props, childNodes, ...newNode });
     return node;
 };
-
+/**
+ * @description 弥补引擎不支持创建正则字符串的问题
+ * @author CHC
+ * @date 2022-03-16 10:03:36
+ * @param {*} reg
+ */
 const $createReg = (reg) => new RegExp(reg);
 
 let naruseComponentId = 1;
@@ -67,21 +72,27 @@ let naruseComponentId = 1;
 /**
  * @description 执行虚拟环境
  */
-const createVmContext = function (prevProps, prevData) {
+const createVmContext = function () {
     if (this.props.code === this.code) return;
     console.log('[naruse-element] didUpdate 更新');
     this.code = this.props.code;
     const injectObject = this.$page.requireList || {};
-    // 获取动态运行代码的对象
-    const component = run(this.props.code, {
-        ...profill,
-        h: createVnode,
-        require,
-        my,
-        getApp,
-        $createReg,
-        ...injectObject,
-    });
+    let component = null;
+    try {
+        // 获取动态运行代码的对象
+        component = run(this.props.code, {
+            ...profill,
+            h: createVnode,
+            require,
+            my,
+            $createReg,
+            ...injectObject,
+        });
+    } catch (err) {
+        console.error('[naruse-element] 运行时出错，自动继续', err);
+        // 运行出错自动继续
+        injectObject.$adImport && injectObject.$adImport.callback && injectObject.$adImport.callback(true);
+    }
     // 更新id
     this.naruseComponentId = naruseComponentId++;
     // 创建虚拟react组件
@@ -106,11 +117,17 @@ const createVmContext = function (prevProps, prevData) {
  * @date 2022-03-15 12:03:14
  * @returns {*}
  */
-const createBehavior = () => {
+const createBehavior = (option = {}) => {
     // 小程序组件默认minxs对象
     const naruseBehavior = {
         ...miniappEventBehavior,
-        didMount() {
+        /**
+         * @description 装载完毕后
+         * @author CHC
+         * @date 2022-03-16 10:03:05
+         */
+        didMount () {
+            this.option = option;
             console.log('[naruse-element] didMount 装载');
             if (this.props.code) {
                 try {
@@ -120,15 +137,24 @@ const createBehavior = () => {
                 }
             }
         },
-        // 组件初始化时运行
-        didUpdate() {
+        /**
+         * @description 组件更新后
+         * @author CHC
+         * @date 2022-03-16 10:03:21
+         */
+        didUpdate () {
             try {
                 createVmContext.call(this);
             } catch (error) {
                 console.error('[naruse-element] 更新失败', error);
             }
         },
-        didUnmount() {
+        /**
+         * @description 组件卸载后
+         * @author CHC
+         * @date 2022-03-16 10:03:36
+         */
+        didUnmount () {
             console.log('[naruse-element] didUnmount 卸载');
             events.off(`update-${this.naruseComponentId}`, this.reRenderCallBack);
         },
