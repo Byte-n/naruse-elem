@@ -38,6 +38,6 @@ module.exports = {
             ],
             customResolver,
         }),
-        narusePlugin({ advertUserDefine: config.advertUserDefine }),
+        narusePlugin({ advertUserDefine: config.advertUserDefine, dropConsole: config.dropConsole }),
     ],
 };

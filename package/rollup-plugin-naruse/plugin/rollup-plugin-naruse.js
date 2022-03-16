@@ -82,6 +82,8 @@ const compressOption = {
     spreads: false,
 };
 
+const scienceNumberReg = /[\d]+[Ee][\d]+/g;
+
 /**
  * @description 清除void 0
  * @author CHC
@@ -91,6 +93,21 @@ const compressOption = {
  */
 const clearViod = (string) => {
     return string.replace(/void 0/g, 'undefined');
+};
+
+/**
+ * @description 清除科学记数法
+ * @author CHC
+ * @date 2022-03-16 11:03:31
+ * @param {string} string
+ */
+const clearScienceNumber = (string) => {
+    while (true) {
+        const matchRes = string.match(scienceNumberReg);
+        if (!matchRes) break;
+        string = string.replace(matchRes[0], Number(matchRes[0]));
+    }
+    return string;
 };
 
 
@@ -113,20 +130,22 @@ const main = (plugin, option = {}, chunks) => {
         output: { beautify: true },
     });
     const minifiedCode = uglifyJs.minify(compiledCode, {
-        compress: { ...compressOption, ...{ drop_console: true } },
+        compress: { ...compressOption, ...{ drop_console: option.dropConsole || false } },
         mangle: { toplevel: true },
         output: { quote_style: 1 },
     }).code;
-    chunks[mainFileName].code = `export default \`${clearViod(reBuildCode.code)}\``;
+
+    const lastCode = clearScienceNumber(clearViod(reBuildCode.code));
+    chunks[mainFileName].code = `export default \`${lastCode}\``;
     plugin.emitFile({
         type: 'asset',
         fileName: 'naruse.min.js',
-        source: minifiedCode,
+        source: (clearScienceNumber(clearViod(minifiedCode))),
     });
     plugin.emitFile({
         type: 'asset',
         fileName: 'naruse.dev.debug.json',
-        source: JSON.stringify(exampleJsonObj(reBuildCode.code, option.advertUserDefine)),
+        source: JSON.stringify(exampleJsonObj(lastCode, option.advertUserDefine)),
     });
     console.log(chalk.green(new Date().toLocaleTimeString(), '【naruse-plugin】【生成完毕】'));
     console.log(chalk.white('广告系统用'), chalk.gray('— naruse.min.js'));
