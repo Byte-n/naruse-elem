@@ -4,6 +4,9 @@ module.exports = {
         'eslint-config-ay',
         'eslint-config-ay/import',
     ],
+    rules: {
+        'linebreak-style': 'off'
+    },
     overrides: [
         {
             files: ['*.js', '*.jsx', '*.ts', '*.tsx'],
