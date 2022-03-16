@@ -32,7 +32,7 @@
     <image id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" 
         catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" 
         catchTap="onTap" catchLongpress="onLongPress" rendering-mode="{{renderingMode}}" src="{{src}}" mode="{{mode}}" webp="{{webp}}" 
-        lazy-load="{{lazyLoad}}" show-menu-by-longpress="{{showMenuByLongpress}}" catchLoad="onImageLoad" catchError="onImageError"></image>
+        lazy-load="{{lazyLoad}}" show-menu-by-longpress="{{showMenuByLongpress}}" onLoad="onImageLoad" catchError="onImageError"></image>
 </template>
 <!-- 视频 -->
 <template name="video">
