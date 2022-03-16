@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "baseUrl": ".",
+        "baseUrl": "./",
         "rootDir": ".",
         "allowJs": true,
         "module": "ES6",
@@ -9,13 +9,13 @@
             "./types/*"
         ],
         "paths": {
-            "@utils": [
+            "@utils/*": [
                 "src/utils/*"
             ],
-            "@components": [
+            "@components/*": [
                 "src/components/*"
             ],
-            "@adverts": [
+            "@adverts/*": [
                 "src/adverts/*"
             ],
         },
