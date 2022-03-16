@@ -92,6 +92,7 @@ const createVmContext = function () {
         console.error('[naruse-element] 运行时出错，自动继续', err);
         // 运行出错自动继续
         injectObject.$adImport && injectObject.$adImport.callback && injectObject.$adImport.callback(true);
+        return;
     }
     // 更新id
     this.naruseComponentId = naruseComponentId++;
