@@ -28,6 +28,7 @@ module.exports = {
                 my: 'readonly',
                 $moment: 'readonly',
                 $adSensorsBeacon: 'readonly',
+                $userInfoChanger: 'readonly',
             },
         },
     ],
