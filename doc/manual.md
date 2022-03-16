@@ -20,6 +20,10 @@ npm run start
 ```
 ### 配置自己的组件
 ```js
-// webpack.config.js
-const entry = './src/adverts/index.js'; // 修改为自己组件路径
+// naruse.config.js
+module.exports = {
+    ...
+    input: './src/adverts/index', // 修改为自己组件路径
+    ...
+};
 ```
