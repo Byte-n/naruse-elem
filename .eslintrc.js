@@ -27,6 +27,8 @@ module.exports = {
                 $mappUtils: 'readonly',
                 my: 'readonly',
                 $moment: 'readonly',
+                $adSensorsBeacon: 'readonly',
+                $userInfoChanger: 'readonly',
             },
         },
     ],
