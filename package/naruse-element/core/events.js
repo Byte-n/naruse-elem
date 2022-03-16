@@ -1,5 +1,9 @@
 // naruse事件中心
 
+/** 允许继续冒泡的事件 */
+const allowPropagetionEventNames = ['onLongClick', 'onClick'];
+
+
 /**
  * @description 为元素生成随机id
  * @author CHC
@@ -96,10 +100,11 @@ const eventNameMap = {
     input: 'onChange',
     blur: 'onBlur',
     focus: 'onFocus',
+    load: 'onLoad',
 };
 
 /**
- * @description 事件分发中心
+ * @description 事件处理中心
  * @author CHC
  * @date 2022-02-23 09:02:22
  * @param {*} event
@@ -107,10 +112,8 @@ const eventNameMap = {
  * @returns {*}
  */
 export const eventCenter = function (event, nodeTree) {
-    let stopPropagetion = true;
-    event.stopPropagetion = () => {
-        stopPropagetion = false;
-    };
+    // 是否继续冒泡的标志
+    let stopFlag = false;
     // 空事件不响应
     if (!(event && event.target && event.target.id)) return;
     // 空节点不响应
@@ -121,7 +124,14 @@ export const eventCenter = function (event, nodeTree) {
     const reflectedEventName = eventNameMap[type];
     // 不支持的事件
     if (!reflectedEventName) {
-        console.log('[naruse-element][warn]', `${reflectedEventName}事件不支持`);
+        console.log('[naruse-element][warn]', `${type}事件不支持`);
+    }
+    // 冒泡事件便允许阻止冒泡
+    if (allowPropagetionEventNames.includes(reflectedEventName)) {
+        stopFlag = true;
+        event.stopPropagation = () => {
+            stopFlag = false;
+        };
     }
     // 反射事件名称
     const responseFuc = eventNode[reflectedEventName];
@@ -132,19 +142,19 @@ export const eventCenter = function (event, nodeTree) {
         responseFuc.call(eventNode, event);
     }
     // 没有截断就继续冒泡
-    if (stopPropagetion) {
+    if (stopFlag) {
         // console.log('[naruse-element][debugger]', `元素${eventNode.naruseType}: 冒泡${reflectedEventName}事件`);
         eventCenter({ ...event, target: { id: eventNode.parentId }, narusePropagetion: true }, nodeTree);
     }
 };
 
 /**
- * @description 事件中心
+ * @description 事件分发中心
  * @author CHC
  * @date 2022-03-15 14:03:55
  * @param {*} props
  */
-const allEvents = function allEvents (props) {
+const allEvents = function allEvents(props) {
     eventCenter(props, this.data.node);
 };
 
@@ -161,5 +171,6 @@ export const miniappEventBehavior = {
         onInputInput: allEvents,
         onInputBlur: allEvents,
         onInputFocus: allEvents,
+        onImageLoad: allEvents,
     },
 };
