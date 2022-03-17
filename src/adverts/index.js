@@ -1,4 +1,5 @@
 import { getText, tips } from './module';
+import style from './index.css';
 import { isBlueBirdUser, getBlueBirdUserExpireTime, isIOS } from '@utils/userInfo';
 console.log('全局属性================================================');
 console.log('设备信息', my.getSystemInfoSync());
@@ -28,7 +29,7 @@ export class Demo extends NaruseComponent {
     }
 
     render () {
-        return <view onClick={() => console.log('冒泡啦')}>
+        return <view style={style.qwer} onClick={() => console.log('冒泡啦')}>
             <checkbox onChange={(e) => console.log(e)} value={'321'} checked={false}/>
             <checkbox onChange={(e) => console.log(e)} value={'123'} checked={false}/>
             <input/>

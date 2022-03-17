@@ -75,7 +75,7 @@ class Token {
                 continue
             }
             if (!code) break
-            code.match(/[a-zA-Z\_\$]/) ? this.readWord() : this.getTokenFromCode(code.charCodeAt())
+            code.match(/[a-zA-Z_$]/) ? this.readWord() : this.getTokenFromCode(code.charCodeAt())
         }
         return this.tokens
     }
@@ -154,7 +154,7 @@ class Token {
         let operator = String.fromCharCode(code)
         const tokentype = priority[operator] && operator;
         if (next === 61) {
-            pos++
+            this.pos++
             return this.finishOp(tt.assign, 2)
         }
         return this.finishOp(tokentype, 1)
