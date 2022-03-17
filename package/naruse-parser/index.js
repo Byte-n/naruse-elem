@@ -951,14 +951,15 @@ class Scope {
 
 const evaluate = (node, scope, arg) => {
     const error = (err) => {
-        err && console.error('[naruse-element] 执行错误', err);
-        console.error('[naruse-element] 不支持的node' + JSON.stringify(node, null, 2));
+        if (err)
+            err && console.error('[naruse-element] 执行错误', err);
+        // console.error('[naruse-element] 不支持的node' + JSON.stringify(node, null, 2));
         throw new Error('[naruse-parser] 代码执行错误！');
     };
     const _evalute = evaluate_map[node.type] || error()
     try {
         return _evalute(node, scope, arg);
-    } catch(e) {
+    } catch (e) {
         error(e);
     }
 }
