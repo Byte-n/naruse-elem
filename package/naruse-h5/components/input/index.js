@@ -125,12 +125,12 @@ class Input extends Component {
                 ref={input => {
                     this.inputRef = input;
                 }}
-                class={className}
+                className={className}
                 value={fixControlledValue(_value)}
                 type={getTrueType(type, confirmType, password)}
                 placeholder={placeholder}
                 disabled={disabled}
-                maxlength={maxlength}
+                maxLength={maxlength}
                 name={name}
                 onInput={this.handleInput}
                 onFocus={this.handleFocus}

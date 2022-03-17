@@ -1,6 +1,7 @@
 const narusejsLoader = require('./narusejs-loader');
 const uglifyJs = require('uglify-js');
 const chalk = require('chalk');
+const css = require('./naruse-css-loader');
 
 
 /**
@@ -161,6 +162,7 @@ const main = (plugin, option = {}, chunks) => {
  */
 module.exports = function rollupPluginNaruse (option = {}) {
     return {
+        ...css(),
         name: pluginName,
         /**
          * @description 生成对应文件
