@@ -1,4 +1,5 @@
 /** 简易事件中心，用来通知是否需要刷新 */
+import { logger } from './uitl'
 class eventBus {
     constructor() {
         this.listeners = {};
@@ -37,7 +38,7 @@ const events = new eventBus();
 const checkReactIntegrity = (obj, self) => {
     const types = Object.keys(obj);
     if (!types.includes('render')) {
-        console.error('naruse-fake-react-runtime 必须要一个render函数');
+        logger.error('naruse-fake-react-runtime 必须要一个render函数');
     }
     types.forEach((key) => {
         if (key === 'constructor') {

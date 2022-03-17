@@ -1,7 +1,7 @@
 import { events, FakeReactRuntime } from './fake-react.js';
 import { miniappEventBehavior, initVnodeTree } from './events.js';
 import run from '../../naruse-parser/index.js';
-import { _classCallCheck, _createClass, _defineProperties } from './uitl.js';
+import { logger, _classCallCheck, _createClass, _defineProperties } from './uitl.js';
 
 /**
  * 一些引擎不支持的方法
@@ -74,7 +74,7 @@ let naruseComponentId = 1;
  */
 const createVmContext = function () {
     if (this.props.code === this.code) return;
-    console.log('[naruse-element] didUpdate 更新');
+    logger.debug('didUpdate 更新');
     this.code = this.props.code;
     const injectObject = this.$page.requireList || {};
     let component = null;
@@ -89,7 +89,7 @@ const createVmContext = function () {
             ...injectObject,
         });
     } catch (err) {
-        console.error('[naruse-element] 运行时出错，自动继续', err);
+        logger.error('运行时出错，自动继续', err);
         // 运行出错自动继续
         injectObject.$adImport && injectObject.$adImport.callback && injectObject.$adImport.callback(true);
         return;
@@ -104,7 +104,7 @@ const createVmContext = function () {
         cb();
     });
     this.reRenderCallBack = () => {
-        console.log('[naruse-element] 重新渲染');
+        logger.debug('重新渲染');
         const [node, cb] = reactRuntime._render();
         this.setData({ node: initVnodeTree(node, null) }, (cb));
     };
@@ -129,12 +129,12 @@ const createBehavior = (option = {}) => {
          */
         didMount () {
             this.option = option;
-            console.log('[naruse-element] didMount 装载');
+            logger.debug('didMount 装载');
             if (this.props.code) {
                 try {
                     createVmContext.call(this);
                 } catch (error) {
-                    console.error('[naruse-element] 初始化失败', error);
+                    logger.error('初始化失败', error);
                 }
             }
         },
@@ -147,7 +147,7 @@ const createBehavior = (option = {}) => {
             try {
                 createVmContext.call(this);
             } catch (error) {
-                console.error('[naruse-element] 更新失败', error);
+                logger.error('更新失败', error);
             }
         },
         /**
@@ -156,7 +156,7 @@ const createBehavior = (option = {}) => {
          * @date 2022-03-16 10:03:36
          */
         didUnmount () {
-            console.log('[naruse-element] didUnmount 卸载');
+            logger.debug('didUnmount 卸载');
             events.off(`update-${this.naruseComponentId}`, this.reRenderCallBack);
         },
     };

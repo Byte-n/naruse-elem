@@ -1,5 +1,7 @@
 // naruse事件中心
 
+import { logger } from './uitl';
+
 /** 允许继续冒泡的事件 */
 const allowPropagetionEventNames = ['onLongClick', 'onClick'];
 
@@ -101,6 +103,7 @@ const eventNameMap = {
     blur: 'onBlur',
     focus: 'onFocus',
     load: 'onLoad',
+    change: 'onChange',
 };
 
 /**
@@ -124,7 +127,7 @@ export const eventCenter = function (event, nodeTree) {
     const reflectedEventName = eventNameMap[type];
     // 不支持的事件
     if (!reflectedEventName) {
-        console.log('[naruse-element][warn]', `${type}事件不支持`);
+        logger.warn(`${type}事件不支持`);
     }
     // 冒泡事件便允许阻止冒泡
     if (allowPropagetionEventNames.includes(reflectedEventName)) {
@@ -136,14 +139,14 @@ export const eventCenter = function (event, nodeTree) {
     // 反射事件名称
     const responseFuc = eventNode[reflectedEventName];
     if (!(responseFuc && typeof responseFuc === 'function')) {
-        // console.log('[naruse-element][debugger]', `元素${eventNode.naruseType}:没有绑定${reflectedEventName}事件`);
+        // logger.debug(`元素${eventNode.naruseType}:没有绑定${reflectedEventName}事件`);
     } else {
-        console.log('[naruse-element][debugger]', `元素${eventNode.naruseType}:触发${reflectedEventName}事件`);
+        logger.debug(`元素${eventNode.naruseType}:触发${reflectedEventName}事件`);
         responseFuc.call(eventNode, event);
     }
     // 没有截断就继续冒泡
     if (stopFlag) {
-        // console.log('[naruse-element][debugger]', `元素${eventNode.naruseType}: 冒泡${reflectedEventName}事件`);
+        // logger.debug(`元素${eventNode.naruseType}: 冒泡${reflectedEventName}事件`);
         eventCenter({ ...event, target: { id: eventNode.parentId }, narusePropagetion: true }, nodeTree);
     }
 };
@@ -154,7 +157,7 @@ export const eventCenter = function (event, nodeTree) {
  * @date 2022-03-15 14:03:55
  * @param {*} props
  */
-const allEvents = function allEvents(props) {
+const allEvents = function allEvents (props) {
     eventCenter(props, this.data.node);
 };
 
@@ -172,5 +175,6 @@ export const miniappEventBehavior = {
         onInputBlur: allEvents,
         onInputFocus: allEvents,
         onImageLoad: allEvents,
+        onCheckboxChange: allEvents,
     },
 };
