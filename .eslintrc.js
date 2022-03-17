@@ -4,9 +4,7 @@ module.exports = {
         'eslint-config-ay',
         'eslint-config-ay/import',
     ],
-    rules: {
-        'linebreak-style': 'off'
-    },
+    rules: { 'linebreak-style': 'off', 'require-jsdoc': 'off' },
     overrides: [
         {
             files: ['*.js', '*.jsx', '*.ts', '*.tsx'],
@@ -16,10 +14,9 @@ module.exports = {
                     array: false,
                     object: true,
                 }],
-                'require-jsdoc': 'off',
                 'constructor-super': 'off',
                 'no-this-before-super': 'off',
-                'require-jsdoc-except': 'off',
+                'id-length': 'off',
             },
             globals: {
                 NaruseComponent: 'readonly',
@@ -29,6 +26,7 @@ module.exports = {
                 $moment: 'readonly',
                 $adSensorsBeacon: 'readonly',
                 $userInfoChanger: 'readonly',
+                Promise: 'readonly',
             },
         },
     ],

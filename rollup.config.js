@@ -4,6 +4,7 @@ const alias = require('@rollup/plugin-alias');
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const path = require('path');
 const config = require('./naruse.config');
+const externalGlobals = require('rollup-plugin-external-globals');
 
 
 const customResolver = nodeResolve({ extensions: ['.mjs', '.js', '.jsx', '.json', '.sass', '.scss'] });
@@ -40,5 +41,6 @@ module.exports = {
             customResolver,
         }),
         narusePlugin({ advertUserDefine: config.advertUserDefine, dropConsole: config.dropConsole }),
+        externalGlobals({ Naruse: 'Naruse' }),
     ],
 };

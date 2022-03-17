@@ -72,30 +72,36 @@
         </block>
     </button>
 </template>
-<!-- 输入框 -->
-<template name="input">
-    <radio-group a:if="{{type === 'radio'}}" id="{{id}}" class="{{className}}" style="{{style}}" data-private-node-id="{{nodeId}}" 
-        data-private-page-id="{{pageId}}" catchChange="onRadioChange">
-        <radio id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" 
-            data-private-page-id="{{pageId}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" 
-            catchTouchcancel="onTouchCancel" catchTap="onTap" catcLongpress="onLongPress" value="{{value}}" disabled="{{disabled}}" 
-            checked="{{checked}}" color="{{color}}"></radio>
-    </radio-group>
-    <checkbox-group a:elif="{{type === 'checkbox'}}" id="{{id}}" class="{{className}}" style="{{style}}" data-private-node-id="{{nodeId}}" 
-        data-private-page-id="{{pageId}}" catchChange="onCheckboxChange">
-        <checkbox hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" catchTouchstart="onTouchStart" 
-            catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" catchTap="onTap" catcLongpress="onLongPress" 
-            value="{{value}}" disabled="{{disabled}}" checked="{{checked}}" color="{{color}}"></checkbox>
+<template name="checkbox">
+    <checkbox-group id="{{id}}" class="{{className}}" style="{{style}}" data-private-node-id="{{nodeId}}" 
+    data-private-page-id="{{pageId}}" onChange="onCheckboxChange">
+    <checkbox hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" catchTouchstart="onTouchStart" 
+        catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" catchTap="onTap" catcLongpress="onLongPress" 
+        value="{{value}}" disabled="{{disabled}}" checked="{{checked}}" color="{{color}}"></checkbox>
     </checkbox-group>
-    <input a:elif="{{type !== 'hidden'}}" id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" 
-        data-private-page-id="{{pageId}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" 
-        catchTouchcancel="onTouchCancel" catchTap="onTap" catcLongpress="onLongPress" value="{{value}}" type="{{type}}" password="{{password}}" 
-        placeholder="{{placeholder}}" placeholder-style="{{placeholderStyle}}" placeholder-class="{{placeholderClass}}" disabled="{{disabled}}" 
-        maxlength="{{maxlength}}" cursor-spacing="{{cursorSpacing}}" auto-focus="{{autoFocus}}" focus="{{focus}}" confirm-type="{{confirmType}}" 
-        confirm-hold="{{confirmHold}}" cursor="{{cursor}}" selection-start="{{selectionStart}}" selection-end="{{selectionEnd}}" 
-        adjust-position="{{adjustPosition}}" hold-keyboard="{{holdKeyboard}}" onInput="onInputInput" onFocus="onInputFocus" 
-        onBlur="onInputBlur" catchConfirm="onInputConfirm" catcKeyboardheightchange="onInputKeyBoardHeightChange"></input>
 </template>
+
+<template name="input">
+    <input hidden="{{hidden}}" id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" 
+    data-private-page-id="{{pageId}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" 
+    catchTouchcancel="onTouchCancel" catchTap="onTap" catcLongpress="onLongPress" value="{{value}}" type="{{type}}" password="{{password}}" 
+    placeholder="{{placeholder}}" placeholder-style="{{placeholderStyle}}" placeholder-class="{{placeholderClass}}" disabled="{{disabled}}" 
+    maxlength="{{maxlength}}" cursor-spacing="{{cursorSpacing}}" auto-focus="{{autoFocus}}" focus="{{focus}}" confirm-type="{{confirmType}}" 
+    confirm-hold="{{confirmHold}}" cursor="{{cursor}}" selection-start="{{selectionStart}}" selection-end="{{selectionEnd}}" 
+    adjust-position="{{adjustPosition}}" hold-keyboard="{{holdKeyboard}}" onInput="onInputInput" onFocus="onInputFocus" 
+    onBlur="onInputBlur" catchConfirm="onInputConfirm" catcKeyboardheightchange="onInputKeyBoardHeightChange"></input>
+</template>
+
+<template name="radio">
+    <radio-group id="{{id}}" class="{{className}}" style="{{style}}" data-private-node-id="{{nodeId}}" 
+    data-private-page-id="{{pageId}}" catchChange="onRadioChange">
+    <radio id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" 
+        data-private-page-id="{{pageId}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" 
+        catchTouchcancel="onTouchCancel" catchTap="onTap" catcLongpress="onLongPress" value="{{value}}" disabled="{{disabled}}" 
+        checked="{{checked}}" color="{{color}}"></radio>
+</radio-group>
+</template>
+
 <!-- 入口组件 -->
 <template name="tree">
     <block a:for="{{childNodes}}" a:key="{{ id }}">
