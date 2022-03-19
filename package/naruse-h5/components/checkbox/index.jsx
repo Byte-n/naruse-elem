@@ -1,4 +1,4 @@
-import {Component } from 'react';
+import { Component } from 'react';
 class Checkbox extends Component {
     /** 改变事件 */
     handleChange (e) {

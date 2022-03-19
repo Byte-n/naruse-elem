@@ -1,8 +1,9 @@
+import { commonEventHander } from '../../core/event';
 import { Component } from 'react';
-import classNames from 'classnames';
+import cssStyle from './index.css'
 
 class Image extends Component {
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.state = { isLoaded: false };
         this.imageOnLoad = this.imageOnLoad.bind(this);
@@ -15,7 +16,6 @@ class Image extends Component {
                 // 异步 api 关系
                 if (entries[entries.length - 1].isIntersecting) {
                     this.setState({ isLoaded: true }, () => {
-                        // findDOMNode(this).children[0].src = this.props.src
                         this.imgRef.src = this.props.src;
                     });
                 }
@@ -29,19 +29,7 @@ class Image extends Component {
     }
 
     /** 当图片加载完毕 */
-    imageOnLoad (e) {
-        const { onLoad } = this.props;
-        Object.defineProperty(e, 'detail', {
-            enumerable: true,
-            writable: true,
-            value: {
-                width: e.target.width,
-                height: e.target.height,
-            },
-        });
-
-        onLoad && onLoad(e);
-    }
+    imageOnLoad = commonEventHander.bind(this)
 
     render () {
         const {
@@ -51,26 +39,19 @@ class Image extends Component {
             mode,
             onError,
             imgProps,
-            ...reset
         } = this.props;
-        const cls = classNames(
-            'taro-img',
-            { 'taro-img__widthfix': mode === 'widthFix' },
-            className
-        );
-        const imgCls = classNames(`taro-img__mode-${
-            (mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')}`);
-
+        const divStyle = { ...cssStyle.naruseImg, ...(mode === 'widthFix' ? cssStyle.naruseImg__widthfix : {}) };
+        const imgStyle = cssStyle[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
         return (
-            <div className={cls} style={style} {...reset}>
+            <div onClick={commonEventHander.bind(this)} className={className} style={{ ...divStyle, ...style }}>
                 {
                     <img
-            ref={img => (this.imgRef = img)}
-            className={imgCls}
-            src={src}
-            onLoad={this.imageOnLoad}
-            onError={onError}
-            {...imgProps}
+                        ref={img => (this.imgRef = img)}
+                        style={imgStyle}
+                        src={src}
+                        onLoad={this.imageOnLoad}
+                        onError={onError}
+                        {...imgProps}
                     />
                 }
             </div>

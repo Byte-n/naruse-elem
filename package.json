@@ -44,6 +44,7 @@
     "eslint-plugin-require-jsdoc-except": "^1.5.0",
     "rollup-plugin-external-globals": "^0.6.1",
     "rollup-pluginutils": "^2.8.2",
-    "stylis": "^4.0.13"
+    "stylis": "^4.0.13",
+    "typescript-plugin-css-modules": "^3.4.0"
   }
 }

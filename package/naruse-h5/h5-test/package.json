@@ -1,0 +1,19 @@
+{
+  "name": "naruse-h5-test",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^1.0.7",
+    "classnames": "^2.3.1",
+    "vite": "^2.8.0"
+  }
+}

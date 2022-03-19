@@ -1,73 +1,71 @@
-img[src=""] {
+.img-empty {
     opacity: 0;
 }
 
-.naruse-img {
+.naruseImg {
     display: inline-block;
     overflow: hidden;
     position: relative;
     font-size: 0;
-    width: 320px;
-    height: 240px;
 }
 
-.naruse-img.naruse-img__widthfix {
+.naruseImg__widthfix {
     height: 100%;
 }
 
-.naruse-img__mode-scaletofill {
+.scaletofill {
     object-fit: contain;
     width: 100%;
     height: 100%;
 }
 
-.naruse-img__mode-aspectfit {
+.aspectfit {
     object-fit: contain;
     width: 100%;
     height: 100%;
 }
 
-.naruse-img__mode-aspectfill {
+.aspectfill {
     object-fit: cover;
     width: 100%;
     height: 100%;
 }
 
-.naruse-img__mode-widthfix {
+.widthfix {
     width: 100%;
 }
 
-.naruse-img__mode-top {
+.top {
     width: 100%;
 }
 
-.naruse-img__mode-bottom {
+.bottom {
     width: 100%;
     position: absolute;
     bottom: 0;
 }
 
-.naruse-img__mode-left {
+.left {
     height: 100%;
 }
 
-.naruse-img__mode-right {
+.right {
     position: absolute;
     height: 100%;
     right: 0;
 }
 
-.naruse-img__mode-topright {
+.topright {
     position: absolute;
     right: 0;
 }
 
-.naruse-img__mode-bottomleft {
+.bottomleft {
     position: absolute;
     bottom: 0;
 }
 
-.naruse-img__mode-bottomright {
+.bottomright {
     position: absolute;
     right: 0;
     bottom: 0;
