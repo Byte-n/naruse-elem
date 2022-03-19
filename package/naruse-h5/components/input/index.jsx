@@ -42,12 +42,13 @@ class Input extends Component {
         Object.defineProperty(this.el, 'value', {
             get: () => this.inputRef?.value,
             set: value => {
-                this._value = value;
+                this.setState({
+                    _value: value,
+                })
             },
             configurable: true,
         });
-
-        this.props.focus && this.inputRef?.focus();
+        setTimeout(() => this.props.focus && this.inputRef?.focus());
     }
 
 
@@ -67,6 +68,7 @@ class Input extends Component {
             e.target.value = value;
         }
         this._value = value;
+        this.setState({ _value: value });
         commonEventHander.call(this, {
             type: 'input', detail: {
                 value,
@@ -103,8 +105,11 @@ class Input extends Component {
             name,
             className,
             value,
+            controlled,
             ...nativeProps
         } = this.props;
+
+        const { _value } = this.state;
 
         return (
             <input
@@ -112,7 +117,8 @@ class Input extends Component {
                     this.inputRef = input;
                 }}
                 className={className}
-                value={fixControlledValue(value)}
+                // 受控则只使用外部值，非受控优先使用外部值
+                value={fixControlledValue(controlled ? value : (value ?? _value))}
                 type={getTrueType(type, confirmType, password)}
                 placeholder={placeholder}
                 disabled={disabled}
