@@ -35,7 +35,7 @@ Naruse是一个在小程序内支持使用 **react** 开发，同时在小程序
    About
 简易的 JavaScript 元循环解释器
 
-## naruse-web
+## naruse-h5
 远程加载react组件并渲染
 
 ## naruse-webpack-loader
