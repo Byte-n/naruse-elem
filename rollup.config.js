@@ -7,7 +7,7 @@ const config = require('./naruse.config');
 const externalGlobals = require('rollup-plugin-external-globals');
 
 
-const customResolver = nodeResolve({ extensions: ['.mjs', '.js', '.jsx', '.json', '.sass', '.scss'] });
+const customResolver = nodeResolve({ extensions: ['.mjs', '.js', '.jsx', '.json', '.sass', '.scss', 'css'] });
 const projectRootDir = path.resolve(__dirname);
 const skipCode = ['FILE_NAME_CONFLICT'];
 

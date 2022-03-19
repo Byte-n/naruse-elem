@@ -30,9 +30,9 @@ const middlewareInit = (component, code) => {
  * @extends {Component}
  */
 export class ReactMiddleware extends Component {
-    constructor () {
+    constructor (props) {
         super();
-        middlewareInit(this, this.props.code);
+        middlewareInit(this, props.code);
     }
 }
 
