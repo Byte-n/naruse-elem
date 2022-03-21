@@ -82,7 +82,7 @@ const compressOption = {
     spreads: false,
 };
 
-const scienceNumberReg = /[\d]+[Ee][\d]+/g;
+const scienceNumberReg = /[\d]+[e][\d]+/g;
 
 /**
  * @description 清除void 0
