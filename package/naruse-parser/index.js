@@ -1,4 +1,4 @@
-import { _defineProperty } from './polyfill'
+import { babelPolyfill } from './polyfill'
 const types = {
     num: "num",
     string: "string",
@@ -951,13 +951,17 @@ class Scope {
         })[kind]()
     }
 }
+// 防止报错栈过多
+let hasError = false;
 
 const evaluate = (node, scope, arg) => {
     const error = (err) => {
-        if (err)
+        if (!hasError && err) {
+            hasError = true;
             err && console.error('[naruse-element] 执行错误', err);
-        // console.error('[naruse-element] 不支持的node' + JSON.stringify(node, null, 2));
-        throw new Error('[naruse-parser] 代码执行错误！');
+            console.error('[naruse-element] 不支持的node' + JSON.stringify(node, null, 2));
+            throw new Error('[naruse-parser] 代码执行错误！');
+        }
     };
     const _evalute = evaluate_map[node.type] || error()
     try {
@@ -1001,9 +1005,10 @@ const default_api = {
     Array,
     JSON,
     Promise,
-    _defineProperty,
+    ...babelPolyfill,
 }
 const run = (code, append_api = {}) => {
+    hasError = false;
     const scope = new Scope('block')
     scope.$const('this', this)
     for (const name of Object.getOwnPropertyNames(default_api)) {

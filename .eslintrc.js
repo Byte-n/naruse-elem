@@ -5,7 +5,7 @@ module.exports = {
         'eslint-config-ay',
         'eslint-config-ay/import',
     ],
-    rules: { 'linebreak-style': 'off', 'require-jsdoc': 'off' },
+    rules: { 'linebreak-style': 'off' },
     overrides: [
         {
             files: ['*.js', '*.jsx', '*.ts', '*.tsx'],
@@ -18,6 +18,7 @@ module.exports = {
                 'constructor-super': 'off',
                 'no-this-before-super': 'off',
                 'id-length': 'off',
+                'require-jsdoc-except/require-jsdoc': 0,
             },
             globals: {
                 NaruseComponent: 'readonly',

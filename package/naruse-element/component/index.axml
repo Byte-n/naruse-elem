@@ -93,17 +93,17 @@
 </template>
 
 <template name="radio">
-    <radio-group id="{{id}}" class="{{className}}" style="{{style}}" data-private-node-id="{{nodeId}}" 
+    <radio-group id="{{id}}" class="{{className}}" style="{{style}}" data-private-node-id="{{nodeId}}"
     data-private-page-id="{{pageId}}" catchChange="onRadioChange">
-    <radio id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" 
-        data-private-page-id="{{pageId}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" 
-        catchTouchcancel="onTouchCancel" catchTap="onTap" catcLongpress="onLongPress" value="{{value}}" disabled="{{disabled}}" 
+    <radio id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}"
+        data-private-page-id="{{pageId}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd"
+        catchTouchcancel="onTouchCancel" catchTap="onTap" catcLongpress="onLongPress" value="{{value}}" disabled="{{disabled}}"
         checked="{{checked}}" color="{{color}}"></radio>
 </radio-group>
 </template>
 
 <template name="naruse-element">
-  <naruse-element code="console.log(123)"></naruse-element>
+  <naruse-element component="{{ component }}"></naruse-element>
 </template>
 
 <!-- 入口组件 -->
