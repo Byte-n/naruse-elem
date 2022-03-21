@@ -93,7 +93,18 @@ const scienceNumberReg = /[\d]+[Ee][\d]+/g;
  * @returns {*}
  */
 const clearViod = (string) => {
-    return string.replace(/void 0/g, 'undefined');
+    return clearCallSpeardArugment(string.replace(/void 0/g, 'undefined'));
+};
+
+/**
+ * @description 替换不支持的callarguments
+ * @author CHC
+ * @date 2022-03-21 18:03:37
+ * @param {*} string
+ * @returns {*}
+ */
+const clearCallSpeardArugment = (string) => {
+    return string.replace('.call(this, ...arguments)', '.apply(this, arguments)');
 };
 
 /**

@@ -1,3 +1,10 @@
-// 配合babel将不支持的语法提前处理
+const _defineProperty = function _defineProperty (obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, { value, enumerable: true, configurable: true, writable: true });
+    } else {
+        obj[key] = value;
+    } return obj;
+};
 
-export function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+/** 常用的polyfill 直接加入引擎 */
+export const babelPolyfill = { _defineProperty };

@@ -141,7 +141,7 @@ export const eventCenter = function (event, nodeTree) {
     if (!(responseFuc && typeof responseFuc === 'function')) {
         // logger.debug(`元素${eventNode.naruseType}:没有绑定${reflectedEventName}事件`);
     } else {
-        logger.debug(`元素${eventNode.naruseType}:触发${reflectedEventName}事件`);
+        // logger.debug(`元素${eventNode.naruseType}:触发${reflectedEventName}事件`);
         responseFuc.call(eventNode, event);
     }
     // 没有截断就继续冒泡
@@ -166,7 +166,7 @@ const allEvents = function allEvents (props) {
  * @type {*}
  * */
 export const miniappEventBehavior = {
-    props: { code: 'exports.render = function () { return h("view", null, "This is naruse-element") }' },
+    props: { code: '', component: {} },
     data: { node: {} },
     methods: {
         onTap: allEvents,

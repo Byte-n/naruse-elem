@@ -30,6 +30,7 @@ module.exports = {
                 [require('@babel/plugin-transform-parameters')],
                 [require('@babel/plugin-transform-template-literals')],
                 [require('babel-plugin-transform-class')],
+                [require('@babel/plugin-proposal-class-properties')],
             ],
         }),
         alias({
