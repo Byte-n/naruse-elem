@@ -1,4 +1,4 @@
-const { parseSync, transformSync } = require('@babel/core');
+const { parseSync, transformSync, types } = require('@babel/core');
 const { default: generate } = require('@babel/generator');
 const chalk = require('chalk');
 
@@ -49,10 +49,9 @@ const _objectSpreadDes = parseSync('const _objectSpread = Object.assign;').progr
  * @returns {*}
  */
 const createBaseExport = (name, right) => {
-    const baseExport = parseSync('exports.qwer = function (){}').program.body[0];
+    const baseExport = parseSync('exports.qwer = 123').program.body[0];
     baseExport.expression.left.property.name = name;
-    baseExport.expression.right.params = right.params;
-    baseExport.expression.right.body = right.body;
+    baseExport.expression.right = right;
     return baseExport;
 };
 
@@ -111,13 +110,17 @@ const dealAst = function dealAst (ast) {
  * @param {*} ast
  */
 const dealDeaultExport = function dealDeaultExport (ast) {
-    const classNode = eatAst(ast.program, { type: 'ClassDeclaration' });
+    const classNode = eatAst(ast.program, { type: 'ExportNamedDeclaration' });
     if (!classNode) {
-        console.log(chalk.red('【naruse-loader】【请export(导出)一个class来进行渲染'));
+        console.log(chalk.red('【naruse-loader】检测到没有任何导出，请检查代码'));
         return;
     }
-    classNode.body.body.map((item) => {
-        ast.program.body.push(createBaseExport(item.key.name, item));
+    if (!classNode.specifiers) {
+        console.log(chalk.red('【naruse-loader】检测到没有导出默认导出组件，页面将不会有任何渲染，请检查代码'));
+        return;
+    }
+    classNode.specifiers.forEach(element => {
+        ast.program.body.push(createBaseExport(element.exported.name, element.local));
     });
 };
 

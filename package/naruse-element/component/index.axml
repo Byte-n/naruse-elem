@@ -102,6 +102,10 @@
 </radio-group>
 </template>
 
+<template name="naruse-element">
+  <naruse-element code="console.log(123)"></naruse-element>
+</template>
+
 <!-- 入口组件 -->
 <template name="tree">
     <block a:for="{{childNodes}}" a:key="{{ id }}">

@@ -1,3 +1,4 @@
+import { _defineProperty } from './polyfill'
 const types = {
     num: "num",
     string: "string",
@@ -501,10 +502,12 @@ class Parser {
     }
     parseBlock(node = {}) {
         node.body = []
-        this.expect(tt.braceL)
+        // 支持单行代码块
+        const hasL = this.eat(tt.braceL)
         while (this.type && this.type !== tt.braceR) {
             let stmt = this.parseStatement()
             node.body.push(stmt)
+            if (!hasL) break;
         }
         this.next()
         return this.finishNode(node, "BlockStatement")
@@ -963,6 +966,7 @@ const evaluate = (node, scope, arg) => {
         error(e);
     }
 }
+
 // 导出默认对象
 const default_api = {
     console,
@@ -996,7 +1000,8 @@ const default_api = {
     RegExp,
     Array,
     JSON,
-    Promise
+    Promise,
+    _defineProperty,
 }
 const run = (code, append_api = {}) => {
     const scope = new Scope('block')

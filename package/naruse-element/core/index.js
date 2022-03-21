@@ -96,10 +96,8 @@ const createVmContext = function () {
     }
     // 更新id
     this.naruseComponentId = naruseComponentId++;
-    // 创建虚拟react组件
-    const reactRuntime = new FakeReactRuntime(component, this.naruseComponentId);
     // 初始化渲染
-    const [node, cb] = reactRuntime._render();
+    const [node, cb] = component.render();
     this.setData({ node: initVnodeTree(node, null) }, () => {
         cb();
     });
