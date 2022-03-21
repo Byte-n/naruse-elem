@@ -53,14 +53,15 @@ const checkReactIntegrity = (obj, self) => {
 }
 
 // 简易的react运行时
-class FakeReactRuntime {
-    constructor(entrance, componentId) {
-        this.state = {};
-        this.componentId = componentId;
-        checkReactIntegrity(entrance, this);
-        entrance.constructor && entrance.constructor.call(this);
-        this._isFristRender = true;
-        this._isUpdating = false;
+
+let componentId = 0;
+class NaruseComponent {
+
+    _isFristRender = false;
+    _isUpdating = false;
+
+    constructor(props) {
+        this.$componentId = componentId++;
     }
 
     _render() {
@@ -86,5 +87,5 @@ class FakeReactRuntime {
 }
 export {
     events,
-    FakeReactRuntime,
+    NaruseComponent,
 };
