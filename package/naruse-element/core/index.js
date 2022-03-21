@@ -52,9 +52,18 @@ const initMainComponent = function () {
         component = exports.default;
     } else {
         // 兼容老版组件
-        const compatibleClass = function compatibleClass () {};
+        const compatibleClass = function compatibleClass (...args) {
+            const self = this;
+            NaruseComponent.apply(this, args);
+            exports.constructor.call(this);
+
+            Object.entries(exports).forEach(([key, value]) => {
+                if (key === 'constructor') return;
+                self[key] = typeof value === 'function' ? value.bind(self) : value;
+            });
+        };
         compatibleClass.prototype = Object.create(NaruseComponent.prototype);
-        Object.assign(compatibleClass.prototype, exports);
+        Object.assign(compatibleClass.prototype, { constructor: compatibleClass });
         component = compatibleClass;
     }
     this.$middware = new Middware(this, component, {});

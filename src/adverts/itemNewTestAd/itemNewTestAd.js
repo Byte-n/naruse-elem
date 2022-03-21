@@ -22,7 +22,7 @@ if (isShown) {
     $adImport.callback(true);
 }
 
-export class component extends NaruseComponent {
+class component extends NaruseComponent {
     constructor() {
         this.state = { show: false };
     }
@@ -133,7 +133,7 @@ export class component extends NaruseComponent {
                                     </view>)
                             }
                             <view style="text-align:center;margin-top:50rpx;" >
-                                <image onClick={this.close} style="width:44rpx;height:44rpx;" src="https://q.aiyongtech.com/item/web/miniappimages/ad-close20220225.png" />
+                                <image onClick={this.close.bind(this)} style="width:44rpx;height:44rpx;" src="https://q.aiyongtech.com/item/web/miniappimages/ad-close20220225.png" />
                             </view>
                         </view>
                     </view>
@@ -142,3 +142,4 @@ export class component extends NaruseComponent {
         );
     }
 }
+export default component;

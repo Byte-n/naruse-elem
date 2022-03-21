@@ -1,4 +1,4 @@
-import { babelPolyfill } from './polyfill'
+import { babelPolyfill } from './polyfill.js'
 const types = {
     num: "num",
     string: "string",
