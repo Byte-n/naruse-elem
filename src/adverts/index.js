@@ -33,7 +33,7 @@ class Demo extends Component {
 
         return (
             <view hoverStyle={{ color: 'red' }} onClick={(e) => console.log('冒泡')}>
-                <image mode='bottom right' style={{ width: 100, height: 100 }} src="https://cdn.pixabay.com/photo/2021/05/10/10/46/yellow-wall-6243164_960_720.jpg" />
+                <image mode='bottom' style={{ width: 100, height: 100 }} src="https://cdn.pixabay.com/photo/2021/05/10/10/46/yellow-wall-6243164_960_720.jpg" />
                 <view style={{ fontSize: '24px', textAlign: 'center' }}>{getText()} {count}</view>
                 <button onClick={() => this.setCount('+')}> count + 1</button>
                 <button onClick={() => this.setCount('-')}> count - 1</button>
