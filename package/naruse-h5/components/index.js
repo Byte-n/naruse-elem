@@ -1,4 +1,4 @@
-import React, { createElement } from 'react';
+import React, { Component, createElement } from 'react';
 import { logger } from '../utils/log';
 import Button from './button/index.jsx';
 import Checkbox from './checkbox/index.jsx';
@@ -32,10 +32,13 @@ const naruseCreateElement = (type, props, ...children) => {
     if (typeof type === 'string') {
         const Component = componentReflectMap[type];
         if (!Component) {
-            logger.warn('组件类型不存在', type);
-            return null;
+            logger.warn('不支持的组件类型', type);
+            return naruseCreateElement('view', null, '不支持的组件类型');
         }
         return createElement(Component, props, ...children);
+    }
+    if (type.prototype instanceof Component) {
+        return createElement(type, props, ...children);
     }
     if (typeof type === 'function') {
         props.children = children;
