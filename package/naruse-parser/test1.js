@@ -10,6 +10,21 @@ import run from './index.js';
 // }
 //   )
 console.log(run(`
-    exports.add = 4 / 2;
+function qq () {};
 
+
+
+console.log(qq);
+Object.assign(qq.prototype, {
+    ww: function () {
+        return 'qwer';
+    }
+})
+
+
+const ww = new qq();
+console.log(ww instanceof qq);
+console.log(ww.ww());
+
+console.log(new RegExp('a'));
 `));

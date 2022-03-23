@@ -39,6 +39,9 @@ const types = {
     _var: "var",
     _const: "const",
     _let: "let",
+    _in: 'in',
+    _instanceof: 'instanceof',
+    _new: 'new',
     _import: "import",
     _null: "null",
     _true: "true",
@@ -47,7 +50,24 @@ const types = {
 const emptyChar = ['\n', '\t', ' ', '\r']
 const isEmptyChar = (char) => emptyChar.includes(char)
 const tt = types
-const keywords = [tt._break, tt._continue, tt._else, tt._for, tt._function, tt._if, tt._return, tt._const, tt._let, tt._null, tt._false, tt._true, tt._var]
+const keywords = [
+    tt._break,
+    tt._continue,
+    tt._else,
+    tt._for,
+    tt._function,
+    tt._if,
+    tt._return,
+    tt._const,
+    tt._let,
+    tt._null,
+    tt._false,
+    tt._true,
+    tt._var,
+    tt._in,
+    tt._instanceof,
+    tt._new,
+]
 const priority = {
     [tt.logicalOR]: 1,
     [tt.logicalAND]: 2,
@@ -59,6 +79,8 @@ const priority = {
     [tt.modulo]: 10,
     [tt.star]: 10,
     [tt.slash]: 10,
+    [tt._in]: 7,
+    [tt._instanceof]: 7,
 }
 // 标记器
 class Token {
@@ -166,7 +188,7 @@ class Token {
         return this.ftk(type, str)
     }
     ftk(type, value) {
-        this.tokens.push({ type, value })
+        this.tokens.push({ type, value, pos: this.pos })
     }
     readToken_pipe_amp(code) {
         let next = this.gnc()
@@ -218,9 +240,11 @@ class Parser {
         this.token = this.tokens[++this.index]
         this.type = this.token && this.token.type
         this.value = this.token && this.token.value
+        this.pos = this.token && this.token.pos
     }
     finishNode(node, type) {
         node.type = type
+        node.pos = this.pos
         return node
     }
     parseTopLevel(node) {
@@ -436,9 +460,19 @@ class Parser {
             case tt._function:
                 this.next()
                 return this.parseFunctionStatement(node)
+            case tt._new:
+                return this.parseNew()
             default:
                 this.raise('无法处理的token' + this.type)
         }
+    }
+    parseNew() {
+        let node = {}
+        this.next()
+        node.callee = this.parseSubscripts(this.parseExprAtom(), true)
+        if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR)
+        else node.arguments = []
+        return this.finishNode(node, "NewExpression")
     }
     parseObj(isPattern) {
         let node = {}, first = true
@@ -791,7 +825,7 @@ const evaluate_map = {
                     return object[property]
                 }
             }
-        } else { throw `如果出现在这里，那就说明有问题了` }
+        } else { throw '如果出现在这里，那就说明有问题了' }
 
         return ({
             "=": (v) => ($var.$set(v), v),
@@ -844,7 +878,7 @@ const evaluate_map = {
     NewExpression: (node, scope) => {
         const func = evaluate(node.callee, scope)
         const args = node.arguments.map(arg => evaluate(arg, scope))
-        return new (func.bind.apply(func, [null].concat(args)))
+        return new func(...args);
     },
     SequenceExpression: (node, scope) => {
         let last
@@ -953,13 +987,42 @@ class Scope {
 }
 // 防止报错栈过多
 let hasError = false;
+let runingCode = '';
+
+const findErrorCode = (pos) => {
+    if (!pos) return code;
+    let headPos = pos;
+    let endPos = pos;
+    const endFlag = runingCode.length - 1;
+    const res = [0, endFlag];
+    while (!(headPos === -1 && endPos === endFlag)) {
+        if (headPos !== -1) {
+            if (runingCode[headPos].charCodeAt() === 10) {
+                res[0] = headPos + 1;
+                headPos = -1;
+            } else {
+                headPos !== -1 && headPos--;
+            }
+        }
+        if (endPos !== endFlag) {
+            if (runingCode[endPos].charCodeAt() === 10) {
+                res[1] = endPos;
+                endPos = endFlag;
+            } else {
+                endPos++;
+            }
+        }
+    }
+    const errorCode = runingCode.slice(res[0], res[1]);
+    return `${errorCode}\n${'^'.repeat(res[1] - res[0])}`;
+}
 
 const evaluate = (node, scope, arg) => {
     const error = (err) => {
         if (!hasError && err) {
             hasError = true;
-            err && console.error('[naruse-element] 执行错误', err);
-            console.error('[naruse-element] 不支持的node' + JSON.stringify(node, null, 2));
+            err && console.error('[naruse-parser] 错误信息', err);
+            console.error('[naruse-parser] 错误代码\n' + findErrorCode(node.pos));
             throw new Error('[naruse-parser] 代码执行错误！');
         }
     };
@@ -1007,8 +1070,10 @@ const default_api = {
     Promise,
     ...babelPolyfill,
 }
+
 const run = (code, append_api = {}) => {
     hasError = false;
+    runingCode = code;
     const scope = new Scope('block')
     scope.$const('this', this)
     for (const name of Object.getOwnPropertyNames(default_api)) {
@@ -1022,7 +1087,8 @@ const run = (code, append_api = {}) => {
     const token = new Token(code)
     token.scan()
     const parser = new Parser(token.tokens)
-    evaluate(parser.parse(), scope)
+    const node = parser.parse();
+    evaluate(node, scope);
     return $exports
 }
 
