@@ -1021,8 +1021,8 @@ const evaluate = (node, scope, arg) => {
     const error = (err) => {
         if (!hasError && err) {
             hasError = true;
-            err && console.error('[naruse-parser] 错误信息', err);
             console.error('[naruse-parser] 错误代码\n' + findErrorCode(node.pos));
+            err && console.error('[naruse-parser] 错误信息', err);
             throw new Error('[naruse-parser] 代码执行错误！');
         }
     };
