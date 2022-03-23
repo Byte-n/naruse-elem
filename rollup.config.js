@@ -25,12 +25,6 @@ module.exports = {
             babelHelpers: 'bundled',
             plugins: [
                 [require('babel-plugin-transform-react-jsx'), { pragma: 'h' }],
-                [require('@babel/plugin-transform-destructuring')],
-                [require('babel-plugin-transform-es2015-arrow-functions')],
-                [require('@babel/plugin-transform-parameters')],
-                [require('@babel/plugin-transform-template-literals')],
-                [require('babel-plugin-transform-class')],
-                [require('@babel/plugin-proposal-class-properties')],
             ],
         }),
         alias({
