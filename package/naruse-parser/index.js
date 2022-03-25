@@ -997,7 +997,8 @@ const findErrorCode = (pos) => {
     const res = [0, endFlag];
     while (!(headPos === -1 && endPos === endFlag)) {
         if (headPos !== -1) {
-            if (runingCode[headPos].charCodeAt() === 10) {
+            // ; \r
+            if ([59,19].includes(runingCode[headPos].charCodeAt())) {
                 res[0] = headPos + 1;
                 headPos = -1;
             } else {
@@ -1005,7 +1006,7 @@ const findErrorCode = (pos) => {
             }
         }
         if (endPos !== endFlag) {
-            if (runingCode[endPos].charCodeAt() === 10) {
+            if ([59,19].includes(runingCode[endPos].charCodeAt())) {
                 res[1] = endPos;
                 endPos = endFlag;
             } else {

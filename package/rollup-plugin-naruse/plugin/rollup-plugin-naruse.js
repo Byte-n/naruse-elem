@@ -104,7 +104,9 @@ const clearViod = (string) => {
  * @returns {*}
  */
 const clearCallSpeardArugment = (string) => {
-    return string.replace('.call(this, ...arguments)', '.apply(this, arguments)');
+    return string
+        .replace('.call(this, ...arguments)', '.apply(this, arguments)')
+        .replace('.call(this,...arguments)', '.apply(this,arguments)');
 };
 
 /**
@@ -152,7 +154,7 @@ const main = (plugin, option = {}, chunks) => {
     plugin.emitFile({
         type: 'asset',
         fileName: 'naruse.min.js',
-        source: (clearScienceNumber(clearViod(minifiedCode))),
+        source: clearScienceNumber(clearViod(minifiedCode)),
     });
     plugin.emitFile({
         type: 'asset',

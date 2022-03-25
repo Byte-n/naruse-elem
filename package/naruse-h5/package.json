@@ -10,6 +10,7 @@
     "classnames": "^2.3.1",
     "react": "^15.6.1",
     "rollup": "^2.70.1",
-    "rollup-plugin-external-globals": "^0.6.1"
+    "rollup-plugin-external-globals": "^0.6.1",
+    "rollup-plugin-uglify": "^6.0.4"
   }
 }

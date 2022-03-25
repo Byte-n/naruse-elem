@@ -55,7 +55,7 @@ const initMainComponent = function () {
         const compatibleClass = function compatibleClass (...args) {
             const self = this;
             NaruseComponent.apply(this, args);
-            exports.constructor.call(this);
+            exports.constructor && exports.constructor.call(this);
 
             Object.entries(exports).forEach(([key, value]) => {
                 if (key === 'constructor') return;
