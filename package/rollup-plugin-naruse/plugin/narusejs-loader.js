@@ -1,4 +1,4 @@
-const { parseSync, transformSync, types } = require('@babel/core');
+const { parseSync, transformSync } = require('@babel/core');
 const { default: generate } = require('@babel/generator');
 const chalk = require('chalk');
 

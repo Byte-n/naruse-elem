@@ -3,7 +3,7 @@ import momemt from 'moment';
 import * as $mappUtils from './mappUtils';
 import * as $adSensorsBeacon from './adSensorsBeacon';
 import * as $sensorsBeacon from './sensorsBeacon';
-import { advertUserDefine  } from '../../naruse.config';
+import { advertUserDefine } from '../../naruse.config.esm';
 const adData = {
     message: 'OK',
     open_id: 'e000b529-879b-4bc2-8ab0-a33c829ee65d',

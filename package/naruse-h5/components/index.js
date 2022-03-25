@@ -7,8 +7,6 @@ import Input from './input/index.jsx';
 import Text from './text/index.jsx';
 import View from './view/index.jsx';
 
-window.React = React;
-
 /** 组件映射表 */
 const componentReflectMap = {
     button: Button,
@@ -29,6 +27,7 @@ const componentReflectMap = {
  * @param {*} children
  */
 const naruseCreateElement = (type, props, ...children) => {
+    transformRpx(props);
     if (typeof type === 'string') {
         const Component = componentReflectMap[type];
         if (!Component) {
@@ -45,6 +44,38 @@ const naruseCreateElement = (type, props, ...children) => {
         return type(props);
     }
     logger.warn('不支持的组件类型', type);
+};
+
+
+const rpxReg = /(\d+)\s?rpx/g;
+
+const parsePx = val => {
+    if (typeof val !== 'string') return val;
+    const matchRes = val.match(rpxReg);
+    if (!matchRes) return val;
+    matchRes.forEach((item) => {
+        const num = parseFloat(item);
+        // 按照手机和电脑的比例进行换算
+        val = val.replace(item, `${(num / 2 * 1.4).toFixed(1)}px`);
+    });
+    return val;
+};
+
+/**
+ * @description 将所有的rpx转换为px
+ * @author CHC
+ * @date 2022-03-25 15:03:47
+ * @param {*} [props={}]
+ * @returns {*}
+ */
+const transformRpx = (props = {}) => {
+    if (!props) return;
+    const { style } = props;
+    if (style && typeof style === 'object') {
+        for (const key in style) {
+            style[key] = parsePx(style[key]);
+        }
+    }
 };
 
 

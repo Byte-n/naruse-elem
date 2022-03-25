@@ -15,7 +15,7 @@ const getItem = function getItem (key) {
 };
 
 /** 同步设置缓存 */
-export const setStorageSync = (key, data = '') => {
+export const setStorageSync = ({ key, data = '' }) => {
     if (typeof key !== 'string') {
         logger.error('setStorageSync:fail key must be string');
         return;
@@ -51,7 +51,7 @@ export const setStorage = (options) => {
     return handle.success();
 };
 /** 同步删除缓存 */
-export const removeStorageSync = (key) => {
+export const removeStorageSync = ({ key }) => {
     if (typeof key !== 'string') {
         logger.error('removeStorageSync:fail key must be string');
         return;
@@ -80,7 +80,7 @@ export const removeStorage = (options) => {
 };
 
 /** 同步获取缓存  */
-export const getStorageSync = (key) => {
+export const getStorageSync = ({ key }) => {
     if (typeof key !== 'string') {
         logger.error('getStorageSync:fail key must be string');
         return;
