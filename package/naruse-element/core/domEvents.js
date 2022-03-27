@@ -82,7 +82,10 @@ export const getVnodeById = function (id, vnode) {
  */
 export const initVnodeTree = function (vnode, parentId) {
     const newNode = vnode;
-    if (typeof vnode !== 'object') return vnode;
+    if (typeof vnode === 'undefined') {
+        logger.error('render函数禁止返回undefined');
+    }
+    if (!vnode || typeof vnode !== 'object') return {};
     // 没有id的挂上id
     if (!newNode.id) newNode.id = randomId(16);
     newNode.parentId = parentId;
