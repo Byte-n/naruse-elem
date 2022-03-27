@@ -69,7 +69,7 @@ const exampleJsonObj = (code, advertUserDefine = {}) => ({
     createTime: new Date().getTime(),
 });
 
-const pluginName = 'NaruseWebpackPlugin';
+const pluginName = 'rollup-plugin-naruse';
 const compressOption = {
     unused: true,
     toplevel: true,
