@@ -15,6 +15,7 @@ class Qwer extends Component {
         console.log('qwer 被卸载啦');
     }
     render() {
+        console.log(this);
         return <view>{
             this.state.qq
         }

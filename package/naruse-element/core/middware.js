@@ -1,4 +1,5 @@
 import { initVnodeTree } from './domEvents';
+import { logger } from './uitl';
 
 /**
  * @description 两个props是否完全相同
@@ -44,6 +45,7 @@ export class Middware {
         this.props = props;
         this.component = miniappComponent;
         this.naruseComponent = new NaruseComponentActuator(props);
+        this.naruseComponent.props = props;
         this.naruseComponent.$updater = this;
         this.fristRender = true;
         this.updating = false;
@@ -53,7 +55,12 @@ export class Middware {
     update (callback) {
         !this.updating && Promise.resolve().then(() => {
             this.updating = false;
-            const node = initVnodeTree(this.naruseComponent.render());
+            if (!this.naruseComponent.render) {
+                logger.error('组件必须需要一个render函数');
+                return;
+            }
+            const vnode = this.naruseComponent.render();
+            const node = initVnodeTree(vnode);
             this.component.setData({ node }, () => {
                 this.onUpdated();
                 callback();
