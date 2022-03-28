@@ -11,11 +11,10 @@ const getAst = (source) => {
             [require('@babel/plugin-proposal-object-rest-spread')],
             [require('@babel/plugin-transform-shorthand-properties')],
             [require('@babel/plugin-transform-destructuring')],
-            [require('babel-plugin-transform-es2015-arrow-functions')],
             [require('@babel/plugin-transform-parameters')],
             [require('@babel/plugin-transform-template-literals')],
-            [require('babel-plugin-transform-class')],
-            [require('@babel/plugin-proposal-class-properties')],
+            [require('./babe-plugin-transform-arrow-function')],
+            [require('./babel-plugin-transform-class&properties')],
         ],
     }).ast;
 };
