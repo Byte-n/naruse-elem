@@ -1,7 +1,6 @@
 
 import { logger } from '../../utils/log';
 import { MethodHandler } from '../../../naruse-share/handler';
-import { exceptType, exceptTypeSync } from '../../../naruse-share/assert';
 
 /** 获取缓存 */
 const getItem = function getItem (key) {
@@ -18,7 +17,10 @@ const getItem = function getItem (key) {
 
 /** 同步设置缓存 */
 export const setStorageSync = (key, data = '') => {
-    if (exceptTypeSync(key, 'string', 'removeStorageSync')) return;
+    if (typeof key !== 'string') {
+        logger.error('setStorageSync:fail key must be string');
+        return;
+    }
 
     const type = typeof data;
     let obj = {};
@@ -33,8 +35,11 @@ export const setStorageSync = (key, data = '') => {
 
 /** 异步设置缓存 */
 export const setStorage = (options) => {
-    let err;
-    if (err = exceptType(options, 'object', 'setStorage')) return err;
+    if (typeof options !== 'object') {
+        const res = { errMsg: 'setStorage:fail must has a object' };
+        logger.error(res.errMsg);
+        return Promise.reject(res);
+    }
 
     const { key, data, success, fail, complete } = options;
     const handle = new MethodHandler({ name: 'setStorage', success, fail, complete });
@@ -49,16 +54,19 @@ export const setStorage = (options) => {
 
 /** 同步删除缓存 */
 export const removeStorageSync = (key) => {
-    if (exceptTypeSync(key, 'string', 'removeStorageSync')) return;
+    if (typeof key !== 'string') {
+        logger.error('removeStorageSync:fail key must be string');
+        return;
+    }
     localStorage.removeItem(key);
 };
-
-
 /** 异步删除缓存 */
 export const removeStorage = (options) => {
-    let err;
-    if (err = exceptType(options, 'object', 'removeStorage')) return err;
-
+    if (typeof options !== 'object') {
+        const res = { errMsg: 'removeStorage:fail must has a object' };
+        logger.error(res.errMsg);
+        return Promise.reject(res);
+    }
     const { key, success, fail, complete } = options;
     const handle = new MethodHandler({ name: 'removeStorage', success, fail, complete });
 
@@ -75,7 +83,10 @@ export const removeStorage = (options) => {
 
 /** 同步获取缓存  */
 export const getStorageSync = (key) => {
-    if (exceptTypeSync(key, 'string', 'getStorageSync')) return;
+    if (typeof key !== 'string') {
+        logger.error('getStorageSync:fail key must be string');
+        return;
+    }
 
     const res = getItem(key);
     if (res.result) return res.data;
@@ -102,8 +113,11 @@ export const getStorageInfo = ({ success, fail, complete } = {}) => {
 
 /** 同步获取缓存 */
 export const getStorage = (options) => {
-    let err;
-    if (err = exceptType(options, 'object', 'getStorage')) return err;
+    if (typeof options !== 'object') {
+        const res = { errMsg: 'removeStorage:fail must has a object' };
+        logger.error(res.errMsg);
+        return Promise.reject(res);
+    }
 
     const { key, success, fail, complete } = options;
     const handle = new MethodHandler({ name: 'getStorage', success, fail, complete });

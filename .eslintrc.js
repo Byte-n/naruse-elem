@@ -19,6 +19,7 @@ module.exports = {
                 'no-this-before-super': 'off',
                 'id-length': 'off',
                 'require-jsdoc-except/require-jsdoc': 0,
+                'no-cond-assign': 0,
             },
             globals: {
                 NaruseComponent: 'readonly',
