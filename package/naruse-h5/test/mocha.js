@@ -989,7 +989,7 @@ Hook.prototype.error = function(err) {
 },{"./runnable":33,"./utils":38}],8:[function(require,module,exports){
 'use strict';
 
-var Test = require('../test');
+var Test = require('.');
 var EVENT_FILE_PRE_REQUIRE = require('../suite').constants
   .EVENT_FILE_PRE_REQUIRE;
 
@@ -1305,7 +1305,7 @@ module.exports = function(suites, context, mocha) {
 },{"../errors":6,"../suite":36}],10:[function(require,module,exports){
 'use strict';
 var Suite = require('../suite');
-var Test = require('../test');
+var Test = require('.');
 
 /**
  * Exports-style (as Node.js module) interface:
@@ -1375,7 +1375,7 @@ exports.exports = require('./exports');
 },{"./bdd":8,"./exports":10,"./qunit":12,"./tdd":13}],12:[function(require,module,exports){
 'use strict';
 
-var Test = require('../test');
+var Test = require('.');
 var EVENT_FILE_PRE_REQUIRE = require('../suite').constants
   .EVENT_FILE_PRE_REQUIRE;
 
@@ -1476,7 +1476,7 @@ module.exports.description = 'QUnit style';
 },{"../suite":36,"../test":37,"./common":9}],13:[function(require,module,exports){
 'use strict';
 
-var Test = require('../test');
+var Test = require('.');
 var EVENT_FILE_PRE_REQUIRE = require('../suite').constants
   .EVENT_FILE_PRE_REQUIRE;
 
@@ -2724,7 +2724,7 @@ function Pending(message) {
 var tty = require('tty');
 var diff = require('diff');
 var milliseconds = require('ms');
-var utils = require('../utils');
+var utils = require('../../naruse-share/utils');
 var supportsColor = process.browser ? null : require('supports-color');
 var constants = require('../runner').constants;
 var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
@@ -3248,7 +3248,7 @@ Base.abstract = true;
  */
 
 var Base = require('./base');
-var utils = require('../utils');
+var utils = require('../../naruse-share/utils');
 var constants = require('../runner').constants;
 var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
 var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
@@ -3346,7 +3346,7 @@ Doc.description = 'HTML documentation';
  */
 
 var Base = require('./base');
-var inherits = require('../utils').inherits;
+var inherits = require('../../naruse-share/utils').inherits;
 var constants = require('../runner').constants;
 var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
 var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
@@ -3433,7 +3433,7 @@ Dot.description = 'dot matrix representation';
  */
 
 var Base = require('./base');
-var utils = require('../utils');
+var utils = require('../../naruse-share/utils');
 var Progress = require('../browser/progress');
 var escapeRe = require('escape-string-regexp');
 var constants = require('../runner').constants;
@@ -4081,7 +4081,7 @@ JSONReporter.description = 'single JSON object';
  */
 
 var Base = require('./base');
-var inherits = require('../utils').inherits;
+var inherits = require('../../naruse-share/utils').inherits;
 var constants = require('../runner').constants;
 var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
 var EVENT_RUN_END = constants.EVENT_RUN_END;
@@ -4201,7 +4201,7 @@ Landing.description = 'Unicode landing strip';
  */
 
 var Base = require('./base');
-var inherits = require('../utils').inherits;
+var inherits = require('../../naruse-share/utils').inherits;
 var constants = require('../runner').constants;
 var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
 var EVENT_RUN_END = constants.EVENT_RUN_END;
@@ -4283,7 +4283,7 @@ List.description = 'like "spec" reporter but flat';
  */
 
 var Base = require('./base');
-var utils = require('../utils');
+var utils = require('../../naruse-share/utils');
 var constants = require('../runner').constants;
 var EVENT_RUN_END = constants.EVENT_RUN_END;
 var EVENT_SUITE_BEGIN = constants.EVENT_SUITE_BEGIN;
@@ -4399,7 +4399,7 @@ Markdown.description = 'GitHub Flavored Markdown';
  */
 
 var Base = require('./base');
-var inherits = require('../utils').inherits;
+var inherits = require('../../naruse-share/utils').inherits;
 var constants = require('../runner').constants;
 var EVENT_RUN_END = constants.EVENT_RUN_END;
 var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
@@ -4456,7 +4456,7 @@ Min.description = 'essentially just a summary';
 
 var Base = require('./base');
 var constants = require('../runner').constants;
-var inherits = require('../utils').inherits;
+var inherits = require('../../naruse-share/utils').inherits;
 var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
 var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
 var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
@@ -4739,7 +4739,7 @@ var constants = require('../runner').constants;
 var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
 var EVENT_TEST_END = constants.EVENT_TEST_END;
 var EVENT_RUN_END = constants.EVENT_RUN_END;
-var inherits = require('../utils').inherits;
+var inherits = require('../../naruse-share/utils').inherits;
 var color = Base.color;
 var cursor = Base.cursor;
 
@@ -4850,7 +4850,7 @@ var EVENT_SUITE_END = constants.EVENT_SUITE_END;
 var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
 var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
 var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
-var inherits = require('../utils').inherits;
+var inherits = require('../../naruse-share/utils').inherits;
 var color = Base.color;
 
 /**
@@ -4952,7 +4952,7 @@ var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
 var EVENT_RUN_END = constants.EVENT_RUN_END;
 var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
 var EVENT_TEST_END = constants.EVENT_TEST_END;
-var inherits = require('../utils').inherits;
+var inherits = require('../../naruse-share/utils').inherits;
 var sprintf = util.format;
 
 /**
@@ -5242,7 +5242,7 @@ TAP.description = 'TAP-compatible output';
  */
 
 var Base = require('./base');
-var utils = require('../utils');
+var utils = require('../../naruse-share/utils');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
 var path = require('path');
@@ -15116,7 +15116,7 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],70:[function(require,module,exports){
-module.exports = require('./lib/_stream_duplex.js');
+module.exports = require('./lib/_stream_duplex.js.js');
 
 },{"./lib/_stream_duplex.js":71}],71:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
@@ -17387,19 +17387,19 @@ module.exports = require('events').EventEmitter;
 module.exports = require('./readable').PassThrough
 
 },{"./readable":80}],80:[function(require,module,exports){
-exports = module.exports = require('./lib/_stream_readable.js');
+exports = module.exports = require('./lib/_stream_readable.js.js');
 exports.Stream = exports;
 exports.Readable = exports;
-exports.Writable = require('./lib/_stream_writable.js');
-exports.Duplex = require('./lib/_stream_duplex.js');
-exports.Transform = require('./lib/_stream_transform.js');
-exports.PassThrough = require('./lib/_stream_passthrough.js');
+exports.Writable = require('./lib/_stream_writable.js.js');
+exports.Duplex = require('./lib/_stream_duplex.js.js');
+exports.Transform = require('./lib/_stream_transform.js.js');
+exports.PassThrough = require('./lib/_stream_passthrough.js.js');
 
 },{"./lib/_stream_duplex.js":71,"./lib/_stream_passthrough.js":72,"./lib/_stream_readable.js":73,"./lib/_stream_transform.js":74,"./lib/_stream_writable.js":75}],81:[function(require,module,exports){
 module.exports = require('./readable').Transform
 
 },{"./readable":80}],82:[function(require,module,exports){
-module.exports = require('./lib/_stream_writable.js');
+module.exports = require('./lib/_stream_writable.js.js');
 
 },{"./lib/_stream_writable.js":75}],83:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */

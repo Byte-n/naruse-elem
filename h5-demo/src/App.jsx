@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import ReactMiddleware from '../../package/naruse-h5/dist/index';
+import ReactMiddleware from '../../package/naruse-h5/dist';
 import Code from '../../dist/naruse.dev.debug';
 import { ayRequireList } from '../../package/naurse-ay-polyfill/index';
 import ReactDom from 'react-dom';
