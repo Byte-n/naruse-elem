@@ -48,6 +48,10 @@ const BLUE_BIRD_USER_RENEWALS_PIDS = {
     '5249': { fName: '解密地址', pid: 5249 },
     '5250': { fName: '一键发货', pid: 5250 },
 };
+const { userNick } = userInfo;
+const toDay = $moment().format('YYYYMMDD');
+const countCacheKey = `count_${userNick}_renewals_dialog`;// 缓存计数键值
+
 
 export class Template extends NaruseComponent {
     constructor () {
@@ -60,24 +64,19 @@ export class Template extends NaruseComponent {
         if (!this.isBlueBird15RenewalsPlan()) {
             return;
         }
-        const { userNick } = userInfo;
 
-        // 缓存计数键值
-        const countCacheKey = `count_${userNick}_renewals_dialog_${$moment().format('YYYYMMDD')}`;
-        const countCacheVal = '1';
-
-        const dialogCount = my.getStorageSync({ key: countCacheKey }).data;
-        console.log('gao_ dialogCount', dialogCount);
+        const dialogSign = my.getStorageSync({ key: countCacheKey }).data;
+        console.log('gao_ dialogSign', dialogSign);
         // 今天已经弹出过, 不处理
-        if (dialogCount === countCacheVal) {
+        if (dialogSign === toDay) {
             return;
         }
         buryAdPageView();
-        my.setStorageSync({ key: countCacheKey, data: countCacheVal });
         this.setState({ dialogVisible: true });
     }
 
     closeDialog () {
+        my.setStorageSync({ key: countCacheKey, data: toDay });
         this.setState({ dialogVisible: false });
     }
 
@@ -184,17 +183,13 @@ export class Template extends NaruseComponent {
         );
     }
 
-
     isBlueBird15RenewalsPlan () {
         console.log('gao isBlueBird15RenewalsPlan',);
         const { tag, promotion, vipFlag, vipTime } = userInfo;
         console.log('gao 1');
         const timeDistance = $moment(promotion, 'YYYY-MM-DD hh:mm:ss').diff($moment());
-        // console.log('gao 2.4', timeDistance)
         const _day = Math.ceil(timeDistance / 100 / 10 / 3600 / 24);
-        // console.log('gao 2.5',_day)
 
-        // const _day = 9;
         remainingDay = _day < 10 ? `0${_day}` : _day;
         console.log('gao 3', _day);
         // 有青鸟tag
@@ -232,19 +227,17 @@ export class Template extends NaruseComponent {
     }
 
     getTemplate () {
-        const { dialogVisible } = this.state;
-        console.log('gao_ dialogVisible', dialogVisible);
-        if (!dialogVisible) {
-            return;
-        }
-        if (isIOS()) {
-            return this.getIosPlanA();
-        }
-        return this.getAndroidPlanA();
+        return isIOS() ? this.getIosPlanA() : this.getAndroidPlanA();
     }
 
     render () {
         console.log('gao_ render1',);
-        return this.getTemplate();
+        const { dialogVisible } = this.state;
+        console.log('gao_ dialogVisible', dialogVisible);
+        return (
+            <view>
+                { dialogVisible && this.getTemplate()}
+            </view>
+        );
     }
 }
