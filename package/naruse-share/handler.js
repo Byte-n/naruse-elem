@@ -1,4 +1,4 @@
-import { logger } from './log';
+import { logger } from '../naruse-h5/utils/log';
 
 export class MethodHandler {
     constructor ({ name, success, fail, complete }) {
