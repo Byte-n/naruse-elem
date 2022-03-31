@@ -1,12 +1,10 @@
 import { naruseCreateElement } from '../components/index';
 import { Component } from 'react';
-import * as Storage from '../api/storage/index';
-import * as Route from '../api/route/index';
+import api from '../api/index';
 
 
 const Naruse = {
-    ...Storage,
-    ...Route,
+    ...api,
     Component,
     env: {
         USER_DATA_PATH: '',
@@ -15,10 +13,11 @@ const Naruse = {
         language: 'zh-Hans',
         platform: 'H5',
     },
-    getSystemInfoSync: () => {
-        return { platform: 'PC' };
-    },
 };
+
+if (typeof window !== 'undefined') {
+    window.Naruse = Naruse;
+}
 
 
 export const jsEngineEnv = {

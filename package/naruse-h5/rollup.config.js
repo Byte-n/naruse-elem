@@ -5,11 +5,13 @@ const replace = require('@rollup/plugin-replace');
 const { babel } = require('@rollup/plugin-babel');
 const css = require('../rollup-plugin-naruse/plugin/naruse-css-loader');
 const { uglify } = require('rollup-plugin-uglify');
+const inject = require('@rollup/plugin-inject');
 
 const customResolver = nodeResolve({ extensions: ['.mjs', '.js', '.jsx', '.json', '.sass', '.scss', '.css'] });
 
+const isDev = process.env.BUILD === 'development';
 
-module.exports = {
+const config = {
     input: './index.js',
     output: {
         file: './dist/index.js',
@@ -28,8 +30,15 @@ module.exports = {
             __IS_WEEX__: false,
         }),
         alias({ customResolver }),
-        externalGlobals({ react: 'React' }),
         css(),
-        uglify(),
     ],
 };
+
+if (!isDev) {
+    config.plugins.push(externalGlobals({ react: 'React' }));
+    config.plugins.push(uglify());
+} else {
+    config.plugins.push(inject({ React: 'react' }));
+}
+
+module.exports = config;
