@@ -33,3 +33,19 @@ export const exceptTypeSync = (obj, type, name) => {
     }
     return false;
 };
+
+
+/**
+ * @description 暂时不支持的api
+ * @author CHC
+ * @date 2022-03-30 18:03:04
+ * @param {*} apiName
+ * @returns {*}
+ */
+export const temporarilyNotSupport = function temporarilyNotSupport (apiName) {
+    return () => {
+        const errMsg = `暂时不支持 API ${apiName}`;
+        logger.error(errMsg);
+        return Promise.reject({ errMsg });
+    };
+};

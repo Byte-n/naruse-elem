@@ -1,4 +1,4 @@
-/** 简易事件中心，用来通知是否需要刷新 */
+/** 简易事件中心 */
 class EventBus {
     constructor () {
         this.listeners = {};
