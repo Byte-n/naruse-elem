@@ -13,7 +13,7 @@ const topImgAdress = 'http://q.aiyongtech.com/ad/images/6auY57qn5pCc57Si_1648690
 // 合单
 // const topImgAdress = 'http://q.aiyongtech.com/ad/images/6Ieq5Yqo5ZCI5Y2V_1648697856605.png';
 // 右上角升级
-// const topImgAdress = 'http://q.aiyongtech.com/ad/images/5Y+z5LiK6KeS_1648697997317.png';
+// const topImgAdress = 'q.aiyongtech.com/trade/web/img/rightTopAdImg.png;
 // 功能点模板下半部分图片
 const bottomImgAdress = 'http://q.aiyongtech.com/ad/images/55S75p2/5aSH5Lu9LTE3_1648690701005.gif';
 
