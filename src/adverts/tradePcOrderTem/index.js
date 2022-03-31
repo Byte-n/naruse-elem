@@ -1,4 +1,4 @@
-import { Component } from 'Naruse';
+import { Component, navigateToWebPage } from 'Naruse';
 import { buryAdOrderNow, buryAdPageView } from '@utils/beacon';
 
 // 模板样式
@@ -8,6 +8,14 @@ const topPart = { width: '800px', height: '390px' };
 const bottomPart = { width: '800px', height: '110px', position: 'relative' };
 const bottomImg = { width: '800px', height: '110px' };
 const bottomClickPart = { width: '400px', height: '110px', position: 'absolute', top: '0' };
+// 高级搜索
+const topImgAdress = 'http://q.aiyongtech.com/ad/images/6auY57qn5pCc57Si_1648690650355.png';
+// 合单
+// const topImgAdress = 'http://q.aiyongtech.com/ad/images/6Ieq5Yqo5ZCI5Y2V_1648697856605.png';
+// 右上角升级
+// const topImgAdress = 'http://q.aiyongtech.com/ad/images/5Y+z5LiK6KeS_1648697997317.png';
+// 功能点模板下半部分图片
+const bottomImgAdress = 'http://q.aiyongtech.com/ad/images/55S75p2/5aSH5Lu9LTE3_1648690701005.gif';
 
 export default class TradePcOrderTem extends Component {
     componentDidMount () {
@@ -18,16 +26,16 @@ export default class TradePcOrderTem extends Component {
         let url = type === 'quarter' ? 'https://c.tb.cn/Y4.iffUB' : 'https://c.tb.cn/Y4.iWcM7';
         let beaconText = type === 'quarter' ? '52/季度' : '148/年';
         buryAdOrderNow(beaconText);
-        my.qn.navigateToWebPage({ url });
+        navigateToWebPage({ url });
     }
 
     render () {
         return (
             <view style={tradePcOrderTem}>
                 <view style={tradePcOrderTemMain}>
-                    <image style={topPart} src='http://q.aiyongtech.com/ad/images/6auY57qn5pCc57Si_1648690650355.png' />
+                    <image style={topPart} src={topImgAdress} />
                     <view style={bottomPart}>
-                        <image style={bottomImg} src='http://q.aiyongtech.com/ad/images/55S75p2/5aSH5Lu9LTE3_1648690701005.gif' />
+                        <image style={bottomImg} src={bottomImgAdress} />
                         <view style={{ ...bottomClickPart, left: '0' }} onClick={() => this.jumpOrderLink('quarter')}></view>
                         <view style={{ ...bottomClickPart, right: '0' }} onClick={() => this.jumpOrderLink('year')}></view>
                     </view>
