@@ -41,6 +41,10 @@ let remainingDay = 0;
 const adInfo = $adImport.adData.results[0];
 console.log('gao adInfo', adInfo);
 console.log('gao env',   my.getSystemInfoSync());
+const { userNick } = userInfo;
+const toDay = $moment().format('YYYYMMDD');
+const countCacheKey = `count_${userNick}_renewals_dialog`;// 缓存计数键值
+
 class blueBirdRenewalsDialog extends NaruseComponent {
     constructor () {
         this.state = { dialogVisible: false };
@@ -52,21 +56,15 @@ class blueBirdRenewalsDialog extends NaruseComponent {
         if (!this.isBlueBird15RenewalsPlan()) {
             return;
         }
-        const { userNick } = userInfo;
 
-        // 缓存计数键值
-        const countCacheKey = `count_${userNick}_renewals_dialog_${$moment().format('YYYYMMDD')}`;
-        const countCacheVal = '1';
-
-        const dialogCount = my.getStorageSync({ key: countCacheKey }).data;
-        console.log('gao_ dialogCount', dialogCount);
+        const dialogSign = my.getStorageSync({ key: countCacheKey }).data;
+        console.log('gao_ dialogSign', dialogSign);
         // 今天已经弹出过, 不处理
-        if (dialogCount === countCacheVal) {
+        if (dialogSign === toDay) {
             return;
         }
         buryAdPageView();
         this.setState({ dialogVisible: true });
-        my.setStorageSync({ key: countCacheKey, data: countCacheVal });
     }
 
     getAdKey () {
@@ -83,7 +81,6 @@ class blueBirdRenewalsDialog extends NaruseComponent {
 
     iosBuy () {
         const { body } = adInfo.user_define;
-        const { pid } = adInfo;
         const text = body.service.replace('[ios_url]', body.ios_url);
         buryAdOrderNow('/跳客服');
         console.log('buy ios', text);
@@ -92,9 +89,7 @@ class blueBirdRenewalsDialog extends NaruseComponent {
 
     androidBuy () {
         const { body } = adInfo.user_define;
-        const { pid } = adInfo;
         console.log('buy androidBuy',);
-        $adSensorsBeacon.adOrderNowBeacon(adInfo, '148/年', pid);
         this.gotoWebPage(body.android_url);
         buryAdOrderNow('148/年');
     }
@@ -142,12 +137,16 @@ class blueBirdRenewalsDialog extends NaruseComponent {
     }
 
     closeDialog () {
+        my.setStorageSync({ key: countCacheKey, data: toDay });
         this.setState({ dialogVisible: false });
     }
 
     render () {
-        const _this = this;
         const { dialogVisible } = this.state;
+        if (!dialogVisible) {
+            return <view/>;
+        }
+        const _this = this;
         const { body } = adInfo.user_define;
         const { pid } = adInfo;
         const adKey = this.getAdKey();
@@ -159,11 +158,11 @@ class blueBirdRenewalsDialog extends NaruseComponent {
             };
         };
         const buyClick = function () {
-            return _isIOS() ? _this.iosBuy : _this.androidBuy;
+            return isIOS() ? _this.iosBuy : _this.androidBuy;
         };
         console.log('gao render 4',);
-        return (<view>
-            {dialogVisible && <view style={wrapperStyle}>
+        return (
+            <view style={wrapperStyle}>
                 <view style={mainStyle}>
                     <image style={{ width: `${imgSize[0]}rpx`, height: `${imgSize[1]}rpx` }} src={body.img}/>
                     <view style={titleStyle}> {`恭喜解锁${BLUE_BIRD_USER_RENEWALS_PIDS[pid].fName}功能`}</view>
@@ -176,7 +175,7 @@ class blueBirdRenewalsDialog extends NaruseComponent {
                         {body[adKey.btn]}
                     </text>
                 </view>
-            </view>}
-        </view>);
+            </view>
+        );
     }
 }

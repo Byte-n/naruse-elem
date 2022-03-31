@@ -20,6 +20,7 @@ module.exports = {
                 'id-length': 'off',
                 'require-jsdoc-except/require-jsdoc': 0,
                 'no-cond-assign': 0,
+                'eol-last': 'off',
             },
             globals: {
                 NaruseComponent: 'readonly',
