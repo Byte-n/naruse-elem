@@ -871,7 +871,10 @@ const evaluate_map = {
             const object = evaluate(node.callee.object, scope)
             return func.apply(object, args)
         } else {
-            const this_val = scope.$find('this')
+            let this_val = scope.$find('this')
+            if (func === setTimeout || func === setInterval) {
+                this_val = null
+            }
             return func.apply(this_val ? this_val.$get() : null, args)
         }
     },
@@ -998,7 +1001,7 @@ const findErrorCode = (pos) => {
     while (!(headPos === -1 && endPos === endFlag)) {
         if (headPos !== -1) {
             // ; \r
-            if ([59,19].includes(runingCode[headPos].charCodeAt())) {
+            if ([59, 19].includes(runingCode[headPos].charCodeAt())) {
                 res[0] = headPos + 1;
                 headPos = -1;
             } else {
@@ -1006,7 +1009,7 @@ const findErrorCode = (pos) => {
             }
         }
         if (endPos !== endFlag) {
-            if ([59,19].includes(runingCode[endPos].charCodeAt())) {
+            if ([59, 19].includes(runingCode[endPos].charCodeAt())) {
                 res[1] = endPos;
                 endPos = endFlag;
             } else {

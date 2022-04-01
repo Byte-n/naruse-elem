@@ -1,4 +1,5 @@
-import { Component } from 'Naruse';
+import ConfirmBuyedDialog from '@components/confirmBuyedDialog';
+import { Component, navigateToWebPage } from 'Naruse';
 const wrapperStyle = { display: 'flex', width: '100vw', height: '100vh', position: 'fixed', top: 0, left: 0, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.7)', zIndex: 900 };
 const mainStyle = { display: 'flex', flexDirection: 'column', position: 'relative', alignItems: 'center' };
 const closeStyle = {
@@ -26,10 +27,6 @@ export default class blueBirdRenewalsDialog extends Component {
         this.state = { dialogVisible: true };
     }
 
-    componentDidMount () {
-        console.log('啊哈哈哈');
-    }
-
     getAdKey () {
         const prefix =  'ios';
         return {
@@ -43,6 +40,8 @@ export default class blueBirdRenewalsDialog extends Component {
     }
 
     closeDialog () {
+        let url = 'qwer';
+        navigateToWebPage({ url });
         $adImport.uninstall();
         this.setState({ dialogVisible: false });
     }
@@ -50,6 +49,7 @@ export default class blueBirdRenewalsDialog extends Component {
     render () {
         return (<view>
             {this.state.dialogVisible && <view style={wrapperStyle}>
+                <ConfirmBuyedDialog />
                 <view style={mainStyle}>
                     <image style={{ width: `${600}rpx`, height: `${720}rpx` }} src={'http://q.aiyongtech.com/ad/images/TUIy_1646823381653.png'}/>
                     <view style={titleStyle}> {'恭喜解锁批量退款功能'}</view>
