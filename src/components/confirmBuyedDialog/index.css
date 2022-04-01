@@ -1,0 +1,81 @@
+.warpStyle {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.4);
+    z-index: 900
+}
+
+.dialogBox {
+    font-size: 18rpx;
+    display: flex;
+    flex-direction: column;
+    width: 352px;
+    min-height: 145px;
+    background-color: #fff;
+    position: relative;
+    border-radius: 4rpx;
+    transition: all 0.5s;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dialogBoxDown {
+    opacity: 0;
+    transform: translateY(-50%);
+}
+
+.dialogHeader {
+    display: flex;
+    padding: 30rpx 20rpx 10rpx 20rpx;
+    color: #000;
+    justify-content: space-between;
+}
+
+.dialogLine {
+    height: 1rpx;
+    background-color: #ccc;
+    margin: 10rpx 15rpx 0;
+}
+
+.dialogContent {
+    padding: 20rpx;
+}
+
+.dialogBottom {
+    padding: 25rpx;
+    display: flex;
+    justify-content: space-around;
+}
+
+.dialogButton {
+    color: white;
+    font-size: 12rpx;
+    padding: 0 16rpx;
+    height: 44rpx;
+    line-height: 44rpx;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all .3s ease-out;
+    background-color: #4389f1;
+    border-color: #4389f1;
+}
+
+.dialogButtonWhite {
+    color: #4389f1;
+    background-color: #e4eefc;
+}
+
+.dialogButtonHover {
+    background-color: #4389f1;
+    color: white;
+}
+
+.dialogSelection {
+    margin-bottom: 15rpx;
+}

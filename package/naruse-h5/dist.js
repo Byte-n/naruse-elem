@@ -1145,7 +1145,12 @@ const evaluate_map = {
       const object = evaluate(node.callee.object, scope);
       return func.apply(object, args);
     } else {
-      const this_val = scope.$find('this');
+      let this_val = scope.$find('this');
+
+      if (func === setTimeout || func === setInterval) {
+        this_val = null;
+      }
+
       return func.apply(this_val ? this_val.$get() : null, args);
     }
   },
@@ -2602,8 +2607,7 @@ const navigateBack = (options = {}) => {
     });
   }
 
-  for (let i = 0; i < delta; i++) window.history.back();
-
+  window.history.go(-Number(delta));
   return handle.success();
 };
 
@@ -2669,7 +2673,7 @@ const setClipboardData = ({
     } else if (typeof window.copy === 'function') {
       window.copy(data);
     } else {
-      throw new Error('Unsupported Function.');
+      throw new Error('Unsupported Function');
     }
 
     return handle.success();

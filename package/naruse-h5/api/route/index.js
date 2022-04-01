@@ -64,7 +64,7 @@ export const navigateBack = (options = {}) => {
         return handle.fail({ errMsg: 'delta must a number' });
     }
 
-    for (let i = 0; i < delta; i++) window.history.back();
+    window.history.go(-Number(delta));
 
     return handle.success();
 };

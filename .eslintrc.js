@@ -30,6 +30,8 @@ module.exports = {
                 $moment: 'readonly',
                 $adSensorsBeacon: 'readonly',
                 $userInfoChanger: 'readonly',
+                $openChat: 'readonly',
+                $ayApi: 'readonly',
                 Promise: 'readonly',
             },
         },

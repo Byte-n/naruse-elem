@@ -113,7 +113,6 @@ interface userInfo {
 
 
 declare global {
-    var NaruseComponent: NaruseComponent;
     var $mappUtils: typeof mappUtils;
     var $openChat: openChat;
     var $userInfoChanger: typeof userInfoChanger;
