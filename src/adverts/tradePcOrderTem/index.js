@@ -4,12 +4,14 @@ import { buryAdOrderNow, buryAdPageView } from '@utils/beacon';
 
 // 模板样式
 const tradePcContainer = { width: '100vw', height: '100vh', position: 'fixed', top: '0', left: '0', backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 900 };
-const tradePcOrderTem = { width: '800rpx', height: '506rpx', background: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+const tradePcOrderTem = { width: '800rpx', height: '500rpx', background: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+const dialogBox = { transition: 'all 0.5s', opacity: '1', transform: 'translateY(0)' };
+const dialogBoxDown = { opacity: '0', transform: 'translateY(-50%)' };
 const tradePcOrderTemMain = { width: '800rpx', height: '500rpx', position: 'relative' };
 const topPart = { width: '800rpx', height: '390rpx' };
-const bottomPart = { width: '800rpx', height: '110rpx', position: 'relative' };
-const bottomImg = { width: '800rpx', height: '110rpx' };
-const bottomClickPart = { width: '400rpx', height: '110rpx', position: 'absolute', top: '0' };
+const bottomPart = { width: '800rpx', height: '100rpx', position: 'relative' };
+const bottomImg = { width: '800rpx', height: '100rpx' };
+const bottomClickPart = { width: '400rpx', height: '100rpx', position: 'absolute', top: '0' };
 const closeStyle = {
     color: 'rgba(255, 255, 255, 0.8)',
     padding: '10rpx 40rpx',
@@ -40,11 +42,21 @@ const {
  */
 export default class TradePcOrderTem extends Component {
     constructor() {
-        this.state = { isShow: true, isShowPayRes: false };
+        this.state = {
+            isShow: true,
+            isShowPayRes: false,
+            animation: true,
+            reBuyLink: orderYearLink,
+        };
     }
 
     componentDidMount() {
         buryAdPageView();
+        new Promise((res) => {
+            setTimeout(res, 500);
+        }).then(() => {
+            this.setState({ animation: false });
+        });
     }
 
     /**
@@ -56,7 +68,7 @@ export default class TradePcOrderTem extends Component {
         let beaconText = type === 'quarter' ? leftButton : rightButton;
         buryAdOrderNow(beaconText);
         navigateToWebPage({ url });
-        this.setState({ isShowPayRes: true });
+        this.setState({ isShowPayRes: true, reBuyLink: url });
     }
 
     /**
@@ -64,20 +76,25 @@ export default class TradePcOrderTem extends Component {
      */
     colsePopup = () => {
         $uninstall();
-        this.setState({ isShow: false });
+        this.setState({ animation: true });
+        new Promise((res) => {
+            setTimeout(res, 500);
+        }).then(() => {
+            this.setState({ isShow: false });
+        });
     }
 
     render() {
-        const { isShow, isShowPayRes } = this.state;
+        const { isShow, isShowPayRes, animation, reBuyLink } = this.state;
         return (
             <view>
                 {
                     isShow && (
                         <view style={tradePcContainer}>
                             {
-                                isShowPayRes && <ConfirmBuyedDialog />
+                                isShowPayRes && <ConfirmBuyedDialog reBuyLink={reBuyLink} />
                             }
-                            <view style={tradePcOrderTem}>
+                            <view style={{ ...tradePcOrderTem, ...dialogBox, ...(animation ? dialogBoxDown : {}) }}>
                                 <view style={tradePcOrderTemMain}>
                                     <image style={topPart} src={topImgUrl} />
                                     <view style={bottomPart}>
