@@ -1,3 +1,4 @@
+import ConfirmBuyedDialog from '@components/confirmBuyedDialog';
 import { Component, navigateToWebPage } from 'Naruse';
 import { buryAdOrderNow, buryAdPageView } from '@utils/beacon';
 
@@ -16,7 +17,7 @@ const closeStyle = {
     borderRadius: '50rpx',
     position: 'absolute',
     bottom: '-100rpx',
-    left: '230px',
+    left: '340rpx',
 };
 
 // 用户信息
@@ -34,34 +35,48 @@ const {
     rightButton
 } = adInfo.user_define.body;
 
+/**
+ * Pc功能点模板
+ */
 export default class TradePcOrderTem extends Component {
     constructor() {
-        this.state = { isShow: true };
+        this.state = { isShow: true, isShowPayRes: false };
     }
 
     componentDidMount() {
         buryAdPageView();
     }
 
+    /**
+     * 跳转订购
+     * @param {String} type 订购类型
+     */
     jumpOrderLink = (type) => {
         let url = type === 'quarter' ? orderQuarterLink : orderYearLink;
         let beaconText = type === 'quarter' ? leftButton : rightButton;
         buryAdOrderNow(beaconText);
         navigateToWebPage({ url });
+        this.setState({ isShowPayRes: true });
     }
 
+    /**
+     * 模板弹窗关闭
+     */
     colsePopup = () => {
-        $adImport.uninstall();
+        $uninstall();
         this.setState({ isShow: false });
     }
 
     render() {
-        const { isShow } = this.state;
+        const { isShow, isShowPayRes } = this.state;
         return (
             <view>
                 {
                     isShow && (
-                        <view style={tradePcContainer} onClick={this.colsePopup}>
+                        <view style={tradePcContainer}>
+                            {
+                                isShowPayRes && <ConfirmBuyedDialog />
+                            }
                             <view style={tradePcOrderTem}>
                                 <view style={tradePcOrderTemMain}>
                                     <image style={topPart} src={topImgUrl} />
