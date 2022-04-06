@@ -81,9 +81,9 @@ export default class TradePcOrderTem extends Component {
         new Promise((res) => {
             setTimeout(res, 500);
         }).then(() => {
-            this.setState({ isShow: false });
+            this.setState({ isShow: false, isShowPayRes: false });
+            $uninstall();
         });
-        $uninstall();
     }
 
     render() {
@@ -94,7 +94,7 @@ export default class TradePcOrderTem extends Component {
                     isShow && (
                         <view style={tradePcContainer}>
                             {
-                                isShowPayRes && <ConfirmBuyedDialog reBuyLink={reBuyLink} />
+                                isShowPayRes && <ConfirmBuyedDialog onClose={() => this.setState({ isShowPayRes: false })} reBuyLink={reBuyLink} />
                             }
                             <view style={{ ...tradePcOrderTem, ...dialogBox, ...(animation ? dialogBoxDown : {}) }}>
                                 <view style={tradePcOrderTemMain}>
