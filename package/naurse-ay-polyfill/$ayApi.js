@@ -4,3 +4,11 @@ export const api = ({ callback, ...args }) => {
         callback({});
     }, 1000);
 };
+
+export const apiAsync = () => {
+    return new Promise((res) => {
+        setTimeout(() => {
+            res({});
+        }, 1000);
+    });
+};

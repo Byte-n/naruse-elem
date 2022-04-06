@@ -46,6 +46,7 @@ export default class ConfirmBuyedDialog extends Component {
         new Promise((res) => {
             setTimeout(res, 500);
         }).then(() => {
+            this.props.onClose && this.props.onClose();
             this.setState({ visible: false });
         });
     }
