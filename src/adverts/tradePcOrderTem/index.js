@@ -10,7 +10,7 @@ const dialogBoxDown = { opacity: '0', transform: 'translateY(-50%)' };
 const tradePcOrderTemMain = { width: '800px', height: '500px', position: 'relative' };
 const topPart = { width: '800px', height: '390px' };
 const bottomPart = { width: '800px', height: '100px', position: 'relative', cursor: 'pointer', marginTop: '-4px' };
-const bottomImg = { width: '800px', height: '100px' };
+const bottomImg = { width: '800px' };
 const bottomClickPart = { width: '400px', height: '100px', position: 'absolute', top: '0' };
 const closeStyle = {
     color: 'rgba(255, 255, 255, 0.8)',
@@ -52,8 +52,18 @@ export default class TradePcOrderTem extends Component {
     }
 
     componentDidMount() {
+        const { creative_id, creative_name, secondary_class, pid_name, primary_class,pid } = adInfo;
+        $sensorsBeacon.sensorsBeacon('YY_AdPageview', {
+            primary_class,
+            secondary_class,
+            cid: Number(creative_id),
+            pid: Number(pid) ,
+            cname: creative_name,
+            pname: pid_name,
+            from_pid: pid,
+            from_pname: pid_name,
+        });
         // 发送初始化埋点
-        $adSensorsBeacon.adViewBeacon(adInfo, false, adInfo.pid);
         new Promise((res) => {
             setTimeout(res, 500);
         }).then(() => {
@@ -98,9 +108,9 @@ export default class TradePcOrderTem extends Component {
                             }
                             <view style={{ ...tradePcOrderTem, ...dialogBox, ...(animation ? dialogBoxDown : {}) }}>
                                 <view style={tradePcOrderTemMain}>
-                                    <image style={topPart} src={topImgUrl} />
+                                    <image style={topPart} src={topImgUrl} mode='widthFix' />
                                     <view style={bottomPart}>
-                                        <image style={bottomImg} src={bottomImgUrl} />
+                                        <image style={bottomImg} src={bottomImgUrl}  mode='aspectFit'/>
                                         <view style={{ ...bottomClickPart, left: '0' }} onClick={() => this.jumpOrderLink('quarter')}></view>
                                         <view style={{ ...bottomClickPart, right: '0' }} onClick={() => this.jumpOrderLink('year')}></view>
                                     </view>
