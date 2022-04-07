@@ -1270,16 +1270,22 @@ class Scope {
     }[kind]();
   }
 
-} // 防止报错栈过多
+} // 记录每条语句的id
 
 
-let hasError = false;
+let traceId = 0; // 记录执行栈
+
+const traceStack = []; // 正在执行的语句
+
 let runingCode = '';
 
 const findErrorCode = pos => {
   if (!pos) return code;
+  pos = pos < 0 ? -1 : pos;
   let headPos = pos;
   let endPos = pos;
+  let headCount = 0;
+  let endCount = 0;
   const endFlag = runingCode.length - 1;
   const res = [0, endFlag];
 
@@ -1287,8 +1293,13 @@ const findErrorCode = pos => {
     if (headPos !== -1) {
       // ; \r
       if ([59, 19].includes(runingCode[headPos].charCodeAt())) {
-        res[0] = headPos + 1;
-        headPos = -1;
+        if (headCount === 2) {
+          res[0] = headPos + 1;
+          headPos = -1;
+        } else {
+          headCount++;
+          headPos++;
+        }
       } else {
         headPos !== -1 && headPos--;
       }
@@ -1296,8 +1307,13 @@ const findErrorCode = pos => {
 
     if (endPos !== endFlag) {
       if ([59, 19].includes(runingCode[endPos].charCodeAt())) {
-        res[1] = endPos;
-        endPos = endFlag;
+        if (endCount === 2) {
+          res[1] = endPos;
+          endPos = endFlag;
+        } else {
+          endCount++;
+          endPos++;
+        }
       } else {
         endPos++;
       }
@@ -1305,23 +1321,32 @@ const findErrorCode = pos => {
   }
 
   const errorCode = runingCode.slice(res[0], res[1]);
-  return `${errorCode}\n${'^'.repeat(res[1] - res[0])}`;
+  const repeatNum = res[1] - res[0];
+  return `${errorCode}\n${'^'.repeat(repeatNum > 40 ? 40 : repeatNum)}`;
 };
 
 const evaluate = (node, scope, arg) => {
+  const thisId = traceId++;
+
   const error = err => {
-    if (!hasError && err) {
-      hasError = true;
-      console.error('[naruse-parser] 错误代码\n' + findErrorCode(node.pos));
+    console.log(err, thisId, traceId, traceStack); // 栈顶的id等于当前id，说明是当前语句
+
+    if (traceStack[traceStack.length - 1] === thisId && err) {
+      console.error('[naruse-parser] 错误代码\n' + findErrorCode(node.pos - 3));
       err && console.error('[naruse-parser] 错误信息', err);
       throw new Error('[naruse-parser] 代码执行错误！');
     }
   };
 
+  traceStack.push(thisId);
+
   const _evalute = evaluate_map[node.type] || error();
 
   try {
-    return _evalute(node, scope, arg);
+    const res = _evalute(node, scope, arg);
+
+    traceStack.pop();
+    return res;
   } catch (e) {
     error(e);
   }
@@ -1365,8 +1390,8 @@ const default_api = {
 };
 
 const run = (code, append_api = {}) => {
-  hasError = false;
   runingCode = code;
+  traceStack.length = 0;
   const scope = new Scope('block');
   scope.$const('this', undefined);
 
@@ -1628,8 +1653,6 @@ class Button extends Component {
     return React.createElement("button", {
       onMouseEnter: this.onTouchStart.bind(this),
       onMouseLeave: this.onTouchEnd.bind(this),
-      onMouseDown: this.onActiveStart.bind(this),
-      onMouseUp: this.onActiveEnd.bind(this),
       style: conStyle,
       disabled: disabled,
       className: className,
@@ -2138,6 +2161,8 @@ const transformRpx = (props = {}) => {
     }
   }
 };
+
+const version = '0.0.4';
 
 class MethodHandler {
   constructor({
@@ -2733,7 +2758,8 @@ const Naruse = { ...api,
     clientVersion: '0.0.1',
     language: 'zh-Hans',
     platform: 'H5'
-  }
+  },
+  version
 };
 
 if (typeof window !== 'undefined') {
