@@ -1,6 +1,11 @@
 module.exports = {
     root: true,
     env: { es6: true },
+    parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: { jsx: true },
+    },
     extends: [
         'eslint-config-ay',
         'eslint-config-ay/import',
