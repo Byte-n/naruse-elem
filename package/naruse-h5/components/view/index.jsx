@@ -42,8 +42,8 @@ class View extends Component {
         const { hover } = this.state;
 
         const conStyle = {
-            ...(hover ? hoverStyle : {}),
             ...style,
+            ...(hover ? hoverStyle : {}),
         };
 
 
