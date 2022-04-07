@@ -21,6 +21,7 @@ const closeStyle = {
     bottom: '-100px',
     left: '340px',
     cursor: 'pointer',
+    transition: 'all 0.5s'
 };
 
 // 用户信息
@@ -115,6 +116,7 @@ export default class TradePcOrderTem extends Component {
                                         <view style={{ ...bottomClickPart, right: '0' }} onClick={() => this.jumpOrderLink('year')}></view>
                                     </view>
                                     <view
+                                        hoverStyle={{ backgroundColor: 'white', color: '#66666'  }}
                                         style={closeStyle}
                                         onClick={this.colsePopup}
                                     >

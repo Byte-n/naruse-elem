@@ -1619,6 +1619,7 @@ class Button extends Component {
     } = this.state;
     const conStyle = { ...cssStyle$2['a-button'],
       ...(type ? cssStyle$2[type] : {}),
+      ...style,
       ...(hover ? hoverStyle : {}),
       ...(active ? { ...cssStyle$2.active,
         ...activeStyle
@@ -1629,9 +1630,7 @@ class Button extends Component {
       onMouseLeave: this.onTouchEnd.bind(this),
       onMouseDown: this.onActiveStart.bind(this),
       onMouseUp: this.onActiveEnd.bind(this),
-      style: { ...conStyle,
-        ...style
-      },
+      style: conStyle,
       disabled: disabled,
       className: className,
       onClick: commonEventHander.bind(this),
@@ -1974,10 +1973,10 @@ class Text extends Component {
     const {
       hover
     } = this.state;
-    const cls = { ...(hover ? hoverStyle : {}),
-      ...cssStyle.text,
+    const cls = { ...cssStyle.text,
       ...(selectable ? cssStyle.textSelectable : {}),
-      ...style
+      ...style,
+      ...(hover ? hoverStyle : {})
     };
     return React.createElement("span", {
       onMouseEnter: this.onTouchStart.bind(this),
@@ -2044,8 +2043,8 @@ class View extends Component {
     const {
       hover
     } = this.state;
-    const conStyle = { ...(hover ? hoverStyle : {}),
-      ...style
+    const conStyle = { ...style,
+      ...(hover ? hoverStyle : {})
     };
     return React.createElement("div", {
       onMouseEnter: this.onTouchStart.bind(this),
