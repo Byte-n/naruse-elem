@@ -1,5 +1,6 @@
 import { naruseCreateElement } from '../components/index';
 import { Component } from 'react';
+import { version } from '../../naruse-share/index';
 import api from '../api/index';
 
 
@@ -13,6 +14,7 @@ const Naruse = {
         language: 'zh-Hans',
         platform: 'H5',
     },
+    version,
 };
 
 if (typeof window !== 'undefined') {
