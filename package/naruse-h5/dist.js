@@ -1329,8 +1329,8 @@ const evaluate = (node, scope, arg) => {
   const thisId = traceId++;
 
   const error = err => {
-    console.log(err, thisId, traceId, traceStack); // 栈顶的id等于当前id，说明是当前语句
-
+    // console.log(err, thisId, traceId, traceStack)
+    // 栈顶的id等于当前id，说明是当前语句
     if (traceStack[traceStack.length - 1] === thisId && err) {
       console.error('[naruse-parser] 错误代码\n' + findErrorCode(node.pos - 3));
       err && console.error('[naruse-parser] 错误信息', err);
