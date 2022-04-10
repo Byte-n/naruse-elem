@@ -38,10 +38,10 @@ class Text extends Component {
         const { className, selectable = false, style, hoverStyle, ...restProps } = this.props;
         const { hover } = this.state;
         const cls = {
-            ...(hover ? hoverStyle : {}),
             ...cssStyle.text,
             ...(selectable ? cssStyle.textSelectable : {}),
             ...style,
+            ...(hover ? hoverStyle : {}),
         };
 
         return (

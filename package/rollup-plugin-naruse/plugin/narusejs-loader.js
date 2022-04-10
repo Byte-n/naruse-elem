@@ -8,13 +8,22 @@ const getAst = (source) => {
     return transformSync(source, {
         ast: true,
         plugins: [
+            // 转译扩展运算符
             [require('@babel/plugin-proposal-object-rest-spread')],
+            // 转译对象简写
             [require('@babel/plugin-transform-shorthand-properties')],
+            // 转译对象结构
             [require('@babel/plugin-transform-destructuring')],
+            // 转译函数参数
             [require('@babel/plugin-transform-parameters')],
+            // 转译模版语法
             [require('@babel/plugin-transform-template-literals')],
-            [require('./babe-plugin-transform-arrow-function')],
-            [require('./babel-plugin-transform-class&properties')],
+            // 转译箭头函数
+            [require('./babel-plugins/babe-plugin-transform-arrow-function')],
+            // class 语法转译为 es3
+            [require('./babel-plugins/babel-plugin-transform-class&properties')],
+            // 不支持语法提示
+            [require('./babel-plugins/babel-plugin-naruse-unsupport')],
         ],
     }).ast;
 };
