@@ -31,3 +31,11 @@ export const isEmpty = (key) => {
     }
 };
 
+
+/**
+ * @description 判断是否是函数
+ * @author CHC
+ * @date 2022-04-07 13:04:03
+ * @param {*} obj
+ */
+export const isFunc = (obj) => typeof obj === 'function';

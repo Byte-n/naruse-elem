@@ -77,6 +77,7 @@ class Button extends Component {
         const conStyle = {
             ...cssStyle['a-button'],
             ...(type ? cssStyle[type] : {}),
+            ...style,
             ...(hover ? hoverStyle : {}),
             ...(active ? { ...cssStyle.active, ...activeStyle } : {}),
         };
@@ -85,9 +86,7 @@ class Button extends Component {
             <button
                 onMouseEnter={this.onTouchStart.bind(this)}
                 onMouseLeave={this.onTouchEnd.bind(this)}
-                onMouseDown={this.onActiveStart.bind(this)}
-                onMouseUp={this.onActiveEnd.bind(this)}
-                style={{ ...conStyle, ...style }}
+                style={conStyle}
                 disabled={disabled}
                 className={className}
                 onClick={commonEventHander.bind(this)}

@@ -1,5 +1,8 @@
 import { NaruseComponent } from './component';
 import { globalEvent, EventBus } from '../../naruse-share/eventCenter';
+import { initNaruseAlipayApi } from '../api/index';
+import { version } from '../../naruse-share/index';
+
 // naruse模块内容
 export const Naruse = {
     Component: NaruseComponent,
@@ -11,5 +14,7 @@ export const Naruse = {
         language: 'zh-Hans',
         platform: 'alipay',
     },
+    version,
     ...my,
+    ...initNaruseAlipayApi(),
 };
