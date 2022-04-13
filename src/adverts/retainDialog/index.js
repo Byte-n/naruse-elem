@@ -4,16 +4,12 @@ import { buryAdOrderNow, buryAdPageView } from '@utils/beacon';
 import style from './index.css';
 import { isIOS,isNotVip } from '@utils/userInfo';
 
-console.log(isIOS(),isNotVip,'isIOSisIOSisIOSisIOS')
 // 模板样式
 
 // 用户信息
 const userInfo = $userInfoChanger.getUserInfo();
 // 广告信息
 const adInfo = $adImport.adData.results[0];
-console.log('ad_ adInfo', adInfo);
-console.log('ad_ userInfo', userInfo);
-console.log(adInfo.user_define.body,'dd')
 const {
     android_url,
     text,
