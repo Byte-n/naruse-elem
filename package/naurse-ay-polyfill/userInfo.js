@@ -15,3 +15,12 @@ let _userInfo = {
 export const getUserInfo = () => {
     return _userInfo || {};
 };
+
+/**
+ * 更新用户信息
+ */
+export const updateUserInfo = () => {
+    return new Promise((resolve) => {
+        resolve(_userInfo);
+    })
+}

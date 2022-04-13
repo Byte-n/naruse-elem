@@ -18,6 +18,8 @@ module.exports = {
             __IS_ALIAPY__: true,
             __IS_H5__: false,
         }),
-        uglify(),
+        uglify({
+            compress: false
+        }),
     ],
 };
