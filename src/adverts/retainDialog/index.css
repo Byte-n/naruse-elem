@@ -1,0 +1,27 @@
+.warpStyle {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+    background-color: rgba(0,0,0,0.4);
+    z-index: 900
+}
+
+.image{
+    width:600rpx;
+    height:720rpx;
+}
+.closeBox{
+    width:100%;
+    text-align: center;
+    margin-top:80rpx;
+}
+.closeBtn{
+    width:44rpx;
+    height:44rpx;
+}

@@ -1,0 +1,75 @@
+.warpStyle {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.4);
+    z-index: 900
+}
+
+.dialogBox {
+    font-size: 18rpx;
+    display: flex;
+    flex-direction: column;
+    width: 600rpx;
+    min-height: 145px;
+    background-color: #fff;
+    position: relative;
+    border-radius: 4rpx;
+    transition: all 0.5s;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dialogBoxDown {
+    opacity: 0;
+    transform: translateY(-50%);
+}
+
+.dialogHeader {
+    display: flex;
+    padding: 30rpx 20rpx 10rpx 20rpx;
+    color: #000;
+    justify-content: space-between;
+    font-size:36rpx;
+}
+
+.dialogLine {
+    height: 1rpx;
+    background-color: #ccc;
+    margin: 10rpx 15rpx 0;
+}
+
+.dialogContent {
+    padding: 32rpx 20rpx;
+    font-size:30rpx;
+    line-height:50rpx;
+}
+
+.dialogBottom {
+    display: flex;
+    justify-content: space-around;
+    border-top:1px solid #f1f1f1;
+    line-height:50rpx;
+    font-size:30rpx;
+}
+
+.dialogButton {
+    width:50%;
+    font-size: 28rpx;
+    text-align: center;
+    font-size:30rpx;
+    border:none;
+}
+.dialogSelection {
+    font-size:28rpx;
+}
+
+.dialogButtonRight{
+    background-color:#4389f1;
+    color:#fff;
+}
