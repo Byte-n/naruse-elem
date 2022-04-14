@@ -1,11 +1,12 @@
 module.exports = {
     root: true,
-    env: { es6: true },
     parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
         ecmaFeatures: { jsx: true },
+        babelOptions: { rootMode: 'upward' },
     },
+    parser: '@babel/eslint-parser',
     extends: [
         'eslint-config-ay',
         'eslint-config-ay/import',
@@ -28,7 +29,6 @@ module.exports = {
                 'eol-last': 'off',
             },
             globals: {
-                NaruseComponent: 'readonly',
                 $adImport: 'readonly',
                 $mappUtils: 'readonly',
                 my: 'readonly',
