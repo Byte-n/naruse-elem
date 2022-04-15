@@ -1,5 +1,6 @@
 import {
-    logger
+    logger,
+    NOOP
 } from './uitl';
 /**
  * @description naruseComponent 实现
@@ -15,7 +16,7 @@ export class NaruseComponent {
         // 中间件实例
         this.$updater = null;
     }
-    setState(update, callback) {
+    setState(update, callback = NOOP) {
         if (!this.$updater) {
             logger.error('小程序组件未装载完毕，无法更新！');
             return;
@@ -31,7 +32,7 @@ export class NaruseComponent {
         };
         this.$updater.update(callback);
     }
-    forceUpdate(callback) {
+    forceUpdate(callback = NOOP) {
         if (!this.$updater) {
             logger.error('小程序组件未装载完毕，无法更新！');
             return;
