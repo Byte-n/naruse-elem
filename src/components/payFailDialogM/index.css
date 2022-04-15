@@ -1,0 +1,17 @@
+.dialogContent{
+    font-size:28rpx;
+}
+.redTitle {
+    color: #c90018;
+    font-size: 45rpx;
+    margin-left: 24 rpx;
+}
+
+.closeBtn {
+    position: absolute;
+    right: 20rpx;
+    top: 20rpx;
+    width: 40rpx;
+    height: 40rpx;
+    cursor: pointer;
+}
