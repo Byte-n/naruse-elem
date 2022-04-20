@@ -8,10 +8,11 @@ import Error from '@/components/oneGoConfirmBuyDialog/error.js';
 import SuccessPC from '@/components/oneGoConfirmBuyDialog/successPC.js';
 import ItemPcRetainDialog from '@/adverts/itemPcRetainDialog/index';
 
+
 const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
-const { footer_url, cent_price, content_url } = user_define.body;
-
+const { footer_url, content_url, cent_price, version, env } = user_define.body;
+const host = env === 'prod' ? '//trade.aiyongtech.com' : 'http://tradepre.aiyongtech.com';
 const isCent = cent_price === '1';
 const service_suffix = `一${isCent ? '分' : '元'}购活动`;
 const button_text = `1${isCent ? '分' : '元'}/15天`;
@@ -28,7 +29,7 @@ const buryAdOrderNow = (order_cycle, btnText) => {
 export default class ItemMoileModal extends Component {
     constructor () {
         super();
-        this.state = { visible: false, stayFlag: false, receiptFlag: false, paymentUrl: '', isPaySuccess: false, pollingFlag: false };
+        this.state = { visible: false, stayFlag: false, timer: null, receiptFlag: false, paymentUrl: '', isPaySuccess: false, pollingFlag: false };
     }
 
     componentDidMount () {
@@ -37,55 +38,64 @@ export default class ItemMoileModal extends Component {
             method: '/activity/oneYuanActivityVisibleState',
             args: { app: 'trade', action: 'get' },
             apiName: 'aiyong.activity.oneyuan.visiblestate.config',
-            host: 'http://tradepre.aiyongtech.com',
+            host,
         };
-        $ayApi.apiAsync(opt)
-            .then((res) => {
-                const { isShown } = res.body || {};
-                if (isShown) return;
-                buryAdPageView();
-                this.setState({ ...this.state, visible: true });
-            })
-            .catch(() => {});
+        const _promiseItem =   $ayApi.apiAsync(opt);
+        _promiseItem.then((res) => {
+            const { isShown } = res.body || {};
+            if (isShown) return;
+            buryAdPageView();
+            this.setState({ ...this.state, visible: true });
+            this.setShown();
+        });
+        _promiseItem.catch(() => {});
+    }
+
+    setShown () {
+        // 已经展示过了，不再展示
+        const opt = {
+            mode: 'post',
+            method: '/activity/oneYuanActivityVisibleState',
+            args: { app: 'trade', action: 'set' },
+            apiName: 'aiyong.activity.oneyuan.visiblestate.config',
+            host,
+        };
+        $ayApi.apiAsync(opt).catch(() => {});
     }
 
 
     onLinkClick () {
-        if ($mappUtils.isIOS()) {
-            $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
-            $openChat.contactCustomerService(`你好，我想参与${service_suffix}`);
-        } else {
-            const opt = {
-                mode: 'post',
-                method: '/activity/getOneYuanActivityOrder',
-                args: { app: 'trade', payCount: cent_price },
-                apiName: 'aiyong.activity.oneyuan.order.get',
-                host: 'http://tradepre.aiyongtech.com',
-            };
-            $ayApi.apiAsync(opt)
-                .then((res) => {
-                    console.log('res', res);
-                    const { payUrl } = res.body || {};
-                    // 是否需要提示信息，待确定
-                    if (!payUrl) return;
-                    buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
-                    navigateToWebPage({ url: payUrl });
-                    taskQue(() => {
-                        this.setState({ ...this.state, receiptFlag: true, paymentUrl: payUrl });
-                    }, 500);
-                    taskQue(() => {
-                        !this.state.pollingFlag &&  this.startPolling();
-                    }, 1 * 1000);
-                })
-                .catch(() => {});
-        }
+        console.log('confirm');
+        this.setState({ ...this.state, receiptFlag: true });
+
+        const opt = {
+            mode: 'post',
+            method: '/activity/getOneYuanActivityOrder',
+            args: { app: 'trade', payCount: cent_price },
+            apiName: 'aiyong.activity.oneyuan.order.get',
+            host,
+        };
+        const _promiseItem =  $ayApi.apiAsync(opt);
+        _promiseItem.then((res) => {
+            const { payUrl } = res.body || {};
+            // 是否需要提示信息，待确定
+            if (!payUrl) return;
+            buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
+            navigateToWebPage({ url: payUrl });
+            this.setState({ ...this.state, paymentUrl: payUrl });
+            taskQue(() => {
+                !this.state.pollingFlag &&  this.startPolling();
+            }, 2 * 1000);
+        });
+        _promiseItem.catch(() => {});
     }
 
     startPolling () {
+        clearInterval(this.state.timer);
         this.setState({ ...this.state, pollingFlag: true });
-        const timer = setInterval(() => {
+        const _timer = setInterval(() => {
             if (!this.state.pollingFlag) {
-                clearInterval(timer);
+                clearInterval(_timer);
                 return;
             }
             const opt = {
@@ -93,16 +103,18 @@ export default class ItemMoileModal extends Component {
                 method: '/activity/confirmOneYuanPurchaseOrder',
                 args: { app: 'trade' },
                 apiName: 'aiyong.activity.oneyuan.order.confirm',
-                host: 'http://tradepre.aiyongtech.com',
+                host,
             };
-            $ayApi.apiAsync(opt)
-                .then((res) => {
-                    const { payResult } = res.body || {};
-                    if (!payResult) return;
-                    this.setState({ ...this.state, pollingFlag: false });
-                })
-                .catch(() => {});
-        }, 2 * 1000);
+            const _promiseItem =  $ayApi.apiAsync(opt);
+            _promiseItem .then((res) => {
+                const { payResult } = res.body || {};
+                if (!payResult) return;
+                this.setState({ ...this.state, pollingFlag: false, isPaySuccess: true });
+                $userInfoChanger.updateUserInfo();
+            });
+            _promiseItem.catch(() => {});
+        }, 3 * 1000);
+        this.setState({ ...this.state, timer: _timer });
     }
     onCloseModal () {
         this.setState({ ...this.state, stayFlag: true });
@@ -115,11 +127,9 @@ export default class ItemMoileModal extends Component {
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, visible: false });
+        $uninstall();
     }
-    onRetainPayment () {
-        this.setState({ ...this.state, stayFlag: false, receiptFlag: true });
-        this.onReAction();
-    }
+
     render () {
         const {  visible, stayFlag, receiptFlag, isPaySuccess } = this.state;
         if (!user_define || !visible) return null;
@@ -128,15 +138,23 @@ export default class ItemMoileModal extends Component {
             return (
                 <view>
                     {isPaySuccess ? (
-                        <view>
+                        <view >
                             <SuccessMB closeBtnName='我知道了'/>
                         </view>
                     ) : (
-                        <view>
+                        <view >
                             <Error onClose={this.onCloseErrModal.bind(this)} onCustomerService={this.onSendServiceMsg.bind(this)} onAgain={this.onReAction.bind(this)} closeBtnName='关闭'/>
                         </view>
 
                     )}
+                </view>
+            );
+        }
+        // 挽留弹窗
+        if (stayFlag) {
+            return (
+                <view>
+                    <ItemPcRetainDialog centPrice={cent_price} onCancel={this.onCloseErrModal.bind(this)} onConfirm={this.onLinkClick.bind(this)} />
                 </view>
             );
         }
@@ -154,7 +172,7 @@ export default class ItemMoileModal extends Component {
                 <view style={style.content} >
                     <image  onClick={this.onLinkClick.bind(this)} style={{ ...style.img, ...style.cursor }}   mode='widthFix'  src={content_url}/>
                 </view>
-                <CloseButton onClose={this.onCloseModal.bind(this)} />
+                <CloseButton onClose={this.onCloseModal.bind(this)}  text={version  || '关闭'}/>
                 <view style={style.footer}>
                     <image onClick={this.onLinkClick.bind(this)} style={style.footerImg}   mode='widthFix'  src={footer_url}/>
                 </view>

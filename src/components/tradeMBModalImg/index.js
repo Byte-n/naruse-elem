@@ -8,8 +8,9 @@ import SuccessMB from '@/components/oneGoConfirmBuyDialog/successMB.js';
 import TradeMbRetainDialog from '@/adverts/tradeMbRetainDialog/index';
 const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
-const { android_img_url, ios_img_url, cent_price, version } = user_define.body;
+const { android_img_url, ios_img_url, cent_price, version, env } = user_define.body;
 const isCent = cent_price === '1';
+const host = env === 'prod' ? '//trade.aiyongtech.com' : 'http://tradepre.aiyongtech.com';
 const service_suffix = `一${isCent ? '分' : '元'}购活动`;
 const button_text = `1${isCent ? '分' : '元'}/15天`;
 const secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
@@ -34,7 +35,7 @@ export default class ItemMoileModal extends Component {
             method: '/activity/oneYuanActivityVisibleState',
             args: { app: 'trade', action: 'get' },
             apiName: 'aiyong.activity.oneyuan.visiblestate.config',
-            host: 'http://tradepre.aiyongtech.com',
+            host,
         };
         const _promiseItem =   $ayApi.apiAsync(opt);
         _promiseItem.then((res) => {
@@ -54,14 +55,13 @@ export default class ItemMoileModal extends Component {
             method: '/activity/oneYuanActivityVisibleState',
             args: { app: 'trade', action: 'set' },
             apiName: 'aiyong.activity.oneyuan.visiblestate.config',
-            host: 'http://tradepre.aiyongtech.com',
+            host,
         };
         $ayApi.apiAsync(opt).catch(() => {});
     }
 
 
     onLinkClick () {
-        console.log('confirm');
         this.setState({ ...this.state, receiptFlag: true });
         if ($mappUtils.isIOS()) {
             $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
@@ -72,7 +72,7 @@ export default class ItemMoileModal extends Component {
                 method: '/activity/getOneYuanActivityOrder',
                 args: { app: 'trade', payCount: cent_price },
                 apiName: 'aiyong.activity.oneyuan.order.get',
-                host: 'http://tradepre.aiyongtech.com',
+                host,
             };
             const _promiseItem =  $ayApi.apiAsync(opt);
             _promiseItem.then((res) => {
@@ -103,13 +103,14 @@ export default class ItemMoileModal extends Component {
                 method: '/activity/confirmOneYuanPurchaseOrder',
                 args: { app: 'trade' },
                 apiName: 'aiyong.activity.oneyuan.order.confirm',
-                host: 'http://tradepre.aiyongtech.com',
+                host,
             };
             const _promiseItem =  $ayApi.apiAsync(opt);
             _promiseItem .then((res) => {
                 const { payResult } = res.body || {};
                 if (!payResult) return;
                 this.setState({ ...this.state, pollingFlag: false, isPaySuccess: true });
+                $userInfoChanger.updateUserInfo();
             });
             _promiseItem.catch(() => {});
         }, 3 * 1000);
@@ -126,6 +127,7 @@ export default class ItemMoileModal extends Component {
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, visible: false });
+        $uninstall();
     }
 
     render () {
