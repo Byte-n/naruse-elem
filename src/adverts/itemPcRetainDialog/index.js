@@ -8,7 +8,7 @@ const container = {
     justifyContent: 'center',
     alignItems: 'center',
     background: 'rgba(0, 0, 0, 0.7)',
-    zIndex: 900,
+    zIndex: 999,
     position: 'fixed',
     top: '0',
     left: '0',
