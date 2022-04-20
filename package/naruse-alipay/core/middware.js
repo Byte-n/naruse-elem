@@ -1,5 +1,5 @@
 import { initVnodeTree } from './domEvents';
-import { logger } from './uitl';
+import { logger, NOOP } from './uitl';
 
 /**
  * @description 两个props是否完全相同
@@ -52,7 +52,7 @@ export class Middware {
     }
 
     /** 执行更新 */
-    update (callback) {
+    update (callback = NOOP) {
         !this.updating && Promise.resolve().then(() => {
             this.updating = false;
             if (!this.naruseComponent.render) {

@@ -90,3 +90,20 @@ export const confirmTradeUserBuyResultM = () => {
         return vipResult;
     });
 };
+
+/**
+ * 领取免费试用15天
+ * @param {Object} args 用户标识
+ */
+export const getFreeTrial = (args) => {
+    $ayApi.apiAsync({
+        apiName: 'aiyong.active.freetrial.give',
+        method: '/activity/freeTrialUser',
+        host: '//trade.aiyongtech.com',
+        args,
+    }).then((res) => {
+        console.log('res===', res);
+    }).catch((err) => {
+        console.log('errr====', err);
+    });
+};

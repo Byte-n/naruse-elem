@@ -71,6 +71,6 @@ const qnPromiseApis = [
 export const initNaruseAlipayApi = () => {
     const NaruseApiInterface = {};
     processApis(NaruseApiInterface, my, { transformMeta, needPromiseApis });
-    processApis(NaruseApiInterface, my.qn, { qnPromiseApis });
+    processApis(NaruseApiInterface, my.qn, { needPromiseApis: qnPromiseApis });
     return NaruseApiInterface;
 };
