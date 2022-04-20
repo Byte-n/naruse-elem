@@ -10,6 +10,10 @@ const container = {
     justifyContent: 'center',
     alignItems: 'center',
     background: 'rgba(0, 0, 0, 0.7)',
+    zIndex: 999,
+    position: 'fixed',
+    top: '0',
+    left: '0',
 };
 const containerMain = { width: '620rpx', height: '800rpx', position: 'absolute' };
 const backgroundImg = {
