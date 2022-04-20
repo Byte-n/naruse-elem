@@ -36,7 +36,7 @@ const {
     orderQuarterLink,
     orderYearLink,
     leftButton,
-    rightButton
+    rightButton,
 } = adInfo.user_define.body;
 
 /**
