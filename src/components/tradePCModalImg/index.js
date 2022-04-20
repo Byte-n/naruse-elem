@@ -6,7 +6,7 @@ import CloseButton from '@/common/CloseButton';
 import FadeContainer, { taskQue } from '@/common/FadeContainer';
 import Error from '@/components/oneGoConfirmBuyDialog/error.js';
 import SuccessPC from '@/components/oneGoConfirmBuyDialog/successPC.js';
-import ItemPcRetainDialog from '@/adverts/itemPcRetainDialog/index';
+import TradePcRetainDialog from '@/adverts/TradePcRetainDialog/index';
 
 
 const adInfo = $adImport.adData.results[0];
@@ -154,15 +154,7 @@ export default class ItemMoileModal extends Component {
         if (stayFlag) {
             return (
                 <view>
-                    <ItemPcRetainDialog centPrice={cent_price} onCancel={this.onCloseErrModal.bind(this)} onConfirm={this.onLinkClick.bind(this)} />
-                </view>
-            );
-        }
-        // 挽留弹窗
-        if (stayFlag) {
-            return (
-                <view>
-                    <ItemPcRetainDialog centPrice={cent_price} onCancel={this.onCloseErrModal.bind(this)} onConfirm={this.onRetainPayment.bind(this)} />;
+                    <TradePcRetainDialog centPrice={cent_price} onCancel={this.onCloseErrModal.bind(this)} onConfirm={this.onLinkClick.bind(this)} />
                 </view>
             );
         }
