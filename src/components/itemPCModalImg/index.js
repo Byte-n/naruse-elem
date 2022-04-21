@@ -57,7 +57,6 @@ export default class ItemMoileModal extends Component {
             this.setState({ ...this.state, visible: true });
             this.setShown();
         });
-        _promiseItem.catch(() => {});
     }
 
     setShown () {
@@ -69,8 +68,7 @@ export default class ItemMoileModal extends Component {
             apiName: 'aiyong.activity.oneyuan.visiblestate.config',
             host,
         };
-        const p =  $ayApi.apiAsync(opt);
-        p.catch(() => {});
+        $ayApi.apiAsync(opt);
     }
 
 
@@ -97,7 +95,6 @@ export default class ItemMoileModal extends Component {
                 !this.state.pollingFlag &&  this.startPolling();
             }, 2 * 1000);
         });
-        _promiseItem.catch(() => {});
     }
 
     startPolling () {
@@ -115,7 +112,6 @@ export default class ItemMoileModal extends Component {
                 this.setState({ ...this.state, pollingFlag: false, isPaySuccess: true });
                 $userInfoChanger.updateUserInfo();
             });
-            _promiseItem.catch(() => {});
         }, 3 * 1000);
         this.timer = _timer;
     }
@@ -140,11 +136,10 @@ export default class ItemMoileModal extends Component {
             navigateToWebPage({ url: payUrl });
             this.setState({ ...this.state, paymentUrl: payUrl });
         });
-        _promiseItem.catch(() => {});
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, visible: false });
-        // $uninstall && !$uninstall();
+        $uninstall();
     }
 
     render () {

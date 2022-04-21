@@ -36,17 +36,17 @@ export default class ItemMoileModal extends Component {
             method: '/activity/oneYuanActivityVisibleState',
             args: { app, action: 'get' },
             apiName: 'aiyong.activity.oneyuan.visiblestate.config',
-            host: 'http://tradepre.aiyongtech.com',
+            host,
         };
         const _promiseItem =   $ayApi.apiAsync(opt);
         _promiseItem.then((res) => {
             const { isShown } = res.body || {};
             if (isShown) return;
+            $mappUtils.hideTabBar();
             buryAdPageView();
             this.setState({ ...this.state, visible: true });
             this.setShown();
-        })
-            .catch(() => {});
+        });
     }
 
     setShown () {
@@ -58,8 +58,7 @@ export default class ItemMoileModal extends Component {
             apiName: 'aiyong.activity.oneyuan.visiblestate.config',
             host,
         };
-        const p =  $ayApi.apiAsync(opt);
-        p.catch(() => {});
+        $ayApi.apiAsync(opt);
     }
 
 
@@ -88,7 +87,6 @@ export default class ItemMoileModal extends Component {
                     !this.state.pollingFlag &&  this.startPolling();
                 }, 2 * 1000);
             });
-            _promiseItem.catch(() => {});
         }
     }
 
@@ -115,7 +113,6 @@ export default class ItemMoileModal extends Component {
                 this.setState({ ...this.state, pollingFlag: false, isPaySuccess: true });
                 $userInfoChanger.updateUserInfo();
             });
-            _promiseItem.catch(() => {});
         }, 3 * 1000);
         this.timer = _timer;
         this.setState({ ...this.state });
@@ -131,7 +128,8 @@ export default class ItemMoileModal extends Component {
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, visible: false });
-        // $uninstall && !$uninstall();
+        $mappUtils.showTabBar();
+        $uninstall();
     }
 
     render () {
