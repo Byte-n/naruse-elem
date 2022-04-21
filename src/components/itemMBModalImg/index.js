@@ -10,7 +10,7 @@ const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
 const { android_img_url, ios_img_url, cent_price, version, env } = user_define.body;
 const isCent = cent_price === '1';
-const host = env === 'prod' ? '//trade.aiyongtech.com' : 'http://tradepre.aiyongtech.com';
+const host = env === 'dev' ?   'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
 const service_suffix = `一${isCent ? '分' : '元'}购活动`;
 const button_text = `1${isCent ? '分' : '元'}/15天`;
 const secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
@@ -26,7 +26,7 @@ const buryAdOrderNow = (order_cycle, btnText) => {
 export default class ItemMoileModal extends Component {
     constructor () {
         super();
-        this.state = { visible: false, stayFlag: false, timer: null, receiptFlag: false, paymentUrl: '', isPaySuccess: false, pollingFlag: false };
+        this.state = { visible: false, stayFlag: false, receiptFlag: false, paymentUrl: '', isPaySuccess: false, pollingFlag: false };
     }
 
     componentDidMount () {
@@ -40,7 +40,7 @@ export default class ItemMoileModal extends Component {
         const _promiseItem =   $ayApi.apiAsync(opt);
         _promiseItem.then((res) => {
             const { isShown } = res.body || {};
-            if (isShown) return;
+            if (isShown && env !== 'dev') return;
             buryAdPageView();
             this.setState({ ...this.state, visible: true });
             this.setShown();
@@ -62,7 +62,6 @@ export default class ItemMoileModal extends Component {
 
 
     onLinkClick () {
-        console.log('confirm');
         this.setState({ ...this.state, receiptFlag: true });
         if ($mappUtils.isIOS()) {
             $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
@@ -92,11 +91,12 @@ export default class ItemMoileModal extends Component {
     }
 
     startPolling () {
-        clearInterval(this.state.timer);
+        clearInterval.call(null, this.timer);
+
         this.setState({ ...this.state, pollingFlag: true });
         const _timer = setInterval(() => {
             if (!this.state.pollingFlag) {
-                clearInterval(_timer);
+                clearInterval.call(null, _timer);
                 return;
             }
             const opt = {
@@ -107,7 +107,7 @@ export default class ItemMoileModal extends Component {
                 host,
             };
             const _promiseItem =  $ayApi.apiAsync(opt);
-            _promiseItem .then((res) => {
+            _promiseItem.then((res) => {
                 const { payResult } = res.body || {};
                 if (!payResult) return;
                 this.setState({ ...this.state, pollingFlag: false, isPaySuccess: true });
@@ -115,7 +115,8 @@ export default class ItemMoileModal extends Component {
             });
             _promiseItem.catch(() => {});
         }, 3 * 1000);
-        this.setState({ ...this.state, timer: _timer });
+        this.timer = _timer;
+        this.setState({ ...this.state });
     }
     onCloseModal () {
         this.setState({ ...this.state, stayFlag: true });
@@ -128,7 +129,7 @@ export default class ItemMoileModal extends Component {
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, visible: false });
-        $uninstall();
+        // $uninstall && !$uninstall();
     }
 
     render () {

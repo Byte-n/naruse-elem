@@ -13,7 +13,7 @@ const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
 const { footer_url, content_url, cent_price, version, env } = user_define.body;
 const isCent = cent_price === '1';
-const host = env === 'prod' ? '//trade.aiyongtech.com' : 'http://tradepre.aiyongtech.com';
+const host = env === 'dev' ?   'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
 const service_suffix = `一${isCent ? '分' : '元'}购活动`;
 const button_text = `1${isCent ? '分' : '元'}/15天`;
 const secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
@@ -43,12 +43,13 @@ export default class ItemMoileModal extends Component {
         const _promiseItem =   $ayApi.apiAsync(opt);
         _promiseItem.then((res) => {
             const { isShown } = res.body || {};
-            if (isShown) return;
+            if (isShown && env !== 'dev') return;
+
             buryAdPageView();
             this.setState({ ...this.state, visible: true });
             this.setShown();
-        })
-            .catch(() => {});
+        });
+        _promiseItem.catch(() => {});
     }
 
     setShown () {
@@ -79,7 +80,7 @@ export default class ItemMoileModal extends Component {
         _promiseItem.then((res) => {
             const { payUrl } = res.body || {};
             // 是否需要提示信息，待确定
-            if (!payUrl) return;
+            // if (!payUrl) return;
             buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
             navigateToWebPage({ url: payUrl });
             this.setState({ ...this.state, paymentUrl: payUrl });
@@ -91,11 +92,11 @@ export default class ItemMoileModal extends Component {
     }
 
     startPolling () {
-        clearInterval(this.state.timer);
+        clearInterval.call(null, this.timer);
         this.setState({ ...this.state, pollingFlag: true });
         const _timer = setInterval(() => {
             if (!this.state.pollingFlag) {
-                clearInterval(_timer);
+                clearInterval.call(null, _timer);
                 return;
             }
             const opt = {
@@ -106,15 +107,16 @@ export default class ItemMoileModal extends Component {
                 host,
             };
             const _promiseItem =  $ayApi.apiAsync(opt);
-            _promiseItem .then((res) => {
+            _promiseItem.then((res) => {
                 const { payResult } = res.body || {};
-                if (!payResult) return;
+                console.log(payResult, '成功');
+                // if (!payResult) return;
                 this.setState({ ...this.state, pollingFlag: false, isPaySuccess: true });
                 $userInfoChanger.updateUserInfo();
             });
             _promiseItem.catch(() => {});
         }, 3 * 1000);
-        this.setState({ ...this.state, timer: _timer });
+        this.timer = _timer;
     }
     onCloseModal () {
         this.setState({ ...this.state, stayFlag: true });
@@ -127,7 +129,7 @@ export default class ItemMoileModal extends Component {
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, visible: false });
-        $uninstall();
+        // $uninstall && !$uninstall();
     }
 
     render () {
@@ -139,7 +141,7 @@ export default class ItemMoileModal extends Component {
                 <view>
                     {isPaySuccess ? (
                         <view >
-                            <SuccessMB closeBtnName='我知道了'/>
+                            <SuccessPC closeBtnName='我知道了'/>
                         </view>
                     ) : (
                         <view >

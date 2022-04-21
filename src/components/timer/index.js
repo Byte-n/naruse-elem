@@ -17,7 +17,7 @@ const formatTimeFromSecond  = (count) => {
 export default class Timer extends Component {
     constructor () {
         super();
-        this.state = { count: (3 * 60) - 1, timer: null };
+        this.state = { count: (3 * 60) - 1 };
     }
 
     componentDidMount () {
@@ -35,10 +35,10 @@ export default class Timer extends Component {
             }
             this.setState({ count: this.state.count - 1 });
         }, 1000);
-        this.setState({ ...this.state, timer });
+        this.timer = timer;
     }
     componentWillUnmount () {
-        clearTimeout(this.state.timer);
+        clearInterval.call(null, this.timer);
     }
 
     render () {
