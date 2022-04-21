@@ -10,7 +10,7 @@ const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
 const { android_img_url, ios_img_url, cent_price, version, env } = user_define.body;
 const isCent = cent_price === '1';
-const host = env === 'prod' ? '//trade.aiyongtech.com' : 'http://tradepre.aiyongtech.com';
+const host = env === 'dev' ?   'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
 const service_suffix = `一${isCent ? '分' : '元'}购活动`;
 const button_text = `1${isCent ? '分' : '元'}/15天`;
 const secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
@@ -106,7 +106,7 @@ export default class ItemMoileModal extends Component {
                 host,
             };
             const _promiseItem =  $ayApi.apiAsync(opt);
-            _promiseItem .then((res) => {
+            _promiseItem.then((res) => {
                 const { payResult } = res.body || {};
                 if (!payResult) return;
                 this.setState({ ...this.state, pollingFlag: false, isPaySuccess: true });
@@ -127,7 +127,7 @@ export default class ItemMoileModal extends Component {
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, visible: false });
-        $uninstall();
+        // $uninstall && !$uninstall();
     }
 
     render () {
