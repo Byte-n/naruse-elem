@@ -39,6 +39,7 @@ export const buryAdOrderNow = (secondary_class,order_cycle) => {
 /**
  * @desc 一分购成功组件
  * @param {string} closeBtnName 关闭按钮文本 默认'关闭'
+ * @param {function} onClone 关闭弹窗时调用
  * @author gao01
  * @date 2022/04/15 16:00:41
  */
@@ -91,16 +92,16 @@ export default class OneGoSuccessMB extends Component {
      */
     getRecommendDialog = () => {
         const { animation } = this.state;
-        const { closeBtnName = '关闭' } = this.props;
-        const  dialogClose = () => {
+        const { onClone, closeBtnName = '关闭' } = this.props;
+        const dialogClose = () => {
             this.setState({ successResDialogVisible:false,recommendDialogVisible:false});
-            $uninstall();
+            onClone && onClone();
         }
         const jumpUrl = (url,order_cycle) => {
             buryAdOrderNow(recommendSecondaryClass,order_cycle);
             navigateTo({ url });
             this.setState({ successResDialogVisible:false,recommendDialogVisible:false});
-            $uninstall();
+            onClone && onClone();
         }
         return (
             <view style={{ ...tradePcOrderTem,...(animation ? dialogBox : {}) }}>
@@ -137,4 +138,3 @@ export default class OneGoSuccessMB extends Component {
         )
     }
 }
-
