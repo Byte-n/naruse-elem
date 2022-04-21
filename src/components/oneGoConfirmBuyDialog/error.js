@@ -42,6 +42,7 @@ export const buryAdOrderNow = (order_cycle, btnText) => {
  * @desc 一分购失败组件
  * @param {function} onCustomerService 联系客服点击动作
  * @param {function} onAgain 再次尝试点击动作
+ * @param {function} onClone 关闭弹窗时调用
  * @param {string} closeBtnName 关闭按钮文本 默认'关闭'
  * @author gao01
  * @date 2022/04/15 16:00:41
@@ -67,9 +68,10 @@ export default class OneGoError extends Component {
         clickCb && clickCb();
     }
 
-    onClose = () => {
+    closeDialog = () => {
+        const { onClone } = this.props;
         this.setState({ dialogVisible: false,animation: false} );
-        $uninstall();
+        onClone && onClone();
     }
 
     render() {
@@ -80,15 +82,14 @@ export default class OneGoError extends Component {
                 {dialogVisible && <view style={{ ...tradePcOrderTem,  ...(animation ? dialogBox : {}) }}>
                     <view style={{ position:'relative'}}>
                         <image style={{width:'580rpx',height:'400rpx'}}  src={'http://q.aiyongtech.com/ad/images/TULlpLHotKXlvLnnqpc=_1650179400796.png'} />
-                        <text style={{ ...buyBtnStyle,left: '40rpx' }} onClick={ () => {this.btnClick(onCustomerService,{order_cycle:'联系客服',btnText:''})}}/>
+                        <text style={{ ...buyBtnStyle,left: '40rpx' }} onClick={() => {this.btnClick(onCustomerService,{order_cycle:'联系客服',btnText:''})}}/>
                         <text style={{ ...buyBtnStyle,left: '300rpx' }} onClick={() => {this.btnClick(onAgain,{order_cycle:'15天',btnText:'0.01/15天'})} }/>
                     </view>
                     <view>
-                        <view style={closeStyle} hoverStyle={buyBtnHoverStyle} onClick={this.onClose} > {closeBtnName} </view>
+                        <view style={closeStyle} hoverStyle={buyBtnHoverStyle} onClick={this.closeDialog} > {closeBtnName} </view>
                     </view>
                 </view>}
             </view>
         )
     }
 }
-
