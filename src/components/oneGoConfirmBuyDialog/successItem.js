@@ -41,6 +41,7 @@ export const buryAdOrderNow = (secondary_class,order_cycle) => {
  * @desc 一分购商品成功组件
  * @param {string} closeBtnName 关闭按钮文本 默认'关闭'
  * @param {boolean} isPc 是否为pc环境 默认'false'
+ * @param {function} onClone 关闭弹窗时调用
  * @author gao01
  * @date 2022/04/15 16:00:41
  */
@@ -71,9 +72,10 @@ export default class successItem extends Component {
         const mbOption = {style:{ width:'600rpx', height:'720rpx' },src:'http://q.aiyongtech.com/ad/images/55S75p2/_1650548641079.png'}
         const imageAttr = isPc ? pcOption : mbOption
         const closeDialog = () => {
+            const { onClone } = this.props;
             this.setState({ successResDialogVisible: false,animation: false});
             buryAdOrderNow(successResSecondaryClass,'我知道了')
-            $uninstall();
+            onClone && onClone();
         }
 
         return(
