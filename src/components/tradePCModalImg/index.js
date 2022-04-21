@@ -6,17 +6,26 @@ import CloseButton from '@/common/CloseButton';
 import FadeContainer, { taskQue } from '@/common/FadeContainer';
 import Error from '@/components/oneGoConfirmBuyDialog/error.js';
 import SuccessPC from '@/components/oneGoConfirmBuyDialog/successPC.js';
-import TradePcRetainDialog from '@/adverts/TradePcRetainDialog/index';
+import TradePcRetainDialog from '@/adverts/tradePcRetainDialog/index';
 
 
 const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
 const { footer_url, content_url, cent_price, version, env } = user_define.body;
-const host = env === 'dev' ?   'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
 const isCent = cent_price === '1';
+const app = 'trade';
+const host = env === 'dev' ?   'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
 const service_suffix = `一${isCent ? '分' : '元'}购活动`;
 const button_text = `1${isCent ? '分' : '元'}/15天`;
 const secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
+
+const payUrlOpt = {
+    mode: 'post',
+    method: '/activity/confirmOneYuanPurchaseOrder',
+    args: { app },
+    apiName: 'aiyong.activity.oneyuan.order.confirm',
+    host,
+};
 const buryAdPageView = () => {
     $adSensorsBeacon.adViewBeacon({ ...adInfo, secondary_class }, adInfo.pid);
 };
@@ -36,7 +45,7 @@ export default class ItemMoileModal extends Component {
         const opt = {
             mode: 'post',
             method: '/activity/oneYuanActivityVisibleState',
-            args: { app: 'trade', action: 'get' },
+            args: { app, action: 'get' },
             apiName: 'aiyong.activity.oneyuan.visiblestate.config',
             host,
         };
@@ -56,22 +65,22 @@ export default class ItemMoileModal extends Component {
         const opt = {
             mode: 'post',
             method: '/activity/oneYuanActivityVisibleState',
-            args: { app: 'trade', action: 'set' },
+            args: { app, action: 'set' },
             apiName: 'aiyong.activity.oneyuan.visiblestate.config',
             host,
         };
-        $ayApi.apiAsync(opt).catch(() => {});
+        const p =  $ayApi.apiAsync(opt);
+        p.catch(() => {});
     }
 
 
     onLinkClick () {
-        console.log('confirm');
         this.setState({ ...this.state, receiptFlag: true });
 
         const opt = {
             mode: 'post',
             method: '/activity/getOneYuanActivityOrder',
-            args: { app: 'trade', payCount: cent_price },
+            args: { app, payCount: cent_price },
             apiName: 'aiyong.activity.oneyuan.order.get',
             host,
         };
@@ -79,6 +88,7 @@ export default class ItemMoileModal extends Component {
         _promiseItem.then((res) => {
             const { payUrl } = res.body || {};
             // 是否需要提示信息，待确定
+            console.log('支付链接：', payUrl);
             if (!payUrl) return;
             buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
             navigateToWebPage({ url: payUrl });
@@ -91,21 +101,14 @@ export default class ItemMoileModal extends Component {
     }
 
     startPolling () {
-        clearInterval(this.state.timer);
+        clearInterval.call(null, this.timer);
         this.setState({ ...this.state, pollingFlag: true });
         const _timer = setInterval(() => {
             if (!this.state.pollingFlag) {
-                clearInterval(_timer);
+                clearInterval.call(null, _timer);
                 return;
             }
-            const opt = {
-                mode: 'post',
-                method: '/activity/confirmOneYuanPurchaseOrder',
-                args: { app: 'trade' },
-                apiName: 'aiyong.activity.oneyuan.order.confirm',
-                host,
-            };
-            const _promiseItem =  $ayApi.apiAsync(opt);
+            const _promiseItem =  $ayApi.apiAsync(payUrlOpt);
             _promiseItem.then((res) => {
                 const { payResult } = res.body || {};
                 if (!payResult) return;
@@ -114,7 +117,7 @@ export default class ItemMoileModal extends Component {
             });
             _promiseItem.catch(() => {});
         }, 3 * 1000);
-        this.setState({ ...this.state, timer: _timer });
+        this.timer = _timer;
     }
     onCloseModal () {
         this.setState({ ...this.state, stayFlag: true });
@@ -123,7 +126,21 @@ export default class ItemMoileModal extends Component {
         $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
     }
     onReAction () {
-        navigateToWebPage({ url: this.state.paymentUrl });
+        if (this.state.paymentUrl) {
+            navigateToWebPage({ url: this.state.paymentUrl });
+            return;
+        }
+        const _promiseItem =  $ayApi.apiAsync(payUrlOpt);
+        _promiseItem.then((res) => {
+            const { payUrl } = res.body || {};
+            // 是否需要提示信息，待确定
+            console.log('支付链接：', payUrl);
+            if (!payUrl) return;
+            buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
+            navigateToWebPage({ url: payUrl });
+            this.setState({ ...this.state, paymentUrl: payUrl });
+        });
+        _promiseItem.catch(() => {});
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, visible: false });
@@ -139,7 +156,7 @@ export default class ItemMoileModal extends Component {
                 <view>
                     {isPaySuccess ? (
                         <view >
-                            <SuccessMB closeBtnName='我知道了'/>
+                            <SuccessPC closeBtnName='我知道了'/>
                         </view>
                     ) : (
                         <view >
@@ -162,7 +179,9 @@ export default class ItemMoileModal extends Component {
         return (
             <FadeContainer inStyle={style.fadeIn}   visible={visible}   style={style.mask} >
                 <view style={style.content} >
-                    <image  onClick={this.onLinkClick.bind(this)} style={{ ...style.img, ...style.cursor }}   mode='widthFix'  src={content_url}/>
+                    <view style={style.contentImg}>
+                        <image  onClick={this.onLinkClick.bind(this)}     src={content_url}/>
+                    </view>
                 </view>
                 <CloseButton onClose={this.onCloseModal.bind(this)}  text={version  || '关闭'}/>
                 <view style={style.footer}>

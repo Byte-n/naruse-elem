@@ -10,6 +10,7 @@ const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
 const { android_img_url, ios_img_url, cent_price, version, env } = user_define.body;
 const isCent = cent_price === '1';
+const app = 'trade';
 const host = env === 'dev' ?   'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
 const service_suffix = `一${isCent ? '分' : '元'}购活动`;
 const button_text = `1${isCent ? '分' : '元'}/15天`;
@@ -26,16 +27,16 @@ const buryAdOrderNow = (order_cycle, btnText) => {
 export default class ItemMoileModal extends Component {
     constructor () {
         super();
-        this.state = { visible: false, stayFlag: false, timer: null, receiptFlag: false, paymentUrl: '', isPaySuccess: false, pollingFlag: false };
+        this.state = { visible: false, stayFlag: false, receiptFlag: false, paymentUrl: '', isPaySuccess: false, pollingFlag: false };
     }
 
     componentDidMount () {
         const opt = {
             mode: 'post',
             method: '/activity/oneYuanActivityVisibleState',
-            args: { app: 'trade', action: 'get' },
+            args: { app, action: 'get' },
             apiName: 'aiyong.activity.oneyuan.visiblestate.config',
-            host,
+            host: 'http://tradepre.aiyongtech.com',
         };
         const _promiseItem =   $ayApi.apiAsync(opt);
         _promiseItem.then((res) => {
@@ -53,11 +54,12 @@ export default class ItemMoileModal extends Component {
         const opt = {
             mode: 'post',
             method: '/activity/oneYuanActivityVisibleState',
-            args: { app: 'trade', action: 'set' },
+            args: { app, action: 'set' },
             apiName: 'aiyong.activity.oneyuan.visiblestate.config',
             host,
         };
-        $ayApi.apiAsync(opt).catch(() => {});
+        const p =  $ayApi.apiAsync(opt);
+        p.catch(() => {});
     }
 
 
@@ -70,7 +72,7 @@ export default class ItemMoileModal extends Component {
             const opt = {
                 mode: 'post',
                 method: '/activity/getOneYuanActivityOrder',
-                args: { app: 'trade', payCount: cent_price },
+                args: { app, payCount: cent_price },
                 apiName: 'aiyong.activity.oneyuan.order.get',
                 host,
             };
@@ -91,17 +93,18 @@ export default class ItemMoileModal extends Component {
     }
 
     startPolling () {
-        clearInterval(this.state.timer);
+        clearInterval.call(null, this.timer);
+
         this.setState({ ...this.state, pollingFlag: true });
         const _timer = setInterval(() => {
             if (!this.state.pollingFlag) {
-                clearInterval(_timer);
+                clearInterval.call(null, _timer);
                 return;
             }
             const opt = {
                 mode: 'post',
                 method: '/activity/confirmOneYuanPurchaseOrder',
-                args: { app: 'trade' },
+                args: { app },
                 apiName: 'aiyong.activity.oneyuan.order.confirm',
                 host,
             };
@@ -114,7 +117,8 @@ export default class ItemMoileModal extends Component {
             });
             _promiseItem.catch(() => {});
         }, 3 * 1000);
-        this.setState({ ...this.state, timer: _timer });
+        this.timer = _timer;
+        this.setState({ ...this.state });
     }
     onCloseModal () {
         this.setState({ ...this.state, stayFlag: true });
