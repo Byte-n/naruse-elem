@@ -20,15 +20,15 @@
     flex-direction: column;
     align-items: center;
     background: transparent;
-    width: 86%;
     cursor: pointer;
 }
 
 
 
-.img {
-    width: 100%;
-    margin-bottom: 24rpx;
+.contentImg {
+    display: flex;
+    width: 600px;
+    height: 386px;
 }
 
 .fadeIn {
@@ -38,6 +38,7 @@
 .footer {
     position: fixed;
     bottom: 0;
+    height: 60rpx;
     width: 100%;
     background: transparent;
 }

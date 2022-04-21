@@ -10,6 +10,7 @@ const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
 const { android_img_url, ios_img_url, cent_price, version, env } = user_define.body;
 const isCent = cent_price === '1';
+const app = 'item';
 const host = env === 'dev' ?   'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
 const service_suffix = `一${isCent ? '分' : '元'}购活动`;
 const button_text = `1${isCent ? '分' : '元'}/15天`;
@@ -33,14 +34,14 @@ export default class ItemMoileModal extends Component {
         const opt = {
             mode: 'post',
             method: '/activity/oneYuanActivityVisibleState',
-            args: { app: 'item', action: 'get' },
+            args: { app, action: 'get' },
             apiName: 'aiyong.activity.oneyuan.visiblestate.config',
             host: 'http://tradepre.aiyongtech.com',
         };
         const _promiseItem =   $ayApi.apiAsync(opt);
         _promiseItem.then((res) => {
             const { isShown } = res.body || {};
-            if (isShown && env !== 'dev') return;
+            if (isShown) return;
             buryAdPageView();
             this.setState({ ...this.state, visible: true });
             this.setShown();
@@ -53,11 +54,12 @@ export default class ItemMoileModal extends Component {
         const opt = {
             mode: 'post',
             method: '/activity/oneYuanActivityVisibleState',
-            args: { app: 'item', action: 'set' },
+            args: { app, action: 'set' },
             apiName: 'aiyong.activity.oneyuan.visiblestate.config',
             host,
         };
-        $ayApi.apiAsync(opt).catch(() => {});
+        const p =  $ayApi.apiAsync(opt);
+        p.catch(() => {});
     }
 
 
@@ -70,7 +72,7 @@ export default class ItemMoileModal extends Component {
             const opt = {
                 mode: 'post',
                 method: '/activity/getOneYuanActivityOrder',
-                args: { app: 'item', payCount: cent_price },
+                args: { app, payCount: cent_price },
                 apiName: 'aiyong.activity.oneyuan.order.get',
                 host,
             };
@@ -102,7 +104,7 @@ export default class ItemMoileModal extends Component {
             const opt = {
                 mode: 'post',
                 method: '/activity/confirmOneYuanPurchaseOrder',
-                args: { app: 'item' },
+                args: { app },
                 apiName: 'aiyong.activity.oneyuan.order.confirm',
                 host,
             };
