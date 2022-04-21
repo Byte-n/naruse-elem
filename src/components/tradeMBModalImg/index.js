@@ -139,15 +139,15 @@ export default class ItemMoileModal extends Component {
         if (receiptFlag) {
             return (
                 <view>
-                    {isPaySuccess ? (
+                    {isPaySuccess && (
                         <view >
                             <SuccessMB  onClone={this.onCloseErrModal.bind(this)} closeBtnName='我知道了'/>
                         </view>
-                    ) : (
+                    ) }
+                    {!isPaySuccess && (
                         <view >
                             <Error onClone={this.onCloseErrModal.bind(this)} onCustomerService={this.onSendServiceMsg.bind(this)} onAgain={this.onReAction.bind(this)} closeBtnName='关闭'/>
                         </view>
-
                     )}
                 </view>
             );
