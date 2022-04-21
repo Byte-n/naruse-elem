@@ -57,7 +57,6 @@ export default class ItemMoileModal extends Component {
             this.setState({ ...this.state, visible: true });
             this.setShown();
         });
-        _promiseItem.catch(() => {});
     }
 
     setShown () {
@@ -69,8 +68,7 @@ export default class ItemMoileModal extends Component {
             apiName: 'aiyong.activity.oneyuan.visiblestate.config',
             host,
         };
-        const p =  $ayApi.apiAsync(opt);
-        p.catch(() => {});
+        $ayApi.apiAsync(opt);
     }
 
 
@@ -88,7 +86,6 @@ export default class ItemMoileModal extends Component {
         _promiseItem.then((res) => {
             const { payUrl } = res.body || {};
             // 是否需要提示信息，待确定
-            console.log('支付链接：', payUrl);
             if (!payUrl) return;
             buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
             navigateToWebPage({ url: payUrl });
@@ -97,7 +94,6 @@ export default class ItemMoileModal extends Component {
                 !this.state.pollingFlag &&  this.startPolling();
             }, 2 * 1000);
         });
-        _promiseItem.catch(() => {});
     }
 
     startPolling () {
@@ -115,7 +111,6 @@ export default class ItemMoileModal extends Component {
                 this.setState({ ...this.state, pollingFlag: false, isPaySuccess: true });
                 $userInfoChanger.updateUserInfo();
             });
-            _promiseItem.catch(() => {});
         }, 3 * 1000);
         this.timer = _timer;
     }
@@ -134,17 +129,15 @@ export default class ItemMoileModal extends Component {
         _promiseItem.then((res) => {
             const { payUrl } = res.body || {};
             // 是否需要提示信息，待确定
-            console.log('支付链接：', payUrl);
             if (!payUrl) return;
             buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
             navigateToWebPage({ url: payUrl });
             this.setState({ ...this.state, paymentUrl: payUrl });
         });
-        _promiseItem.catch(() => {});
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, visible: false });
-        // $uninstall && !$uninstall();
+        $uninstall();
     }
 
     render () {
@@ -162,7 +155,6 @@ export default class ItemMoileModal extends Component {
                         <view >
                             <Error onClose={this.onCloseErrModal.bind(this)} onCustomerService={this.onSendServiceMsg.bind(this)} onAgain={this.onReAction.bind(this)} closeBtnName='关闭'/>
                         </view>
-
                     )}
                 </view>
             );

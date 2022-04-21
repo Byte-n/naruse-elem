@@ -2,10 +2,10 @@
 module.exports = {
     // 入口文件
     // input: './src/components/entry.js',
-    // input: './src/components/itemMBModalImg/index.js',
+    input: './src/components/itemMBModalImg/index.js',
     // input: './src/components/itemPCModalImg/index.js',
     // input: './src/components/tradeMBModalImg/index.js',
-    input: './src/components/tradePCModalImg/index.js',
+    // input: './src/components/tradePCModalImg/index.js',
     // 编译后的userDefinebody会自带的一些内容，用于本地调试
     advertUserDefine: {
         android_url: 'https://fuwu.taobao.com/ser/confirmOrder1.htm?commonParams=activityCode%3AACT_877021141_220309112922%3BagentId%3Afuwu.taobao.com%7Cmarketing-Order-0%3BmarketKey%3AFWSPP_MARKETING_URL%3BpromIds%3A%5B1008002086%5D&subParams=cycleNum%3A12%2CcycleUnit%3A2%2CitemCode%3AFW_GOODS-1827490-v2&sign=0E5DC09D055A248FDEDE7B05140985A9&spm=a313p.266.ei5lud.1372507379574&short_name=Y4.7DJwH&app=chrome',

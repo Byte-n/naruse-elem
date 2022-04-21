@@ -93,13 +93,13 @@ export default class OneGoSuccessPC extends Component {
         const { closeBtnName = '关闭' } = this.props;
         const  dialogClose = () => {
             this.setState({ successResDialogVisible: false, recommendDialogVisible: false });
-            // $uninstall && !$uninstall();
+            $uninstall();
         };
         const jumpUrl = (url, order_cycle) => {
             buryAdOrderNow(recommendSecondaryClass, order_cycle);
             navigateTo({ url });
             this.setState({ successResDialogVisible: false, recommendDialogVisible: false });
-            // $uninstall && !$uninstall();
+            $uninstall();
         };
         return (
             <view style={{ ...tradePcOrderTem, ...(animation ? dialogBox : {}) }}>
