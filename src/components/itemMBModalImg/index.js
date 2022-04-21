@@ -4,7 +4,7 @@ import style from './index.css';
 import CloseButton from '@/common/CloseButton';
 import FadeContainer, { taskQue } from '@/common/FadeContainer';
 import Error from '@/components/oneGoConfirmBuyDialog/error.js';
-import SuccessMB from '@/components/oneGoConfirmBuyDialog/successMB.js';
+import SuccessItem from '@/components/oneGoConfirmBuyDialog/successItem.js';
 import ItemMbRetainDialog from '@/adverts/itemMbRetainDialog/index';
 const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
@@ -135,17 +135,19 @@ export default class ItemMoileModal extends Component {
     render () {
         const {  visible, stayFlag, receiptFlag, isPaySuccess } = this.state;
         if (!user_define || !visible) return null;
+        console.log(this.state);
+
         // 支付结果
         if (receiptFlag) {
             return (
                 <view>
                     {isPaySuccess ? (
                         <view >
-                            <SuccessMB closeBtnName='我知道了'/>
+                            <SuccessItem onClone={this.onCloseErrModal.bind(this)}  closeBtnName='我知道了'/>
                         </view>
                     ) : (
                         <view >
-                            <Error onClose={this.onCloseErrModal.bind(this)} onCustomerService={this.onSendServiceMsg.bind(this)} onAgain={this.onReAction.bind(this)} closeBtnName='关闭'/>
+                            <Error onClone={this.onCloseErrModal.bind(this)} onCustomerService={this.onSendServiceMsg.bind(this)} onAgain={this.onReAction.bind(this)} closeBtnName='关闭'/>
                         </view>
 
                     )}

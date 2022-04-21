@@ -143,17 +143,18 @@ export default class ItemMoileModal extends Component {
     render () {
         const {  visible, stayFlag, receiptFlag, isPaySuccess } = this.state;
         if (!user_define || !visible) return null;
+        console.log(this.state);
         // 支付结果
         if (receiptFlag) {
             return (
                 <view>
                     {isPaySuccess ? (
                         <view >
-                            <SuccessPC closeBtnName='我知道了'/>
+                            <SuccessPC onClone={this.onCloseErrModal.bind(this)} closeBtnName='我知道了'/>
                         </view>
                     ) : (
                         <view >
-                            <Error onClose={this.onCloseErrModal.bind(this)} onCustomerService={this.onSendServiceMsg.bind(this)} onAgain={this.onReAction.bind(this)} closeBtnName='关闭'/>
+                            <Error onClone={this.onCloseErrModal.bind(this)} onCustomerService={this.onSendServiceMsg.bind(this)} onAgain={this.onReAction.bind(this)} closeBtnName='关闭'/>
                         </view>
                     )}
                 </view>

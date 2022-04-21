@@ -5,7 +5,7 @@ import style from './index.css';
 import CloseButton from '@/common/CloseButton';
 import FadeContainer, { taskQue } from '@/common/FadeContainer';
 import Error from '@/components/oneGoConfirmBuyDialog/error.js';
-import SuccessPC from '@/components/oneGoConfirmBuyDialog/successPC.js';
+import SuccessItem from '@/components/oneGoConfirmBuyDialog/successItem.js';
 import ItemPCRetainDialog from '@/adverts/itemPcRetainDialog/index';
 
 
@@ -151,11 +151,11 @@ export default class ItemMoileModal extends Component {
                 <view>
                     {isPaySuccess ? (
                         <view >
-                            <SuccessPC closeBtnName='我知道了'/>
+                            <SuccessItem onClone={this.onCloseErrModal.bind(this)} isPc={true} closeBtnName='我知道了'/>
                         </view>
                     ) : (
                         <view >
-                            <Error onClose={this.onCloseErrModal.bind(this)} onCustomerService={this.onSendServiceMsg.bind(this)} onAgain={this.onReAction.bind(this)} closeBtnName='关闭'/>
+                            <Error onClone={this.onCloseErrModal.bind(this)} onCustomerService={this.onSendServiceMsg.bind(this)} onAgain={this.onReAction.bind(this)} closeBtnName='关闭'/>
                         </view>
 
                     )}
