@@ -135,7 +135,6 @@ export default class ItemMoileModal extends Component {
     render () {
         const {  visible, stayFlag, receiptFlag, isPaySuccess } = this.state;
         if (!user_define || !visible) return null;
-        console.log(this.state);
 
         // 支付结果
         if (receiptFlag) {
