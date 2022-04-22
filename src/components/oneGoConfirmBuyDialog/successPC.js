@@ -1,4 +1,4 @@
-import { Component } from 'Naruse' ;
+import { Component, navigateTo } from 'Naruse' ;
 
 // 模板样式
 const tradePcContainer = { width: '100vw', height: '100vh', position: 'fixed', top: '0', left: '0', backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 900 };
