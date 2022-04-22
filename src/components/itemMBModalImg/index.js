@@ -83,10 +83,10 @@ export default class ItemMoileModal extends Component {
                 buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
                 navigateToWebPage({ url: payUrl });
                 this.setState({ ...this.state, paymentUrl: payUrl });
-                taskQue(() => {
-                    !this.state.pollingFlag &&  this.startPolling();
-                }, 2 * 1000);
             }
+            taskQue(() => {
+                !this.state.pollingFlag &&  this.startPolling();
+            }, 2 * 1000);
         });
     }
 
@@ -140,6 +140,9 @@ export default class ItemMoileModal extends Component {
                 $openChat.contactCustomerService(`你好，我想参与${service_suffix}。\n链接地址：${payUrl}`);
             });
         }
+        taskQue(() => {
+            !this.state.pollingFlag &&  this.startPolling();
+        }, 2 * 1000);
     }
     onReAction () {
         if (this.state.paymentUrl) {
@@ -172,6 +175,9 @@ export default class ItemMoileModal extends Component {
                 }
             });
         }
+        taskQue(() => {
+            !this.state.pollingFlag &&  this.startPolling();
+        }, 2 * 1000);
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, visible: false });
