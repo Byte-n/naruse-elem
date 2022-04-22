@@ -10,9 +10,10 @@ const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
 const { android_img_url, ios_img_url, cent_price, version, env } = user_define.body;
 const isCent = cent_price === '1';
+const service_suffix = `一${isCent ? '分' : '元'}购活动`;
+
 const app = 'trade';
 const host = env === 'dev' ?   'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
-const service_suffix = `一${isCent ? '分' : '元'}购活动`;
 const button_text = `1${isCent ? '分' : '元'}/15天`;
 const secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
 const buryAdPageView = () => {
@@ -50,7 +51,7 @@ export default class ItemMoileModal extends Component {
     }
 
     setShown () {
-        // 已经展示过了，不再展示
+        // 已经展示过了，不再展示.
         const opt = {
             mode: 'post',
             method: '/activity/oneYuanActivityVisibleState',
@@ -80,19 +81,18 @@ export default class ItemMoileModal extends Component {
                 $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
                 $openChat.contactCustomerService(`你好，我想参与${service_suffix}。\n链接地址：${payUrl}`);
             } else {
+                this.setState({ ...this.state, paymentUrl: payUrl });
                 buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
                 navigateToWebPage({ url: payUrl });
-                this.setState({ ...this.state, paymentUrl: payUrl });
-                taskQue(() => {
-                    !this.state.pollingFlag &&  this.startPolling();
-                }, 2 * 1000);
             }
+            taskQue(() => {
+                !this.state.pollingFlag &&  this.startPolling();
+            }, 2 * 1000);
         });
     }
 
     startPolling () {
         clearInterval.call(null, this.timer);
-
         this.setState({ ...this.state, pollingFlag: true });
         const _timer = setInterval(() => {
             if (!this.state.pollingFlag) {
@@ -140,6 +140,9 @@ export default class ItemMoileModal extends Component {
                 $openChat.contactCustomerService(`你好，我想参与${service_suffix}。\n链接地址：${payUrl}`);
             });
         }
+        taskQue(() => {
+            !this.state.pollingFlag &&  this.startPolling();
+        }, 2 * 1000);
     }
     onReAction () {
         if (this.state.paymentUrl) {
@@ -172,6 +175,9 @@ export default class ItemMoileModal extends Component {
                 }
             });
         }
+        taskQue(() => {
+            !this.state.pollingFlag &&  this.startPolling();
+        }, 2 * 1000);
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, visible: false });
