@@ -60,7 +60,7 @@ export default class ItemPcRetainDialog extends Component {
         onCancel(closeText);
         buryAdOrderNow('关闭商品pc端挽留弹窗', closeText);
         this.setState({ isShow: false });
-        $uninstall();
+        // $uninstall();
     }
 
     /**
@@ -83,7 +83,7 @@ export default class ItemPcRetainDialog extends Component {
             buryAdOrderNow(`关闭商品手机端挽留弹窗${isIOS ? 'ios' : 'android'}`, '优惠结束');
         }
         this.setState({ isShow: false });
-        $uninstall();
+        // $uninstall();
     }
 
     render () {

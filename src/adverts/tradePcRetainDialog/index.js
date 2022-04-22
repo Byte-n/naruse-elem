@@ -64,7 +64,7 @@ export default class TradePcRetainDialog extends Component {
         onCancel(closeText);
         buryAdOrderNow('关闭交易pc端挽留弹窗', closeText);
         this.setState({ isShow: false });
-        $uninstall();
+        // $uninstall();
     }
 
     /**
@@ -87,7 +87,7 @@ export default class TradePcRetainDialog extends Component {
             buryAdOrderNow('关闭交易pc端挽留弹窗', '优惠结束');
         }
         this.setState({ isShow: false });
-        $uninstall();
+        // $uninstall();
     }
 
     render () {
@@ -109,7 +109,10 @@ export default class TradePcRetainDialog extends Component {
                                     style={{ ...btnStyle, ...{ left: '125px' } }}
                                     onClick={this.closeDialog.bind(this)}
                                 />
+                                <image
+                                    src={!isOrderBtn ? discountOverBtnSrc : (centPrice === '100' ? orderOneyuanBtnSrc : orderOnecentBtnSrc)}
                                     style={{ ...btnStyle, ...{ right: '125px' } }}
+                                    onClick={this.orderVip.bind(this)}
                                 />
                             </view>
                         </view>
