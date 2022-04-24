@@ -122,7 +122,6 @@ const createBehavior = (option = {}) => {
                     this.$middware.props = this.props.component.props;
                     this.$middware.canUpdate(props);
                 } else {
-                    console.log('切换组件拉');
                     this.$middware.onUnMount();
                     initChildComponent.call(this, this.props.component);
                 }
