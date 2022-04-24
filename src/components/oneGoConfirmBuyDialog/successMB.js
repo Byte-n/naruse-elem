@@ -105,16 +105,13 @@ export default class OneGoSuccessMB extends Component {
                 <view style={{ position: 'relative' }}>
                     <image style={{ width: '600rpx', height: '720rpx' }}  src={'http://q.aiyongtech.com/ad/images/TULmiJDlip/lvLnnqpcy_1650348792629.png'} />
                     <text style={{ ...buyBtnStyle, bottom: '450rpx' }} onClick={() => {
-                        jumpUrl('自动评价');
-                        navigateTo({ url: '/sp-01/pages/autoRate/index' });
+                        jumpUrl('/pages/featureIntroduction/index', '自动评价');
                     }}/>
                     <text style={{ ...buyBtnStyle, bottom: '260rpx' }} onClick={() => {
-                        jumpUrl('差评拦截');
-                        navigateTo({ url: '/sp-01/pages/intercept/index' });
+                        jumpUrl('/pages/featureIntroduction/index', '差评拦截');
                     }}/>
                     <text style={{ ...buyBtnStyle, bottom: '60rpx' }} onClick={() => {
-                        jumpUrl('核对地址');
-                        my.switchTab({ url: '/pages/tradeList/index' });
+                        jumpUrl('/pages/tradeList/index', '核对地址');
                     }}/>
                 </view>
                 <view>
