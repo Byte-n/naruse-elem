@@ -1,4 +1,4 @@
-import { Component } from 'Naruse' ;
+import { Component, navigateTo } from 'Naruse' ;
 
 // 模板样式
 const tradePcContainer = { width: '100vw', height: '100vh', position: 'fixed', top: '0', left: '0', backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 900 };
@@ -40,6 +40,7 @@ export const buryAdOrderNow = (secondary_class,order_cycle) => {
 /**
  * @desc 一分购成功组件
  * @param {string} closeBtnName 关闭按钮文本 默认'关闭'
+ * @param {function} onClone 关闭弹窗时调用
  * @author gao01
  * @date 2022/04/15 16:00:41
  */
@@ -92,16 +93,16 @@ export default class OneGoSuccessPC extends Component {
      */
     getRecommendDialog = () => {
         const { animation } = this.state;
-        const { closeBtnName = '关闭' } = this.props;
-        const  dialogClose = () => {
+        const { onClone, closeBtnName = '关闭' } = this.props;
+        const dialogClose = () => {
             this.setState({ successResDialogVisible:false,recommendDialogVisible:false});
-            $uninstall();
+            onClone && onClone();
         }
         const jumpUrl = (url,order_cycle) => {
             buryAdOrderNow(recommendSecondaryClass,order_cycle);
             navigateTo({ url });
             this.setState({ successResDialogVisible:false,recommendDialogVisible:false});
-            $uninstall();
+            onClone && onClone();
         }
         return (
             <view style={{ ...tradePcOrderTem,...(animation ? dialogBox : {}) }}>
@@ -138,4 +139,3 @@ export default class OneGoSuccessPC extends Component {
         )
     }
 }
-
