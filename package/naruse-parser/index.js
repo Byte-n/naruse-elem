@@ -256,20 +256,22 @@ const evaluate_map = {
     },
 
     CallExpression: (node, scope) => {
+        let this_val = null;
+        let func = null;
+        // fix: ww().ww().ww()
         if (node.callee.type === 'MemberExpression') {
             const { object, property, computed } = node.callee;
-            let this_val = evaluate(object, scope);
+            this_val = evaluate(object, scope);
             const funcName = !computed ? property.name : evaluate_map[property.type](property, scope);
-            const func = this_val[funcName];
+            func = this_val[funcName];
             if (illegalFun.includes(func)) this_val = null;
-            return func.apply(this_val, node.arguments.map(arg => evaluate(arg, scope)));
+        } else {
+            this_val = scope.$find('this').$get();
+            func = evaluate(node.callee, scope);
+            // fix: setTimeout.apply({}, '');
+            if (illegalFun.includes(func)) this_val = null;
         }
-        let this_val = scope.$find('this').$get();
-        const func = evaluate(node.callee, scope);
-        const args = node.arguments.map(arg => evaluate(arg, scope));
-        // fix: setTimeout.apply({}, '');
-        if (illegalFun.includes(func)) this_val = null;
-        return func.apply(this_val, args);
+        return func.apply(this_val, node.arguments.map(arg => evaluate(arg, scope)));
     },
     NewExpression: (node, scope) => {
         const Func = evaluate(node.callee, scope);

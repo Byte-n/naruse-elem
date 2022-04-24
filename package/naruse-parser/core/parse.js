@@ -243,6 +243,7 @@ export class Parser {
     finishNode (node, type) {
         node.type = type;
         node.start = this.start || 0;
+        node.end = this.end || 0;
         return node;
     }
     parseTopLevel (node) {
