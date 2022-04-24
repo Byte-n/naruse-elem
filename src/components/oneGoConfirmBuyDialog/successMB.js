@@ -1,4 +1,4 @@
-import { Component } from 'Naruse';
+import { Component, navigateTo } from 'Naruse';
 
 // 模板样式
 const tradePcContainer = { width: '100vw', height: '100vh', position: 'fixed', top: '0', left: '0', backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 900 };
@@ -81,7 +81,7 @@ export default class OneGoSuccessMB extends Component {
                 </view>
             </view>
         );
-    };
+    }
 
     /**
      * @desc 功能引导弹窗
@@ -95,9 +95,8 @@ export default class OneGoSuccessMB extends Component {
             this.setState({ successResDialogVisible: false, recommendDialogVisible: false });
             onClone && onClone();
         };
-        const jumpUrl = (url, order_cycle) => {
+        const jumpUrl = (order_cycle) => {
             buryAdOrderNow(recommendSecondaryClass, order_cycle);
-            navigateTo({ url });
             this.setState({ successResDialogVisible: false, recommendDialogVisible: false });
             onClone && onClone();
         };
@@ -106,13 +105,16 @@ export default class OneGoSuccessMB extends Component {
                 <view style={{ position: 'relative' }}>
                     <image style={{ width: '600rpx', height: '720rpx' }}  src={'http://q.aiyongtech.com/ad/images/TULmiJDlip/lvLnnqpcy_1650348792629.png'} />
                     <text style={{ ...buyBtnStyle, bottom: '450rpx' }} onClick={() => {
-                        jumpUrl('pages/featureIntroduction/index', '自动评价');
+                        jumpUrl('自动评价');
+                        navigateTo({ url: '/sp-01/pages/autoRate/index' });
                     }}/>
                     <text style={{ ...buyBtnStyle, bottom: '260rpx' }} onClick={() => {
-                        jumpUrl('pages/featureIntroduction/index', '差评拦截');
+                        jumpUrl('差评拦截');
+                        navigateTo({ url: '/sp-01/pages/intercept/index' });
                     }}/>
                     <text style={{ ...buyBtnStyle, bottom: '60rpx' }} onClick={() => {
-                        jumpUrl('pages/tradeList/index', '核对地址');
+                        jumpUrl('核对地址');
+                        my.switchTab({ url: '/pages/tradeList/index' });
                     }}/>
                 </view>
                 <view>
@@ -120,7 +122,7 @@ export default class OneGoSuccessMB extends Component {
                 </view>
             </view>
         );
-    };
+    }
 
     getDialog = () => {
         const { successResDialogVisible, recommendDialogVisible } = this.state;
@@ -130,7 +132,7 @@ export default class OneGoSuccessMB extends Component {
                 {recommendDialogVisible && this.getRecommendDialog()}
             </view>
         );
-    };
+    }
 
     render () {
         const { successResDialogVisible, recommendDialogVisible } = this.state;
