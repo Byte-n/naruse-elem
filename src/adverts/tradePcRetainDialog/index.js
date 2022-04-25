@@ -22,7 +22,9 @@ const backgroundImg = {
 const btnStyle = { width: '160px', height: '40px', position: 'absolute', top: '336px' };
 
 const baseImgSrc = 'http://q.aiyongtech.com/ad/images/';
-const backgroundSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDc=_1650359418137.png`;
+const backgroundSrc = `${baseImgSrc}55S75p2/_1650886880633.png`;
+const oneYuanBgSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDc=_1650885100644.png`;
+
 const leaveBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDQ=_1650434802345.png`;
 const orderOneyuanBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDEy_1650381083973.png`;
 const orderOnecentBtnSrc = `${baseImgSrc}55S75p2/IDI=_1650421545665.png`;
@@ -93,12 +95,13 @@ export default class TradePcRetainDialog extends Component {
     render () {
         const { isShow, isOrderBtn } = this.state;
         const { centPrice } = this.props;
+        console.log(centPrice === '100');
         return (
             <view>
                 {
                     isShow && (
                         <view style={container}>
-                            <image style={backgroundImg} src={backgroundSrc} />
+                            <image style={backgroundImg} src={centPrice === '100' ?   oneYuanBgSrc : backgroundSrc } />
                             <view style={containerMain}>
                                 <HorseRaceLamp equipmentType={'pc'} />
                                 <view style={{ marginTop: '415rpx', marginLeft: '380rpx' }}>
