@@ -13,7 +13,7 @@ const apiDiff = {
     },
 };
 
-export const transformMeta = (api, options) =>  {
+export const transformMeta = (api, options) => {
     let apiAlias = api;
     Object.keys(apiDiff).forEach(item => {
         const apiItem = apiDiff[item];
@@ -44,6 +44,52 @@ export const transformMeta = (api, options) =>  {
     };
 };
 
+export const handleSyncApis = function handleSyncApis (key, global, args) {
+    if (key === 'getStorageSync') {
+        const arg1 = args[0];
+        if (arg1 != null) {
+            const res = global[key]({ key: arg1 });
+
+            // 支付宝小程序遗留bug：值可能在data或APDataStorage字段下
+            let data = null;
+            if (res.hasOwnProperty('data')) {
+                data = res.data;
+            } else if (res.hasOwnProperty('APDataStorage')) {
+                data = res.APDataStorage;
+            }
+
+            return data === null ? '' : data;
+        }
+        return console.error('getStorageSync 传入参数错误');
+    }
+    if (key === 'setStorageSync') {
+        const arg1 = args[0];
+        const arg2 = args[1];
+        if (arg1 != null) {
+            return global[key]({
+                key: arg1,
+                data: arg2,
+            });
+        }
+        return console.error('setStorageSync 传入参数错误');
+    }
+    if (key === 'removeStorageSync') {
+        const arg1 = args[0];
+        if (arg1 != null) {
+            return global[key]({ key: arg1 });
+        }
+        return console.error('removeStorageSync 传入参数错误');
+    }
+    if (key === 'createSelectorQuery') {
+        const query = global[key]();
+        query.in = function () {
+            return query;
+        };
+        return query;
+    }
+    return global[key].apply(global, args);
+};
+
 const needPromiseApis = [
     'getStorage',
     'setStorage',
@@ -55,6 +101,14 @@ const needPromiseApis = [
     'navigateBack',
     'setClipboard',
     'getClipboard',
+];
+
+const syncApis = [
+    'getStorageSync',
+    'setStorageSync',
+    'removeStorageSync',
+    'clearStorageSync',
+    'getStorageInfoSync',
 ];
 
 const qnPromiseApis = [
@@ -70,7 +124,12 @@ const qnPromiseApis = [
  */
 export const initNaruseAlipayApi = () => {
     const NaruseApiInterface = {};
-    processApis(NaruseApiInterface, my, { transformMeta, needPromiseApis });
+    processApis(NaruseApiInterface, my, {
+        transformMeta,
+        needPromiseApis,
+        handleSyncApis,
+        needSyncApis: syncApis,
+    });
     processApis(NaruseApiInterface, my.qn, { needPromiseApis: qnPromiseApis });
     return NaruseApiInterface;
 };

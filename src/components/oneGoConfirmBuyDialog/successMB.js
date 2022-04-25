@@ -81,7 +81,7 @@ export default class OneGoSuccessMB extends Component {
                 </view>
             </view>
         );
-    }
+    };
 
     /**
      * @desc 功能引导弹窗
@@ -119,7 +119,7 @@ export default class OneGoSuccessMB extends Component {
                 </view>
             </view>
         );
-    }
+    };
 
     getDialog = () => {
         const { successResDialogVisible, recommendDialogVisible } = this.state;
@@ -129,7 +129,7 @@ export default class OneGoSuccessMB extends Component {
                 {recommendDialogVisible && this.getRecommendDialog()}
             </view>
         );
-    }
+    };
 
     render () {
         const { successResDialogVisible, recommendDialogVisible } = this.state;
