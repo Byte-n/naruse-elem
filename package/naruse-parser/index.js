@@ -56,7 +56,7 @@ const evaluate_map = {
     ForStatement: (node, scope) => {
         for (
             const new_scope = new Scope('loop', scope),
-            init_val = node.init ? evaluate(node.init, new_scope) : null;
+                init_val = node.init ? evaluate(node.init, new_scope) : null;
             node.test ? evaluate(node.test, new_scope) : true;
             node.update ? evaluate(node.update, new_scope) : void (0)
         ) {
@@ -155,11 +155,11 @@ const evaluate_map = {
                 ? evaluate(argument.property, scope)
                 : (argument.property).name;
             $var = {
-                $set(value) {
+                $set (value) {
                     object[property] = value;
                     return true;
                 },
-                $get() {
+                $get () {
                     return object[property];
                 },
             };
@@ -207,11 +207,11 @@ const evaluate_map = {
                 ? evaluate(left.property, scope)
                 : (left.property).name;
             $var = {
-                $set(value) {
+                $set (value) {
                     object[property] = value;
                     return true;
                 },
-                $get() {
+                $get () {
                     return object[property];
                 },
             };
@@ -256,20 +256,22 @@ const evaluate_map = {
     },
 
     CallExpression: (node, scope) => {
+        let this_val = null;
+        let func = null;
+        // fix: ww().ww().ww()
         if (node.callee.type === 'MemberExpression') {
             const { object, property, computed } = node.callee;
-            let this_val = evaluate(object, scope);
+            this_val = evaluate(object, scope);
             const funcName = !computed ? property.name : evaluate_map[property.type](property, scope);
-            const func = this_val[funcName];
+            func = this_val[funcName];
             if (illegalFun.includes(func)) this_val = null;
-            return func.apply(this_val, node.arguments.map(arg => evaluate(arg, scope)));
+        } else {
+            this_val = scope.$find('this').$get();
+            func = evaluate(node.callee, scope);
+            // fix: setTimeout.apply({}, '');
+            if (illegalFun.includes(func)) this_val = null;
         }
-        let this_val = scope.$find('this').$get();
-        const func = evaluate(node.callee, scope);
-        const args = node.arguments.map(arg => evaluate(arg, scope));
-        // fix: setTimeout.apply({}, '');
-        if (illegalFun.includes(func)) this_val = null;
-        return func.apply(this_val, args);
+        return func.apply(this_val, node.arguments.map(arg => evaluate(arg, scope)));
     },
     NewExpression: (node, scope) => {
         const Func = evaluate(node.callee, scope);
@@ -288,18 +290,18 @@ const evaluate_map = {
 class ScopeVar {
     value;
     kind;
-    constructor(kind, value) {
+    constructor (kind, value) {
         this.value = value;
         this.kind = kind;
     }
-    $set(value) {
+    $set (value) {
         if (this.value === 'const') {
             return false;
         }
         this.value = value;
         return true;
     }
-    $get() {
+    $get () {
         return this.value;
     }
 }
@@ -310,14 +312,14 @@ class Scope {
     type;
     invasived;
     prefix = '';
-    constructor(type, parent) {
+    constructor (type, parent) {
         this.type = type;
         this.parent = parent || null;
         this.content = {};
         this.invasived = false;
     }
 
-    $find(raw_name) {
+    $find (raw_name) {
         const name = this.prefix + raw_name;
         if (this.content.hasOwnProperty(name)) {
             return this.content[name];
@@ -327,7 +329,7 @@ class Scope {
         return null;
     }
 
-    $let(raw_name, value) {
+    $let (raw_name, value) {
         const name = this.prefix + raw_name;
         const $var = this.content[name];
         if (!$var) {
@@ -336,7 +338,7 @@ class Scope {
         } return false;
     }
 
-    $const(raw_name, value) {
+    $const (raw_name, value) {
         const name = this.prefix + raw_name;
         const $var = this.content[name];
         if (!$var) {
@@ -345,7 +347,7 @@ class Scope {
         } return false;
     }
 
-    $var(raw_name, value) {
+    $var (raw_name, value) {
         const name = this.prefix + raw_name;
         let scope = this;
 
@@ -359,7 +361,7 @@ class Scope {
             return true;
         } return false;
     }
-    $declar(kind, raw_name, value) {
+    $declar (kind, raw_name, value) {
         return ({
             var: () => this.$var(raw_name, value),
             let: () => this.$let(raw_name, value),
