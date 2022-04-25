@@ -124,6 +124,7 @@ export default class ItemMoileModal extends Component {
     }
     onSendServiceMsg () {
         if (this.state.paymentUrl) {
+            $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
             $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
             return;
         }
@@ -139,21 +140,40 @@ export default class ItemMoileModal extends Component {
             const { payUrl } = res.body || {};
             if (!payUrl) return;
             this.setState({ ...this.state, paymentUrl: payUrl });
+            $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
             $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
         });
     }
     onReAction () {
         if (this.state.paymentUrl) {
-            navigateToWebPage({ url: this.state.paymentUrl });
+            if ($mappUtils.isIOS()) {
+                $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
+                $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
+            } else {
+                buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
+                navigateToWebPage({ url: this.state.paymentUrl });
+            }
             return;
         }
-        const _promiseItem =  $ayApi.apiAsync(payUrlOpt);
+        const opt = {
+            mode: 'post',
+            method: '/activity/getOneYuanActivityOrder',
+            args: { app, payCount: cent_price },
+            apiName: 'aiyong.activity.oneyuan.order.get',
+            host,
+        };
+        const _promiseItem =  $ayApi.apiAsync(opt);
         _promiseItem.then((res) => {
             const { payUrl } = res.body || {};
             // 是否需要提示信息，待确定
             if (!payUrl) return;
-            buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
-            navigateToWebPage({ url: payUrl });
+            if ($mappUtils.isIOS()) {
+                $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
+                $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
+            } else {
+                buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
+                navigateToWebPage({ url: this.state.paymentUrl });
+            }
             this.setState({ ...this.state, paymentUrl: payUrl });
         });
     }
