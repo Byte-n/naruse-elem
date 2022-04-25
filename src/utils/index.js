@@ -107,3 +107,12 @@ export const getFreeTrial = (args) => {
         console.log('errr====', err);
     });
 };
+
+/**
+ * @description 判断当前用户是否是子账号
+ * @author CHC
+ * @date 2022-04-25 15:04:21
+ */
+export const isSubUser = () => {
+    return !!$userInfoChanger.getUserInfo().subUserNick;
+};
