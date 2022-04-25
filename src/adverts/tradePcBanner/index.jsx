@@ -2,6 +2,7 @@ import { Component, navigateToWebPage } from 'Naruse';
 import { taskQue } from '@/common/FadeContainer';
 import Error from '@components/oneGoConfirmBuyDialog/error';
 import SuccessPc from '@components/oneGoConfirmBuyDialog/successPC';
+import { oneYuanActivitySubUserContact } from '@utils/index';
 const adInfo = $adImport.adData.results[0];
 const { user_define, img_path: imgSrc } = adInfo;
 const { cent_price, env } = user_define.body;
@@ -27,7 +28,6 @@ export default class PcBanner extends Component {
     }
 
     onLinkClick () {
-        this.setState({ ...this.state, receiptFlag: true });
         const opt = {
             mode: 'post',
             method: '/activity/getOneYuanActivityOrder',
@@ -43,14 +43,11 @@ export default class PcBanner extends Component {
                 this.onCloseModal();
                 return;
             }
+            // 一元购子账号返回
+            if (oneYuanActivitySubUserContact(cent_price, payUrl)) return;
             buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
-            if ($mappUtils.isIOS()) {
-                $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
-                $openChat.contactCustomerService(`你好，我想参与${service_suffix}`);
-            } else {
-                navigateToWebPage({ url: payUrl });
-            }
-            this.setState({ ...this.state, paymentUrl: payUrl });
+            navigateToWebPage({ url: payUrl });
+            this.setState({ ...this.state, paymentUrl: payUrl, receiptFlag: true });
             taskQue(() => {
                 !this.state.pollingFlag && this.startPolling();
             }, 2 * 1000);
@@ -86,7 +83,9 @@ export default class PcBanner extends Component {
     }
     onCloseModal () {
         this.setState({ ...this.state, visible: false });
-        $uninstall();
+        setTimeout(() => {
+            $uninstall();
+        });
     }
     onSendServiceMsg () {
         $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
@@ -120,7 +119,6 @@ export default class PcBanner extends Component {
         return (
             <view>
                 <image onClick={this.onLinkClick.bind(this)} src={imgSrc} />
-                {this.state.paymentUrl}
                 {payResJsx}
             </view>
         );

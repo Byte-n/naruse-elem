@@ -27,35 +27,29 @@ export default class PcBanner extends Component {
     }
 
     onLinkClick () {
-        this.setState({  receiptFlag: true });
-        if ($mappUtils.isIOS()) {
-            $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
-            $openChat.contactCustomerService(`你好，我想参与${service_suffix}`);
-        } else {
-            const opt = {
-                mode: 'post',
-                method: '/activity/getOneYuanActivityOrder',
-                args: { app: 'item', payCount: cent_price },
-                apiName: 'aiyong.activity.oneyuan.order.get',
-                host,
-            };
-            const _promiseItem = $ayApi.apiAsync(opt);
-            _promiseItem.then((res) => {
-                const { payUrl } = res.body || {};
-                // 是否需要提示信息，待确定
-                if (!payUrl) {
-                    this.onCloseModal();
-                    return;
-                }
-                buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
-                navigateToWebPage({ url: payUrl });
-                this.setState({  paymentUrl: payUrl });
-                taskQue(() => {
-                    !this.state.pollingFlag && this.startPolling();
-                }, 2 * 1000);
-            });
-            _promiseItem.catch(() => { });
-        }
+        const opt = {
+            mode: 'post',
+            method: '/activity/getOneYuanActivityOrder',
+            args: { app: 'item', payCount: cent_price },
+            apiName: 'aiyong.activity.oneyuan.order.get',
+            host,
+        };
+        const _promiseItem = $ayApi.apiAsync(opt);
+        _promiseItem.then((res) => {
+            const { payUrl } = res.body || {};
+            // 是否需要提示信息，待确定
+            if (!payUrl) {
+                this.onCloseModal();
+                return;
+            }
+            buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
+            navigateToWebPage({ url: payUrl });
+            this.setState({  paymentUrl: payUrl, receiptFlag: true });
+            taskQue(() => {
+                !this.state.pollingFlag && this.startPolling();
+            }, 2 * 1000);
+        });
+        _promiseItem.catch(() => { });
     }
 
     startPolling () {

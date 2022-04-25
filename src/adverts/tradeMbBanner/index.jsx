@@ -4,6 +4,7 @@ import CloseButton from '@/common/CloseButton';
 import { taskQue } from '@/common/FadeContainer';
 import Error from '@components/oneGoConfirmBuyDialog/error';
 import SuccessMB from '@components/oneGoConfirmBuyDialog/successMB';
+import { oneYuanActivitySubUserContact } from '@utils/index';
 const adInfo = $adImport.adData.results[0];
 const { user_define, img_path: imgSrc } = adInfo;
 const { cent_price, env } = user_define.body;
@@ -41,7 +42,6 @@ export default class ItemMoileModal extends Component {
     }
 
     onLinkClick () {
-        this.setState({ ...this.state, receiptFlag: true });
         const opt = {
             mode: 'post',
             method: '/activity/getOneYuanActivityOrder',
@@ -54,8 +54,14 @@ export default class ItemMoileModal extends Component {
             const { payUrl } = res.body || {};
             // 是否需要提示信息，待确定
             if (!payUrl) {
+                this.onCloseModal();
+                setTimeout(() => {
+                    $uninstall();
+                });
                 return;
             }
+            // 一元购子账号返回
+            if (oneYuanActivitySubUserContact(cent_price, payUrl)) return;
             if ($mappUtils.isIOS()) {
                 $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
                 $openChat.contactCustomerService(`你好，我想参与${service_suffix}\n${payUrl}`);
@@ -63,7 +69,7 @@ export default class ItemMoileModal extends Component {
                 buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
                 navigateToWebPage({ url: payUrl });
             }
-            this.setState({ ...this.state, paymentUrl: payUrl });
+            this.setState({ ...this.state, paymentUrl: payUrl,  receiptFlag: true });
             taskQue(() => {
                 !this.state.pollingFlag && this.startPolling();
             }, 2 * 1000);
