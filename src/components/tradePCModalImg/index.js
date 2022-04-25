@@ -125,7 +125,14 @@ export default class ItemMoileModal extends Component {
             navigateToWebPage({ url: this.state.paymentUrl });
             return;
         }
-        const _promiseItem =  $ayApi.apiAsync(payUrlOpt);
+        const opt = {
+            mode: 'post',
+            method: '/activity/getOneYuanActivityOrder',
+            args: { app, payCount: cent_price },
+            apiName: 'aiyong.activity.oneyuan.order.get',
+            host,
+        };
+        const _promiseItem =  $ayApi.apiAsync(opt);
         _promiseItem.then((res) => {
             const { payUrl } = res.body || {};
             // 是否需要提示信息，待确定
