@@ -1,3 +1,4 @@
+
 import { Component, navigateToWebPage } from 'Naruse';
 import style from './index.css';
 
@@ -6,6 +7,8 @@ import FadeContainer, { taskQue } from '@/common/FadeContainer';
 import Error from '@/components/oneGoConfirmBuyDialog/error.js';
 import SuccessMB from '@/components/oneGoConfirmBuyDialog/successMB.js';
 import TradeMbRetainDialog from '@/adverts/tradeMbRetainDialog/index';
+
+
 const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
 const { android_img_url, ios_img_url, cent_price, version, env } = user_define.body;
@@ -15,6 +18,14 @@ const host = env === 'dev' ?   'http://tradepre.aiyongtech.com' : '//trade.aiyon
 const service_suffix = `一${isCent ? '分' : '元'}购活动`;
 const button_text = `1${isCent ? '分' : '元'}/15天`;
 const secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
+
+const payUrlOpt = {
+    mode: 'post',
+    method: '/activity/confirmOneYuanPurchaseOrder',
+    args: { app },
+    apiName: 'aiyong.activity.oneyuan.order.confirm',
+    host,
+};
 const buryAdPageView = () => {
     $adSensorsBeacon.adViewBeacon({ ...adInfo, secondary_class }, adInfo.pid);
 };
@@ -43,8 +54,8 @@ export default class ItemMoileModal extends Component {
             const { isShown } = res.body || {};
             if (isShown) return;
             $mappUtils.hideTabBar();
-            this.setState({ ...this.state, visible: true });
             buryAdPageView();
+            this.setState({ ...this.state, visible: true });
             this.setShown();
         });
     }
@@ -64,49 +75,41 @@ export default class ItemMoileModal extends Component {
 
     onLinkClick () {
         this.setState({ ...this.state, receiptFlag: true });
-        if ($mappUtils.isIOS()) {
-            $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
-            $openChat.contactCustomerService(`你好，我想参与${service_suffix}`);
-        } else {
-            const opt = {
-                mode: 'post',
-                method: '/activity/getOneYuanActivityOrder',
-                args: { app, payCount: cent_price },
-                apiName: 'aiyong.activity.oneyuan.order.get',
-                host,
-            };
-            const _promiseItem =  $ayApi.apiAsync(opt);
-            _promiseItem.then((res) => {
-                const { payUrl } = res.body || {};
-                // 是否需要提示信息，待确定
-                if (!payUrl) return;
+        const opt = {
+            mode: 'post',
+            method: '/activity/getOneYuanActivityOrder',
+            args: { app, payCount: cent_price },
+            apiName: 'aiyong.activity.oneyuan.order.get',
+            host,
+        };
+        const _promiseItem =  $ayApi.apiAsync(opt);
+        _promiseItem.then((res) => {
+            const { payUrl } = res.body || {};
+            // 是否需要提示信息，待确定
+            if (!payUrl) return;
+            if ($mappUtils.isIOS()) {
+                $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
+                $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${payUrl}`);
+            } else {
                 buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
                 navigateToWebPage({ url: payUrl });
                 this.setState({ ...this.state, paymentUrl: payUrl });
-                taskQue(() => {
-                    !this.state.pollingFlag &&  this.startPolling();
-                }, 2 * 1000);
-            });
-        }
+            }
+            taskQue(() => {
+                !this.state.pollingFlag &&  this.startPolling();
+            }, 2 * 1000);
+        });
     }
 
     startPolling () {
         clearInterval.call(null, this.timer);
-
         this.setState({ ...this.state, pollingFlag: true });
         const _timer = setInterval(() => {
             if (!this.state.pollingFlag) {
                 clearInterval.call(null, _timer);
                 return;
             }
-            const opt = {
-                mode: 'post',
-                method: '/activity/confirmOneYuanPurchaseOrder',
-                args: { app },
-                apiName: 'aiyong.activity.oneyuan.order.confirm',
-                host,
-            };
-            const _promiseItem =  $ayApi.apiAsync(opt);
+            const _promiseItem =  $ayApi.apiAsync(payUrlOpt);
             _promiseItem.then((res) => {
                 const { payResult } = res.body || {};
                 if (!payResult) return;
@@ -115,16 +118,64 @@ export default class ItemMoileModal extends Component {
             });
         }, 3 * 1000);
         this.timer = _timer;
-        this.setState({ ...this.state });
     }
     onCloseModal () {
         this.setState({ ...this.state, stayFlag: true });
     }
     onSendServiceMsg () {
-        $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
+        if (this.state.paymentUrl) {
+            $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
+            $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
+            return;
+        }
+        const opt = {
+            mode: 'post',
+            method: '/activity/getOneYuanActivityOrder',
+            args: { app, payCount: cent_price },
+            apiName: 'aiyong.activity.oneyuan.order.get',
+            host,
+        };
+        const _promiseItem =  $ayApi.apiAsync(opt);
+        _promiseItem.then((res) => {
+            const { payUrl } = res.body || {};
+            if (!payUrl) return;
+            this.setState({ ...this.state, paymentUrl: payUrl });
+            $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
+            $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
+        });
     }
     onReAction () {
-        navigateToWebPage({ url: this.state.paymentUrl });
+        if (this.state.paymentUrl) {
+            if ($mappUtils.isIOS()) {
+                $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
+                $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
+            } else {
+                buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
+                navigateToWebPage({ url: this.state.paymentUrl });
+            }
+            return;
+        }
+        const opt = {
+            mode: 'post',
+            method: '/activity/getOneYuanActivityOrder',
+            args: { app, payCount: cent_price },
+            apiName: 'aiyong.activity.oneyuan.order.get',
+            host,
+        };
+        const _promiseItem =  $ayApi.apiAsync(opt);
+        _promiseItem.then((res) => {
+            const { payUrl } = res.body || {};
+            // 是否需要提示信息，待确定
+            if (!payUrl) return;
+            if ($mappUtils.isIOS()) {
+                $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
+                $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
+            } else {
+                buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
+                navigateToWebPage({ url: this.state.paymentUrl });
+            }
+            this.setState({ ...this.state, paymentUrl: payUrl });
+        });
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, visible: false });
