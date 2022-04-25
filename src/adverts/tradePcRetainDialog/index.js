@@ -107,7 +107,10 @@ export default class TradePcRetainDialog extends Component {
                                     style={{ ...btnStyle, ...{ left: '125px' } }}
                                     onClick={this.closeDialog.bind(this)}
                                 />
+                                <image
+                                    src={!isOrderBtn ? discountOverBtnSrc : (centPrice === '100' ? orderOneyuanBtnSrc : orderOnecentBtnSrc)}
                                     style={{ ...btnStyle, ...{ right: '125px' } }}
+                                    onClick={this.orderVip.bind(this)}
                                 />
                             </view>
                         </view>
