@@ -24,6 +24,7 @@ const btnStyle = { width: '260rpx', height: '90rpx', position: 'absolute', top: 
 
 const baseImgSrc = 'http://q.aiyongtech.com/ad/images/';
 const backgroundSrc = `${baseImgSrc}55S75p2/_1650337101811.png`;
+const oneYuanBgSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDY=_1650885160178.png`;
 const leaveBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDQ=_1650353672603.png`;
 const orderOneyuanBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDEy_1650381083973.png`;
 const orderOnecentBtnSrc = `${baseImgSrc}55S75p2/IDI=_1650421545665.png`;
@@ -97,7 +98,7 @@ export default class TradeMbRetainDialog extends Component {
                 {
                     isShow && (
                         <view style={container}>
-                            <image style={backgroundImg} src={backgroundSrc} />
+                            <image style={backgroundImg} src={centPrice === '100' ? oneYuanBgSrc : backgroundSrc} />
                             <view style={containerMain}>
                                 <HorseRaceLamp />
                                 <view style={{ marginTop: '572rpx', marginLeft: '80rpx' }}>
