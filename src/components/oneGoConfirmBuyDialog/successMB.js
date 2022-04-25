@@ -103,16 +103,19 @@ export default class OneGoSuccessMB extends Component {
         return (
             <view style={{ ...tradePcOrderTem, ...(animation ? dialogBox : {}) }}>
                 <view style={{ position: 'relative' }}>
-                    <image style={{ width: '600rpx', height: '720rpx' }}  src={'http://q.aiyongtech.com/ad/images/TULmiJDlip/lvLnnqpcy_1650348792629.png'} />
+                    <image style={{ width: '600rpx', height: '720rpx' }} src={'http://q.aiyongtech.com/ad/images/TULmiJDlip/lvLnnqpcy_1650348792629.png'} />
                     <text style={{ ...buyBtnStyle, bottom: '450rpx' }} onClick={() => {
-                        jumpUrl('/pages/featureIntroduction/index', '自动评价');
-                    }}/>
+                        jumpUrl('自动评价');
+                        navigateTo({ url: '/sp-01/pages/autoRate/index' });
+                    }} />
                     <text style={{ ...buyBtnStyle, bottom: '260rpx' }} onClick={() => {
-                        jumpUrl('/pages/featureIntroduction/index', '差评拦截');
-                    }}/>
+                        jumpUrl('差评拦截');
+                        navigateTo({ url: '/sp-01/pages/intercept/index' });
+                    }} />
                     <text style={{ ...buyBtnStyle, bottom: '60rpx' }} onClick={() => {
-                        jumpUrl('/pages/tradeList/index', '核对地址');
-                    }}/>
+                        jumpUrl('核对地址');
+                        my.switchTab({ url: '/pages/tradeList/index' });
+                    }} />
                 </view>
                 <view>
                     <view style={closeStyle} hoverStyle={buyBtnHoverStyle} onClick={dialogClose} > {closeBtnName} </view>
