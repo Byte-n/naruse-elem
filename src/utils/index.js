@@ -103,9 +103,10 @@ export const getFreeTrial = (args) => {
         args,
     }).then((res) => {
         console.log('res===', res);
-    }).catch((err) => {
-        console.log('errr====', err);
-    });
+    })
+        .catch((err) => {
+            console.log('errr====', err);
+        });
 };
 
 /**
@@ -115,4 +116,22 @@ export const getFreeTrial = (args) => {
  */
 export const isSubUser = () => {
     return !!$userInfoChanger.getUserInfo().subUserNick;
+};
+
+
+/**
+ * @description 一元购子账号联系用户
+ * @author CHC
+ * @date 2022-04-25 16:04:10
+ * @param {number} cent_price
+ * @param {string} payLink
+ * @returns {boolean} 是否是子账号自动联系用户
+ */
+export const oneYuanActivitySubUserContact = (cent_price, payLink) => {
+    if (!isSubUser()) return false;
+    $openChat.openChat({
+        nick: $userInfoChanger.getUserInfo().userNick,
+        text: `请使用主账号参与一${cent_price === '1' ? '分' : '元'}购活动，活动地址: ${payLink}`,
+    });
+    return true;
 };

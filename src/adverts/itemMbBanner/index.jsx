@@ -54,6 +54,10 @@ export default class ItemMoileModal extends Component {
             const { payUrl } = res.body || {};
             // 是否需要提示信息，待确定
             if (!payUrl) {
+                this.onCloseModal();
+                setTimeout(() => {
+                    $uninstall();
+                });
                 return;
             }
             buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
@@ -101,7 +105,7 @@ export default class ItemMoileModal extends Component {
     onCloseModal () {
         const key = `bannerShow${adInfo.pid}`;
         setStorage({ key, data: $moment().format('YYYY-MM-DD') });
-        this.setState({ ...this.state, visible: false });
+        this.setState({ visible: false });
     }
     onSendServiceMsg () {
         $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
@@ -124,14 +128,15 @@ export default class ItemMoileModal extends Component {
 
     render () {
         const { visible, receiptFlag, isPaySuccess } = this.state;
-        console.log(this.state);
         if (!user_define || !visible) return null;
         let payResJsx = null;
         // 支付结果
         if (receiptFlag) {
             payResJsx = <view>
                 {isPaySuccess && <SuccessMB closeBtnName='我知道了' onClone={this.onCloseModal.bind(this)} />}
-                {!isPaySuccess && <Error onClone={this.onCloseErrModal.bind(this)} onCustomerService={this.onSendServiceMsg.bind(this)} onAgain={this.onReAction.bind(this)} closeBtnName='关闭' />}
+                <view>
+                    {!isPaySuccess && <Error onClone={this.onCloseErrModal.bind(this)} onCustomerService={this.onSendServiceMsg.bind(this)} onAgain={this.onReAction.bind(this)} closeBtnName='关闭' />}
+                </view>
             </view>;
         }
 
