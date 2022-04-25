@@ -63,7 +63,6 @@ export default class TradeMbRetainDialog extends Component {
         onCancel(closeText);
         buryAdOrderNow(`关闭交易手机端挽留弹窗${isIOS ? 'ios' : 'android'}`, closeText);
         this.setState({ isShow: false });
-        $uninstall();
     }
 
     /**
@@ -86,7 +85,6 @@ export default class TradeMbRetainDialog extends Component {
             buryAdOrderNow(`关闭交易手机端挽留弹窗${isIOS ? 'ios' : 'android'}`, '优惠结束');
         }
         this.setState({ isShow: false });
-        $uninstall();
     }
 
     render () {

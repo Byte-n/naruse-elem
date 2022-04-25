@@ -64,7 +64,6 @@ export default class TradePcRetainDialog extends Component {
         onCancel(closeText);
         buryAdOrderNow('关闭交易pc端挽留弹窗', closeText);
         this.setState({ isShow: false });
-        $uninstall();
     }
 
     /**
@@ -87,7 +86,6 @@ export default class TradePcRetainDialog extends Component {
             buryAdOrderNow('关闭交易pc端挽留弹窗', '优惠结束');
         }
         this.setState({ isShow: false });
-        $uninstall();
     }
 
     render () {
