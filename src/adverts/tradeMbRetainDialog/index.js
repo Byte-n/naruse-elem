@@ -83,8 +83,6 @@ export default class TradeMbRetainDialog extends Component {
         const { onConfirm } = this.props;
         if (isOrderBtn) {
             onConfirm();
-        } else {
-            buryAdOrderNow(`关闭交易手机端挽留弹窗${isIOS ? 'ios' : 'android'}`, '优惠结束');
         }
         // $uninstall();
     }
