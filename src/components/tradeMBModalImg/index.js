@@ -163,11 +163,14 @@ export default class ItemMoileModal extends Component {
         return;
     }
     onCloseErrModal () {
-        this.setState({ ...this.state, pollingFlag: false, visible: false });
         $mappUtils.showTabBar();
+        this.setState({ ...this.state, pollingFlag: false, visible: false });
         $uninstall();
     }
 
+    onRouterLink () {
+        $mappUtils.showTabBar();
+    }
     render () {
         const {  visible, stayFlag, receiptFlag, isPaySuccess } = this.state;
         if (!user_define || !visible) return null;
@@ -177,7 +180,7 @@ export default class ItemMoileModal extends Component {
                 <view>
                     {isPaySuccess && (
                         <view >
-                            <SuccessMB  onClone={this.onCloseErrModal.bind(this)} closeBtnName='我知道了'/>
+                            <SuccessMB  onClone={this.onRouterLink.bind(this)} closeBtnName='我知道了'/>
                         </view>
                     ) }
                     {!isPaySuccess && (
