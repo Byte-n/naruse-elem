@@ -28,7 +28,7 @@ const oneYuanBgSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDY=_1650885160178.png`;
 const leaveBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDQ=_1650353672603.png`;
 const orderOneyuanBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDEy_1650381083973.png`;
 const orderOnecentBtnSrc = `${baseImgSrc}55S75p2/IDI=_1650421545665.png`;
-const orderIosBtnSrc = `${baseImgSrc}5ZWG5ZOBTUI=_1650428896611.png`;
+const orderIosBtnSrc = `${baseImgSrc}5Lqk5piTTUI=_1650946750257.png`;
 const leaveLastBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDM=_1650382500397.png`;
 const discountOverBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDU=_1650382605642.png`;
 
@@ -86,7 +86,6 @@ export default class TradeMbRetainDialog extends Component {
         } else {
             buryAdOrderNow(`关闭交易手机端挽留弹窗${isIOS ? 'ios' : 'android'}`, '优惠结束');
         }
-        this.setState({ isShow: false });
         // $uninstall();
     }
 
