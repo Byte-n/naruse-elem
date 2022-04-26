@@ -23,6 +23,8 @@ const btnStyle = { width: '260rpx', height: '90rpx', position: 'absolute', top: 
 
 const baseImgSrc = 'http://q.aiyongtech.com/ad/images/';
 const backgroundSrc = `${baseImgSrc}MeWIhumSseaMveeVmeW8ueeqlw==_1650359001803.png`;
+const oneYuanBgSrc = `${baseImgSrc}b25leXVhbg==_1650887050936.png`;
+
 const leaveBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9_1650383848828.png`;
 const orderOneyuanBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDI=_1650384004775.png`;
 const orderOnecentBtnSrc = `${baseImgSrc}55S75p2/_1650422727204.png`;
@@ -96,7 +98,7 @@ export default class ItemMbRetainDialog extends Component {
                 {
                     isShow && (
                         <view style={container}>
-                            <image style={backgroundImg} src={backgroundSrc} />
+                            <image style={backgroundImg} src={centPrice === '100' ? oneYuanBgSrc : backgroundSrc} />
                             <view style={containerMain}>
                                 <view style={{ marginTop: '572rpx', marginLeft: '80rpx' }}>
                                     <Timer closeTimer={this.closeTimer.bind(this)} />

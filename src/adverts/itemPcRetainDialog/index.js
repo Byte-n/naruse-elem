@@ -22,6 +22,7 @@ const btnStyle = { width: '160px', height: '40px', position: 'absolute', top: '3
 
 const baseImgSrc = 'http://q.aiyongtech.com/ad/images/';
 const backgroundSrc = `${baseImgSrc}MeWIhg==_1650365033250.png`;
+const oneYuanBgSrc = `${baseImgSrc}MeWFgw==_1650885425586.png`;
 const leaveBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDEw_1650363759695.png`;
 const orderOneyuanBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDI=_1650384004775.png`;
 const orderOnecentBtnSrc = `${baseImgSrc}55S75p2/_1650422727204.png`;
@@ -94,7 +95,7 @@ export default class ItemPcRetainDialog extends Component {
                 {
                     isShow && (
                         <view style={container}>
-                            <image style={backgroundImg} src={backgroundSrc} />
+                            <image style={backgroundImg} src={centPrice === '100' ? oneYuanBgSrc : backgroundSrc} />
                             <view style={containerMain}>
                                 <view style={{ marginTop: '415rpx', marginLeft: '380rpx' }}>
                                     <Timer equipmentType={'pc'} closeTimer={this.closeTimer.bind(this)} />

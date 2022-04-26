@@ -2,6 +2,7 @@
 import { Component, navigateToWebPage } from 'Naruse';
 import style from './index.css';
 
+import { oneYuanActivitySubUserContact, isSubUser } from '@utils/index';
 import CloseButton from '@/common/CloseButton';
 import FadeContainer, { taskQue } from '@/common/FadeContainer';
 import Error from '@/components/oneGoConfirmBuyDialog/error.js';
@@ -42,6 +43,10 @@ export default class ItemMoileModal extends Component {
     }
 
     componentDidMount () {
+        if (isSubUser()) {
+            $uninstall();
+            return;
+        }
         const opt = {
             mode: 'post',
             method: '/activity/oneYuanActivityVisibleState',
@@ -74,7 +79,6 @@ export default class ItemMoileModal extends Component {
 
 
     onLinkClick () {
-        this.setState({ ...this.state, receiptFlag: true });
         const opt = {
             mode: 'post',
             method: '/activity/getOneYuanActivityOrder',
@@ -87,13 +91,17 @@ export default class ItemMoileModal extends Component {
             const { payUrl } = res.body || {};
             // 是否需要提示信息，待确定
             if (!payUrl) return;
+            if (oneYuanActivitySubUserContact(cent_price, payUrl)) {
+                this.onCloseErrModal();
+                return;
+            }
+            this.setState({ ...this.state, receiptFlag: true, paymentUrl: payUrl });
             if ($mappUtils.isIOS()) {
+                $openChat.contactCustomerService(`你好，我想参加参加${service_suffix}。\n链接地址：${payUrl}`);
                 $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
-                $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${payUrl}`);
             } else {
                 buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
                 navigateToWebPage({ url: payUrl });
-                this.setState({ ...this.state, paymentUrl: payUrl });
             }
             taskQue(() => {
                 !this.state.pollingFlag &&  this.startPolling();
@@ -145,37 +153,14 @@ export default class ItemMoileModal extends Component {
         });
     }
     onReAction () {
-        if (this.state.paymentUrl) {
-            if ($mappUtils.isIOS()) {
-                $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
-                $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
-            } else {
-                buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
-                navigateToWebPage({ url: this.state.paymentUrl });
-            }
-            return;
+        if ($mappUtils.isIOS()) {
+            $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
+            $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
+        } else {
+            buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
+            navigateToWebPage({ url: this.state.paymentUrl });
         }
-        const opt = {
-            mode: 'post',
-            method: '/activity/getOneYuanActivityOrder',
-            args: { app, payCount: cent_price },
-            apiName: 'aiyong.activity.oneyuan.order.get',
-            host,
-        };
-        const _promiseItem =  $ayApi.apiAsync(opt);
-        _promiseItem.then((res) => {
-            const { payUrl } = res.body || {};
-            // 是否需要提示信息，待确定
-            if (!payUrl) return;
-            if ($mappUtils.isIOS()) {
-                $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
-                $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
-            } else {
-                buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
-                navigateToWebPage({ url: this.state.paymentUrl });
-            }
-            this.setState({ ...this.state, paymentUrl: payUrl });
-        });
+        return;
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, visible: false });
@@ -207,7 +192,7 @@ export default class ItemMoileModal extends Component {
         if (stayFlag) {
             return (
                 <view>
-                    <TradeMbRetainDialog centPrice={cent_price} onCancel={this.onCloseErrModal.bind(this)} onConfirm={this.onLinkClick.bind(this)} />
+                    <TradeMbRetainDialog centPrice={ cent_price} onCancel={this.onCloseErrModal.bind(this)} onConfirm={this.onLinkClick.bind(this)} />
                 </view>
             );
         }
