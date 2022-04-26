@@ -24,10 +24,10 @@ const baseImgSrc = 'http://q.aiyongtech.com/ad/images/';
 const backgroundSrc = `${baseImgSrc}MeWIhg==_1650365033250.png`;
 const oneYuanBgSrc = `${baseImgSrc}MeWFgw==_1650885425586.png`;
 const leaveBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDEw_1650363759695.png`;
-const orderOneyuanBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDI=_1650384004775.png`;
-const orderOnecentBtnSrc = `${baseImgSrc}55S75p2/_1650422727204.png`;
-const leaveLastBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDM=_1650384047461.png`;
-const discountOverBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDU=_1650382605642.png`;
+const orderOneyuanBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDc=_1650959079933.png`;
+const orderOnecentBtnSrc = `${baseImgSrc}55S75p2/IDI=_1650958822555.png`;
+const leaveLastBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDg=_1650959548599.png`;
+const discountOverBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDk=_1650961569036.png`;
 
 // 广告信息
 const adInfo = $adImport.adData.results[0];
@@ -83,7 +83,6 @@ export default class ItemPcRetainDialog extends Component {
         } else {
             buryAdOrderNow(`关闭商品手机端挽留弹窗${isIOS ? 'ios' : 'android'}`, '优惠结束');
         }
-        this.setState({ isShow: false });
         // $uninstall();
     }
 
