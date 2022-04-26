@@ -2,7 +2,7 @@ import { Component, navigateToWebPage } from 'Naruse';
 import { taskQue } from '@/common/FadeContainer';
 import Error from '@components/oneGoConfirmBuyDialog/error';
 import SuccessPc from '@components/oneGoConfirmBuyDialog/successPC';
-import { oneYuanActivitySubUserContact } from '@utils/index';
+import { oneYuanActivitySubUserContact, isSubUser } from '@utils/index';
 const adInfo = $adImport.adData.results[0];
 const { user_define, img_path: imgSrc } = adInfo;
 const { cent_price, env } = user_define.body;
@@ -20,11 +20,13 @@ const buryAdOrderNow = (order_cycle, btnText) => {
 export default class PcBanner extends Component {
     constructor () {
         super();
-        this.state = { visible: true, timer: null, receiptFlag: false, paymentUrl: '', isPaySuccess: false, pollingFlag: false };
+        this.state = { visible: false, timer: null, receiptFlag: false, paymentUrl: '', isPaySuccess: false, pollingFlag: false };
     }
 
     componentDidMount () {
+        if (isSubUser()) return;
         buryAdOrderNow();
+        this.setState({ visible: true });
     }
 
     onLinkClick () {
@@ -82,13 +84,13 @@ export default class PcBanner extends Component {
         this.setState({ ...this.state, timer: _timer });
     }
     onCloseModal () {
-        this.setState({ ...this.state, visible: false });
+        this.setState({ ...this.state, visible: false, pollingFlag: false });
         setTimeout(() => {
             $uninstall();
         });
     }
     onSendServiceMsg () {
-        $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
+        $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？链接地址：${this.state.paymentUrl}`);
     }
     onReAction () {
         navigateToWebPage({ url: this.state.paymentUrl });
