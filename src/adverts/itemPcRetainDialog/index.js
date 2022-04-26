@@ -80,7 +80,10 @@ export default class ItemPcRetainDialog extends Component {
         const { onConfirm } = this.props;
         if (isOrderBtn) {
             onConfirm();
+        } else {
+            buryAdOrderNow('关闭商品pc端挽留弹窗', '优惠结束');
         }
+        this.setState({ isShow: false });
         // $uninstall();
     }
 
