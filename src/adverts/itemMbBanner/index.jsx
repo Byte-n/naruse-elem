@@ -4,6 +4,7 @@ import CloseButton from '@/common/CloseButton';
 import { taskQue } from '@/common/FadeContainer';
 import Error from '@components/oneGoConfirmBuyDialog/error';
 import SuccessMB from '@components/oneGoConfirmBuyDialog/successItem';
+import { isSubUser } from '@utils/';
 const adInfo = $adImport.adData.results[0];
 const { user_define, img_path: imgSrc } = adInfo;
 const { cent_price, env } = user_define.body;
@@ -28,6 +29,7 @@ export default class ItemMoileModal extends Component {
     }
 
     componentDidMount () {
+        if (isSubUser()) return;
         buryAdPageView();
         const key = `bannerShow${adInfo.pid}`;
         getStorage({ key })
@@ -41,7 +43,6 @@ export default class ItemMoileModal extends Component {
     }
 
     onLinkClick () {
-        this.setState({ ...this.state, receiptFlag: true });
         const opt = {
             mode: 'post',
             method: '/activity/getOneYuanActivityOrder',
@@ -68,7 +69,7 @@ export default class ItemMoileModal extends Component {
                 buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
                 navigateToWebPage({ url: payUrl });
             }
-            this.setState({ ...this.state, paymentUrl: payUrl });
+            this.setState({ ...this.state, paymentUrl: payUrl, receiptFlag: true });
             taskQue(() => {
                 !this.state.pollingFlag && this.startPolling();
             }, 2 * 1000);
@@ -106,6 +107,7 @@ export default class ItemMoileModal extends Component {
         const key = `bannerShow${adInfo.pid}`;
         setStorage({ key, data: $moment().format('YYYY-MM-DD') });
         this.setState({ visible: false });
+        $uninstall();
     }
     onSendServiceMsg () {
         $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);

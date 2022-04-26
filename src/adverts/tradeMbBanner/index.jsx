@@ -4,7 +4,7 @@ import CloseButton from '@/common/CloseButton';
 import { taskQue } from '@/common/FadeContainer';
 import Error from '@components/oneGoConfirmBuyDialog/error';
 import SuccessMB from '@components/oneGoConfirmBuyDialog/successMB';
-import { oneYuanActivitySubUserContact } from '@utils/index';
+import { isSubUser, oneYuanActivitySubUserContact } from '@utils/index';
 const adInfo = $adImport.adData.results[0];
 const { user_define, img_path: imgSrc } = adInfo;
 const { cent_price, env } = user_define.body;
@@ -29,6 +29,7 @@ export default class ItemMoileModal extends Component {
     }
 
     componentDidMount () {
+        if (isSubUser()) return;
         buryAdPageView();
         const key = `bannerShow${adInfo.pid}`;
         getStorage({ key })
