@@ -2,16 +2,17 @@
 import { Component, navigateToWebPage } from 'Naruse';
 import style from './index.css';
 
+import {  isSubUser } from '@utils/index';
 import CloseButton from '@/common/CloseButton';
 import FadeContainer, { taskQue } from '@/common/FadeContainer';
 import Error from '@/components/oneGoConfirmBuyDialog/error.js';
 import SuccessItem from '@/components/oneGoConfirmBuyDialog/successItem.js';
-import ItemPCRetainDialog from '@/adverts/itemPcRetainDialog/index';
+import ItemPcRetainDialog from '@/adverts/itemPcRetainDialog/index';
 
 
 const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
-const { footer_url, content_url, cent_price, version, env } = user_define.body;
+const {  content_url, cent_price, version, env } = user_define.body;
 const isCent = cent_price === '1';
 const app = 'item';
 const host = env === 'dev' ?   'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
@@ -38,10 +39,14 @@ const buryAdOrderNow = (order_cycle, btnText) => {
 export default class ItemMoileModal extends Component {
     constructor () {
         super();
-        this.state = { visible: false, stayFlag: false, timer: null, receiptFlag: false, paymentUrl: '', isPaySuccess: false, pollingFlag: false };
+        this.state = { visible: false, stayFlag: false,  receiptFlag: false, paymentUrl: '', isPaySuccess: false, pollingFlag: false };
     }
 
     componentDidMount () {
+        if (isSubUser()) {
+            $uninstall();
+            return;
+        }
         const opt = {
             mode: 'post',
             method: '/activity/oneYuanActivityVisibleState',
@@ -73,8 +78,6 @@ export default class ItemMoileModal extends Component {
 
 
     onLinkClick () {
-        this.setState({ ...this.state, receiptFlag: true });
-
         const opt = {
             mode: 'post',
             method: '/activity/getOneYuanActivityOrder',
@@ -86,11 +89,11 @@ export default class ItemMoileModal extends Component {
         _promiseItem.then((res) => {
             const { payUrl } = res.body || {};
             // 是否需要提示信息，待确定
-            console.log('支付链接：', payUrl);
             if (!payUrl) return;
+
+            this.setState({ ...this.state, paymentUrl: payUrl, receiptFlag: true });
             buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
             navigateToWebPage({ url: payUrl });
-            this.setState({ ...this.state, paymentUrl: payUrl });
             taskQue(() => {
                 !this.state.pollingFlag &&  this.startPolling();
             }, 2 * 1000);
@@ -119,18 +122,24 @@ export default class ItemMoileModal extends Component {
         this.setState({ ...this.state, stayFlag: true });
     }
     onSendServiceMsg () {
-        $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
+        $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？链接地址：${this.state.paymentUrl}`);
     }
     onReAction () {
         if (this.state.paymentUrl) {
             navigateToWebPage({ url: this.state.paymentUrl });
             return;
         }
-        const _promiseItem =  $ayApi.apiAsync(payUrlOpt);
+        const opt = {
+            mode: 'post',
+            method: '/activity/getOneYuanActivityOrder',
+            args: { app, payCount: cent_price },
+            apiName: 'aiyong.activity.oneyuan.order.get',
+            host,
+        };
+        const _promiseItem =  $ayApi.apiAsync(opt);
         _promiseItem.then((res) => {
             const { payUrl } = res.body || {};
             // 是否需要提示信息，待确定
-            console.log('支付链接：', payUrl);
             if (!payUrl) return;
             buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
             navigateToWebPage({ url: payUrl });
@@ -145,19 +154,19 @@ export default class ItemMoileModal extends Component {
     render () {
         const {  visible, stayFlag, receiptFlag, isPaySuccess } = this.state;
         if (!user_define || !visible) return null;
+        console.log(this.state);
         // 支付结果
         if (receiptFlag) {
             return (
                 <view>
                     {isPaySuccess ? (
                         <view >
-                            <SuccessItem onClone={this.onCloseErrModal.bind(this)} isPc={true} closeBtnName='我知道了'/>
+                            <SuccessItem isPc={true} onClone={this.onCloseErrModal.bind(this)} closeBtnName='我知道了'/>
                         </view>
                     ) : (
-                        <view >
+                        <view>
                             <Error onClone={this.onCloseErrModal.bind(this)} onCustomerService={this.onSendServiceMsg.bind(this)} onAgain={this.onReAction.bind(this)} closeBtnName='关闭'/>
                         </view>
-
                     )}
                 </view>
             );
@@ -166,7 +175,7 @@ export default class ItemMoileModal extends Component {
         if (stayFlag) {
             return (
                 <view>
-                    <ItemPCRetainDialog centPrice={cent_price} onCancel={this.onCloseErrModal.bind(this)} onConfirm={this.onLinkClick.bind(this)} />
+                    <ItemPcRetainDialog centPrice={cent_price} onCancel={this.onCloseErrModal.bind(this)} onConfirm={this.onLinkClick.bind(this)} />
                 </view>
             );
         }
@@ -179,9 +188,6 @@ export default class ItemMoileModal extends Component {
                     </view>
                 </view>
                 <CloseButton onClose={this.onCloseModal.bind(this)}  text={version  || '关闭'}/>
-                <view style={style.footer}>
-                    <image onClick={this.onLinkClick.bind(this)} style={style.footerImg}   mode='widthFix'  src={footer_url}/>
-                </view>
             </FadeContainer>
         );
     }

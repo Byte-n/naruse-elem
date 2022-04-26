@@ -2,6 +2,7 @@
 import { Component, navigateToWebPage } from 'Naruse';
 import style from './index.css';
 
+import {  isSubUser } from '@utils/index';
 import CloseButton from '@/common/CloseButton';
 import FadeContainer, { taskQue } from '@/common/FadeContainer';
 import Error from '@/components/oneGoConfirmBuyDialog/error.js';
@@ -11,7 +12,7 @@ import TradePcRetainDialog from '@/adverts/tradePcRetainDialog/index';
 
 const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
-const { footer_url, content_url, cent_price, version, env } = user_define.body;
+const {  content_url, cent_price, version, env } = user_define.body;
 const isCent = cent_price === '1';
 const app = 'trade';
 const host = env === 'dev' ?   'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
@@ -38,10 +39,14 @@ const buryAdOrderNow = (order_cycle, btnText) => {
 export default class ItemMoileModal extends Component {
     constructor () {
         super();
-        this.state = { visible: false, stayFlag: false, timer: null, receiptFlag: false, paymentUrl: '', isPaySuccess: false, pollingFlag: false };
+        this.state = { visible: false, stayFlag: false,  receiptFlag: false, paymentUrl: '', isPaySuccess: false, pollingFlag: false };
     }
 
     componentDidMount () {
+        if (isSubUser()) {
+            $uninstall();
+            return;
+        }
         const opt = {
             mode: 'post',
             method: '/activity/oneYuanActivityVisibleState',
@@ -73,8 +78,6 @@ export default class ItemMoileModal extends Component {
 
 
     onLinkClick () {
-        this.setState({ ...this.state, receiptFlag: true });
-
         const opt = {
             mode: 'post',
             method: '/activity/getOneYuanActivityOrder',
@@ -87,9 +90,10 @@ export default class ItemMoileModal extends Component {
             const { payUrl } = res.body || {};
             // 是否需要提示信息，待确定
             if (!payUrl) return;
+
+            this.setState({ ...this.state, paymentUrl: payUrl, receiptFlag: true });
             buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
             navigateToWebPage({ url: payUrl });
-            this.setState({ ...this.state, paymentUrl: payUrl });
             taskQue(() => {
                 !this.state.pollingFlag &&  this.startPolling();
             }, 2 * 1000);
@@ -118,7 +122,7 @@ export default class ItemMoileModal extends Component {
         this.setState({ ...this.state, stayFlag: true });
     }
     onSendServiceMsg () {
-        $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
+        $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？链接地址：${this.state.paymentUrl}`);
     }
     onReAction () {
         if (this.state.paymentUrl) {
@@ -184,9 +188,6 @@ export default class ItemMoileModal extends Component {
                     </view>
                 </view>
                 <CloseButton onClose={this.onCloseModal.bind(this)}  text={version  || '关闭'}/>
-                <view style={style.footer}>
-                    <image onClick={this.onLinkClick.bind(this)} style={style.footerImg}   mode='widthFix'  src={footer_url}/>
-                </view>
             </FadeContainer>
         );
     }
