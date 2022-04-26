@@ -85,8 +85,6 @@ export default class TradePcRetainDialog extends Component {
         const { onConfirm } = this.props;
         if (isOrderBtn) {
             onConfirm();
-        } else {
-            buryAdOrderNow('关闭交易pc端挽留弹窗', '优惠结束');
         }
         // $uninstall();
     }
