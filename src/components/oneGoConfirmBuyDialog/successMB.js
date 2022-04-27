@@ -1,4 +1,4 @@
-import { Component } from 'Naruse' ;
+import { Component, navigateTo } from 'Naruse' ;
 
 // 模板样式
 const tradePcContainer = { width: '100vw', height: '100vh', position: 'fixed', top: '0', left: '0', backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 900 };
@@ -39,6 +39,7 @@ export const buryAdOrderNow = (secondary_class,order_cycle) => {
 /**
  * @desc 一分购成功组件
  * @param {string} closeBtnName 关闭按钮文本 默认'关闭'
+ * @param {function} onClone 关闭弹窗时调用
  * @author gao01
  * @date 2022/04/15 16:00:41
  */
@@ -91,24 +92,24 @@ export default class OneGoSuccessMB extends Component {
      */
     getRecommendDialog = () => {
         const { animation } = this.state;
-        const { closeBtnName = '关闭' } = this.props;
-        const  dialogClose = () => {
+        const { onClone, closeBtnName = '关闭' } = this.props;
+        const dialogClose = () => {
             this.setState({ successResDialogVisible:false,recommendDialogVisible:false});
-            $uninstall();
+            onClone && onClone();
         }
         const jumpUrl = (url,order_cycle) => {
             buryAdOrderNow(recommendSecondaryClass,order_cycle);
             navigateTo({ url });
             this.setState({ successResDialogVisible:false,recommendDialogVisible:false});
-            $uninstall();
+            onClone && onClone();
         }
         return (
             <view style={{ ...tradePcOrderTem,...(animation ? dialogBox : {}) }}>
                 <view style={{ position:'relative'}}>
                     <image style={{width:'600rpx',height:'720rpx'}}  src={'http://q.aiyongtech.com/ad/images/TULmiJDlip/lvLnnqpcy_1650348792629.png'} />
-                    <text style={{ ...buyBtnStyle, bottom: '450rpx', }} onClick={() => {jumpUrl('pages/featureIntroduction/index','自动评价')}}/>
-                    <text style={{ ...buyBtnStyle, bottom: '260rpx', }} onClick={() => {jumpUrl('pages/featureIntroduction/index','差评拦截')}}/>
-                    <text style={{ ...buyBtnStyle, bottom: '60rpx',}} onClick={() => {jumpUrl('pages/tradeList/index','核对地址')}}/>
+                    <text style={{ ...buyBtnStyle, bottom: '450rpx', }} onClick={() => {jumpUrl('/pages/featureIntroduction/index','自动评价')}}/>
+                    <text style={{ ...buyBtnStyle, bottom: '260rpx', }} onClick={() => {jumpUrl('/pages/featureIntroduction/index','差评拦截')}}/>
+                    <text style={{ ...buyBtnStyle, bottom: '60rpx',}} onClick={() => {jumpUrl('/pages/tradeList/index','核对地址')}}/>
                 </view>
                 <view>
                     <view style={closeStyle} hoverStyle={buyBtnHoverStyle} onClick={dialogClose} > {closeBtnName} </view>
@@ -137,4 +138,3 @@ export default class OneGoSuccessMB extends Component {
         )
     }
 }
-

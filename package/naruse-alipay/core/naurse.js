@@ -18,3 +18,5 @@ export const Naruse = {
     ...my,
     ...initNaruseAlipayApi(),
 };
+
+my.Naruse = Naruse;

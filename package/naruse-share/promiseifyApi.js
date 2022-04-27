@@ -13,6 +13,7 @@ export const processApis = function processApis (Naruse, global, config = {}) {
     if (!global) return;
 
     const apis = config.needPromiseApis || [];
+    const syncApis = config.needSyncApis || [];
 
     const { transformMeta } = config;
 
@@ -52,7 +53,7 @@ export const processApis = function processApis (Naruse, global, config = {}) {
                     resolve(res);
                 };
                 obj.fail = res => {
-                    isFunc(options.fail) &&  options.fail(res);
+                    isFunc(options.fail) && options.fail(res);
                     reject(res);
                 };
                 obj.complete = res => {
@@ -67,5 +68,18 @@ export const processApis = function processApis (Naruse, global, config = {}) {
 
             return p;
         };
+    });
+
+    syncApis.forEach(key => {
+        if (typeof global[key] === 'function') {
+            Naruse[key] = (...args) => {
+                if (config.handleSyncApis) {
+                    return config.handleSyncApis(key, global, args);
+                }
+                return global[key].apply(global, args);
+            };
+        } else {
+            Naruse[key] = global[key];
+        }
     });
 };
