@@ -25,11 +25,11 @@ const baseImgSrc = 'http://q.aiyongtech.com/ad/images/';
 const backgroundSrc = `${baseImgSrc}55S75p2/_1650886880633.png`;
 const oneYuanBgSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDc=_1650885100644.png`;
 
-const leaveBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDQ=_1650434802345.png`;
-const orderOneyuanBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDEy_1650381083973.png`;
-const orderOnecentBtnSrc = `${baseImgSrc}55S75p2/IDI=_1650421545665.png`;
-const leaveLastBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDM=_1650382500397.png`;
-const discountOverBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDU=_1650382605642.png`;
+const leaveBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDEw_1650958010157.png`;
+const orderOneyuanBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDEx_1650957930858.png`;
+const orderOnecentBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDk=_1650957847783.png`;
+const leaveLastBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDg=_1650957773966.png`;
+const discountOverBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDk=_1650961569036.png`;
 
 // 广告信息
 const adInfo = $adImport.adData.results[0];
