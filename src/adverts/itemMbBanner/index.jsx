@@ -6,8 +6,8 @@ import Error from '@components/oneGoConfirmBuyDialog/error';
 import SuccessMB from '@components/oneGoConfirmBuyDialog/successItem';
 import { isSubUser } from '@utils/';
 const adInfo = $adImport.adData.results[0];
-const { user_define, img_path: imgSrc } = adInfo;
-const { cent_price, env } = user_define.body;
+const { user_define } = adInfo;
+const { cent_price, env, ios_img_url, android_img_url } = user_define.body;
 const isCent = cent_price === '1';
 const host = env === 'dev' ? 'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
 const service_suffix = `一${isCent ? '分' : '元'}购活动`;
@@ -145,7 +145,7 @@ export default class ItemMoileModal extends Component {
         // 广告Banner
         return (
             <view style={style.bannerWarp}>
-                <image onClick={this.onLinkClick.bind(this)} style={style.img} src={imgSrc} />
+                <image onClick={this.onLinkClick.bind(this)} style={style.img} src={$mappUtils.isIOS() ? ios_img_url : android_img_url} />
                 <image onClick={this.onCloseModal.bind(this)} style={style.closeBtn} src='//q.aiyongtech.com/miniapp/marketing/mobile/banner_closer.png' />
                 {payResJsx}
             </view>
