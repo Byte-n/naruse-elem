@@ -19,6 +19,7 @@ const {
 } = adInfo.user_define.body;
 const toDay = $moment().format('YYYYMMDD');
 
+
 /**
  * 缓存的key
  */
@@ -78,13 +79,10 @@ export default class TradePcOrderTem extends Component {
             from_pid: pid,
             from_pname: pid_name,
         });
-        $mappUtils.hideTabBar();
-        // 发送初始化埋点
-        new Promise((res) => {
-            setTimeout(res, 500);
-        }).then(() => {
-            this.setState({ animation: false, isShow:true });
-        });
+        setTimeout(() => {
+            $mappUtils.hideTabBar();
+            this.setState({ animation: false, isShow:true }); 
+        }, 500);
         const data = {
             frequencyDay: frequencyDay,
             frequency:frequency,
