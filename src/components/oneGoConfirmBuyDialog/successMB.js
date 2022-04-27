@@ -97,7 +97,7 @@ export default class OneGoSuccessMB extends Component {
         };
         const jumpUrl = (order_cycle) => {
             buryAdOrderNow(recommendSecondaryClass, order_cycle);
-            this.setState({ successResDialogVisible: false, recommendDialogVisible: false });
+            this.setState({ successResDialogVisible: false, recommendDialogVisible: true });
             onClone && onClone();
         };
         return (
