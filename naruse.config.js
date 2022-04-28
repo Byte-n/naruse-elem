@@ -2,9 +2,9 @@
 module.exports = {
     // 入口文件
     // input: './src/components/entry.js',
-    // input: './src/components/itemMBModalImg/index.js',
+    input: './src/components/itemMBModalImg/index.js',
     // input: './src/components/itemPCModalImg/index.js',
-    input: './src/components/tradeMBModalImg/index.js',
+    // input: './src/components/tradeMBModalImg/index.js',
     // input: './src/components/tradePCModalImg/index.js',
     // 编译后的userDefinebody会自带的一些内容，用于本地调试
     advertUserDefine: {
