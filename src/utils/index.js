@@ -145,3 +145,35 @@ export const oneYuanActivitySubUserContact = (cent_price, payLink) => {
 export const hasTag = (tag) => {
     return $userInfoChanger.getUserInfo().tag && $userInfoChanger.getUserInfo().tag.includes(tag);
 };
+
+/**
+ * @description 获取商品一元购价格
+ * @author CHC
+ * @date 2022-04-28 13:04:18
+ * @returns {*}
+ */
+export const getItemOneYuanGoCentPrice = () => {
+    if (hasTag('itemOneyuangoA')) {
+        return '1';
+    }
+    if (hasTag('itemOneyuangoB')) {
+        return '100';
+    }
+    return '0';
+};
+
+/**
+ * @description 获取商品一元购价格
+ * @author CHC
+ * @date 2022-04-28 13:04:18
+ * @returns {*}
+ */
+export const getTradeOneYuanGoCentPrice = () => {
+    if (hasTag('newAdTestA')) {
+        return '1';
+    }
+    if (hasTag('newAdTestB')) {
+        return '100';
+    }
+    return '0';
+};
