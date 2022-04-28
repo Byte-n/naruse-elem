@@ -135,3 +135,13 @@ export const oneYuanActivitySubUserContact = (cent_price, payLink) => {
     });
     return true;
 };
+
+/**
+ * @description 判断用户是否有对应tag
+ * @author CHC
+ * @date 2022-04-28 12:04:32
+ * @param {*} tag
+ */
+export const hasTag = (tag) => {
+    return $userInfoChanger.getUserInfo().tag?.includes(tag);
+};
