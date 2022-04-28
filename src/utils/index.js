@@ -143,5 +143,5 @@ export const oneYuanActivitySubUserContact = (cent_price, payLink) => {
  * @param {*} tag
  */
 export const hasTag = (tag) => {
-    return $userInfoChanger.getUserInfo().tag?.includes(tag);
+    return $userInfoChanger.getUserInfo().tag && $userInfoChanger.getUserInfo().tag.includes(tag);
 };
