@@ -15,9 +15,6 @@ const { user_define } = adInfo;
 
 const oneCentTag = 'newAdTestA'
 const oneYuanTag = 'newAdTestB'
-const { tag } = $userInfoChanger.getUserInfo() || {}
-const isOneCent = tag && tag.includes(oneCentTag);
-
 const getParamsByConfig = (config) => {
     const { one_android_img_url, one_ios_img_url, hundred_android_img_url, hundred_ios_img_url } = config;
     return {
@@ -26,17 +23,11 @@ const getParamsByConfig = (config) => {
         cent_price: isOneCent ? '1' : '100'
     }
 }
-const { android_img_url, ios_img_url, cent_price } = getParamsByConfig(user_define.body)
-const isShowAd = tag.includes(oneCentTag)  ||  tag.includes(oneYuanTag);
+let tag, isOneCent, isCent, service_suffix, button_text, secondary_class, isShowAd, android_img_url, ios_img_url, cent_price
 
 const { version, env } = user_define.body;
-const isCent = cent_price === '1';
 const app = 'trade';
 const host = env === 'dev' ? 'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
-const service_suffix = `一${isCent ? '分' : '元'}购活动`;
-const button_text = `1${isCent ? '分' : '元'}/15天`;
-const secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
-
 const payUrlOpt = {
     mode: 'post',
     method: '/activity/confirmOneYuanPurchaseOrder',
@@ -60,26 +51,45 @@ export default class ItemMoileModal extends Component {
     }
 
     componentDidMount() {
-        if (isSubUser() || !isShowAd) {
+        if (isSubUser()) {
             $uninstall();
             return;
         }
-        const opt = {
-            mode: 'post',
-            method: '/activity/oneYuanActivityVisibleState',
-            args: { app, action: 'get' },
-            apiName: 'aiyong.activity.oneyuan.visiblestate.config',
-            host,
-        };
-        const _promiseItem = $ayApi.apiAsync(opt);
-        _promiseItem.then((res) => {
-            const { isShown } = res.body || {};
-            if (isShown) return;
-            $mappUtils.hideTabBar();
-            buryAdPageView();
-            this.setState({ ...this.state, visible: true });
-            this.setShown();
-        });
+        const initInfo = $userInfoChanger.updateUserInfo()
+        initInfo.then((info) => {
+            tag = info.tag || ''
+            isOneCent = tag && tag.includes(oneCentTag);
+            const _params = getParamsByConfig(user_define.body)
+            android_img_url = _params.android_img_url
+            ios_img_url = _params.ios_img_url
+            cent_price = _params.cent_price
+            isShowAd = tag.includes(oneCentTag) || tag.includes(oneYuanTag);
+            isCent = cent_price === '1';
+            service_suffix = `一${isCent ? '分' : '元'}购活动`;
+            button_text = `1${isCent ? '分' : '元'}/15天`;
+            secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
+            if (!isShowAd) {
+                $uninstall();
+                return
+            }
+            const opt = {
+                mode: 'post',
+                method: '/activity/oneYuanActivityVisibleState',
+                args: { app, action: 'get' },
+                apiName: 'aiyong.activity.oneyuan.visiblestate.config',
+                host,
+            };
+            const _promiseItem = $ayApi.apiAsync(opt);
+            _promiseItem.then((res) => {
+                const { isShown } = res.body || {};
+                if (isShown) return;
+                $mappUtils.hideTabBar();
+                buryAdPageView();
+                this.setState({ ...this.state, visible: true });
+                this.setShown();
+            });
+        })
+
     }
 
     setShown() {
