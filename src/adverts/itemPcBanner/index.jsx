@@ -2,11 +2,13 @@ import { Component, navigateToWebPage } from 'Naruse';
 import { taskQue } from '@/common/FadeContainer';
 import Error from '@components/oneGoConfirmBuyDialog/error';
 import SuccessPc from '@components/oneGoConfirmBuyDialog/successItem';
-import { isSubUser } from '@utils/index';
+import { isSubUser, getItemOneYuanGoCentPrice } from '@utils/index';
 const adInfo = $adImport.adData.results[0];
-const { user_define, img_path: imgSrc } = adInfo;
-const { cent_price, env } = user_define.body;
+const { user_define } = adInfo;
+const { env, yuan_img_url, cent_img_url } = user_define.body;
+const cent_price = getItemOneYuanGoCentPrice();
 const isCent = cent_price === '1';
+const imgSrc = isCent ? cent_img_url : yuan_img_url;
 const host = env === 'dev' ? 'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
 const service_suffix = `一${isCent ? '分' : '元'}购活动`;
 const button_text = `1${isCent ? '分' : '元'}/15天`;
@@ -24,7 +26,10 @@ export default class PcBanner extends Component {
     }
 
     componentDidMount () {
-        if (isSubUser()) return;
+        if (isSubUser() || cent_price === '0') {
+            $uninstall();
+            return;
+        };
         buryAdOrderNow();
         this.setState({ visible: true });
     }
@@ -116,7 +121,7 @@ export default class PcBanner extends Component {
         // 广告弹窗
         return (
             <view>
-                <image onClick={this.onLinkClick.bind(this)} src={imgSrc} />
+                <image onClick={this.onLinkClick.bind(this)} src={imgSrc} style={{ height: '65rpx' }} />
                 {payResJsx}
             </view>
         );
