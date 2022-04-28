@@ -52,7 +52,7 @@ export default class ItemMoileModal extends Component {
     }
 
     componentDidMount() {
-        if (isSubUser() || !isShowAd) {
+        if (isSubUser()) {
             $uninstall();
             return;
         }
