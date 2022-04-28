@@ -12,7 +12,21 @@ import ItemPcRetainDialog from '@/adverts/itemPcRetainDialog/index';
 
 const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
-const {  content_url, cent_price, version, env } = user_define.body;
+
+const oneCentTag = 'hasPrivilegedTagA'
+const oneYuanTag = 'hasPrivilegedTagB'
+const { tag } = $userInfoChanger.getUserInfo() || {}
+const isOneCent = tag && tag.includes(oneCentTag);
+const getParamsByConfig = (config) => {
+    const { one_content_url, hundred_content_url } = config;
+    return {
+        content_url: isOneCent ? one_content_url : hundred_content_url,
+        cent_price: isOneCent ? '1' : '100'
+    }
+}
+const { content_url, cent_price } = getParamsByConfig(user_define.body)
+const isShowAd = tag.includes(oneCentTag) || tag.includes(oneYuanTag);
+const {  version, env } = user_define.body;
 const isCent = cent_price === '1';
 const app = 'item';
 const host = env === 'dev' ?   'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
