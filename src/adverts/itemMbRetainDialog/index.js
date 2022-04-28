@@ -23,6 +23,8 @@ const btnStyle = { width: '260rpx', height: '90rpx', position: 'absolute', top: 
 
 const baseImgSrc = 'http://q.aiyongtech.com/ad/images/';
 const backgroundSrc = `${baseImgSrc}MeWIhumSseaMveeVmeW8ueeqlw==_1650359001803.png`;
+const oneYuanBgSrc = `${baseImgSrc}b25leXVhbg==_1650887050936.png`;
+
 const leaveBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9_1650383848828.png`;
 const orderOneyuanBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDI=_1650384004775.png`;
 const orderOnecentBtnSrc = `${baseImgSrc}55S75p2/_1650422727204.png`;
@@ -34,10 +36,10 @@ const discountOverBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDU=_1650382605642.png`
 const adInfo = $adImport.adData.results[0];
 const { pid } = adInfo;
 const buryAdPageView = (secondary_class) => {
-    $adSensorsBeacon.adViewBeacon({ ...adInfo,secondary_class}, pid);
+    $adSensorsBeacon.adViewBeacon({ ...adInfo, secondary_class }, pid);
 };
-const buryAdOrderNow = (secondary_class,order_cycle) => {
-    $adSensorsBeacon.adOrderNowBeacon({ ...adInfo,secondary_class,order_cycle}, '' , pid);
+const buryAdOrderNow = (secondary_class, order_cycle) => {
+    $adSensorsBeacon.adOrderNowBeacon({ ...adInfo, secondary_class, order_cycle }, '', pid);
 };
 
 /**
@@ -58,11 +60,11 @@ export default class ItemMbRetainDialog extends Component {
     closeDialog () {
         const { isOrderBtn } = this.state;
         const { onCancel } = this.props;
-        const closeText = `${isOrderBtn ? '忍痛离开' : '下次再来'}`
+        const closeText = `${isOrderBtn ? '忍痛离开' : '下次再来'}`;
         onCancel(closeText);
         buryAdOrderNow(`关闭交易手机端挽留弹窗${isIOS ? 'ios' : 'android'}`, closeText);
         this.setState({ isShow: false });
-        $uninstall();
+        // $uninstall();
     }
 
     /**
@@ -70,7 +72,7 @@ export default class ItemMbRetainDialog extends Component {
      * @param {boolean} isTime 倒计时是否清零
      */
     closeTimer (isTime) {
-        this.setState({ isOrderBtn: isTime })
+        this.setState({ isOrderBtn: isTime });
     }
 
     /**
@@ -81,11 +83,8 @@ export default class ItemMbRetainDialog extends Component {
         const { onConfirm } = this.props;
         if (isOrderBtn) {
             onConfirm();
-        } else {
-            buryAdOrderNow(`关闭商品手机端挽留弹窗${isIOS ? 'ios' : 'android'}`, '优惠结束');
         }
-        this.setState({ isShow: false });
-        $uninstall();
+        // $uninstall();
     }
 
     render () {
@@ -96,20 +95,20 @@ export default class ItemMbRetainDialog extends Component {
                 {
                     isShow && (
                         <view style={container}>
-                            <image style={backgroundImg} src={backgroundSrc} />
+                            <image style={backgroundImg} src={centPrice === '100' ? oneYuanBgSrc : backgroundSrc} />
                             <view style={containerMain}>
                                 <view style={{ marginTop: '572rpx', marginLeft: '80rpx' }}>
                                     <Timer closeTimer={this.closeTimer.bind(this)} />
                                 </view>
                                 <image
                                     src={isOrderBtn ? leaveBtnSrc : leaveLastBtnSrc}
-                                    style={{...btnStyle, ...{left: '33rpx'}}}
+                                    style={{ ...btnStyle, ...{ left: '33rpx' } }}
                                     onClick={this.closeDialog.bind(this)}
                                 />
                                 <image
                                     // src={!isOrderBtn ? discountOverBtnSrc : (centPrice ==='100' ? orderOneyuanBtnSrc : orderOnecentBtnSrc)}
-                                    src={!isOrderBtn ? discountOverBtnSrc : (isIOS() ? orderIosBtnSrc : (centPrice ==='100' ? orderOneyuanBtnSrc : orderOnecentBtnSrc))}
-                                    style={{...btnStyle, ...{right: '33rpx'}}}
+                                    src={!isOrderBtn ? discountOverBtnSrc : (isIOS() ? orderIosBtnSrc : (centPrice === '100' ? orderOneyuanBtnSrc : orderOnecentBtnSrc))}
+                                    style={{ ...btnStyle, ...{ right: '33rpx' } }}
                                     onClick={this.orderVip.bind(this)}
                                 />
                             </view>
@@ -117,6 +116,6 @@ export default class ItemMbRetainDialog extends Component {
                     )
                 }
             </view>
-        )
+        );
     }
 }

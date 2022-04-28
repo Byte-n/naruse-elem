@@ -56,7 +56,7 @@ const evaluate_map = {
     ForStatement: (node, scope) => {
         for (
             const new_scope = new Scope('loop', scope),
-            init_val = node.init ? evaluate(node.init, new_scope) : null;
+                init_val = node.init ? evaluate(node.init, new_scope) : null;
             node.test ? evaluate(node.test, new_scope) : true;
             node.update ? evaluate(node.update, new_scope) : void (0)
         ) {
@@ -155,11 +155,11 @@ const evaluate_map = {
                 ? evaluate(argument.property, scope)
                 : (argument.property).name;
             $var = {
-                $set(value) {
+                $set (value) {
                     object[property] = value;
                     return true;
                 },
-                $get() {
+                $get () {
                     return object[property];
                 },
             };
@@ -207,11 +207,11 @@ const evaluate_map = {
                 ? evaluate(left.property, scope)
                 : (left.property).name;
             $var = {
-                $set(value) {
+                $set (value) {
                     object[property] = value;
                     return true;
                 },
-                $get() {
+                $get () {
                     return object[property];
                 },
             };
@@ -290,18 +290,18 @@ const evaluate_map = {
 class ScopeVar {
     value;
     kind;
-    constructor(kind, value) {
+    constructor (kind, value) {
         this.value = value;
         this.kind = kind;
     }
-    $set(value) {
+    $set (value) {
         if (this.value === 'const') {
             return false;
         }
         this.value = value;
         return true;
     }
-    $get() {
+    $get () {
         return this.value;
     }
 }
@@ -312,14 +312,14 @@ class Scope {
     type;
     invasived;
     prefix = '';
-    constructor(type, parent) {
+    constructor (type, parent) {
         this.type = type;
         this.parent = parent || null;
         this.content = {};
         this.invasived = false;
     }
 
-    $find(raw_name) {
+    $find (raw_name) {
         const name = this.prefix + raw_name;
         if (this.content.hasOwnProperty(name)) {
             return this.content[name];
@@ -329,7 +329,7 @@ class Scope {
         return null;
     }
 
-    $let(raw_name, value) {
+    $let (raw_name, value) {
         const name = this.prefix + raw_name;
         const $var = this.content[name];
         if (!$var) {
@@ -338,7 +338,7 @@ class Scope {
         } return false;
     }
 
-    $const(raw_name, value) {
+    $const (raw_name, value) {
         const name = this.prefix + raw_name;
         const $var = this.content[name];
         if (!$var) {
@@ -347,7 +347,7 @@ class Scope {
         } return false;
     }
 
-    $var(raw_name, value) {
+    $var (raw_name, value) {
         const name = this.prefix + raw_name;
         let scope = this;
 
@@ -361,7 +361,7 @@ class Scope {
             return true;
         } return false;
     }
-    $declar(kind, raw_name, value) {
+    $declar (kind, raw_name, value) {
         return ({
             var: () => this.$var(raw_name, value),
             let: () => this.$let(raw_name, value),
