@@ -4,15 +4,24 @@ import CloseButton from '@/common/CloseButton';
 import { taskQue } from '@/common/FadeContainer';
 import Error from '@components/oneGoConfirmBuyDialog/error';
 import SuccessMB from '@components/oneGoConfirmBuyDialog/successMB';
-import { isSubUser, oneYuanActivitySubUserContact } from '@utils/index';
+import { getTradeOneYuanGoCentPrice, isSubUser, oneYuanActivitySubUserContact } from '@utils/index';
 const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
-const { cent_price, env, ios_img_url, android_img_url } = user_define.body;
-const isCent = cent_price === '1';
-const host = env === 'dev' ? 'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
-const service_suffix = `一${isCent ? '分' : '元'}购活动`;
-const button_text = `1${isCent ? '分' : '元'}/15天`;
-const secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
+const {
+    env,
+    yuan_ios_img_url,
+    yuan_android_img_url,
+    cent_ios_img_url,
+    cent_android_img_url,
+} = user_define.body;
+let cent_price = null;
+let isCent = null;
+let ios_img_url = null;
+let android_img_url = null;
+let host = null;
+let service_suffix = null;
+let button_text =  null;
+let secondary_class = null;
 const buryAdPageView = () => {
     $adSensorsBeacon.adViewBeacon({ ...adInfo, secondary_class }, adInfo.pid);
 };
@@ -29,7 +38,25 @@ export default class ItemMoileModal extends Component {
     }
 
     componentDidMount () {
-        if (isSubUser()) return;
+        if (!$userInfoChanger.getUserInfo().tag) {
+            $userInfoChanger.updateUserInfo().then(() => {
+                this.init();
+            });
+        } else {
+            this.init();
+        }
+    }
+
+    init = () => {
+        cent_price = getTradeOneYuanGoCentPrice();
+        isCent = cent_price === '1';
+        ios_img_url = isCent ? cent_ios_img_url : yuan_ios_img_url;
+        android_img_url = isCent ? cent_android_img_url : yuan_android_img_url;
+        host = env === 'dev' ? 'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
+        service_suffix = `一${isCent ? '分' : '元'}购活动`;
+        button_text = `1${isCent ? '分' : '元'}/15天`;
+        secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
+        if (isSubUser() || cent_price === '0') return;
         buryAdPageView();
         const key = `bannerShow${adInfo.pid}`;
         getStorage({ key })
