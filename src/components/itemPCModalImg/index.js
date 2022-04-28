@@ -13,8 +13,8 @@ import ItemPcRetainDialog from '@/adverts/itemPcRetainDialog/index';
 const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
 
-const oneCentTag = 'hasPrivilegedTagA'
-const oneYuanTag = 'hasPrivilegedTagB'
+const oneCentTag = 'itemOneyuangoA'
+const oneYuanTag = 'itemOneyuangoB'
 const getParamsByConfig = (config) => {
     const { one_content_url, hundred_content_url } = config;
     return {
