@@ -21,7 +21,7 @@ const closeStyle = {
     bottom: '-100px',
     left: '340px',
     cursor: 'pointer',
-    transition: 'all 0.5s'
+    transition: 'all 0.5s',
 };
 
 // 用户信息
@@ -43,7 +43,7 @@ const {
  * Pc功能点模板
  */
 export default class TradePcOrderTem extends Component {
-    constructor() {
+    constructor () {
         this.state = {
             isShow: true,
             isShowPayRes: false,
@@ -52,13 +52,13 @@ export default class TradePcOrderTem extends Component {
         };
     }
 
-    componentDidMount() {
-        const { creative_id, creative_name, secondary_class, pid_name, primary_class,pid } = adInfo;
+    componentDidMount () {
+        const { creative_id, creative_name, secondary_class, pid_name, primary_class, pid } = adInfo;
         $sensorsBeacon.sensorsBeacon('YY_AdPageview', {
             primary_class,
             secondary_class,
             cid: Number(creative_id),
-            pid: Number(pid) ,
+            pid: Number(pid),
             cname: creative_name,
             pname: pid_name,
             from_pid: pid,
@@ -77,12 +77,12 @@ export default class TradePcOrderTem extends Component {
      * @param {String} type 订购类型
      */
     jumpOrderLink = (type) => {
-        let url = type === 'quarter' ? orderQuarterLink : orderYearLink;
-        let beaconText = type === 'quarter' ? leftButton : rightButton;
+        const url = type === 'quarter' ? orderQuarterLink : orderYearLink;
+        const beaconText = type === 'quarter' ? leftButton : rightButton;
         buryAdOrderNow(beaconText);
         navigateToWebPage({ url });
         this.setState({ isShowPayRes: true, reBuyLink: url });
-    }
+    };
 
     /**
      * 模板弹窗关闭
@@ -93,11 +93,10 @@ export default class TradePcOrderTem extends Component {
             setTimeout(res, 500);
         }).then(() => {
             this.setState({ isShow: false, isShowPayRes: false });
-            $uninstall();
         });
-    }
+    };
 
-    render() {
+    render () {
         const { isShow, isShowPayRes, animation, reBuyLink } = this.state;
         return (
             <view>
@@ -128,6 +127,6 @@ export default class TradePcOrderTem extends Component {
                     )
                 }
             </view>
-        )
+        );
     }
 }

@@ -10,7 +10,7 @@ export default class upperRightFlagDialogDemo extends Component {
     }
 
     closeDialog () {
-        let url = 'qwer';
+        const url = 'qwer';
         navigateToWebPage({ url });
         $adImport.uninstall();
         this.setState({ dialogVisible: false });
@@ -18,10 +18,10 @@ export default class upperRightFlagDialogDemo extends Component {
 
     render () {
         return (<view>
-            {/*<SuccessPCcloseBtnName={'关闭按钮1'}/>*/}
-            {/*<SuccessMB closeBtnName={'关闭按钮2'}/>*/}
+            {/* <SuccessPCcloseBtnName={'关闭按钮1'}/> */}
+            {/* <SuccessMB closeBtnName={'关闭按钮2'}/> */}
             <SuccessItem isPc={ true } closeBtnName={'关闭按钮2'}/>
-            {/*<Error onCustomerService={() => { console.log('onCustomerService');}} onAgain={() => { console.log('onAgain');}} closeBtnName={'关闭按钮1'}/>*/}
+            {/* <Error onCustomerService={() => { console.log('onCustomerService');}} onAgain={() => { console.log('onAgain');}} closeBtnName={'关闭按钮1'}/> */}
         </view>);
     }
 }
