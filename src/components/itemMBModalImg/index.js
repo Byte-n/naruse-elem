@@ -36,10 +36,10 @@ const payUrlOpt = {
     apiName: 'aiyong.activity.oneyuan.order.confirm',
     host,
 };
-const buryAdPageView = () => {
+const buryAdPageView = (secondary_class) => {
     $adSensorsBeacon.adViewBeacon({ ...adInfo, secondary_class }, adInfo.pid);
 };
-const buryAdOrderNow = (order_cycle, btnText) => {
+const buryAdOrderNow = (order_cycle, btnText, secondary_class) => {
     if (btnText === undefined) {
         btnText = '';
     }
@@ -85,12 +85,12 @@ export default class ItemMoileModal extends Component {
                 const { isShown } = res.body || {};
                 if (isShown) return;
                 $mappUtils.hideTabBar();
-                buryAdPageView();
+                buryAdPageView(secondary_class);
                 this.setState({ ...this.state, visible: true });
                 this.setShown();
             });
         })
-      
+
     }
 
     setShown() {
@@ -106,7 +106,7 @@ export default class ItemMoileModal extends Component {
     }
 
 
-    onLinkClick() {
+    onLinkClick(fromName) {
         const opt = {
             mode: 'post',
             method: '/activity/getOneYuanActivityOrder',
@@ -126,9 +126,9 @@ export default class ItemMoileModal extends Component {
             this.setState({ ...this.state, receiptFlag: true, paymentUrl: payUrl });
             if ($mappUtils.isIOS()) {
                 $openChat.contactCustomerService(`你好，我想参加参加${service_suffix}。\n链接地址：${payUrl}`);
-                $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
+                $adSensorsBeacon.adOrderNowBeacon({ ...adInfo, secondary_class: fromName }, '/跳客服', adInfo.pid);
             } else {
-                buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
+                buryAdOrderNow('付款链接跳转', button_text, fromName);
                 navigateToWebPage({ url: payUrl });
             }
             taskQue(() => {
@@ -160,7 +160,7 @@ export default class ItemMoileModal extends Component {
     }
     onSendServiceMsg() {
         if (this.state.paymentUrl) {
-            $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
+            $adSensorsBeacon.adOrderNowBeacon({ ...adInfo, secondary_class: '支付失败弹窗' }, '/跳客服', adInfo.pid);
             $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
             return;
         }
@@ -176,16 +176,16 @@ export default class ItemMoileModal extends Component {
             const { payUrl } = res.body || {};
             if (!payUrl) return;
             this.setState({ ...this.state, paymentUrl: payUrl });
-            $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
+            $adSensorsBeacon.adOrderNowBeacon({ ...adInfo, secondary_class: '支付失败弹窗' }, '/跳客服', adInfo.pid);
             $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
         });
     }
     onReAction() {
         if ($mappUtils.isIOS()) {
-            $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
+            $adSensorsBeacon.adOrderNowBeacon({ ...adInfo, secondary_class: '支付失败弹窗' }, '/跳客服', adInfo.pid);
             $openChat.contactCustomerService(`你好，我想参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
         } else {
-            buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
+            buryAdOrderNow('付款链接跳转', button_text, '支付失败弹窗');
             navigateToWebPage({ url: this.state.paymentUrl });
         }
         return;
@@ -220,7 +220,7 @@ export default class ItemMoileModal extends Component {
         if (stayFlag) {
             return (
                 <view>
-                    <ItemMbRetainDialog centPrice={cent_price} onCancel={this.onCloseErrModal.bind(this)} onConfirm={this.onLinkClick.bind(this)} />
+                    <ItemMbRetainDialog centPrice={cent_price} onCancel={this.onCloseErrModal.bind(this)} onConfirm={this.onLinkClick.bind(this, '挽留弹窗')} />
                 </view>
             );
         }
@@ -228,7 +228,7 @@ export default class ItemMoileModal extends Component {
         return (
             <FadeContainer inStyle={style.fadeIn} visible={visible} style={style.mask} >
                 <view style={style.content} >
-                    <image onClick={this.onLinkClick.bind(this)} style={{ ...style.img, ...style.cursor }} mode='widthFix' src={$mappUtils.isIOS() ? ios_img_url : android_img_url} />
+                    <image onClick={this.onLinkClick.bind(this, secondary_class)} style={{ ...style.img, ...style.cursor }} mode='widthFix' src={$mappUtils.isIOS() ? ios_img_url : android_img_url} />
                     <CloseButton onClose={this.onCloseModal.bind(this)} text={version || '关闭'} />
                 </view>
             </FadeContainer>
