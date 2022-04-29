@@ -57,12 +57,11 @@ export default class OneGoError extends Component {
     componentDidMount () {
         setTimeout(() => {
             this.setState({ animation: true });
-            buryAdPageView('PC续费落地页A');
         });
     }
 
     btnClick = (clickCb, { order_cycle, btnText }) => {
-        buryAdOrderNow(order_cycle, btnText);
+        // buryAdOrderNow(order_cycle, btnText);
         // this.setState({ dialogVisible:false});
         clickCb && clickCb();
     };
