@@ -56,12 +56,14 @@ export default class ItemMoileModal extends Component {
         }
         const initInfo = $userInfoChanger.updateUserInfo()
         initInfo.then((info) => {
-            tag = info.tag || ''
-            isOneCent = tag && tag.includes(oneCentTag);
+            // tag = info.tag || ''
+            // isOneCent = tag && tag.includes(oneCentTag);
+            isOneCent = true
             const _params = getParamsByConfig(user_define.body)
             content_url = _params.content_url
             cent_price = _params.cent_price
-            isShowAd = tag.includes(oneCentTag) || tag.includes(oneYuanTag);
+            // isShowAd = tag.includes(oneCentTag) || tag.includes(oneYuanTag);
+            isShowAd = true
             isCent = cent_price === '1';
             service_suffix = `一${isCent ? '分' : '元'}购活动`;
             button_text = `1${isCent ? '分' : '元'}/15天`;
