@@ -1,0 +1,24 @@
+.imageStyle{
+    width:750rpx;
+}
+.imageHeight{
+    height:1000rpx;
+}
+.btnImage{
+    position:absolute;
+    width:210rpx;
+    height:94rpx;
+    right:40rpx;
+}
+.viewBox{
+    margin:0;
+    position:relative
+}
+
+.hotStyle{
+    position: absolute;
+    width: 444rpx;
+    bottom: 196rpx;
+    height: 84rpx;
+    left: 154rpx;
+}
