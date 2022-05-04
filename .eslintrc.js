@@ -1,18 +1,5 @@
 module.exports = {
     root: true,
-    parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        ecmaFeatures: { jsx: true },
-        babelOptions: {
-            rootMode: 'upward',
-            plugins: [
-                [
-                    '@babel/plugin-transform-react-jsx',
-                ],
-            ],
-        },
-    },
     parser: '@babel/eslint-parser',
     extends: [
         'eslint-config-ay',
