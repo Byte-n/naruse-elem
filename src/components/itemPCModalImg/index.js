@@ -34,10 +34,10 @@ const payUrlOpt = {
     apiName: 'aiyong.activity.oneyuan.order.confirm',
     host,
 };
-const buryAdPageView = () => {
+const buryAdPageView = (secondary_class) => {
     $adSensorsBeacon.adViewBeacon({ ...adInfo, secondary_class }, adInfo.pid);
 };
-const buryAdOrderNow = (order_cycle, btnText) => {
+const buryAdOrderNow = (order_cycle, btnText, secondary_class) => {
     if (btnText === undefined) {
         btnText = '';
     }
@@ -83,7 +83,7 @@ export default class ItemMoileModal extends Component {
             _promiseItem.then((res) => {
                 const { isShown } = res.body || {};
                 if (isShown) return;
-                buryAdPageView();
+                buryAdPageView(secondary_class);
                 this.setState({ ...this.state, visible: true });
                 this.setShown();
             });
@@ -104,7 +104,7 @@ export default class ItemMoileModal extends Component {
     }
 
 
-    onLinkClick() {
+    onLinkClick(fromName) {
         const opt = {
             mode: 'post',
             method: '/activity/getOneYuanActivityOrder',
@@ -119,7 +119,7 @@ export default class ItemMoileModal extends Component {
             if (!payUrl) return;
 
             this.setState({ ...this.state, paymentUrl: payUrl, receiptFlag: true });
-            buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
+            buryAdOrderNow('付款链接跳转', button_text, fromName);
             navigateToWebPage({ url: payUrl });
             taskQue(() => {
                 !this.state.pollingFlag && this.startPolling();
@@ -149,7 +149,7 @@ export default class ItemMoileModal extends Component {
         this.setState({ ...this.state, stayFlag: true });
     }
     onSendServiceMsg() {
-        $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？链接地址：${this.state.paymentUrl}`);
+        $adSensorsBeacon.adOrderNowBeacon({ ...adInfo, secondary_class: '支付失败弹窗' }, '/跳客服', adInfo.pid);
     }
     onReAction() {
         if (this.state.paymentUrl) {
@@ -168,7 +168,7 @@ export default class ItemMoileModal extends Component {
             const { payUrl } = res.body || {};
             // 是否需要提示信息，待确定
             if (!payUrl) return;
-            buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
+            buryAdOrderNow('付款链接跳转', button_text, '支付失败弹窗');
             navigateToWebPage({ url: payUrl });
             this.setState({ ...this.state, paymentUrl: payUrl });
         });
@@ -202,7 +202,7 @@ export default class ItemMoileModal extends Component {
         if (stayFlag) {
             return (
                 <view>
-                    <ItemPcRetainDialog centPrice={cent_price} onCancel={this.onCloseErrModal.bind(this)} onConfirm={this.onLinkClick.bind(this)} />
+                    <ItemPcRetainDialog centPrice={cent_price} onCancel={this.onCloseErrModal.bind(this)} onConfirm={this.onLinkClick.bind(this, '挽留弹窗')} />
                 </view>
             );
         }
@@ -211,7 +211,7 @@ export default class ItemMoileModal extends Component {
             <FadeContainer inStyle={style.fadeIn} visible={visible} style={style.mask} >
                 <view style={style.content} >
                     <view style={style.contentImg}>
-                        <image onClick={this.onLinkClick.bind(this)} src={content_url} />
+                        <image onClick={this.onLinkClick.bind(this, secondary_class)} src={content_url} />
                     </view>
                 </view>
                 <CloseButton onClose={this.onCloseModal.bind(this)} text={version || '关闭'} />
