@@ -6,18 +6,21 @@ import { oneYuanActivitySubUserContact, isSubUser, getTradeOneYuanGoCentPrice } 
 const adInfo = $adImport.adData.results[0];
 const { user_define } = adInfo;
 const { env, yuan_img_url, cent_img_url } = user_define.body;
-const cent_price = getTradeOneYuanGoCentPrice();
+const cent_price = '1';
 const isCent = cent_price === '1';
 const imgSrc = isCent ? cent_img_url : yuan_img_url;
 const host = env === 'dev' ? 'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
 const service_suffix = `一${isCent ? '分' : '元'}购活动`;
 const button_text = `1${isCent ? '分' : '元'}/15天`;
-const secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
+const secondary_class = `一${isCent ? '分' : '元'}购Banner`;
 const buryAdOrderNow = (order_cycle, btnText) => {
     if (btnText === undefined) {
         btnText = '';
     }
     $adSensorsBeacon.adOrderNowBeacon({ ...adInfo, secondary_class, order_cycle }, btnText, adInfo.pid);
+};
+const adViewBeacon = (sc) => {
+    $adSensorsBeacon.adViewBeacon({ ...adInfo, secondary_class: sc ? sc : secondary_class }, adInfo.pid);
 };
 export default class PcBanner extends Component {
     constructor () {
@@ -27,7 +30,7 @@ export default class PcBanner extends Component {
 
     componentDidMount () {
         if (isSubUser() || cent_price === '0') return;
-        buryAdOrderNow();
+        adViewBeacon();
         this.setState({ visible: true });
     }
 
@@ -51,6 +54,7 @@ export default class PcBanner extends Component {
             if (oneYuanActivitySubUserContact(cent_price, payUrl)) return;
             buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
             navigateToWebPage({ url: payUrl });
+            adViewBeacon('支付失败弹窗');
             this.setState({ ...this.state, paymentUrl: payUrl, receiptFlag: true });
             taskQue(() => {
                 !this.state.pollingFlag && this.startPolling();
@@ -78,10 +82,10 @@ export default class PcBanner extends Component {
             _promiseItem.then((res) => {
                 const { payResult } = res.body || {};
                 if (!payResult) return;
+                adViewBeacon('支付成功弹窗');
                 this.setState({ ...this.state, pollingFlag: false, isPaySuccess: true });
                 $userInfoChanger.updateUserInfo();
             });
-            _promiseItem.catch(() => { });
         }, 3 * 1000);
         this.setState({ ...this.state, timer: _timer });
     }
@@ -92,9 +96,11 @@ export default class PcBanner extends Component {
         });
     }
     onSendServiceMsg () {
+        buryAdOrderNow('联系客服', button_text)
         $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？链接地址：${this.state.paymentUrl}`);
     }
     onReAction () {
+        buryAdOrderNow('RE付款链接跳转', button_text, adInfo.pid);
         navigateToWebPage({ url: this.state.paymentUrl });
     }
     onCloseErrModal () {
