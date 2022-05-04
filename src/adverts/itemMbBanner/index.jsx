@@ -22,8 +22,8 @@ let host = null;
 let service_suffix = null;
 let button_text =  null;
 let secondary_class = null;
-const buryAdPageView = () => {
-    $adSensorsBeacon.adViewBeacon({ ...adInfo, secondary_class }, adInfo.pid);
+const buryAdPageView = (sc) => {
+    $adSensorsBeacon.adViewBeacon({ ...adInfo, secondary_class: sc ? sc : secondary_class }, adInfo.pid);
 };
 const buryAdOrderNow = (order_cycle, btnText) => {
     if (btnText === undefined) {
@@ -56,7 +56,7 @@ export default class ItemMoileModal extends Component {
     }
 
     init = () => {
-        cent_price = getItemOneYuanGoCentPrice();
+        cent_price = '1';
         isCent = cent_price === '1';
         ios_img_url = isCent ? cent_ios_img_url : yuan_ios_img_url;
         android_img_url = isCent ? cent_android_img_url : yuan_android_img_url;
@@ -65,7 +65,6 @@ export default class ItemMoileModal extends Component {
         button_text = `1${isCent ? '分' : '元'}/15天`;
         secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
         if (isSubUser() || cent_price === '0') return;
-        buryAdPageView();
         const key = `bannerShow${adInfo.pid}`;
         getStorage({ key })
             .then(({ data }) => {
@@ -73,6 +72,7 @@ export default class ItemMoileModal extends Component {
                 const now = $moment().format('YYYY-MM-DD');
                 if (!data || data !== now) {
                     this.setState({ visible: true });
+                    buryAdOrderNow();
                 }
             });
     }
@@ -96,7 +96,6 @@ export default class ItemMoileModal extends Component {
                 });
                 return;
             }
-            buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
             if ($mappUtils.isIOS()) {
                 $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
                 $openChat.contactCustomerService(`你好，我想参与${service_suffix}\n${payUrl}`);
@@ -104,6 +103,7 @@ export default class ItemMoileModal extends Component {
                 buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
                 navigateToWebPage({ url: payUrl });
             }
+            buryAdPageView('支付失败回执弹窗');
             this.setState({ ...this.state, paymentUrl: payUrl, receiptFlag: true });
             taskQue(() => {
                 !this.state.pollingFlag && this.startPolling();
@@ -131,6 +131,7 @@ export default class ItemMoileModal extends Component {
             _promiseItem.then((res) => {
                 const { payResult } = res.body || {};
                 if (!payResult) return;
+                buryAdPageView();
                 this.setState({ pollingFlag: false, isPaySuccess: true });
                 $userInfoChanger.updateUserInfo();
             });
@@ -154,6 +155,7 @@ export default class ItemMoileModal extends Component {
         } else {
             navigateToWebPage({ url: paymentUrl });
         }
+        buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
     }
     onCloseErrModal () {
         this.setState({ ...this.state, pollingFlag: false, receiptFlag: false });

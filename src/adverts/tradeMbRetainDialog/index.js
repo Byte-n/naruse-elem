@@ -54,16 +54,16 @@ export default class TradeMbRetainDialog extends Component {
     }
 
     componentDidMount () {
-        buryAdPageView(`交易手机端挽留弹窗${isIOS ? 'ios' : 'android'}`);
+        buryAdPageView(`交易手机端挽留弹窗${isIOS() ? 'ios' : 'android'}`);
     }
 
     closeDialog () {
         const { isOrderBtn } = this.state;
         const { onCancel } = this.props;
         const closeText = `${isOrderBtn ? '忍痛离开' : '下次再来'}`;
-        onCancel(closeText);
-        buryAdOrderNow(`关闭交易手机端挽留弹窗${isIOS ? 'ios' : 'android'}`, closeText);
+        buryAdOrderNow(`关闭交易手机端挽留弹窗${isIOS() ? 'ios' : 'android'}`, closeText);
         this.setState({ isShow: false });
+        onCancel(closeText);
         // $uninstall();
     }
 
