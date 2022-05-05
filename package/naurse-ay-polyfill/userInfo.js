@@ -3,7 +3,7 @@ let _userInfo = {
     vipFlag: 1,
     showPayBtn: '升级',
     userNick: '老白你在哪',
-    tag:'newUserRenewTest,newAdTestA,hasPrivilegedTagA',
+    tag:'newUserRenewTest,newAdTestA,itemOneyuangoA',
     promotion:'2022-03-10 20:11:34',
     vipTime:'2022-03-10 '
 } 
