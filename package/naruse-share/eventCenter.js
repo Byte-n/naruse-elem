@@ -29,6 +29,10 @@ class EventBus {
             callback(...args);
         });
     }
+
+    clear () {
+        this.listeners = {};
+    }
 }
 
 /** 全局事件中心 */
