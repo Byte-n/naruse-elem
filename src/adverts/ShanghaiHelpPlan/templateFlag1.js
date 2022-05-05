@@ -3,7 +3,7 @@ import CloseButton from '@components/CloseButton';
 import { getToast } from '@adverts/ShanghaiHelpPlan/toast';
 import { addActivityComplete } from '../../service/activity';
 import { buryAdOrderNow, buryAdPageView } from '@utils/beacon';
-import { isPC } from '@utils/platform';
+import { isAppTrade, isPC } from '@utils/platform';
 
 // 模板样式
 const tradePcContainer = { width: '100vw', height: '100vh', position: 'fixed', top: '0', left: '0', backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 900 };
@@ -16,8 +16,10 @@ const { closeBtnName, ad_img ,toast_success,toast_error} = adInfo.user_define.bo
 
 const adDefine = {
     img_style: '',
+    activityCode: '',
 };
 adDefine.img_style = isPC() ? { width: '1000rpx', height: '570rpx' } : { width: '600rpx', height: '720rpx' };
+adDefine.activityCode = isAppTrade() ? 'shanghaiAidTradeFlag1' : 'shanghaiAidItemFlag1';
 
 
 const delDialog = () => {
@@ -57,7 +59,8 @@ export default class TemplateFlag1 extends Component {
                 $uninstall();
             },3000)
         }
-        addActivityComplete({"activityCode": "shanghaiAidTradeFlag0",nick:"老白你在哪"}).then((res) => {
+        const {activityCode} = adDefine
+        addActivityComplete({activityCode,nick:"老白你在哪"}).then((res) => {
             if(res.code != 200){
                 this.setState({ toastMsg:toast_error});
                 return

@@ -22,8 +22,8 @@ let host = null;
 let service_suffix = null;
 let button_text =  null;
 let secondary_class = null;
-const buryAdPageView = () => {
-    $adSensorsBeacon.adViewBeacon({ ...adInfo, secondary_class }, adInfo.pid);
+const buryAdPageView = (sc) => {
+    $adSensorsBeacon.adViewBeacon({ ...adInfo, secondary_class: sc ? sc : secondary_class }, adInfo.pid);
 };
 const buryAdOrderNow = (order_cycle, btnText) => {
     if (btnText === undefined) {
@@ -48,22 +48,22 @@ export default class ItemMoileModal extends Component {
     }
 
     init = () => {
-        cent_price = getTradeOneYuanGoCentPrice();
+        cent_price = '1';
         isCent = cent_price === '1';
         ios_img_url = isCent ? cent_ios_img_url : yuan_ios_img_url;
         android_img_url = isCent ? cent_android_img_url : yuan_android_img_url;
         host = env === 'dev' ? 'http://tradepre.aiyongtech.com' : '//trade.aiyongtech.com';
         service_suffix = `一${isCent ? '分' : '元'}购活动`;
         button_text = `1${isCent ? '分' : '元'}/15天`;
-        secondary_class = `一${isCent ? '分' : '元'}购弹窗`;
+        secondary_class = `一${isCent ? '分' : '元'}购Banner`;
         if (isSubUser() || cent_price === '0') return;
-        buryAdPageView();
         const key = `bannerShow${adInfo.pid}`;
         getStorage({ key })
             .then(({ data }) => {
                 console.log(data);
                 const now = $moment().format('YYYY-MM-DD');
                 if (!data || data !== now) {
+                    buryAdPageView();
                     this.setState({ visible: true });
                 }
             });
@@ -91,12 +91,13 @@ export default class ItemMoileModal extends Component {
             // 一元购子账号返回
             if (oneYuanActivitySubUserContact(cent_price, payUrl)) return;
             if ($mappUtils.isIOS()) {
-                $adSensorsBeacon.adOrderNowBeacon(adInfo, '/跳客服', adInfo.pid);
+                buryAdOrderNow('跳转客服', button_text);
                 $openChat.contactCustomerService(`你好，我想参与${service_suffix}\n${payUrl}`);
             } else {
-                buryAdOrderNow('付款链接跳转', button_text, adInfo.pid);
+                buryAdOrderNow('付款链接跳转', button_text);
                 navigateToWebPage({ url: payUrl });
             }
+            buryAdPageView('购买失败弹窗');
             this.setState({ ...this.state, paymentUrl: payUrl,  receiptFlag: true });
             taskQue(() => {
                 !this.state.pollingFlag && this.startPolling();
@@ -124,6 +125,7 @@ export default class ItemMoileModal extends Component {
             _promiseItem.then((res) => {
                 const { payResult } = res.body || {};
                 if (!payResult) return;
+                buryAdPageView('购买成功弹窗')
                 this.setState({ pollingFlag: false, isPaySuccess: true });
                 $userInfoChanger.updateUserInfo();
             });
@@ -138,12 +140,15 @@ export default class ItemMoileModal extends Component {
     }
     onSendServiceMsg () {
         $openChat.contactCustomerService(`你好，参加${service_suffix}支付失败怎么办？\n链接地址：${this.state.paymentUrl}`);
+        buryAdOrderNow('联系客服');
     }
     onReAction () {
         const { paymentUrl } = this.state;
         if ($mappUtils.isIOS()) {
+            buryAdOrderNow('RE跳转客服', button_text);
             $openChat.contactCustomerService(`你好，我想参与${service_suffix}\n${paymentUrl}`);
         } else {
+            buryAdOrderNow('RE付款链接跳转', button_text);
             navigateToWebPage({ url: paymentUrl });
         }
     }
