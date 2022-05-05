@@ -77,7 +77,10 @@ interface openChat {
 }
 
 interface env {
-
+    ENV :{
+        app:string
+    },
+    app:string
 }
 
 
