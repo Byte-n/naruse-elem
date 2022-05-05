@@ -86,7 +86,7 @@ export default class ItemMoileModal extends Component {
                 const { isShown } = res.body || {};
                 if (isShown) return;
                 $mappUtils.hideTabBar();
-                buryAdPageView(secondary_classs);
+                buryAdPageView(secondary_class);
                 this.setState({ ...this.state, visible: true });
                 this.setShown();
             });
