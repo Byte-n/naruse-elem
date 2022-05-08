@@ -103,6 +103,10 @@ const createBehavior = (option = {}) => {
         didMount () {
             this.option = option;
             try {
+                const { onGetData } = this.props;
+                if (onGetData && typeof onGetData === 'function') {
+                    this.props = { ...this.props, ...onGetData() };
+                }
                 createVmContext.call(this);
             } catch (error) {
                 logger.error('初始化失败', error);
@@ -114,6 +118,10 @@ const createBehavior = (option = {}) => {
          * @date 2022-03-16 10:03:21
          */
         didUpdate (prevProps) {
+            const { onGetData } = this.props;
+            if (onGetData && typeof onGetData === 'function') {
+                this.props = { ...this.props, ...onGetData() };
+            }
             // 只有子组件需要走更新进程
             if (!isEmpty(this.props.component)) {
                 const { props, actuator } = prevProps.component;
