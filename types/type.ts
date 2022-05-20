@@ -4,28 +4,7 @@ import * as adSensorsBeacon from '../package/naurse-ay-polyfill/adSensorsBeacon'
 import * as mappUtils from '../package/naurse-ay-polyfill/mappUtils'
 import * as sensorsBeacon from '../package/naurse-ay-polyfill/sensorsBeacon'
 import moment from 'moment';
-/**
-* 伪react组件
-*/
-class NaruseComponent {
-    state: {
-        [key in string]: any;
-    };
-    /** 更改状态 */
-    setState: (newState: Object) => {};
-    /**
-     * 当组件被挂载时被调用
-     */
-    componentDidMount: () => {};
-    /**
-     * 当组件每次重新渲染完毕后调用
-     */
-    componentDidUpdate: () => {};
-    /**
-     * 渲染函数
-     */
-    render: () => any;
-}
+
 
 /**
 * 自定义广告的引入组件
@@ -77,7 +56,10 @@ interface openChat {
 }
 
 interface env {
-
+    ENV :{
+        app:string
+    },
+    app:string
 }
 
 

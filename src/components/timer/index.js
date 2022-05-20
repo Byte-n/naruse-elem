@@ -35,6 +35,10 @@ export default class Timer extends Component {
             }
             this.setState({ count: this.state.count - 1 });
         }, 1000);
+        this.timer = timer;
+    }
+    componentWillUnmount () {
+        clearInterval.call(null, this.timer);
     }
 
     render () {
@@ -59,6 +63,8 @@ export default class Timer extends Component {
             justifyContent: 'center',
             alignItems: 'center',
             color: '#F26413',
+            fontWeight: '500',
+            fontSize: `${equipmentType === 'pc' ? '34rpx' : '52rpx'}`,
         };
         const { hours, minutes, seconds }  = formatTimeFromSecond(this.state.count);
         return (
