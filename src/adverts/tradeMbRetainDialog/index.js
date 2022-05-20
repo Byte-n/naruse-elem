@@ -24,10 +24,11 @@ const btnStyle = { width: '260rpx', height: '90rpx', position: 'absolute', top: 
 
 const baseImgSrc = 'http://q.aiyongtech.com/ad/images/';
 const backgroundSrc = `${baseImgSrc}55S75p2/_1650337101811.png`;
+const oneYuanBgSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDY=_1650885160178.png`;
 const leaveBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDQ=_1650353672603.png`;
 const orderOneyuanBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDEy_1650381083973.png`;
 const orderOnecentBtnSrc = `${baseImgSrc}55S75p2/IDI=_1650421545665.png`;
-const orderIosBtnSrc = `${baseImgSrc}5ZWG5ZOBTUI=_1650428896611.png`;
+const orderIosBtnSrc = `${baseImgSrc}5Lqk5piTTUI=_1650946750257.png`;
 const leaveLastBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDM=_1650382500397.png`;
 const discountOverBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDU=_1650382605642.png`;
 
@@ -35,10 +36,10 @@ const discountOverBtnSrc = `${baseImgSrc}55S75p2/5aSH5Lu9IDU=_1650382605642.png`
 const adInfo = $adImport.adData.results[0];
 const { pid } = adInfo;
 const buryAdPageView = (secondary_class) => {
-    $adSensorsBeacon.adViewBeacon({ ...adInfo,secondary_class}, pid);
+    $adSensorsBeacon.adViewBeacon({ ...adInfo, secondary_class }, pid);
 };
-const buryAdOrderNow = (secondary_class,order_cycle) => {
-    $adSensorsBeacon.adOrderNowBeacon({ ...adInfo,secondary_class,order_cycle}, '' , pid);
+const buryAdOrderNow = (secondary_class, order_cycle) => {
+    $adSensorsBeacon.adOrderNowBeacon({ ...adInfo, secondary_class, order_cycle }, '', pid);
 };
 
 /**
@@ -53,17 +54,17 @@ export default class TradeMbRetainDialog extends Component {
     }
 
     componentDidMount () {
-        buryAdPageView(`交易手机端挽留弹窗${isIOS ? 'ios' : 'android'}`);
+        buryAdPageView(`交易手机端挽留弹窗${isIOS() ? 'ios' : 'android'}`);
     }
 
     closeDialog () {
         const { isOrderBtn } = this.state;
         const { onCancel } = this.props;
-        const closeText = `${isOrderBtn ? '忍痛离开' : '下次再来'}`
-        onCancel(closeText);
-        buryAdOrderNow(`关闭交易手机端挽留弹窗${isIOS ? 'ios' : 'android'}`, closeText);
+        const closeText = `${isOrderBtn ? '忍痛离开' : '下次再来'}`;
+        buryAdOrderNow(`关闭交易手机端挽留弹窗${isIOS() ? 'ios' : 'android'}`, closeText);
         this.setState({ isShow: false });
-        $uninstall();
+        onCancel(closeText);
+        // $uninstall();
     }
 
     /**
@@ -71,22 +72,19 @@ export default class TradeMbRetainDialog extends Component {
      * @param {boolean} isTime 倒计时是否清零
      */
     closeTimer (isTime) {
-        this.setState({ isOrderBtn: isTime })
+        this.setState({ isOrderBtn: isTime });
     }
 
     /**
      * 订购点击
      */
-     orderVip () {
+    orderVip () {
         const { isOrderBtn } = this.state;
         const { onConfirm } = this.props;
         if (isOrderBtn) {
             onConfirm();
-        } else {
-            buryAdOrderNow(`关闭交易手机端挽留弹窗${isIOS ? 'ios' : 'android'}`, '优惠结束');
         }
-        this.setState({ isShow: false });
-        $uninstall();
+        // $uninstall();
     }
 
     render () {
@@ -97,7 +95,7 @@ export default class TradeMbRetainDialog extends Component {
                 {
                     isShow && (
                         <view style={container}>
-                            <image style={backgroundImg} src={backgroundSrc} />
+                            <image style={backgroundImg} src={centPrice === '100' ? oneYuanBgSrc : backgroundSrc} />
                             <view style={containerMain}>
                                 <HorseRaceLamp />
                                 <view style={{ marginTop: '572rpx', marginLeft: '80rpx' }}>
@@ -105,12 +103,12 @@ export default class TradeMbRetainDialog extends Component {
                                 </view>
                                 <image
                                     src={isOrderBtn ? leaveBtnSrc : leaveLastBtnSrc}
-                                    style={{...btnStyle, ...{left: '33rpx'}}}
+                                    style={{ ...btnStyle, ...{ left: '33rpx' } }}
                                     onClick={this.closeDialog.bind(this)}
                                 />
                                 <image
-                                    src={!isOrderBtn ? discountOverBtnSrc : (isIOS() ? orderIosBtnSrc : (centPrice ==='100' ? orderOneyuanBtnSrc : orderOnecentBtnSrc))}
-                                    style={{...btnStyle, ...{right: '33rpx'}}}
+                                    src={!isOrderBtn ? discountOverBtnSrc : (isIOS() ? orderIosBtnSrc : (centPrice === '100' ? orderOneyuanBtnSrc : orderOnecentBtnSrc))}
+                                    style={{ ...btnStyle, ...{ right: '33rpx' } }}
                                     onClick={this.orderVip.bind(this)}
                                 />
                             </view>
@@ -118,6 +116,6 @@ export default class TradeMbRetainDialog extends Component {
                     )
                 }
             </view>
-        )
+        );
     }
 }

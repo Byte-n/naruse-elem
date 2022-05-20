@@ -3,17 +3,17 @@
 Page({
   data: {},
   onLoad(query) {
-    console.log('page onLoad', query)
-  },
-      qwer() {
-      console.log('事件触发');
-    },
-  method: {
-    qwer(e) {
-      console.log(e)
+    this.onUnload = () => {
+      console.log('要卸载拉')
     }
+    this.onPageScroll = () => {
+      console.log('滚动滚动！')
+    }
+    console.log(this);
   },
-  onShow() {
-    console.log(JSON)
+  event: {
+    onBack() {
+      console.log('123');
+    }
   }
 })

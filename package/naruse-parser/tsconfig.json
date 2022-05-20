@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"outDir": "dist",
+		"declaration": true,
+		"module": "esnext",
+		"target": "ES6",
+		"lib": ["es6", "dom"],
+		"jsx": "react",
+		"allowJs": true,
+		"allowSyntheticDefaultImports": true,
+		"moduleResolution": "node",
+		"forceConsistentCasingInFileNames": true,
+		"noImplicitReturns": true,
+		"suppressImplicitAnyIndexErrors": true,
+		"noImplicitThis": false,
+		"experimentalDecorators": true,
+		"strictNullChecks": true
+	}
+}

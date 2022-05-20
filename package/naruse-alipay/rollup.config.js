@@ -5,7 +5,9 @@ const { uglify } = require('rollup-plugin-uglify');
 
 const customResolver = nodeResolve({ extensions: ['.mjs', '.js', '.jsx', '.json', '.sass', '.scss', '.css'] });
 
-
+/**
+ * @type {import('rollup').RollupOptions}
+ */
 module.exports = {
     input: './component/index.js',
     output: {
@@ -19,7 +21,7 @@ module.exports = {
             __IS_H5__: false,
         }),
         uglify({
-            compress: false
+            compress: false,
         }),
     ],
 };

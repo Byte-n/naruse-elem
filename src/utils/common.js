@@ -4,5 +4,7 @@ export const ww = (qwer) => {
 
 
 export const navigateTo = () => {
-     my.createXnnGraphQuery.apply('12323');
+    my.createXnnGraphQuery.apply('12323');
 }
+
+export const NOOP = () => { }

@@ -1,0 +1,3 @@
+<view>
+  <button onTap="gotoIndex">navigateTo主页</button>
+</view>

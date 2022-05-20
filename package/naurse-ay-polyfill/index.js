@@ -4,6 +4,7 @@ import * as $mappUtils from './mappUtils';
 import * as $adSensorsBeacon from './adSensorsBeacon';
 import * as $sensorsBeacon from './sensorsBeacon';
 import * as $ayApi from './$ayApi';
+import $env from './env';
 import { advertUserDefine } from '../../naruse.config.esm';
 const adData = {
     message: 'OK',
@@ -55,4 +56,5 @@ export const ayRequireList = {
         },
     },
     $ayApi,
+    $env
 };

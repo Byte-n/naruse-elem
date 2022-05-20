@@ -1,0 +1,17 @@
+.closeButton {
+    border: 2rpx solid rgba(255, 255, 255, 0.859);
+    width: 128rpx;
+    text-align: center;
+    line-height: 50rpx;
+    border-radius: 25rpx;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.851);
+    display: inline-block;
+    font-size: 26rpx;
+    cursor: pointer;
+}
+
+.hoverStyle {
+    background: white;
+    color: #666;
+}

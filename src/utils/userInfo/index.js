@@ -21,16 +21,7 @@ export const vipFlagMap = {
     PLUS: 6,
 };
 
-/**
- * @desc 判断用户设备是否是ios
- * @author gao01
- * @return {boolean}
- * @date 2022/03/16 11:21:59
- */
-export const isIOS = ()  => {
-    const { platform } = my.getSystemInfoSync();
-    return ['iOS', 'ios'].includes(platform);
-};
+
 
 /**
  * @desc 判断用户是否是有效期内的青鸟用户
@@ -92,4 +83,3 @@ export const isCommonVip = () => {
 export const isNotVip = () => {
     return userInfo.vipFlag === vipFlagMap.NOT_PAY;
 };
-

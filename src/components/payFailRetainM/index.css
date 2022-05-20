@@ -1,0 +1,180 @@
+.warpStyle {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.4);
+    z-index: 900
+}
+
+.dialogBox {
+    font-size: 18rpx;
+    display: flex;
+    flex-direction: column;
+    width: 600rpx;
+    min-height: 720rpx;
+    position: relative;
+    border-radius: 14rpx;
+    transition: all 0.5s;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dialogBoxDown {
+    opacity: 0;
+    transform: translateY(-50%);
+}
+
+.iosBackgroundImg{
+    width: 600rpx;
+    height: 720rpx;
+}
+
+.backgroundImg{
+    width: 600rpx;
+    height: 720rpx;
+    position: absolute;
+}
+
+.checkSign{
+    width: 34rpx;
+    height: 24rpx;
+    position: absolute;
+    left: 540rpx;
+}
+
+.dialogHeader{
+    width: 600rpx;
+    height: 143rpx;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    flex-direction: inherit;
+}
+
+.dialogHeaderMainTip{
+    width: 600rpx;
+    height: 53rpx;
+    margin-top: 24rpx;
+    text-align: center;
+    line-height: 53rpx;
+    font-size: 38rpx;
+}
+
+.dialogHeaderOtherTip{
+    width: 600rpx;
+    height: 50rpx;
+    text-align: center;
+    line-height: 50rpx;
+    font-size: 28rpx;
+    color: #AAAAC3;
+}
+
+.iosDialogContent{
+    width: 560rpx;
+    height: 220rpx;
+    position: absolute;
+    top: 220rpx;
+    padding: 0 20rpx;
+    display: flex;
+    justify-content: center;
+}
+
+.dialogContent{
+    width: 600rpx;
+    height: 220rpx;
+    position: absolute;
+    top: 146rpx;
+    display: flex;
+    justify-content: center;
+}
+
+.dialogFooter{
+    width: 600rpx;
+    height: 360rpx;
+    position: absolute;
+    top: 367rpx;
+}
+
+.dialogFooterYearBtn{
+    width: 600rpx;
+    height: 70rpx;
+}
+
+.dialogFooterMonthBtn{
+    width: 600rpx;
+    height: 70rpx;
+    margin-top: 8rpx;
+}
+
+.iosDialogOrder{
+    width: 600rpx;
+    height: 90rpx;
+    position: absolute;
+    top: 472rpx;
+    display: flex;
+    justify-content: center;
+}
+
+.iosDialogOrderBtn{
+    width: 420rpx;
+}
+
+.dialogFooterOrder{
+    width: 600rpx;
+    height: 90rpx;
+    margin-top: 39rpx;
+    display: flex;
+    justify-content: center;
+}
+
+.dialogFooterOrderBtn{
+    width: 420rpx;
+}
+
+.iosDialogService{
+    width: 600rpx;
+    height: 56rpx;
+    position: absolute;
+    top: 580rpx;
+    display: flex;
+    justify-content: center;
+}
+
+.iosDialogServicePart{
+    width: 300rpx;
+    height: 40rpx;
+}
+
+.dialogFooterService{
+    width: 600rpx;
+    height: 60rpx;
+    margin-top: 16rpx;
+    display: flex;
+    justify-content: center;
+}
+
+.dialogFooterServicePart{
+    width: 420rpx;
+    height: 40rpx;
+}
+
+.closeBtn{
+    width: 150rpx;
+    height: 50rpx;
+    color: rgba(255, 255, 255, 0.8);
+    border: 2rpx solid #FFF;
+    border-radius: 30rpx;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28rpx;
+    position: absolute;
+    left: 50%;
+    transform: translate(-75rpx, 0px);
+}

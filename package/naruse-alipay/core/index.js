@@ -103,6 +103,10 @@ const createBehavior = (option = {}) => {
         didMount () {
             this.option = option;
             try {
+                const { onGetData } = this.props;
+                if (onGetData && typeof onGetData === 'function') {
+                    this.props = { ...this.props, ...onGetData() };
+                }
                 createVmContext.call(this);
             } catch (error) {
                 logger.error('初始化失败', error);
@@ -114,11 +118,21 @@ const createBehavior = (option = {}) => {
          * @date 2022-03-16 10:03:21
          */
         didUpdate (prevProps) {
+            const { onGetData } = this.props;
+            if (onGetData && typeof onGetData === 'function') {
+                this.props = { ...this.props, ...onGetData() };
+            }
             // 只有子组件需要走更新进程
             if (!isEmpty(this.props.component)) {
-                const { props } = prevProps.component;
-                this.$middware.props = this.props.component.props;
-                this.$middware.canUpdate(props);
+                const { props, actuator } = prevProps.component;
+                // FIX: 修复了当切换装载器后不会卸载组件重新渲染
+                if (actuator === this.props.component.actuator) {
+                    this.$middware.props = this.props.component.props;
+                    this.$middware.canUpdate(props);
+                } else {
+                    this.$middware.onUnMount();
+                    initChildComponent.call(this, this.props.component);
+                }
             }
         },
         /**
