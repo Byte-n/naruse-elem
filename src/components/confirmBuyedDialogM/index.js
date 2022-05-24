@@ -52,8 +52,8 @@ class ConfirmBuyedDialog extends Component {
                 this.setState({ isOpenMessage: true });
             }
             my.setStorageSync({key: 'retainRecord', data: `${year}-${month + 1}-${day}-${pid}`});
+            this.setState({ visible: false });
         }
-        this.setState({ visible: false });
         confirmTradeUserBuyResultM().then((res) => {
             if (res === 1 || res === 2 || res === 3) {
                 // resSuccess
@@ -100,13 +100,13 @@ class ConfirmBuyedDialog extends Component {
         if (!visible && resFail && !isOldDialog && !isOpenMessage) return <PayFailRetainM onClose={this.initState.bind(this)} onOpen={this.handleOpen.bind(this)} orderYearLink={reBuyLink} orderMonthLink={reBuyLink} />;
         if (!visible && resSuccess && !isOldDialog) return <OrderSuccessM onClose={this.initState.bind(this)} />;
         if (!visible) return null;
-        if (resSuccess && isOldDialog) return <PaySuccessDialogM />;
+        if (resSuccess && !!isOldDialog) return <PaySuccessDialogM />;
         return (
             <view style={style.warpStyle}>
                 <view style={{ ...style.dialogBox, ...(animation ? style.dialogBoxDown : {}) }}>
                     <view style={style.dialogHeader}>
                         <text>温馨提示</text>
-                        <text onClick={isOldDialog ? this.close.bind(this) : this.confirmHasBuyed.bind(this)} style={{ transform: 'scale(1.3)', cursor: 'pointer' }}>X</text>
+                        <text onClick={!!isOldDialog ? this.close.bind(this) : this.confirmHasBuyed.bind(this)} style={{ transform: 'scale(1.3)', cursor: 'pointer' }}>X</text>
                     </view>
                     <text style={style.dialogLine}></text>
                     <text style={style.dialogContent}>
