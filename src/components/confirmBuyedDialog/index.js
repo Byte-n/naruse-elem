@@ -61,8 +61,8 @@ class ConfirmBuyedDialog extends Component {
             }
             // 可以弹挽留
             Naruse.setStorageSync('retainRecord', `${year}-${month + 1}-${day}-${pid}`);
+            this.setState({ visible: false });
         }
-        this.setState({ visible: false });
         confirmTradeUserBuyResult().then((res) => {
             if (res === 1 || res === 2 || res === 3) {
                 // 弹成功关闭,支付回执
@@ -83,6 +83,16 @@ class ConfirmBuyedDialog extends Component {
         this.setState({visible: true, isOpenMessage: false, resSuccess: false, resFail: false});
     }
 
+    close () {
+        this.setState({ animation: true });
+        new Promise((res) => {
+            setTimeout(res, 500);
+        }).then(() => {
+            this.props.onClose && this.props.onClose();
+            this.setState({ visible: false });
+        });
+    }
+
     /**
      * @description 当付款遇到问题联系客服
      * @author CHC
@@ -94,20 +104,20 @@ class ConfirmBuyedDialog extends Component {
     render () {
         const { reBuyLink, isOldDialog, orderYearLink, orderMonthLink } = this.props;
         const { animation, resSuccess, resFail, visible, isOpenMessage } = this.state;
-        console.log('qqqq', visible, resSuccess, resFail, isOpenMessage);
+        console.log('qqqq', visible, resSuccess, resFail, isOpenMessage, isOldDialog);
         // 支付失败弹框 挽留true 接口告知失败 回执弹框关闭
         if (isOpenMessage && resFail && !visible) return <MessageTip message={'未完成支付'} time={3000} onClose={this.initState.bind(this)} />;
         // 挽留弹框 回执弹框关闭 接口告知失败 新回执 挽留false
         if (!visible && resFail && !isOldDialog && !isOpenMessage) return <PayFailRetain onClose={this.initState.bind(this)} onOpen={this.handleOpen.bind(this)} orderYearLink={orderYearLink} orderMonthLink={orderMonthLink} />;
         if (!visible && resSuccess && !isOldDialog) return <OrderSuccess onClose={this.initState.bind(this)} />;
         if (!visible) return null;
-        if (resSuccess && isOldDialog) return <PaySuccessDialog />;
+        if (resSuccess && !!isOldDialog) return <PaySuccessDialog />;
         return (
             <view style={style.warpStyle}>
                 <view style={{ ...style.dialogBox, ...(animation ? style.dialogBoxDown : {}) }}>
                     <view style={style.dialogHeader}>
                         <text>温馨提示</text>
-                        <text onClick={isOldDialog ? this.close.bind(this) : this.confirmHasBuyed.bind(this)} style={{ transform: 'scale(1.3)', cursor: 'pointer' }}>X</text>
+                        <text onClick={!isOldDialog ? this.confirmHasBuyed.bind(this) : this.close.bind(this)} style={{ transform: 'scale(1.3)', cursor: 'pointer' }}>X</text>
                     </view>
                     <text style={style.dialogLine}></text>
                     <text style={style.dialogContent}>
@@ -126,7 +136,7 @@ class ConfirmBuyedDialog extends Component {
                         >付款遇到问题</button>
                     </view>
                 </view>
-                {resFail && isOldDialog && <PayFailDialog onClose={() => this.setState({ resFail: false })} reBuyLink={reBuyLink} />}
+                {resFail && !!isOldDialog && <PayFailDialog onClose={() => this.setState({ resFail: false })} reBuyLink={reBuyLink} />}
             </view>
         );
     }
