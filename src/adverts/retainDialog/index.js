@@ -2,7 +2,7 @@ import ConfirmBuyedDialogM from '@components/confirmBuyedDialogM';
 import { Component, navigateToWebPage } from 'Naruse';
 import { buryAdOrderNow, buryAdPageView } from '@utils/beacon';
 import style from './index.css';
-import { isIOS,isNotVip } from '@utils/userInfo';
+import { isIOS } from '@utils/platform';
 
 // 模板样式
 
@@ -102,7 +102,7 @@ export default class TradePcOrderTem extends Component {
         }else{
             my.qn.navigateToWebPage({ url: android_url });
         }
-        this.setState({ isShowPayRes: true, isShow:false });
+        this.setState({ isShowPayRes: true });
     }
 
     /**
@@ -121,11 +121,12 @@ export default class TradePcOrderTem extends Component {
 
     render() {
         const { isShow, isShowPayRes, animation, reBuyLink } = this.state;
+        let img_url= 'http://q.aiyongtech.com/ad/images/YW5kcm9pZFJldGFpbg%3D%3D_1652796568509.png';
         return (
             <view>
                 <view>
                 {
-                    isShowPayRes && <ConfirmBuyedDialogM onClose={() => this.setState({ isShowPayRes: false })} reBuyLink={reBuyLink} text={text} />
+                    isShowPayRes && <ConfirmBuyedDialogM onClose={() => this.setState({ isShowPayRes: false })} reBuyLink={reBuyLink} orderYearLick={reBuyLink} orderMonthLick={reBuyLink} text={text} isOldDialog={false} />
                 }
                 </view>
                 {
