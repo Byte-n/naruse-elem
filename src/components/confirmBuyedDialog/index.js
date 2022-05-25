@@ -32,7 +32,6 @@ class ConfirmBuyedDialog extends Component {
     }
 
     componentDidMount () {
-        console.log(111);
         new Promise((res) => {
             setTimeout(res, 500);
         }).then(() => {
@@ -53,7 +52,6 @@ class ConfirmBuyedDialog extends Component {
             const month = today.getMonth();
             const day = today.getDate();
             const retainRecord = Naruse.getStorageSync('retainRecord');
-            console.log('date===', today, year, month, day);
             const retainRecordDate = retainRecord.split('-');
             if (retainRecordDate[0] == year && retainRecordDate[1] == month + 1 && retainRecordDate[2] == day && retainRecordDate[3] == pid) {
                 this.setState({ isOpenMessage: true });
@@ -104,7 +102,6 @@ class ConfirmBuyedDialog extends Component {
     render () {
         const { reBuyLink, isOldDialog, orderYearLink, orderMonthLink } = this.props;
         const { animation, resSuccess, resFail, visible, isOpenMessage } = this.state;
-        console.log('qqqq', visible, resSuccess, resFail, isOpenMessage, isOldDialog);
         // 支付失败弹框 挽留true 接口告知失败 回执弹框关闭
         if (isOpenMessage && resFail && !visible) return <MessageTip message={'未完成支付'} time={3000} onClose={this.initState.bind(this)} />;
         // 挽留弹框 回执弹框关闭 接口告知失败 新回执 挽留false

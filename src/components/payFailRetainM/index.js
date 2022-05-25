@@ -23,16 +23,7 @@ export default class PayFailRetain extends Component {
     }
 
     componentDidMount () {
-        $sensorsBeacon.sensorsBeacon('YY_AdPageview', {
-            primary_class: '挽留弹窗',
-            secondary_class: '点击未支付挽留弹窗',
-            cid: Number(creative_id),
-            pid: Number(pid) ,
-            cname: creative_name,
-            pname: pid_name,
-            from_pid: pid,
-            from_pname: pid_name,
-        });
+        $adSensorsBeacon.adViewBeacon({ ...adInfo, primary_class: '挽留弹窗', secondary_class: '点击未支付挽留弹窗' }, pid);
         new Promise((res) => {
             setTimeout(res, 500);
         }).then(() => {
@@ -46,23 +37,10 @@ export default class PayFailRetain extends Component {
     jumpOrderLink () {
         const { orderCheck } = this.state;
         const { orderYearLink, orderMonthLink, onOpen } = this.props;
-        console.log(111, orderYearLink, orderMonthLink);
-        $sensorsBeacon.sensorsBeacon('YY_OrderNow', {
-            primary_class: '挽留弹窗',
-            secondary_class: '点击未支付挽留弹窗',
-            cid: Number(creative_id),
-            pid: Number(pid) ,
-            cname: creative_name,
-            pname: pid_name,
-            from_pid: pid,
-            from_pname: pid_name,
-            amount_payable: `${orderCheck ? '148' : '52'}`,
-        });
-        console.log(222);
+        $adSensorsBeacon.adOrderNowBeacon({ ...adInfo, primary_class: '挽留弹窗', secondary_class: '点击未支付挽留弹窗', amount_payable: `${orderCheck ? '148' : '52'}` }, '', pid);
         this.setState({ visible: false });
         onOpen && onOpen();
         my.qn.navigateToWebPage({ url: orderCheck ? orderYearLink : orderMonthLink });
-        console.log(333);
     }
 
     /**
@@ -71,19 +49,10 @@ export default class PayFailRetain extends Component {
      */
     openService (type) {
         const { onOpen } = this.props;
-        $sensorsBeacon.sensorsBeacon('YY_OrderNow', {
-            primary_class: '挽留弹窗',
-            secondary_class: '点击未支付挽留弹窗',
-            cid: Number(creative_id),
-            pid: Number(pid) ,
-            cname: creative_name,
-            pname: pid_name,
-            from_pid: pid,
-            from_pname: pid_name,
-        });
         let text = '你好，我想订购爱用交易高级版，但是支付失败，我该怎么办';
         if (type === 'orderIos') {
             text = service;
+            $adSensorsBeacon.adOrderNowBeacon({ ...adInfo, primary_class: '挽留弹窗', secondary_class: '点击未支付挽留弹窗' }, '', pid);
             this.setState({ visible: false });
             onOpen && onOpen();
         }

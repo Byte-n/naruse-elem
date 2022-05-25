@@ -25,7 +25,6 @@ class ConfirmBuyedDialog extends Component {
     }
 
     componentDidMount () {
-        console.log('okkkk');
         new Promise((res) => {
             setTimeout(res, 500);
         }).then(() => {
@@ -45,13 +44,12 @@ class ConfirmBuyedDialog extends Component {
             const year = today.getFullYear();
             const month = today.getMonth();
             const day = today.getDay();
-            const retainRecord = my.getStorageSync({key: 'retainRecord'}).data;
-            console.log('date===', today, year, month, day);
+            const retainRecord = Naruse.getStorageSync('retainRecord');
             const retainRecordDate = retainRecord.split('-');
             if (retainRecordDate[0] == year && retainRecordDate[1] == month + 1 && retainRecordDate[2] == day && retainRecordDate[3] == pid) {
                 this.setState({ isOpenMessage: true });
             }
-            my.setStorageSync({key: 'retainRecord', data: `${year}-${month + 1}-${day}-${pid}`});
+            Naruse.setStorageSync('retainRecord', `${year}-${month + 1}-${day}-${pid}`);
             this.setState({ visible: false });
         }
         confirmTradeUserBuyResultM().then((res) => {
@@ -94,8 +92,6 @@ class ConfirmBuyedDialog extends Component {
     render () {
         const { reBuyLink, text, isOldDialog, orderYearLink, orderMonthLink } = this.props;
         const { animation, resSuccess, resFail, visible, isOpenMessage } = this.state;
-        console.log('nooo', visible, resSuccess, resFail, isOpenMessage);
-        console.log('orderYearLink====', orderYearLink, reBuyLink);
         if (isOpenMessage && resFail && !visible) return <MessageTip message={'未完成支付'} time={3000} onClose={this.initState.bind(this)} />;
         if (!visible && resFail && !isOldDialog && !isOpenMessage) return <PayFailRetainM onClose={this.initState.bind(this)} onOpen={this.handleOpen.bind(this)} orderYearLink={reBuyLink} orderMonthLink={reBuyLink} />;
         if (!visible && resSuccess && !isOldDialog) return <OrderSuccessM onClose={this.initState.bind(this)} />;

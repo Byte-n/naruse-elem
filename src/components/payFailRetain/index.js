@@ -22,17 +22,7 @@ export default class PayFailRetain extends Component {
     }
 
     componentDidMount () {
-        console.log(999999);
-        $sensorsBeacon.sensorsBeacon('YY_AdPageview', {
-            primary_class: '挽留弹窗',
-            secondary_class: '点击未支付挽留弹窗',
-            cid: Number(creative_id),
-            pid: Number(pid) ,
-            cname: creative_name,
-            pname: pid_name,
-            from_pid: pid,
-            from_pname: pid_name,
-        });
+        $adSensorsBeacon.adViewBeacon({ ...adInfo, primary_class: '挽留弹窗', secondary_class: '点击未支付挽留弹窗' }, pid);
         new Promise((res) => {
             setTimeout(res, 500);
         }).then(() => {
@@ -51,18 +41,6 @@ export default class PayFailRetain extends Component {
     }
 
     openService () {
-        const { orderCheck } = this.state;
-        $sensorsBeacon.sensorsBeacon('YY_OrderNow', {
-            primary_class: '挽留弹窗',
-            secondary_class: '点击未支付挽留弹窗',
-            cid: Number(creative_id),
-            pid: Number(pid) ,
-            cname: creative_name,
-            pname: pid_name,
-            from_pid: pid,
-            from_pname: pid_name,
-            amount_payable: `${orderCheck ? '148' : '52'}`,
-        });
         $openChat.openChat({ text: '你好，我想订购爱用交易高级版，但是支付失败，我该怎么办？' });
     }
 
@@ -75,7 +53,7 @@ export default class PayFailRetain extends Component {
         } else {
             orderLink = orderMonthLink;
         }
-        console.log(222);
+        $adSensorsBeacon.adOrderNowBeacon({ ...adInfo, primary_class: '挽留弹窗', secondary_class: '点击未支付挽留弹窗', amount_payable: `${orderCheck ? '148' : '52'}` }, '', pid);
         this.setState({ visible: false });
         this.props.onOpen && this.props.onOpen();
         navigateToWebPage({ url: orderLink });
