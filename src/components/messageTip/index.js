@@ -44,14 +44,14 @@ class MessageTip extends Component {
     }
 
     componentDidMount () {
-        const { time } = this.props;
+        const { time, onClose } = this.props;
         new Promise((res) => {
             setTimeout(res, 500);
         }).then(() => {
             this.setState({ animation: false });
         });
         setTimeout(() => {
-            this.setState({ isShow: false });
+            this.setState({ isShow: false }, () => {onClose && onClose()});
         }, time);
     }
 
