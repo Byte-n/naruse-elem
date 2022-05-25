@@ -28,8 +28,6 @@ const closeStyle = {
 const userInfo = $userInfoChanger.getUserInfo();
 // 广告信息
 const adInfo = $adImport.adData.results[0];
-console.log('ad_ adInfo', adInfo);
-console.log('ad_ userInfo', userInfo);
 const {
     topImgUrl,
     bottomImgUrl,
@@ -37,6 +35,7 @@ const {
     orderYearLink,
     leftButton,
     rightButton,
+    isOldDialog
 } = adInfo.user_define.body;
 
 /**
@@ -98,14 +97,13 @@ export default class TradePcOrderTem extends Component {
 
     render () {
         const { isShow, isShowPayRes, animation, reBuyLink } = this.state;
-        console.log('isShowPayRes====', isShowPayRes);
         return (
             <view>
                 {
                     isShow && (
                         <view style={tradePcContainer}>
                             {
-                                isShowPayRes && <ConfirmBuyedDialog onClose={() =>{this.setState({ isShowPayRes: false })}} reBuyLink={reBuyLink} orderYearLink={reBuyLink} orderMonthLink={reBuyLink} isOldDialog={false} />
+                                isShowPayRes && <ConfirmBuyedDialog onClose={() =>{this.setState({ isShowPayRes: false })}} reBuyLink={reBuyLink} orderYearLink={reBuyLink} orderMonthLink={reBuyLink} isOldDialog={isOldDialog} />
                             }
                             <view style={{ ...tradePcOrderTem, ...dialogBox, ...(animation ? dialogBoxDown : {}) }}>
                                 <view style={tradePcOrderTemMain}>
