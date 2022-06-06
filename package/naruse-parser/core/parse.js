@@ -83,11 +83,10 @@ const priority = {
 };
 // 标记器
 class Token {
-    pos = 0;
-    input = '';
-    tokens = [];
     constructor (input) {
         this.input = input;
+        this.pos = 0;
+        this.tokens = [];
     }
     scan () {
         while (1) {
@@ -216,10 +215,9 @@ class Token {
 }
 // 解析器
 export class Parser {
-    tokens = [];
-    index = -1;
     constructor (code) {
         this.tokens = (new Token(code)).scan();
+        this.index = -1;
     }
     parse () {
         const node = { body: [] };

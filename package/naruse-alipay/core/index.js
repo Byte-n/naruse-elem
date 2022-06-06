@@ -1,8 +1,8 @@
 import { miniappEventBehavior } from './domEvents.js';
-import run from '../../naruse-parser/index.js';
+import run from 'naruse-parser';
 import { logger } from './uitl.js';
 import { createElement } from './createElement.js';
-import { isEmpty } from '../../naruse-share/utils';
+import { isEmpty } from 'naruse-share';
 import { NaruseComponent } from './component.js';
 import { Middware } from './middware.js';
 import { Naruse } from './naurse.js';

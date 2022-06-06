@@ -40,7 +40,7 @@ const naruseCreateElement = (type, props, ...children) => {
         return createElement(type, props, ...children);
     }
     if (typeof type === 'function') {
-        props.children = children;
+        props && (props.children = children);
         return type(props);
     }
     logger.warn('不支持的组件类型', type);

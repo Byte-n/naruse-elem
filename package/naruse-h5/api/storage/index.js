@@ -1,7 +1,6 @@
 
 import { logger } from '../../utils/log';
-import { MethodHandler } from '../../../naruse-share/handler';
-import { exceptType, exceptTypeSync } from '../../../naruse-share/assert';
+import { exceptType, exceptTypeSync, MethodHandler } from 'naruse-share';
 
 /** 获取缓存 */
 const getItem = function getItem (key) {

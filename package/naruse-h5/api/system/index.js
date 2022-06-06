@@ -1,4 +1,4 @@
-import { MethodHandler } from '../../../naruse-share/handler';
+import { MethodHandler } from 'naruse-share';
 
 const getOsInfo = () => {
     const userAgent = navigator.userAgent.toLowerCase();

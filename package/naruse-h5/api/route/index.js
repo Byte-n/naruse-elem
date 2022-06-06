@@ -1,5 +1,4 @@
-import { MethodHandler } from '../../../naruse-share/handler';
-import { exceptType } from '../../../naruse-share/assert';
+import { MethodHandler, exceptType } from 'naruse-share';
 
 /**
  * @description 跳转到其他页面
