@@ -41,7 +41,6 @@ const createClassElement = (type, props, childNodes) => {
     return { naruseType: 'naruse-element', component };
 };
 
-
 /**
  * @description 创建基础节点
  * @author CHC

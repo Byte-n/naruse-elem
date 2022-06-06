@@ -9,8 +9,8 @@ import {
  * @class NaruseComponent
  */
 export class NaruseComponent {
-    state = {}
     constructor(props) {
+        this.state = {};
         this.props = props;
         this.$mounted = false;
         // 中间件实例

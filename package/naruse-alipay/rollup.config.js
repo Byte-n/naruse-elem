@@ -2,6 +2,7 @@ const alias = require('@rollup/plugin-alias');
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const replace = require('@rollup/plugin-replace');
 const { uglify } = require('rollup-plugin-uglify');
+const babel = require('rollup-plugin-babel');
 
 const customResolver = nodeResolve({ extensions: ['.mjs', '.js', '.jsx', '.json', '.sass', '.scss', '.css'] });
 
@@ -20,8 +21,7 @@ module.exports = {
             __IS_ALIAPY__: true,
             __IS_H5__: false,
         }),
-        uglify({
-            compress: false,
-        }),
+        babel({ exclude: 'node_modules/**' }),
+        uglify({ compress: false }),
     ],
 };

@@ -1,6 +1,6 @@
 import { naruseCreateElement } from '../components/index';
 import { Component } from 'react';
-import { version } from '../../naruse-share/index';
+import { version } from 'naruse-share';
 import api from '../api/index';
 
 

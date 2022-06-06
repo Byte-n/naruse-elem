@@ -6,7 +6,7 @@
  */
 
 import { setStorage, setStorageSync, getStorageSync } from '../storage/index';
-import { MethodHandler } from '../../../naruse-share/handler';
+import { MethodHandler } from 'naruse-share';
 
 const CLIPBOARD_STORAGE_NAME = 'naruse_clipboard';
 

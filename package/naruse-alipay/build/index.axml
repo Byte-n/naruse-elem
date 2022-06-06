@@ -1,0 +1,106 @@
+<!-- 视图组件 -->
+<template name="view">
+    <view id="{{ id }}" class="{{className || ''}}" style="{{style || ''}}" disable-scroll="{{ disableScroll }}" hidden="{{ hidden }}" 
+        hover-class="{{ hoverClass }}" catchTap="onTap">
+        <block a:if="{{ childNodes }}">
+            <template a:for="{{ childNodes }}" data="{{ ...item }}" is="{{ item.naruseType }}"></template>
+        </block>
+    </view>
+</template>
+<!-- 文字 -->
+<template name="text">
+    <text id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" 
+        catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" catchTap="onTap" catchLongpress="onLongPress" selectable="{{selectable}}" 
+        space="{{space}}" decode="{{decode}}">
+        {{content}}
+    </text>
+</template>
+<!-- 富文本 -->
+<template name="rich-text">
+    <rich-text id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" 
+        catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" catchTap="onTap" catchLongpress="onLongPress" nodes="{{nodes}}" 
+        space="{{space}}"></rich-text>
+</template>
+<!-- 图标 -->
+<template name="icon">
+    <icon id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" 
+        catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" 
+        catchTap="onTap" catchLongpress="onLongPress" type="{{type}}" size="{{size}}" color="{{color}}"></icon>
+</template>
+<!-- 图片 -->
+<template name="image">
+    <image id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" 
+        catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" 
+        catchTap="onTap" catchLongpress="onLongPress" rendering-mode="{{renderingMode}}" src="{{src}}" mode="{{mode}}" webp="{{webp}}" 
+        lazy-load="{{lazyLoad}}" show-menu-by-longpress="{{showMenuByLongpress}}" catchLoad="onImageLoad" catchError="onImageError"></image>
+</template>
+<!-- 视频 -->
+<template name="video">
+    <video id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" 
+        catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" 
+        catchTap="onTap" catchLongpress="onLongPress" src="{{src}}" duration="{{duration}}" controls="{{controls}}" danmu-list="{{danmuList}}" 
+        danmu-btn="{{danmuBtn}}" enable-danmu="{{enableDanmu}}" autoplay="{{autoplay}}" loop="{{loop}}" muted="{{muted}}" 
+        initial-time="{{initialTime}}" direction="{{direction}}" show-progress="{{showProgress}}" show-fullscreen-btn="{{showFullscreenBtn}}" 
+        show-play-btn="{{showPlayBtn}}" show-center-play-btn="{{showCenterPlayBtn}}" enable-progress-gesture="{{enableProgressGesture}}" 
+        object-fit="{{objectFit}}" poster="{{poster}}" show-mute-btn="{{showMuteBtn}}" title="{{title}}" play-btn-position="{{playBtnPosition}}" 
+        enable-play-gesture="{{enablePlayGesture}}" auto-pause-if-navigate="{{autoPauseIfNavigate}}" auto-pause-if-open-native="{{autoPauseIfOpenNative}}" 
+        vslide-gesture="{{vslideGesture}}" vslide-gesture-in-fullscreen="{{vslideGestureInFullscreen}}" ad-unit-id="{{adUnitId}}" 
+        poster-for-crawler="{{posterForCrawler}}" show-casting-button="{{showCastingButton}}" picture-in-picture-mode="{{pictureInPictureMode}}" 
+        pictureInPictureShowProgress="{{pictureInPictureShowProgress}}" enable-auto-rotation="{{enableAutoRotation}}" show-screen-lock-button="{{showScreenLockButton}}" 
+        catchPlay="onVideoPlay" catchPause="onVideoPause" catchEnded="onVideoEnded" catchTimeupdate="onVideoTimeUpdate" catchFullscreenchange="onVideoFullScreenChange" 
+        catchWaiting="onVideoWaiting" catchError="onVideoError" catchProgress="onVideoProgress" catchLoadedmetadata="onVideoLoadedMetaData" 
+        catchControlstoggle="onVideoControlsToggle" catchEnterpictureinpicture="onVideoEnterPictureInPicture" catchLeavepictureinpicture="onVideoLeavePictureInPicture">
+        <block a:if="{{ childNodes }}">
+            <template a:for="{{ childNodes }}" data="{{ ...item }}" is="{{ item.naruseType }}"></template>
+        </block>
+    </video>
+</template>
+<!-- 按钮 -->
+<template name="button">
+    <button id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" 
+        catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" 
+        catchTap="onTap" catcLongpress="onLongPress" size="{{size}}" type="{{type}}" plain="{{plain}}" disabled="{{disabled}}" 
+        loading="{{loading}}" form-type="{{formType}}" open-type="{{openType}}" hover-class="{{hoverClass}}" hover-stop-propagation="{{hoverStopPropagation}}" 
+        hover-start-time="{{hoverStartTime}}" hover-stay-time="{{hoverStayTime}}" lang="{{lang}}" session-from="{{sessionFrom}}" 
+        send-message-title="{{sendMessageTitle}}" send-message-path="{{sendMessagePath}}" send-message-img="{{sendMessageImg}}" 
+        app-parameter="{{appParameter}}" show-message-card="{{showMessageCard}}" business-id="{{businessId}}" catchGetuserinfo="onButtonGetUserInfo" 
+        catchContact="onButtonContact" catchGetphonenumber="onButtonGetPhoneNumber" catchError="onButtonError" catchOpensetting="onButtonOpenSetting" 
+        catcLaunchapp="onButtonLaunchApp" catchGetrealnameauthinfo="onButtonGetRealnameAuthInfo" share-type="{{shareType}}" 
+        share-mode="{{shareMode}}">
+        <block a:if="{{ childNodes }}">
+            <template a:for="{{ childNodes }}" data="{{ ...item }}" is="{{ item.naruseType }}"></template>
+        </block>
+    </button>
+</template>
+<!-- 输入框 -->
+<template name="input">
+    <radio-group a:if="{{type === 'radio'}}" id="{{id}}" class="{{className}}" style="{{style}}" data-private-node-id="{{nodeId}}" 
+        data-private-page-id="{{pageId}}" catchChange="onRadioChange">
+        <radio id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" 
+            data-private-page-id="{{pageId}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" 
+            catchTouchcancel="onTouchCancel" catchTap="onTap" catcLongpress="onLongPress" value="{{value}}" disabled="{{disabled}}" 
+            checked="{{checked}}" color="{{color}}"></radio>
+    </radio-group>
+    <checkbox-group a:elif="{{type === 'checkbox'}}" id="{{id}}" class="{{className}}" style="{{style}}" data-private-node-id="{{nodeId}}" 
+        data-private-page-id="{{pageId}}" catchChange="onCheckboxChange">
+        <checkbox hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" catchTouchstart="onTouchStart" 
+            catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" catchTap="onTap" catcLongpress="onLongPress" 
+            value="{{value}}" disabled="{{disabled}}" checked="{{checked}}" color="{{color}}"></checkbox>
+    </checkbox-group>
+    <input a:elif="{{type !== 'hidden'}}" id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" 
+        data-private-page-id="{{pageId}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" 
+        catchTouchcancel="onTouchCancel" catchTap="onTap" catcLongpress="onLongPress" value="{{value}}" type="{{type}}" password="{{password}}" 
+        placeholder="{{placeholder}}" placeholder-style="{{placeholderStyle}}" placeholder-class="{{placeholderClass}}" disabled="{{disabled}}" 
+        maxlength="{{maxlength}}" cursor-spacing="{{cursorSpacing}}" auto-focus="{{autoFocus}}" focus="{{focus}}" confirm-type="{{confirmType}}" 
+        confirm-hold="{{confirmHold}}" cursor="{{cursor}}" selection-start="{{selectionStart}}" selection-end="{{selectionEnd}}" 
+        adjust-position="{{adjustPosition}}" hold-keyboard="{{holdKeyboard}}" onInput="onInputInput" onFocus="onInputFocus" 
+        onBlur="onInputBlur" catchConfirm="onInputConfirm" catcKeyboardheightchange="onInputKeyBoardHeightChange"></input>
+</template>
+<!-- 入口组件 -->
+<template name="tree">
+    <block a:for="{{childNodes}}" a:key="{{ id }}">
+        <template is="{{ item.naruseType }}" data="{{ ...item }}"></template>
+    </block>
+</template>
+
+<template is="{{ node.naruseType }}" data="{{ ...node }}" />

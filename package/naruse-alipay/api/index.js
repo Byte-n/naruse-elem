@@ -1,4 +1,4 @@
-import { processApis } from '../../naruse-share/promiseifyApi';
+import { processApis } from 'naruse-share';
 
 const apiDiff = {
     getClipboardData: { alias: 'getClipboard' },

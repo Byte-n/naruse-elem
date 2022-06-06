@@ -288,8 +288,6 @@ const evaluate_map = {
 };
 
 class ScopeVar {
-    value;
-    kind;
     constructor (kind, value) {
         this.value = value;
         this.kind = kind;
@@ -307,16 +305,12 @@ class ScopeVar {
 }
 
 class Scope {
-    content;
-    parent;
-    type;
-    invasived;
-    prefix = '';
     constructor (type, parent) {
         this.type = type;
         this.parent = parent || null;
         this.content = {};
         this.invasived = false;
+        this.prefix = '';
     }
 
     $find (raw_name) {

@@ -1,4 +1,4 @@
-import createLogger from '../../naruse-share/log/logger';
+import { createLogger } from 'naruse-share';
 const logger = createLogger('naruse-element');
 
 const NOOP = () => {};

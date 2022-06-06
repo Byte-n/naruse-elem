@@ -1,4 +1,3 @@
-import { logger } from '../naruse-h5/utils/log';
 
 export class MethodHandler {
     constructor ({ name, success, fail, complete }) {
@@ -25,7 +24,7 @@ export class MethodHandler {
         } else {
             res.errMsg = `${this.methodName}:fail ${res.errMsg}`;
         }
-        logger.error(res.errMsg);
+        console.error(res.errMsg);
         typeof this.__fail === 'function' && this.__fail(res);
         typeof this.__complete === 'function' && this.__complete(res);
         return reject(res);

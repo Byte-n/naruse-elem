@@ -1,1 +1,1 @@
-export { ReactMiddleware as default } from './core/reactMiddleware';
+export { ReactMiddleware as default } from './core/reactMiddleware.jsx';
