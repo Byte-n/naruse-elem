@@ -1,3 +1,4 @@
+import { NaruseComponent } from './component';
 import { initVnodeTree } from './domEvents';
 import { logger, NOOP } from './uitl';
 
@@ -44,8 +45,12 @@ export class Middware {
     constructor (miniappComponent, NaruseComponentActuator, props) {
         this.props = props;
         this.component = miniappComponent;
-        this.naruseComponent = new NaruseComponentActuator(props);
-        this.naruseComponent.props = props;
+        if (NaruseComponentActuator instanceof NaruseComponent) {
+            this.naruseComponent = NaruseComponentActuator;
+        } else {
+            this.naruseComponent = new NaruseComponentActuator(props);
+            this.naruseComponent.props = props;
+        }
         this.naruseComponent.$updater = this;
         this.fristRender = true;
         this.updating = false;
