@@ -1,7 +1,7 @@
 import { Component, navigateToWebPage } from 'Naruse';
 import style from '../confirmBuyedDialogM/index.css';
 import style2 from './index.css';
-import { isIOS } from '@utils/userInfo';
+import { isIOS } from '@utils/platform';
 
 /**
  * @description 购买确认弹窗

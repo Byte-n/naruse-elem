@@ -1,0 +1,147 @@
+.warpStyle {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.4);
+    z-index: 900
+}
+
+.dialogBox {
+    font-size: 18rpx;
+    display: flex;
+    flex-direction: column;
+    width: 620px;
+    min-height: 400px;
+    background-color: #fff;
+    position: relative;
+    border-radius: 20px;
+    transition: all 0.5s;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dialogBoxDown {
+    opacity: 0;
+    transform: translateY(-50%);
+}
+
+.dialogHeader{
+    width: 620px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    flex-direction: inherit;
+}
+
+.dialogHeaderMainTip{
+    width: 620px;
+    height: 37px;
+    margin-top: 16px;
+    text-align: center;
+    line-height: 37px;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+.dialogHeaderOtherTip{
+    width: 620px;
+    height: 28px;
+    text-align: center;
+    line-height: 28px;
+    font-size: 19px;
+    color: #AAAAC3;
+}
+
+.dialogContent{
+    width: 620px;
+    height: 144px;
+}
+
+.dialogFooter{
+    width: 620px;
+    height: 176px;
+}
+
+.dialogFooterBtn{
+    width: 583px;
+    height: 66px;
+    margin-left: 18px;
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.dialogFooterLeft{
+    width: 289px;
+    cursor: pointer;
+}
+
+.dialogFooterRight{
+    width: 270px;
+    padding-top: 20px;
+    cursor: pointer;
+}
+
+.dialogFooterOrder{
+    width: 620px;
+    height: 90px;
+    position: relative;
+}
+
+.dialogFooterOrderBtn{
+    width: 264px;
+    height: 50px;
+    border-radius: 5px;
+    background-color: #2D96ED;
+    color: #FFF;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-132px, -25px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.dialogFooterService{
+    width: 154px;
+    height: 20px;
+    color: #2D96ED;
+    position: absolute;
+    right: 6px;
+    bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.closeStyle{
+    width: 76px;
+    height: 28px;
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #FFF;
+    border-radius: 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    bottom: -48px;
+    position: absolute;
+    left: 50%;
+    transform: translate(-38px, 0px);
+}
+
+.buyBtnHoverStyle{
+    background-color: #FFF;
+    color: #666666;
+}
