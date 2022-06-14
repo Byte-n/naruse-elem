@@ -2,6 +2,7 @@ import { miniappEventBehavior } from './domEvents.js';
 import { logger } from './uitl.js';
 import { Middware, propsEquals } from './middware.js';
 import { getNaruseComponentFromProps } from './init.js';
+import { bindRenderEventOnComponent } from '../expand/index.js';
 
 /**
  * @description 初始化naruse主组件
@@ -51,6 +52,9 @@ const createMainBehavior = (option = {}) => {
          * @date 2022-03-16 10:03:05
          */
         didMount() {
+            const { unique = false } = this.props || {};
+            // 绑定重新渲染事件
+            if (unique) bindRenderEventOnComponent(this);
             this.option = option;
             createVmContext.call(this);
         },
