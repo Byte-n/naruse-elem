@@ -1,5 +1,5 @@
 import { NaruseComponent } from './component';
-import { globalEvent, EventBus, version } from 'naruse-share';
+import { globalEvent, EventBus, version } from '../../naruse-share/index';
 import { initNaruseAlipayApi } from '../api/index';
 import { withPage } from '../api/HOC/index';
 

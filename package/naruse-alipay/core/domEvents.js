@@ -166,7 +166,7 @@ const allEvents = function allEvents (props) {
  * @type {*}
  * */
 export const miniappEventBehavior = {
-    props: { code: '', component: {} },
+    props: { component: {} },
     data: { node: {} },
     methods: {
         onTap: allEvents,

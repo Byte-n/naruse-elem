@@ -10,9 +10,9 @@ const customResolver = nodeResolve({ extensions: ['.mjs', '.js', '.jsx', '.json'
  * @type {import('rollup').RollupOptions}
  */
 module.exports = {
-    input: './component/index.js',
+    input: './core/index.js',
     output: {
-        file: './dist/index.js',
+        file: './build/lib.js',
         format: 'es',
     },
     plugins: [

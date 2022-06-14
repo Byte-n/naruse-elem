@@ -1,6 +1,6 @@
 // 放置页面相关的处理
 
-import { EventBus } from 'naruse-share';
+import { EventBus } from '../../naruse-share/index';
 import { logger } from './uitl';
 
 const pageCenter = {};

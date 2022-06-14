@@ -1,4 +1,4 @@
-import { processApis } from 'naruse-share';
+import { processApis } from '../../naruse-share/index';
 
 const apiDiff = {
     getClipboardData: { alias: 'getClipboard' },
