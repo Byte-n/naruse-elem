@@ -28,8 +28,6 @@ const closeStyle = {
 const userInfo = $userInfoChanger.getUserInfo();
 // 广告信息
 const adInfo = $adImport.adData.results[0];
-console.log('ad_ adInfo', adInfo);
-console.log('ad_ userInfo', userInfo);
 const {
     topImgUrl,
     bottomImgUrl,
@@ -37,6 +35,7 @@ const {
     orderYearLink,
     leftButton,
     rightButton,
+    isOldDialog
 } = adInfo.user_define.body;
 
 /**
@@ -80,9 +79,9 @@ export default class TradePcOrderTem extends Component {
         const url = type === 'quarter' ? orderQuarterLink : orderYearLink;
         const beaconText = type === 'quarter' ? leftButton : rightButton;
         buryAdOrderNow(beaconText);
-        navigateToWebPage({ url });
         this.setState({ isShowPayRes: true, reBuyLink: url });
-    };
+        navigateToWebPage({ url });
+    }
 
     /**
      * 模板弹窗关闭
@@ -104,7 +103,7 @@ export default class TradePcOrderTem extends Component {
                     isShow && (
                         <view style={tradePcContainer}>
                             {
-                                isShowPayRes && <ConfirmBuyedDialog onClose={() => this.setState({ isShowPayRes: false })} reBuyLink={reBuyLink} />
+                                isShowPayRes && <ConfirmBuyedDialog onClose={() =>{this.setState({ isShowPayRes: false })}} reBuyLink={reBuyLink} orderYearLink={reBuyLink} orderMonthLink={reBuyLink} isOldDialog={isOldDialog} />
                             }
                             <view style={{ ...tradePcOrderTem, ...dialogBox, ...(animation ? dialogBoxDown : {}) }}>
                                 <view style={tradePcOrderTemMain}>
