@@ -469,8 +469,9 @@ const default_api = {
     Array,
     JSON,
     Promise,
-    ...babelPolyfill,
 };
+
+Object.assign(default_api, babelPolyfill);
 
 export const run = (code, append_api = {}) => {
     runingCode = code;
