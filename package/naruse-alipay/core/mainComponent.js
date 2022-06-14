@@ -1,7 +1,7 @@
 import { miniappEventBehavior } from './domEvents.js';
 import { logger } from './uitl.js';
 import { Middware, propsEquals } from './middware.js';
-import { getNaruseComponentFromProps } from './init.js';
+import { getNaruseComponentFromProps } from './create.js';
 import { bindRenderEventOnComponent } from '../expand/index.js';
 
 /**

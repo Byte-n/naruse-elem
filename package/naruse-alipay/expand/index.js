@@ -1,5 +1,7 @@
 import { globalEvent } from "../../naruse-share/index";
-import { Middware } from "../core/middware";
+import { naruseExtend } from "../core/index";
+import { getNaruseComponentFromCode } from "../core/create";
+import { Middware } from '../core/middware'
 import { logger } from "../core/uitl";
 
 
@@ -18,6 +20,7 @@ const bindedPages = {};
 const renderComponentOnPage = (route, Component) => {
     globalEvent.emit('naruse.renderComponentOnPage', route, Component);
 };
+
 
 /**
  * @description 绑定渲染中心到组件上，一个页面只允许绑定一个
@@ -45,8 +48,26 @@ const bindRenderEventOnComponent = (miniComponent) => {
     });
 }
 
+/**
+ * @description 渲染组件在某个页面使用代码
+ * @author CHC
+ * @date 2022-06-14 16:06:46
+ * @param {*} route
+ * @param {*} code
+ * @param {*} ctx
+ */
+const renderComponentOnPageWithCode = async (route, code, ctx) => {
+    if (!route) return;
+    const component =  await getNaruseComponentFromCode(code, ctx);
+    renderComponentOnPage(route, component);
+}
+
+naruseExtend({ renderComponentOnPage });
+
+
 
 export {
     renderComponentOnPage,
-    bindRenderEventOnComponent
+    bindRenderEventOnComponent,
+    renderComponentOnPageWithCode
 }
