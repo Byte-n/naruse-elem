@@ -91,16 +91,13 @@
     adjust-position="{{adjustPosition}}" hold-keyboard="{{holdKeyboard}}" onInput="onInputInput" onFocus="onInputFocus" 
     onBlur="onInputBlur" catchConfirm="onInputConfirm" catcKeyboardheightchange="onInputKeyBoardHeightChange"></input>
 </template>
-
 <!-- fragment -->
 <template name="fragment">
     <block a:if="{{ childNodes }}">
         <template a:for="{{ childNodes }}" data="{{ ...item }}" is="{{ item.naruseType }}"></template>
     </block>
 </template>
-
 <template name="naruse-element">
     <naruse-element component="{{ component }}"></naruse-element>
 </template>
-
 <template is="{{ node.naruseType }}" data="{{ ...node }}" />

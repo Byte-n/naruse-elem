@@ -9,7 +9,7 @@ import { logger, NOOP } from './uitl';
  * @param {*} b
  * @returns {*}
  */
-const propsEquals = (a, b) => {
+export const propsEquals = (a, b) => {
     if (Object.is(a, b) && typeof a !== 'object') {
         return true;
     }
@@ -53,6 +53,7 @@ export class Middware {
 
     /** 执行更新 */
     update (callback = NOOP) {
+        const self = this;
         !this.updating && Promise.resolve().then(() => {
             this.updating = false;
             if (!this.naruseComponent.render) {
@@ -62,7 +63,7 @@ export class Middware {
             const vnode = this.naruseComponent.render();
             const node = initVnodeTree(vnode);
             this.component.setData({ node }, () => {
-                this.onUpdated();
+                this.onUpdated.call(self);
                 callback();
             });
         });
@@ -71,6 +72,7 @@ export class Middware {
 
     /** 更新后 */
     onUpdated () {
+        if (!this.naruseComponent) return;
         const funcName = this.fristRender ? 'componentDidMount' : 'componentDidUpdate';
         this.naruseComponent[funcName] && this.naruseComponent[funcName]();
         if (this.fristRender) this.naruseComponent.$mounted = true;
@@ -80,6 +82,7 @@ export class Middware {
     /** 父组件更新后是否需要更新子组件 */
     canUpdate (prevProps) {
         if (!propsEquals(prevProps, this.props)) {
+            this.prevProps = prevProps;
             this.naruseComponent.props = this.props;
             this.update();
         }
@@ -87,7 +90,7 @@ export class Middware {
 
     /** 卸载时 */
     onUnMount () {
-        this.naruseComponent.componentWillUnmount();
+        this.naruseComponent && this.naruseComponent.componentWillUnmount();
         // 解绑对象
         this.component = null;
         this.naruseComponent = null;
