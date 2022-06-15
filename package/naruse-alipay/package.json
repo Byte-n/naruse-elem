@@ -19,9 +19,5 @@
     "rollup": "^2.70.1",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-uglify": "^6.0.4"
-  },
-  "dependencies": {
-    "naruse-parser": "^0.0.6",
-    "naruse-share": "^0.0.3"
   }
 }

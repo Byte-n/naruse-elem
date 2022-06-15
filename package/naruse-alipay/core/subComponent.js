@@ -5,7 +5,7 @@ import { Middware } from './middware.js';
 
 
 /**
- * @description 初始化子组件
+ * @description 初始化子虚拟组件
  * @author CHC
  * @date 2022-03-21 16:03:28
  * @param {*} component
@@ -62,7 +62,8 @@ const createSubBehavior = () => {
             if (!isEmpty(this.props.component)) {
                 const { props, actuator } = prevProps.component;
                 // FIX: 修复了当切换装载器后不会卸载组件重新渲染
-                if (actuator === this.props.component.actuator) {
+                // FIX: 修复了当key发生变化后组件不会重新渲染 0615
+                if (actuator === this.props.component.actuator && props.key === this.props.component.props.key) {
                     this.$middware.props = this.props.component.props;
                     this.$middware.canUpdate(props);
                 } else {
