@@ -1,6 +1,6 @@
 
 import { logger } from '../../utils/log';
-import { exceptType, exceptTypeSync, MethodHandler } from 'naruse-share';
+import { exceptType, exceptTypeSync, MethodHandler } from '../../../naruse-share/index';
 
 /** 获取缓存 */
 const getItem = function getItem (key) {
@@ -110,6 +110,7 @@ export const getStorage = (options) => {
     if (typeof key !== 'string') {
         return handle.fail({ errMsg: 'getStorage:fail key must be string' });
     }
+    return handle.success(getStorageSync(key));
 };
 
 /** 同步清除缓存 */

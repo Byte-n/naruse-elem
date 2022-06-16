@@ -10,7 +10,7 @@ const Naruse = {
     env: {
         USER_DATA_PATH: '',
         clientName: 'H5',
-        clientVersion: '0.0.1',
+        clientVersion: version,
         language: 'zh-Hans',
         platform: 'H5',
     },
