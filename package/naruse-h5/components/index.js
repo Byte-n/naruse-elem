@@ -32,7 +32,7 @@ const naruseCreateElement = (type, props, ...children) => {
         const Component = componentReflectMap[type];
         if (!Component) {
             logger.warn('不支持的组件类型', type);
-            return naruseCreateElement('view', null, '不支持的组件类型');
+            return naruseCreateElement('view', null, `不支持的组件类型-${type}`);
         }
         return createElement(Component, props, ...children);
     }
