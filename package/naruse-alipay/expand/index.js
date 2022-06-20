@@ -1,5 +1,4 @@
 import { globalEvent } from "../../naruse-share/index";
-import { naruseExtend } from "../core/index";
 import { getNaruseComponentFromCode } from "../core/create";
 import { Middware } from '../core/middware'
 import { logger } from "../core/uitl";
@@ -61,9 +60,6 @@ const renderComponentOnPageWithCode = async (route, code, ctx) => {
     const component =  await getNaruseComponentFromCode(code, ctx);
     renderComponentOnPage(route, component);
 }
-
-naruseExtend({ renderComponentOnPage });
-
 
 
 export {
