@@ -1,6 +1,6 @@
 // 放置页面相关的处理
 
-import { EventBus } from '../../naruse-share/index';
+import { mitt } from '../../naruse-share/index';
 import { logger } from './uitl';
 
 const pageCenter = {};
@@ -40,7 +40,7 @@ export class Page {
         // 小程序实例
         this.miniPage = miniPage;
         // 事件中心
-        this.eventCenter = new EventBus();
+        this.eventCenter = mitt();
         // 各个原有事件
         this.oldEvents = {};
         // 替换监听事件
