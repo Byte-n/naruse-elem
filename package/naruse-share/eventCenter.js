@@ -1,4 +1,4 @@
-import { mitt } from 'mitt';
+import mitt from 'mitt';
 
 /** 全局事件中心 */
 const globalEvent = mitt();
