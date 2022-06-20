@@ -19,10 +19,7 @@ const vnodeSpecialMap = {
  * @param {*} childNodes 子节点
  * @returns {*}
  */
-export const createElement = function (type, props, childNodes) {
-    if (arguments.length > 2) {
-		childNodes = arguments.length > 3 ? Array.slice.call(arguments, 2) : childNodes;
-	}
+export const createElement = function (type, props, ...childNodes) {
     if (isNaruseComponent(type.prototype)) return createClassElement(type, props, childNodes);
     if (typeof type === 'function') return createFuncElement(type, props, childNodes);
     return createBaseElement(type, props, childNodes);
