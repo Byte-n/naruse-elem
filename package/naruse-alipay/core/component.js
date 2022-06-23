@@ -26,11 +26,13 @@ export class NaruseComponent {
             return;
         }
         if (this.state === update) return;
-        this.state = {
+        const newState = {
             ...this.state,
             ...update,
         };
-        this.$updater.update(callback);
+        const flag = this.$updater.shouldUpdate(this.props, newState);
+        this.state = newState;
+        flag && this.$updater.update(callback);
     }
     forceUpdate(callback = NOOP) {
         if (!this.$updater) {
