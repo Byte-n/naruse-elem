@@ -4,11 +4,12 @@
 
 ## history
 
+#### 0.2.0
++ #FIX: 修复了当alipay node为空时导致报错的问题
 #### 0.1.9
 + #FEAT: 修复错误的props判定导致的无法重新渲染
 #### 0.1.8
 + #FEAT: 新增shouldComponentUpdate生命周期，与react保持一致
-
 #### 0.1.7
 + #BACK: 由于children的行为改变具有破坏性，推迟到后续修复，先删除此commit
 #### v0.1.6
@@ -20,7 +21,6 @@
 + #FIX: 修复了小程序端当key发生变化后组件不会重新渲染
 + #FIX: 修复小程序端createElement与react.createElement参数不一致的问题
 + #FIX: 修复小程序中children中与React行为不一致的问题
-
 #### v0.1.4
 + FIX: 修复了因为依赖的naruse-parser与naruse-share使用的es6语法导致小程序编译失败
 + FIX: 修复了函数式函数传入单传入children会报错的问题

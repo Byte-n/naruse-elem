@@ -2658,11 +2658,12 @@ var randomId = function randomId(randomLength) {
 
 var getPathById = function getPathById(id, vnode) {
   var path = [];
+  if (!vnode) return;
   if (vnode.id === id) return path;
   if (!vnode.childNodes || !vnode.childNodes.length) return; // 层次遍历
 
   for (var i = 0; i < vnode.childNodes.length; i++) {
-    if (vnode.childNodes[i].id === id) {
+    if (vnode.childNodes[i].id && vnode.childNodes[i].id === id) {
       path.push(i);
       return path;
     }
