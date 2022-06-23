@@ -13,11 +13,15 @@ import { bindRenderEventOnComponent } from '../expand/index.js';
 const initMainComponent = function () {
     getNaruseComponentFromProps(this.props)
         .then((component) => { 
+            if (!component) {
+                logger.warn('无远程资源，不加载组件')
+                return;
+            };
             this.$middware = new Middware(this, component, {});
             this.$middware.update();
         })
         .catch((err) => {
-            console.error('初始化主组件失败', err);
+            logger.error('初始化主组件失败', err);
         })
 };
 

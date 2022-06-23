@@ -86,11 +86,21 @@ export class Middware {
 
     /** 父组件更新后是否需要更新子组件 */
     canUpdate (prevProps) {
-        if (!propsEquals(prevProps, this.props)) {
+        const c = this.naruseComponent;
+        const flag = this.shouldUpdate(this.props, (c ? c.state : {}));
+        if (flag && propsEquals(prevProps, this.props)) {
             this.prevProps = prevProps;
-            this.naruseComponent.props = this.props;
+            c.props = this.props;
             this.update();
         }
+    }
+
+    /** 是否应该刷新 */
+    shouldUpdate (nextProps, nextState) {
+        const c = this.naruseComponent;
+        if (!c || typeof c.shouldComponentUpdate !== 'function') return true;
+        const res = c.shouldComponentUpdate.call(c, nextProps, nextState);
+        return  res === undefined ? true : res;
     }
 
     /** 卸载时 */

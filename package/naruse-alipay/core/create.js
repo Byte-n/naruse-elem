@@ -13,10 +13,15 @@ import { Naruse } from './naurse';
 export const getNaruseComponentFromProps = async (props) => {
     if (!props || typeof props !== 'object') {
         logger.error('无效参数，无法生成对应naruse组件');
+        return;
     }; 
     const { hotPuller, baseCtx: _baseCtx } = getNaruseConfig();
-    const { code, ctx } = await hotPuller(props);
-    return getNaruseComponentFromCode(code, ctx);
+    try {
+        const { code, ctx } = await hotPuller(props);
+        return getNaruseComponentFromCode(code, ctx);
+    } catch (e) {
+        logger.error('加载远程代码资源失败', e);
+    }
 }
 
 
@@ -30,6 +35,7 @@ export const getNaruseComponentFromProps = async (props) => {
  * @returns {*} 
  */
 export const getNaruseComponentFromCode = async (code, ctx) => {
+    if (!code) return;
     const {  baseCtx: _baseCtx, onRunError } = getNaruseConfig();
     const baseCtx = typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx;
     // 导出变量

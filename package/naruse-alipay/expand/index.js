@@ -48,7 +48,7 @@ const bindRenderEventOnComponent = (miniComponent) => {
 }
 
 /**
- * @description 渲染组件在某个页面使用代码
+ * @description 使用代码渲染组件在某个页面
  * @author CHC
  * @date 2022-06-14 16:06:46
  * @param {*} route
