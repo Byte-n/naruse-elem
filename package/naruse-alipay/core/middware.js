@@ -87,8 +87,8 @@ export class Middware {
     /** 父组件更新后是否需要更新子组件 */
     canUpdate (prevProps) {
         const c = this.naruseComponent;
-        const flag = this.shouldUpdate(this.props, (c ? c.state : {}));
-        if (flag && propsEquals(prevProps, this.props)) {
+        const flag = this.shouldUpdate(this.props,  c.state);
+        if (flag && !propsEquals(prevProps, this.props)) {
             this.prevProps = prevProps;
             c.props = this.props;
             this.update();
