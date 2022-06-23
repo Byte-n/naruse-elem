@@ -2932,9 +2932,9 @@ var Middware = /*#__PURE__*/function () {
     key: "canUpdate",
     value: function canUpdate(prevProps) {
       var c = this.naruseComponent;
-      var flag = this.shouldUpdate(this.props, c ? c.state : {});
+      var flag = this.shouldUpdate(this.props, c.state);
 
-      if (flag && propsEquals(prevProps, this.props)) {
+      if (flag && !propsEquals(prevProps, this.props)) {
         this.prevProps = prevProps;
         c.props = this.props;
         this.update();

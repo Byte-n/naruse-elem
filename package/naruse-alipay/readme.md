@@ -4,6 +4,11 @@
 
 ## history
 
+#### 0.1.9
++ #FEAT: 修复错误的props判定导致的无法重新渲染
+#### 0.1.8
++ #FEAT: 新增shouldComponentUpdate生命周期，与react保持一致
+
 #### 0.1.7
 + #BACK: 由于children的行为改变具有破坏性，推迟到后续修复，先删除此commit
 #### v0.1.6
