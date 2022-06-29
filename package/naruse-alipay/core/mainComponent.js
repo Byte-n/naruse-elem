@@ -82,7 +82,8 @@ const createMainBehavior = (option = {}) => {
          * @date 2022-03-16 10:03:36
          */
         didUnmount() {
-            this.$middware && this.$middware.onUnMount();
+            if (!this.$middware) return;
+            this.$middware.onUnMount();
         },
     };
     return naruseBehavior;
