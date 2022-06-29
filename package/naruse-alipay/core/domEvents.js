@@ -36,7 +36,7 @@ export const getPathById = function (id, vnode) {
     if (!vnode.childNodes || !vnode.childNodes.length) return;
     // 层次遍历
     for (let i = 0; i < vnode.childNodes.length; i++) {
-        if (vnode.childNodes[i].id && vnode.childNodes[i].id === id) {
+        if (vnode.childNodes[i] && vnode.childNodes[i].id === id) {
             path.push(i);
             return path;
         }
