@@ -39,7 +39,8 @@ export class NaruseComponent {
             logger.error('小程序组件未装载完毕，无法更新！');
             return;
         }
-        this.$updater.update(callback)
+        const flag = this.$updater.shouldUpdate(this.props, this.state);
+        flag && this.$updater.update(callback)
     }
     componentDidMount() {}
     componentDidUpdate() {}
