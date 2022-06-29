@@ -3,8 +3,14 @@
 这是一个在小程序内模拟WEB的DOM树的基础库
 
 ## history
-
-#### 0.2.0
+#### 0.2.2
+#FEAT: 【alipay】修改withPage事件挂载机制，新增了更多事件挂载
+#FEAT: 【alipay】新增unsafe_run 在naruse命名空间内
+#FIX: 【alipay】修复了因为容错导致的事件无法触发
+#FIX: 【alipay】修复老组件兼容错误的问题
+#FIX: 【alipay】修复了forceUpdate不会触发shouUpdate生命周期的问题
+#FIX: 【alipay】修复主组件卸载时的错误
+#### 0.2.0 && 0.2.1
 + #FIX: 修复了当alipay node为空时导致报错的问题
 #### 0.1.9
 + #FEAT: 修复错误的props判定导致的无法重新渲染
