@@ -1,9 +1,28 @@
 // 放置页面相关的处理
 
-import { EventBus } from '../../naruse-share/index';
-import { logger } from './uitl';
+import {
+    EventBus
+} from '../../naruse-share/index';
+import {
+    logger
+} from './uitl';
 
 const pageCenter = {};
+
+const ALLOW_EVENT = [
+    'onLoad',
+    'onShow',
+    'onReady',
+    'onHide',
+    'onUnload',
+    'onShareAppMessage',
+    'onTitleClick',
+    'onOptionMenuClick',
+    'onPullDownRefresh',
+    'onTabItemTap',
+    'onPageScroll',
+    'onReachBottom'
+]
 
 /**
  * @description 获取naruse内部的页面对象
@@ -36,20 +55,15 @@ export const getPageInstance = (miniComponent) => {
  * @class Page
  */
 export class Page {
-    constructor (miniPage) {
+    constructor(miniPage) {
         // 小程序实例
         this.miniPage = miniPage;
         // 事件中心
         this.eventCenter = new EventBus();
         // 各个原有事件
         this.oldEvents = {};
-        // 替换监听事件
-        this.interceptEvent('onShow');
-        this.interceptEvent('onHide');
-        this.interceptEvent('onUnload');
-        this.interceptEvent('onPullDownRefresh');
-        this.interceptEvent('onPageScroll');
         // this.eventCenter.on('onUnload', () => setTimeout(() => this.clear()));
+        this.hasBind = {};
     }
 
     /**
@@ -59,7 +73,7 @@ export class Page {
      * @param {*} key
      * @param {*} value
      */
-    interceptEvent (key) {
+    interceptEvent(key) {
         const selfPage = this;
         // 保存原有事件并进入事件中心
         selfPage.oldEvents[key] = selfPage.miniPage[key];
@@ -67,10 +81,10 @@ export class Page {
         // 原有事件同样挂载到事件中心
         selfPage.eventCenter.on(key, (...args) => typeof oldEvent === 'function' && oldEvent.apply(this.miniPage, args));
         Object.defineProperty(this.miniPage, key, {
-            get () {
-                return () => selfPage.eventCenter.emit(key);
+            get() {
+                return (...arg) => selfPage.eventCenter.emit(key, ...arg);
             },
-            set () {
+            set() {
                 logger.error('正在修改页面事件，请勿修改，请使用Naruse.Page.on()');
             },
             enumerable: true,
@@ -78,19 +92,28 @@ export class Page {
         });
     }
 
-    on (eventName, func) {
+    on(eventName, func) {
+        if (!ALLOW_EVENT.includes(eventName)) {
+            logger.error(`无效绑定事件名-${eventName}`);
+            return;
+        }
+        // 使用时再绑定
+        if (!this.hasBind[eventName]) {
+            this.interceptEvent(eventName);
+            this.hasBind[eventName] = true;
+        }
         this.eventCenter.on(eventName, func);
     }
 
-    off (eventName, func) {
+    off(eventName, func) {
         this.eventCenter.off(eventName, func);
     }
 
-    get route () {
+    get route() {
         return this.miniPage.route;
     }
 
-    clear () {
+    clear() {
         this.eventCenter.clear();
         // 替换回对应的事件
         Object.keys(this.oldEvents).forEach((key) => {
