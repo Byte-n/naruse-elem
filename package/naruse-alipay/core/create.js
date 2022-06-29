@@ -4,7 +4,6 @@ import { run } from '../../naruse-parser/index';
 import { createElement } from './createElement';
 import { Naruse } from './naurse';
 
-
 /**
  * @description 根据props获取naruse组件
  * @author CHC
@@ -58,6 +57,7 @@ export const getNaruseComponentFromCode = async (code, ctx) => {
     if (exports.default) {
         component = exports.default;
     } else {
+        const NaruseComponent = Naruse.Component;
         // 兼容老版组件
         const compatibleClass = function compatibleClass (...args) {
             const self = this;
