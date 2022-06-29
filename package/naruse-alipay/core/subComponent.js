@@ -78,6 +78,7 @@ const createSubBehavior = () => {
          * @date 2022-03-16 10:03:36
          */
         didUnmount() {
+            if (!this.$middware) return;
             this.$middware.onUnMount();
         },
     };
