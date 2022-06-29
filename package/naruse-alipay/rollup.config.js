@@ -22,6 +22,6 @@ module.exports = {
             __IS_H5__: false,
         }),
         babel({ exclude: 'node_modules/**' }),
-        // uglify({ compress: false }),
+        uglify({ compress: false }),
     ],
 };
