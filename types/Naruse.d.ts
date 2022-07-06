@@ -3,7 +3,7 @@ interface ComponentLifecycle<P, S, SS = any> {
   /**
    * Called immediately after a component is mounted. Setting state here will trigger re-rendering.
    */
-  componentDidMount?(): void;
+  componentDidMount(): void;
   /**
    * @description 暂未实现
    * Called to determine whether the change in props and state should trigger a re-render.
@@ -15,7 +15,7 @@ interface ComponentLifecycle<P, S, SS = any> {
    * If false is returned, `Component#render`, `componentWillUpdate`
    * and `componentDidUpdate` will not be called.
    */
-  shouldComponentUpdate?(
+  shouldComponentUpdate(
     nextProps: Readonly<P>,
     nextState: Readonly<S>,
     nextContext: any
@@ -24,13 +24,13 @@ interface ComponentLifecycle<P, S, SS = any> {
    * Called immediately before a component is destroyed. Perform any necessary cleanup in this method, such as
    * cancelled network requests, or cleaning up any DOM elements created in `componentDidMount`.
    */
-  componentWillUnmount?(): void;
+  componentWillUnmount(): void;
   /**
    * Called immediately after updating occurs. Not called for the initial render.
    *
    * The snapshot is only present if getSnapshotBeforeUpdate is present and returns non-null.
    */
-  componentDidUpdate?(prevProps: Readonly<P>, prevState: Readonly<S>, snapshot?: SS): void;
+  componentDidUpdate(prevProps: Readonly<P>, prevState: Readonly<S>, snapshot?: SS): void;
   /**
    * @deprecated 暂未实现
    */

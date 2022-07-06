@@ -16,10 +16,13 @@
         "pagePath": "pages/index/index",
         "name": "首页"
       },
+            {
+        "pagePath": "pages/qwer/qwer",
+        "name": "测试"
+      },
       {
         "pagePath": "pages/my/my",
         "name": "我的"
-        
       }
     ]
   }

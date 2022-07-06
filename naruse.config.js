@@ -16,5 +16,5 @@ module.exports = {
         service: '点击链接即可享受续费优惠价：[ios_url]',
     },
     // 生成的代码是否删除console
-    dropConsole: true,
+    dropConsole: false,
 };

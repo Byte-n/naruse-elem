@@ -1,0 +1,28 @@
+{
+  "name": "naruse-weex",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "rollup -c ./rollup.config.js -w --environment PROJECT_NAME:weex",
+    "build": "rollup -c ./rollup.config.js --environment PROJECT_NAME:weex"
+  },
+  "author": "CHC",
+  "license": "ISC",
+  "dependencies": {
+    "rax": "^1.1.0",
+    "rax-document": "^0.1.0",
+    "rax-image": "^2.0.0",
+    "rax-link": "^1.0.1",
+    "rax-text": "^2.0.0",
+    "rax-view": "^2.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-alias": "^3.1.9",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-typescript": "^8.3.3",
+    "rollup": "^2.75.7",
+    "typescript": "^4.7.4"
+  }
+}

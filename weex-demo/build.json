@@ -1,0 +1,14 @@
+{
+  "targets": [
+    "web",
+    "weex"
+  ],
+  "webpack5": true,
+  "web": {
+    "mpa": true
+  },
+  "weex": {
+    "mpa": true
+  },
+  "plugins": []
+}
