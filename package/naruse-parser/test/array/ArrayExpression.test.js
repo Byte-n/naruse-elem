@@ -2,13 +2,13 @@ import { run } from '../../dist/index.js';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 
-describe('数组测试', () => {
+describe('元表达式测试', () => {
     const arr = run(`
 	var arr = [1, 2, 3];
 	arr.push(4);
 	exports.arr = arr;
   `);
-    it('数组测试1', () => {
+    it('void', () => {
         expect(arr.arr.length).to.equal(4);
         expect(arr.arr).to.deep.equal([1, 2, 3, 4]);
     });

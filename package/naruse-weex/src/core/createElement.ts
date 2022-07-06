@@ -1,2 +1,2 @@
-import { createElement } from 'rax';
-export default createElement;
+import { createElement, Component } from 'rax';
+export default createElement; 

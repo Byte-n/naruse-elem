@@ -1,3 +1,4 @@
 <view>
   <button onTap="gotoIndex">navigateTo主页</button>
+  <naruse unique="true" />
 </view>

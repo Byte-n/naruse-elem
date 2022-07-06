@@ -45,6 +45,13 @@ const types = {
     _null: 'null',
     _true: 'true',
     _false: 'false',
+    _void: 'void',
+    _typeof: 'typeof',
+    _delete: 'delete',
+    _try: 'try',
+    _catch: 'catch',
+    _throw: 'throw',
+    _finally: '_finally',
 };
 const emptyChar = ['\n', '\t', ' ', '\r'];
 const isEmptyChar = (char) => emptyChar.includes(char);

@@ -43,7 +43,7 @@ export const processApis = function processApis (Naruse, global, config = {}) {
             }
 
             let task = null;
-            const obj = { ...options };
+            const obj = Object.assign({}, options);
 
 
             // Promisify

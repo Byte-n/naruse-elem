@@ -1,5 +1,6 @@
-import { Component } from './core/component';
 import createElement from './core/createElement';
+import View from './components/view/index';
 export {
-    createElement
+    createElement,
+    View
 }

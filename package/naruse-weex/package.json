@@ -20,9 +20,13 @@
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^3.1.9",
+    "@rollup/plugin-inject": "^4.0.4",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-typescript": "^8.3.3",
+    "@types/rax": "^1.0.8",
+    "rax-components": "^0.6.5",
     "rollup": "^2.75.7",
+    "rollup-plugin-external-globals": "^0.6.1",
     "typescript": "^4.7.4"
   }
 }

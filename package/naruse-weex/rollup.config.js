@@ -17,4 +17,5 @@ module.exports = {
     alias({ customResolver }),
     typescript(),
   ],
+  external: ['rax-components', 'rax'],
 };
