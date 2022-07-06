@@ -1,6 +1,16 @@
 module.exports = {
     root: true,
     parser: '@babel/eslint-parser',
+    parserOptions: {
+        babelOptions: {
+            rootMode: 'upward',
+            plugins: [
+                [
+                    '@babel/plugin-transform-react-jsx',
+                ],
+            ],
+        },
+    },
     extends: [
         'eslint-config-ay',
         'eslint-config-ay/import',
