@@ -1,46 +1,22 @@
 module.exports = {
-    root: true,
-    parser: '@babel/eslint-parser',
-    parserOptions: {
-        babelOptions: {
-            rootMode: 'upward',
-            plugins: [
-                [
-                    '@babel/plugin-transform-react-jsx',
-                ],
-            ],
-        },
+    "env": {
+        "browser": true,
+        "es2021": true
     },
-    extends: [
-        'eslint-config-ay',
-        'eslint-config-ay/import',
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended"
     ],
-    rules: { 'linebreak-style': 'off' },
-    overrides: [{
-        files: ['*.js', '*.jsx', '*.ts', '*.tsx'],
-        rules: {
-            'no-console': 'off',
-            'prefer-destructuring': ['error', {
-                array: false,
-                object: true,
-            }],
-            'constructor-super': 'off',
-            'no-this-before-super': 'off',
-            'id-length': 'off',
-            'require-jsdoc-except/require-jsdoc': 0,
-            'no-cond-assign': 0,
-            'eol-last': 'off',
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
         },
-        globals: {
-            $adImport: 'readonly',
-            $mappUtils: 'readonly',
-            my: 'readonly',
-            $moment: 'readonly',
-            $adSensorsBeacon: 'readonly',
-            $userInfoChanger: 'readonly',
-            $openChat: 'readonly',
-            $ayApi: 'readonly',
-            Promise: 'readonly',
-        },
-    }],
+        "ecmaVersion": 12,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+    }
 };
