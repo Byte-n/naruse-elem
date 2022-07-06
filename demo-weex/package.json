@@ -21,11 +21,12 @@
   },
   "devDependencies": {
     "@iceworks/spec": "^1.0.0",
-    "rax-app": "^3.8.7",
+    "@types/rax": "^1.0.8",
     "eslint": "^8.0.0",
     "prettier": "^2.1.2",
-    "stylelint": "^13.7.2",
-    "@types/rax": "^1.0.8"
+    "rax-app": "^3.8.7",
+    "rax-components": "^0.6.5",
+    "stylelint": "^13.7.2"
   },
   "private": true,
   "originTemplate": "@rax-materials/scaffolds-app-js"

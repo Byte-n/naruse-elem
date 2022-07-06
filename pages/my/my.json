@@ -1,1 +1,5 @@
-{}
+{
+    "usingComponents": {
+      "naruse": "../../package/naruse-alipay/build/index"
+    }
+  }

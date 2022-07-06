@@ -1,1 +1,2 @@
-<naruse code="{{ code }}" />
+<naruse code="{{ code }}" unique="true" />
+<button onTap="qwer">册书</button>

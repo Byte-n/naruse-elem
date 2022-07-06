@@ -56,7 +56,7 @@ const evaluate_map = {
     ForStatement: (node, scope) => {
         for (
             const new_scope = new Scope('loop', scope),
-                init_val = node.init ? evaluate(node.init, new_scope) : null;
+            init_val = node.init ? evaluate(node.init, new_scope) : null;
             node.test ? evaluate(node.test, new_scope) : true;
             node.update ? evaluate(node.update, new_scope) : void (0)
         ) {
@@ -118,7 +118,7 @@ const evaluate_map = {
     },
 
     FunctionExpression: (node, scope) => {
-        return function (...args) {
+        function func(...args) {
             const new_scope = new Scope('function', scope);
             new_scope.invasived = true;
             for (let i = 0; i < node.params.length; i++) {
@@ -132,6 +132,9 @@ const evaluate_map = {
                 return result.result;
             }
         };
+        // 手动矫正func length
+        Object.defineProperty(func, "length", { value: node.params.length });
+        return func;
     },
     UnaryExpression: (node, scope) => {
         return ({
@@ -139,6 +142,28 @@ const evaluate_map = {
             '+': () => +evaluate(node.argument, scope),
             '!': () => !evaluate(node.argument, scope),
             '~': () => ~evaluate(node.argument, scope),
+            'void': () => void evaluate(node.argument, scope),
+            'typeof': () => {
+                if (node.argument.type === 'Identifier') {
+                    const $var = scope.$find(node.argument.name)
+                    return $var ? typeof $var.$get() : 'undefined'
+                } else {
+                    return typeof evaluate(node.argument, scope)
+                }
+            },
+            'delete': () => {
+                if (node.argument.type === 'MemberExpression') {
+                    const { object, property, computed } = node.argument
+                    if (computed) {
+                        return delete evaluate(object, scope)[evaluate(property, scope)]
+                    } else {
+                        return delete evaluate(object, scope)[(property).name]
+                    }
+                } else if (node.argument.type === 'Identifier') {
+                    const $this = scope.$find('this')
+                    if ($this) return $this.$get()[node.argument.name]
+                }
+            }
         })[node.operator]();
     },
     UpdateExpression: (node, scope) => {
@@ -155,11 +180,11 @@ const evaluate_map = {
                 ? evaluate(argument.property, scope)
                 : (argument.property).name;
             $var = {
-                $set (value) {
+                $set(value) {
                     object[property] = value;
                     return true;
                 },
-                $get () {
+                $get() {
                     return object[property];
                 },
             };
@@ -207,11 +232,11 @@ const evaluate_map = {
                 ? evaluate(left.property, scope)
                 : (left.property).name;
             $var = {
-                $set (value) {
+                $set(value) {
                     object[property] = value;
                     return true;
                 },
-                $get () {
+                $get() {
                     return object[property];
                 },
             };
@@ -285,27 +310,53 @@ const evaluate_map = {
         }
         return last;
     },
+    ThrowStatement: (node, scope) => {
+        throw evaluate(node.argument, scope)
+    },
+
+    TryStatement: (node, scope) => {
+        try {
+            return evaluate(node.block, scope)
+        } catch (err) {
+            if (node.handler) {
+                const param = node.handler.param
+                const new_scope = new Scope('block', scope)
+                new_scope.invasived = true // 标记为侵入式Scope，不用再多构造啦
+                new_scope.$const(param.name, err)
+                return evaluate(node.handler, new_scope)
+            } else {
+                throw err
+            }
+        } finally {
+            if (node.finalizer)
+                return evaluate(node.finalizer, scope)
+        }
+    },
+
+    CatchClause: (node, scope) => {
+        return evaluate(node.body, scope)
+    },
 };
 
 class ScopeVar {
-    constructor (kind, value) {
+    constructor(kind, value) {
         this.value = value;
         this.kind = kind;
     }
-    $set (value) {
+    $set(value) {
         if (this.value === 'const') {
             return false;
         }
         this.value = value;
         return true;
     }
-    $get () {
+    $get() {
         return this.value;
     }
 }
 
 class Scope {
-    constructor (type, parent) {
+    constructor(type, parent) {
         this.type = type;
         this.parent = parent || null;
         this.content = {};
@@ -313,7 +364,7 @@ class Scope {
         this.prefix = '';
     }
 
-    $find (raw_name) {
+    $find(raw_name) {
         const name = this.prefix + raw_name;
         if (this.content.hasOwnProperty(name)) {
             return this.content[name];
@@ -323,7 +374,7 @@ class Scope {
         return null;
     }
 
-    $let (raw_name, value) {
+    $let(raw_name, value) {
         const name = this.prefix + raw_name;
         const $var = this.content[name];
         if (!$var) {
@@ -332,7 +383,7 @@ class Scope {
         } return false;
     }
 
-    $const (raw_name, value) {
+    $const(raw_name, value) {
         const name = this.prefix + raw_name;
         const $var = this.content[name];
         if (!$var) {
@@ -341,7 +392,7 @@ class Scope {
         } return false;
     }
 
-    $var (raw_name, value) {
+    $var(raw_name, value) {
         const name = this.prefix + raw_name;
         let scope = this;
 
@@ -355,7 +406,7 @@ class Scope {
             return true;
         } return false;
     }
-    $declar (kind, raw_name, value) {
+    $declar(kind, raw_name, value) {
         return ({
             var: () => this.$var(raw_name, value),
             let: () => this.$let(raw_name, value),

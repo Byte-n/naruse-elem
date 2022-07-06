@@ -1,5 +1,5 @@
 {
   "usingComponents": {
-    "naruse": "../../package/naruse-alipay/component/index"
+    "naruse": "../../package/naruse-alipay/build/index"
   }
 }

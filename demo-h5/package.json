@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "naruse-h5": "0.0.7",
     "react": "^15.6.1",
     "react-dom": "^15.6.1"
   },
