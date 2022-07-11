@@ -1,9 +1,7 @@
 # naruse-h5
 naruse的h5端运行平台
 
-## 设计
-1. 组件编译时
-2. 编译时转运行时
-3. 组件库
-4. 组件库映射
-5. 尺寸转换
+## 发布记录
+
+#### 0.0.8
++ #FEAT: view 组件支持 `onMouseEnter` `onMouseMove` `onMouseLeave` 事件
