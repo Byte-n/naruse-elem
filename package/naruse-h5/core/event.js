@@ -1,7 +1,7 @@
 
 const reflectEventMap = {
     /** 点击事件处理 */
-    click (e) {
+    click(e) {
         return {
             type: 'click',
             detail: {
@@ -11,13 +11,13 @@ const reflectEventMap = {
                 pageY: e.pageY,
             },
             /** 阻止冒泡 */
-            stopPropagation () {
+            stopPropagation() {
                 e.stopPropagation();
             },
         };
     },
     /** 加载完毕 */
-    load (e) {
+    load(e) {
         return {
             type: 'load',
             detail: {
@@ -27,21 +27,21 @@ const reflectEventMap = {
         };
     },
     /** 聚焦 */
-    focus (e) {
+    focus(e) {
         return {
             type: 'foucs',
             detail: { value: e.target.value },
         };
     },
     /** 失焦 */
-    blur (e) {
+    blur(e) {
         return {
             type: 'blur',
             detail: { value: e.target.value },
         };
     },
     /** 按键 */
-    keydown (e) {
+    keydown(e) {
         e.stopPropagation();
         const { value } = e.target;
         const keyCode = e.keyCode || e.code;
@@ -55,7 +55,7 @@ const reflectEventMap = {
         };
     },
     /** 输入 */
-    input (e) {
+    input(e) {
         return {
             type: 'input',
             detail: e.detail,
@@ -88,3 +88,23 @@ export const commonEventHander = function (e) {
     res.timeStamp = new Date().getTime();
     event && handler(res);
 };
+
+
+/**
+ * @description
+ * @author CHC
+ * @date 2022-07-08 15:07:54
+ * @param {React.MouseEvent<T, MouseEvent>} event
+ * @returns {*} 
+ */
+export const commonMouseEventCreater = (event) => {
+    const { altKey, ctrlKey, shiftKey, clientX, clientY, pageX, pageY, screenX, screenY, stopPropagation, type } = event;
+    return {
+        type,
+        detail: {
+            altKey, ctrlKey, shiftKey, clientX, clientY, pageX, pageY, screenX, screenY,
+        },
+        stopPropagation,
+        timeStamp: new Date().getTime(),
+    }
+}

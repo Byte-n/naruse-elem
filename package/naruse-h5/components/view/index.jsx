@@ -1,4 +1,4 @@
-import { commonEventHander } from '../../core/event';
+import { commonEventHander, commonMouseEventCreater } from '../../core/event';
 import { Component } from 'react';
 
 class View extends Component {
@@ -32,6 +32,24 @@ class View extends Component {
     }
 
 
+    onMouseEnter (event) {
+        const { onMouseEnter } = this.props;
+        onMouseEnter && onMouseEnter(commonMouseEventCreater(event));
+        this.onTouchStart();
+    }
+
+    onMouseMove (event) {
+        const { onMouseMove } = this.props;
+        onMouseMove && onMouseMove(commonMouseEventCreater(event));
+    }
+
+    onMouseLeave (event) {
+        const { onMouseLeave } = this.props;
+        onMouseLeave && onMouseLeave(commonMouseEventCreater(event));
+        this.onTouchEnd();
+    }
+
+
     render() {
         const {
             className,
@@ -49,8 +67,9 @@ class View extends Component {
 
         return (
             <div
-                onMouseEnter={this.onTouchStart.bind(this)}
-                onMouseLeave={this.onTouchEnd.bind(this)}
+                onMouseEnter={this.onMouseEnter.bind(this)}
+                onMouseLeave={this.onMouseLeave.bind(this)}
+                onMouseMove={this.onMouseMove.bind(this)}
                 onTouchStart={this.onTouchStart.bind(this)}
                 onTouchEnd={this.onTouchEnd.bind(this)}
                 className={className}

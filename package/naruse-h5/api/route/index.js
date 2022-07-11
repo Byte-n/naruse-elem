@@ -1,4 +1,4 @@
-import { MethodHandler, exceptType } from 'naruse-share';
+import { MethodHandler, exceptType } from '../../../naruse-share/index';
 
 /**
  * @description 跳转到其他页面
