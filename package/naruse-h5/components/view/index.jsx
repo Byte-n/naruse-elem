@@ -2,13 +2,22 @@ import { commonEventHander, commonMouseEventCreater } from '../../core/event';
 import { Component } from 'react';
 
 class View extends Component {
-    state = {
-        hover: false
+    constructor() {
+        super();
+        this.state = {
+            hover: false
+        }
+    }
+    componentDidMount() {
+        this.mounted = true;
+    }
+    componentWillUnmount() {
+        this.mounted = false;
     }
     /** 当开始点击时 */
     onTouchStart() {
         const { disabled, hoverStartTime = 20 } = this.props;
-        if (disabled) return;
+        if (disabled || !this.mounted) return;
 
         this.touch = true;
         setTimeout(() => {
@@ -19,9 +28,7 @@ class View extends Component {
     /** 点击结束时 */
     onTouchEnd() {
         const { disabled, hoverStayTime = 70 } = this.props;
-        if (disabled) {
-            return;
-        }
+        if (disabled || !this.mounted) return;
 
         this.touch = false;
         setTimeout(() => {
@@ -32,18 +39,18 @@ class View extends Component {
     }
 
 
-    onMouseEnter (event) {
+    onMouseEnter(event) {
         const { onMouseEnter } = this.props;
         onMouseEnter && onMouseEnter(commonMouseEventCreater(event));
         this.onTouchStart();
     }
 
-    onMouseMove (event) {
+    onMouseMove(event) {
         const { onMouseMove } = this.props;
         onMouseMove && onMouseMove(commonMouseEventCreater(event));
     }
 
-    onMouseLeave (event) {
+    onMouseLeave(event) {
         const { onMouseLeave } = this.props;
         onMouseLeave && onMouseLeave(commonMouseEventCreater(event));
         this.onTouchEnd();
