@@ -3,6 +3,8 @@
 这是一个在小程序内模拟WEB的DOM树的基础库
 
 ## history
+#### 0.2.3
+#FEAT: 【alipay】新增getDefer api 方便Naruse内部与外部交换数据
 #### 0.2.2
 #FEAT: 【alipay】修改withPage事件挂载机制，新增了更多事件挂载
 #FEAT: 【alipay】新增unsafe_run 在naruse命名空间内
