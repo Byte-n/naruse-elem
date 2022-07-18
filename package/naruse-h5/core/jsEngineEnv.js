@@ -1,4 +1,5 @@
 import { naruseCreateElement } from '../components/index';
+import { getDeferred, globalEvent, EventBus } from '../../naruse-share/index';
 import { Component } from 'react';
 import api from '../api/index';
 
@@ -15,6 +16,9 @@ const Naruse = {
         language: 'zh-Hans',
         platform: 'H5',
     },
+    getDeferred,
+    globalEvent,
+    EventBus,
     version,
 };
 

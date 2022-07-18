@@ -183,7 +183,7 @@ class Token {
     }
 
     ++this.pos;
-    console.warn(this.pos, `Unexpected character '${code}'`);
+    console.warn(this.pos, `Unexpected character '${code}' ${String.fromCharCode(code)}`);
   }
 
   readWord() {
@@ -1540,6 +1540,52 @@ const exceptTypeSync = (obj, type, name) => {
   return false;
 };
 
+/** 简易事件中心 */
+class EventBus {
+  constructor() {
+    this.listeners = {};
+  }
+
+  on(eventName, callback) {
+    if (this.listeners[eventName] === undefined) {
+      this.listeners[eventName] = [];
+    }
+
+    this.listeners[eventName].push(callback);
+  }
+
+  off(eventName, callback) {
+    if (this.listeners[eventName] === undefined) {
+      return;
+    }
+
+    const index = this.listeners[eventName].indexOf(callback);
+
+    if (index !== -1) {
+      this.listeners[eventName].splice(index, 1);
+    }
+  }
+
+  emit(eventName, ...args) {
+    if (this.listeners[eventName] === undefined) {
+      return;
+    }
+
+    this.listeners[eventName].forEach(callback => {
+      callback(...args);
+    });
+  }
+
+  clear() {
+    this.listeners = {};
+  }
+
+}
+/** 全局事件中心 */
+
+
+const globalEvent = new EventBus();
+
 class MethodHandler {
   constructor({
     name,
@@ -1581,6 +1627,48 @@ class MethodHandler {
   }
 
 }
+
+const deferMap = {};
+
+const getDeferPromise = () => {
+  let resolve, reject;
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  promise.resolve = resolve;
+  promise.reject = reject;
+  return promise;
+};
+
+const proxyObject = obj => {
+  if (typeof Proxy !== 'function') {
+    return obj;
+  }
+
+  return new Proxy(obj, {
+    get(target, key) {
+      if (!target[key]) {
+        return obj[key] = getDeferPromise();
+      }
+
+      return obj[key];
+    }
+
+  });
+};
+
+const getDeferred = key => {
+  if (!key) {
+    return proxyObject(deferMap);
+  }
+
+  if (deferMap[key]) {
+    return deferMap[key];
+  } else {
+    return deferMap[key] = getDeferPromise();
+  }
+};
 
 const logger = createLogger('naruse-h5');
 
@@ -2201,17 +2289,29 @@ class Text extends Component {
 }
 
 class View extends Component {
-  state = {
-    hover: false
-  };
+  constructor() {
+    super();
+    this.state = {
+      hover: false
+    };
+  }
+
+  componentDidMount() {
+    this.mounted = true;
+  }
+
+  componentWillUnmount() {
+    this.mounted = false;
+  }
   /** 当开始点击时 */
+
 
   onTouchStart() {
     const {
       disabled,
       hoverStartTime = 20
     } = this.props;
-    if (disabled) return;
+    if (disabled || !this.mounted) return;
     this.touch = true;
     setTimeout(() => {
       this.setState({
@@ -2227,11 +2327,7 @@ class View extends Component {
       disabled,
       hoverStayTime = 70
     } = this.props;
-
-    if (disabled) {
-      return;
-    }
-
+    if (disabled || !this.mounted) return;
     this.touch = false;
     setTimeout(() => {
       if (!this.touch) {
@@ -2891,6 +2987,9 @@ const Naruse = { ...api,
     language: 'zh-Hans',
     platform: 'H5'
   },
+  getDeferred,
+  globalEvent,
+  EventBus,
   version
 };
 
