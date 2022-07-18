@@ -13,8 +13,8 @@ export const getNaruseComponentFromProps = async (props) => {
     if (!props || typeof props !== 'object') {
         logger.error('无效参数，无法生成对应naruse组件');
         return;
-    }; 
-    const { hotPuller, baseCtx: _baseCtx } = getNaruseConfig();
+    }
+    const { hotPuller } = getNaruseConfig();
     try {
         const { code, ctx } = await hotPuller(props);
         return getNaruseComponentFromCode(code, ctx);

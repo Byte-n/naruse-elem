@@ -1,5 +1,5 @@
 import { NaruseComponent } from './component';
-import { globalEvent, EventBus, version } from '../../naruse-share/index';
+import { globalEvent, EventBus, version, getDeferred } from '../../naruse-share/index';
 import { initNaruseAlipayApi } from '../api/index';
 import { withPage } from '../api/HOC/index';
 import run from '../../naruse-parser/index';
@@ -10,6 +10,7 @@ const apis = initNaruseAlipayApi();
 // naruse模块内容
 export const Naruse = {
     Component: NaruseComponent,
+    getDeferred, 
     globalEvent,
     EventBus,
     env: {
