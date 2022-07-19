@@ -10,6 +10,16 @@ describe('eventCenter', () => {
         inst = EventBus(events);
     });
 
+    describe('op', () => {
+        it('can be new', () => {
+            const newEvent = new EventBus();
+            expect(newEvent).to.have.property('on').that.is.a('function');
+            expect(newEvent).to.have.property('off').that.is.a('function');
+            expect(newEvent).to.have.property('emit').that.is.a('function');
+            expect(newEvent).to.have.property('clear').that.is.a('function');
+        });
+    });
+
     describe('on()', () => {
         it('should be a function', () => {
             expect(inst)
