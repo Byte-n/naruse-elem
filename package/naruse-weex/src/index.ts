@@ -1,6 +1,5 @@
-import createElement from './core/createElement';
-import View from './components/view/index';
+import Naruse from './core/naruse';
+
 export {
-    createElement,
-    View
+    Naruse
 }
