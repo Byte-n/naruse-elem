@@ -1,6 +1,8 @@
 .homeContainer {
   align-items: center;
   margin-top: 200rpx;
+  font-size: 100rpx;
+  font-weight: bold;
 }
 
 .homeTitle {
