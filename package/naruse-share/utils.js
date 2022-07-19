@@ -39,3 +39,18 @@ export const isEmpty = (key) => {
  * @param {*} obj
  */
 export const isFunc = (obj) => typeof obj === 'function';
+
+/**
+ * @description 不会报错的JSON.parse
+ * @author CHC
+ * @date 2022-07-14 17:07:45
+ * @param {*} str
+ * @returns {*} 
+ */
+export const safeJsonParse = (str) => {
+    try {
+        return JSON.parse(str);
+    } catch (e) {
+        return null;
+    }
+}
