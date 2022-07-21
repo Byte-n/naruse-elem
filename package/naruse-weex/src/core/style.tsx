@@ -3,28 +3,28 @@ import Text from '../components/text/index';
 import { getCurrentRenderingComponent, isNaruseComponent, isRaxComponent } from './component';
 
 /** 可继承属性 */
-const inheritableStyle = [
-    'color',
-    'fontSize',
-    'fontWeight',
-    'fontStyle',
-    'fontFamily',
-    'lineHeight',
-    'textAlign',
-    'textDecoration',
-    'textOverflow',
-    'textShadow',
-    'textTransform',
-    'letterSpacing',
-    'wordSpacing',
-    'textIndent',
-    'whiteSpace',
-    'wordWrap',
-    'wordBreak',
-    'direction',
-    'visibility',
-    'backgroundImage',
-]
+const inheritableStyleMap: Record<string, boolean> = {
+    color: true,
+    fontSize: true,
+    fontWeight: true,
+    fontStyle: true,
+    fontFamily: true,
+    lineHeight: true,
+    textAlign: true,
+    textDecoration: true,
+    textOverflow: true,
+    textShadow: true,
+    textTransform: true,
+    letterSpacing: true,
+    wordSpacing: true,
+    textIndent: true,
+    whiteSpace: true,
+    wordWrap: true,
+    wordBreak: true,
+    direction: true,
+    visibility: true,
+    backgroundImage: true,
+}
 
 
 /** 获取继承后的属性 */
@@ -32,7 +32,7 @@ const inheritStyle = (style: Record<string, any>) => {
     if (!style) return style;
     const newStyle: Record<string, any> = {};
     for (const key in style) {
-        if (inheritableStyle.includes(key)) {
+        if (inheritableStyleMap[key]) {
             newStyle[key] = style[key];
         }
     }
@@ -69,7 +69,7 @@ const infectionStyleChildren = (children: Rax.RaxNode, parentStyle: Record<strin
 
     // naruse组件判断是否含有fix组件
     if (isNaruseComponent(children)) {
-        return children?.props?.style = { ...filteredStyle, ...children.props.style };
+        return children.props.style = { ...filteredStyle, ...children.props.style };
     }
 
     if (isBaseTypeComponent(children)) {
