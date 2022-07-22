@@ -110,7 +110,7 @@ export const getStorage = (options) => {
     if (typeof key !== 'string') {
         return handle.fail({ errMsg: 'getStorage:fail key must be string' });
     }
-    return handle.success(getStorageSync(key));
+    return handle.success({ data: getStorageSync(key) });
 };
 
 /** 同步清除缓存 */
