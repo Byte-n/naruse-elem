@@ -29,6 +29,11 @@ class _Image extends Component<any, any> {
     private width: number = 400;
     private height: number = 400;
     state = { height: 400, width: 400, resize: 'stretch' };
+
+    constructor (props: any) {
+        super(props);
+    }
+
     onLoad = (event: { success: any; size: any; }) => {
         const { success, size } = event;
         const { onLoad } = this.props;

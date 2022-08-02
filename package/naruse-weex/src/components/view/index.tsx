@@ -6,7 +6,9 @@ import { infectionStyleChildren } from '../../core/style';
 import { allFixedComponents, BaseComponent, bindRender, nowRenderingComponentStack } from 'src/core/component';
 
 class _View extends BaseComponent {
-
+    constructor (props: any) {
+        super(props);
+    }
     onClick = (event: any) => {
         const { onClick } = this.props;
         const item = event.position || {};
@@ -48,7 +50,7 @@ class _View extends BaseComponent {
 
     componentWillUnmount () {
         // 清除
-        this._fixedComponents.length = 0;
+        this._fixedComponents && (this._fixedComponents.length = 0);
         allFixedComponents[this._naruseId] && delete allFixedComponents[this._naruseId];
     }
 

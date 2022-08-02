@@ -10,6 +10,10 @@ class _Text extends Component<any, any> {
     private touched = true;
     private eventRaw: TouchEvent | undefined;
 
+    constructor (props: any) {
+        super(props);
+    }
+
     onTouchStart = (event: TouchEvent) => {
         this.touched = true;
         this.eventRaw = event;
