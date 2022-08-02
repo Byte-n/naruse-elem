@@ -38,6 +38,10 @@ class BaseComponent extends Component<any, any> {
 
     /** 绑定前函数 */
     public _bindRender?: () => Rax.RaxNode;
+
+    constructor (props: any) {
+        super(props);
+    }
 }
 
 let fixedComponentUpdater: () => void = () => {};
@@ -49,7 +53,7 @@ let hasNextTick = false;
  * @date 2022-07-14 12:07:43
  */
 const updateFixedComponents = () => {
-    if (fixedComponentUpdater && !hasNextTick) {
+    if (!hasNextTick) {
         hasNextTick = true;
         nexTick(() => {
             hasNextTick = false;
@@ -115,11 +119,11 @@ class NaruseComponent extends BaseComponent {
         super(props);
         this.__render = this.render.bind(this);
         this.render = this.__naruseRender.bind(this);
-        this.__componentWillUnmount = this.componentWillMount;
+        this.__componentWillUnmount = this.componentWillMount?.bind(this);
     }
 
     componentWillUnmount () {
-        this._fixedComponents.length = 0;
+        this._fixedComponents && (this._fixedComponents.length = 0);
         typeof this.__componentWillUnmount === 'function' && this.__componentWillUnmount.call(this);
     }
 

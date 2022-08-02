@@ -19,7 +19,7 @@ const componentReflectMap: Record<string, any> = {
  * @author CHC
  * @date 2022-03-17 17:03:42
  */
-const naruseCreateElement = (type: string | { (arg0: any): any; prototype: any; }, props: any, ...children: string[]): any => {
+const naruseCreateElement = (type: string | { (arg0: any): any; prototype: any; }, props?: any, ...children: string[]): any => {
     if (typeof type === 'string') {
         const Component = componentReflectMap[type];
         if (!Component) {
@@ -43,4 +43,8 @@ const naruseCreateElement = (type: string | { (arg0: any): any; prototype: any; 
 };
 
 
-export { naruseCreateElement };
+const emptyElement = (): any => {
+    return createElement(View);
+}
+
+export { naruseCreateElement, emptyElement };
