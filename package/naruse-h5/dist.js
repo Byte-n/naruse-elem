@@ -1,5 +1,987 @@
 import React, { Component, createElement } from 'react';
 
+const createLogger = name => {
+  const Logger = {
+    debug() {
+      console.debug(`[${name}][debugger]`, ...arguments);
+    },
+
+    warn() {
+      console.warn(`[${name}][warn]`, ...arguments);
+    },
+
+    info() {
+      console.info(`[${name}][info]`, ...arguments);
+    },
+
+    error() {
+      console.error(`[${name}][error]`, ...arguments);
+    }
+
+  };
+  return Logger;
+};
+
+const logger$1 = createLogger('naurse-error');
+/**
+ * @description 期望为某个类型，异步版
+ * @author CHC
+ * @date 2022-03-30 15:03:05
+ * @param {*} { obj, type, name }
+ * @returns {*}
+ */
+
+const exceptType = (obj, type, name) => {
+  if (typeof obj !== type) {
+    const res = {
+      errMsg: `${name}:fail must has a ${type}`
+    };
+    logger$1.error(res.errMsg);
+    return Promise.reject(res);
+  }
+};
+/**
+ * @description 期望为某个类型同步版
+ * @author CHC
+ * @date 2022-03-30 15:03:22
+ * @param {*} obj
+ * @param {*} type
+ * @param {*} name
+ * @returns {*}
+ */
+
+const exceptTypeSync = (obj, type, name) => {
+  if (typeof obj !== type) {
+    logger$1.error(`${name}:fail must has a ${type}`);
+    return true;
+  }
+
+  return false;
+};
+
+const mitt = function (n) {
+  return {
+    all: n = n || new Map(),
+    on: function (e, t) {
+      var i = n.get(e);
+      i ? i.push(t) : n.set(e, [t]);
+    },
+    off: function (e, t) {
+      var i = n.get(e);
+      i && (t ? i.splice(i.indexOf(t) >>> 0, 1) : n.set(e, []));
+    },
+    emit: function (e, ...t) {
+      var i = n.get(e);
+      i && i.slice().map(function (n) {
+        n(t);
+      }), (i = n.get("*")) && i.slice().map(function (n) {
+        typeof n === 'function' && n(e, ...t);
+      });
+    },
+    clear: function () {
+      n.clear();
+    }
+  };
+};
+/** 全局事件中心 */
+
+
+const globalEvent = mitt();
+/**
+ * 这里不要改成箭头函数
+ * 需要利用 new 来执行(兼容)
+ * 如果构造函数内部通过 return 语句返回了一个引用类型值，则 new 操作最终返回这个引用类型值
+ * 否则返回刚创建的新对象。
+ * 箭头函数没有 constructor
+ * @returns mitt
+ */
+
+function EventBus(map) {
+  return mitt(map);
+}
+
+class MethodHandler {
+  constructor({
+    name,
+    success,
+    fail,
+    complete
+  }) {
+    this.methodName = name;
+    this.__success = success;
+    this.__fail = fail;
+    this.__complete = complete;
+  }
+  /** 成功 */
+
+
+  success(res = {}, resolve = Promise.resolve.bind(Promise)) {
+    if (!res.errMsg) {
+      res.errMsg = `${this.methodName}:ok`;
+    }
+
+    typeof this.__success === 'function' && this.__success(res);
+    typeof this.__complete === 'function' && this.__complete(res);
+    return resolve(res);
+  }
+  /** 失败 */
+
+
+  fail(res = {}, reject = Promise.reject.bind(Promise)) {
+    if (!res.errMsg) {
+      res.errMsg = `${this.methodName}:fail`;
+    } else {
+      res.errMsg = `${this.methodName}:fail ${res.errMsg}`;
+    }
+
+    console.error(res.errMsg);
+    typeof this.__fail === 'function' && this.__fail(res);
+    typeof this.__complete === 'function' && this.__complete(res);
+    return reject(res);
+  }
+
+}
+
+const deferMap = {};
+
+const getDeferPromise = () => {
+  let resolve, reject;
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  promise.resolve = resolve;
+  promise.reject = reject;
+  return promise;
+};
+
+const proxyObject = obj => {
+  if (typeof Proxy !== 'function') {
+    return obj;
+  }
+
+  return new Proxy(obj, {
+    get(target, key) {
+      if (!target[key]) {
+        return obj[key] = getDeferPromise();
+      }
+
+      return obj[key];
+    }
+
+  });
+};
+
+const getDeferred = key => {
+  if (!key) {
+    return proxyObject(deferMap);
+  }
+
+  if (deferMap[key]) {
+    return deferMap[key];
+  } else {
+    return deferMap[key] = getDeferPromise();
+  }
+};
+
+const logger = createLogger('naruse-h5');
+
+const reflectEventMap = {
+  /** 点击事件处理 */
+  click(e) {
+    return {
+      type: 'click',
+      detail: {
+        clientX: e.clientX,
+        clientY: e.clientY,
+        pageX: e.pageX,
+        pageY: e.pageY
+      },
+
+      /** 阻止冒泡 */
+      stopPropagation() {
+        e.stopPropagation();
+      }
+
+    };
+  },
+
+  /** 加载完毕 */
+  load(e) {
+    return {
+      type: 'load',
+      detail: {
+        width: e.target.width,
+        height: e.target.height
+      }
+    };
+  },
+
+  /** 聚焦 */
+  focus(e) {
+    return {
+      type: 'foucs',
+      detail: {
+        value: e.target.value
+      }
+    };
+  },
+
+  /** 失焦 */
+  blur(e) {
+    return {
+      type: 'blur',
+      detail: {
+        value: e.target.value
+      }
+    };
+  },
+
+  /** 按键 */
+  keydown(e) {
+    e.stopPropagation();
+    const {
+      value
+    } = e.target;
+    const keyCode = e.keyCode || e.code;
+    return {
+      type: 'keydown',
+      detail: {
+        value,
+        cursor: value.length,
+        keyCode
+      }
+    };
+  },
+
+  /** 输入 */
+  input(e) {
+    return {
+      type: 'input',
+      detail: e.detail
+    };
+  }
+
+};
+/** 事件名称对应处理名称 */
+
+const reflectEventNameMap = {
+  click: 'onClick',
+  load: 'onLoad',
+  focus: 'onFocus',
+  blur: 'onBlur',
+  keydown: 'onKeyDown',
+  input: 'onInput'
+};
+/**
+ * @description 通用事件处理
+ * @author CHC
+ * @date 2022-03-18 16:03:45
+ * @param {React.SyntheticEvent} e
+ */
+
+const commonEventHander = function (e) {
+  const handler = this.props[reflectEventNameMap[e.type]];
+  if (!handler || typeof handler !== 'function') return;
+  const event = reflectEventMap[e.type];
+  const res = reflectEventMap[e.type](e);
+  res.timeStamp = new Date().getTime();
+  event && handler(res);
+};
+/**
+ * @description
+ * @author CHC
+ * @date 2022-07-08 15:07:54
+ * @param {React.MouseEvent<T, MouseEvent>} event
+ * @returns {*} 
+ */
+
+const commonMouseEventCreater = event => {
+  const {
+    altKey,
+    ctrlKey,
+    shiftKey,
+    clientX,
+    clientY,
+    pageX,
+    pageY,
+    screenX,
+    screenY,
+    stopPropagation,
+    type
+  } = event;
+  return {
+    type,
+    detail: {
+      altKey,
+      ctrlKey,
+      shiftKey,
+      clientX,
+      clientY,
+      pageX,
+      pageY,
+      screenX,
+      screenY
+    },
+    stopPropagation,
+    timeStamp: new Date().getTime()
+  };
+};
+
+var cssStyle$2 = {"a-button":{"display":"block","outline":"0","WebkitAppearance":"none","boxSizing":"border-box","padding":"0","textAlign":"center","fontSize":"18px","height":"47px","lineHeight":"47px","borderRadius":"2px","overflow":"hidden","textOverflow":"ellipsis","wordBreak":"break-word","whiteSpace":"nowrap","color":"#000","backgroundColor":"#fff","border":"1px solid #eee"},"active":{"backgroundColor":"#ddd","color":"rgba(0,0,0,.3)"},"disabled":{"color":"rgba(0,0,0,.6)","backgroundColor":"rgba(255,255,255,.6)"}};
+
+class Button extends Component {
+  constructor() {
+    super();
+    this.state = {
+      hover: false,
+      active: false
+    };
+    this.touch = false;
+  }
+  /** 当开始点击时 */
+
+
+  onTouchStart() {
+    const {
+      disabled,
+      hoverStartTime = 20
+    } = this.props;
+    if (disabled) return;
+    this.touch = true;
+    setTimeout(() => {
+      this.setState({
+        hover: true
+      });
+    }, hoverStartTime);
+  }
+  /** 点击结束时 */
+
+
+  onTouchEnd() {
+    const {
+      disabled,
+      hoverStayTime = 70
+    } = this.props;
+
+    if (disabled) {
+      return;
+    }
+
+    this.touch = false;
+    setTimeout(() => {
+      if (!this.touch) {
+        this.setState({
+          hover: false
+        });
+      }
+    }, hoverStayTime);
+  }
+  /** 当开始点击时 */
+
+
+  onActiveStart() {
+    const {
+      disabled,
+      hoverStartTime = 20
+    } = this.props;
+    if (disabled) return;
+    this.touch = true;
+    setTimeout(() => {
+      this.setState({
+        active: true
+      });
+    }, hoverStartTime);
+  }
+  /** 点击结束时 */
+
+
+  onActiveEnd() {
+    const {
+      disabled,
+      hoverStayTime = 70
+    } = this.props;
+
+    if (disabled) {
+      return;
+    }
+
+    this.touch = false;
+    setTimeout(() => {
+      if (!this.touch) {
+        this.setState({
+          active: false
+        });
+      }
+    }, hoverStayTime);
+  }
+
+  render() {
+    const {
+      type,
+      disabled,
+      style,
+      className,
+      hoverStyle,
+      activeStyle,
+      ...other
+    } = this.props;
+    const {
+      hover,
+      active
+    } = this.state;
+    const conStyle = { ...cssStyle$2['a-button'],
+      ...(type ? cssStyle$2[type] : {}),
+      ...style,
+      ...(hover ? hoverStyle : {}),
+      ...(active ? { ...cssStyle$2.active,
+        ...activeStyle
+      } : {})
+    };
+    return React.createElement("button", {
+      onMouseEnter: this.onTouchStart.bind(this),
+      onMouseLeave: this.onTouchEnd.bind(this),
+      style: conStyle,
+      disabled: disabled,
+      className: className,
+      onClick: commonEventHander.bind(this),
+      onTouchStart: this.onTouchStart.bind(this),
+      onTouchEnd: this.onTouchEnd.bind(this) // {...other}
+
+    }, this.props.children);
+  }
+
+}
+
+function _extends() {
+  _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
+class Checkbox extends Component {
+  /** 改变事件 */
+  handleChange(e) {
+    e.stopPropagation();
+    this.props.onChange && this.props.onChange({
+      value: this.value
+    });
+  }
+
+  render() {
+    const {
+      checked,
+      name,
+      color,
+      value,
+      disabled,
+      ...nativeProps
+    } = this.props;
+    return React.createElement("input", _extends({
+      ref: dom => {
+        if (!dom) return;
+        this.inputEl = dom;
+        if (this.id) dom.setAttribute('id', this.id);
+      },
+      type: 'checkbox',
+      value: value,
+      name: name,
+      style: {
+        color
+      },
+      checked: checked,
+      disabled: disabled,
+      onChange: this.handleChange.bind(this)
+    }, nativeProps));
+  }
+
+}
+
+var cssStyle$1 = {"img-empty":{"opacity":"0"},"naruseImg":{"display":"inline-block","overflow":"hidden","position":"relative","fontSize":"0"},"naruseImg__widthfix":{"height":"100%"},"scaletofill":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfit":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfill":{"objectFit":"cover","width":"100%","height":"100%"},"widthfix":{"width":"100%"},"top":{"width":"100%"},"bottom":{"width":"100%","position":"absolute","bottom":"0"},"left":{"height":"100%"},"right":{"position":"absolute","height":"100%","right":"0"},"topright":{"position":"absolute","right":"0"},"bottomleft":{"position":"absolute","bottom":"0"},"bottomright":{"position":"absolute","right":"0","bottom":"0"}};
+
+class Image extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoaded: false
+    };
+    this.imageOnLoad = this.imageOnLoad.bind(this);
+    this.observer = {};
+    this.imgRef = null;
+  }
+
+  componentDidMount() {
+    if (this.props.lazyLoad) {
+      this.observer = new IntersectionObserver(entries => {
+        // 异步 api 关系
+        if (entries[entries.length - 1].isIntersecting) {
+          this.setState({
+            isLoaded: true
+          }, () => {
+            this.imgRef.src = this.props.src;
+          });
+        }
+      }, {
+        rootMargin: '300px 0px'
+      });
+      this.observer.observe(this.imgRef);
+    }
+  }
+
+  componentWillUnmount() {
+    this.observer.disconnect && this.observer.disconnect();
+  }
+  /** 当图片加载完毕 */
+
+
+  imageOnLoad = commonEventHander.bind(this);
+
+  render() {
+    const {
+      className,
+      src,
+      style = {},
+      mode,
+      onError,
+      imgProps
+    } = this.props;
+    const divStyle = { ...cssStyle$1.naruseImg,
+      ...(mode === 'widthFix' ? cssStyle$1.naruseImg__widthfix : {})
+    };
+    const imgStyle = cssStyle$1[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
+    return React.createElement("div", {
+      onClick: commonEventHander.bind(this),
+      className: className,
+      style: { ...divStyle,
+        ...style
+      }
+    }, React.createElement("img", _extends({
+      ref: img => this.imgRef = img,
+      style: imgStyle,
+      src: src,
+      onLoad: this.imageOnLoad,
+      onError: onError
+    }, imgProps)));
+  }
+
+}
+
+/** 是否是支持的type */
+
+const getTrueType = function getTrueType(type, confirmType, password) {
+  if (confirmType === 'search') type = 'search';
+  if (password) type = 'password';
+
+  if (typeof type === 'undefined') {
+    return 'text';
+  }
+
+  if (!type) {
+    throw new Error('unexpected type');
+  }
+
+  if (type === 'digit') type = 'number';
+  return type;
+};
+/** 修复可控值 */
+
+
+const fixControlledValue = function fixControlledValue(value) {
+  return value ?? '';
+};
+
+class Input extends Component {
+  constructor() {
+    super();
+    this.inputRef = null;
+    this.isOnComposition = false;
+    this.onInputExcuted = false;
+    this.el = {};
+    this.state = {
+      _value: ''
+    };
+  }
+
+  componentDidMount() {
+    if (this.props.type === 'file') {
+      this.fileListener = e => {
+        this.props.onInput && this.props.onInput(e);
+      };
+
+      this.inputRef?.addEventListener('change', this.fileListener);
+    }
+
+    Object.defineProperty(this.el, 'value', {
+      get: () => this.inputRef?.value,
+      set: value => {
+        this.setState({
+          _value: value
+        });
+      },
+      configurable: true
+    });
+    setTimeout(() => this.props.focus && this.inputRef?.focus());
+  }
+  /** 输入 */
+
+
+  handleInput(e) {
+    e.stopPropagation();
+    const {
+      type,
+      maxlength,
+      confirmType,
+      password
+    } = this.props;
+    let {
+      value
+    } = e.target;
+    const inputType = getTrueType(type, confirmType, password);
+
+    if (inputType === 'number' && value && maxlength <= value.length) {
+      value = value.substring(0, maxlength);
+      e.target.value = value;
+    }
+
+    this._value = value;
+    this.setState({
+      _value: value
+    });
+    commonEventHander.call(this, {
+      type: 'input',
+      detail: {
+        value,
+        cursor: value.length
+      }
+    });
+  }
+  /** 聚焦 */
+
+
+  handleFocus = commonEventHander.bind(this);
+  /** 脱焦 */
+
+  handleBlur = commonEventHander.bind(this);
+  /** 改变 */
+
+  handleChange = commonEventHander.bind(this);
+  /** 按下 */
+
+  handleKeyDown = e => {
+    const {
+      value
+    } = e.target;
+    const keyCode = e.keyCode || e.code;
+    commonEventHander.call(this, e);
+    keyCode === 13 && this.props.onConfirm && this.props.onConfirm({
+      value
+    });
+  };
+
+  render() {
+    const {
+      type,
+      password,
+      placeholder,
+      disabled,
+      maxlength,
+      confirmType,
+      name,
+      className,
+      value,
+      controlled,
+      ...nativeProps
+    } = this.props;
+    const {
+      _value
+    } = this.state;
+    return React.createElement("input", {
+      ref: input => {
+        this.inputRef = input;
+      },
+      className: className // 受控则只使用外部值，非受控优先使用外部值
+      ,
+      value: fixControlledValue(controlled ? value : value ?? _value),
+      type: getTrueType(type, confirmType, password),
+      placeholder: placeholder,
+      disabled: disabled,
+      maxLength: maxlength,
+      name: name,
+      onInput: this.handleInput.bind(this),
+      onFocus: this.handleFocus.bind(this),
+      onBlur: this.handleBlur.bind(this),
+      onChange: this.handleChange.bind(this),
+      onKeyDown: this.handleKeyDown.bind(this)
+    });
+  }
+
+}
+
+var cssStyle = {"text":{"MozUserSelect":"none","WebkitUserSelect":"none","MsUserSelect":"none","userSelect":"none"},"textSelectable":{"MozUserSelect":"text","WebkitUserSelect":"text","MsUserSelect":"text","userSelect":"text"}};
+
+class Text extends Component {
+  state = {
+    hover: false
+  };
+  /** 当开始点击时 */
+
+  onTouchStart() {
+    const {
+      disabled,
+      hoverStartTime = 20
+    } = this.props;
+    if (disabled) return;
+    this.touch = true;
+    setTimeout(() => {
+      this.setState({
+        hover: true
+      });
+    }, hoverStartTime);
+  }
+  /** 点击结束时 */
+
+
+  onTouchEnd() {
+    const {
+      disabled,
+      hoverStayTime = 70
+    } = this.props;
+
+    if (disabled) {
+      return;
+    }
+
+    this.touch = false;
+    setTimeout(() => {
+      if (!this.touch) {
+        this.setState({
+          hover: false
+        });
+      }
+    }, hoverStayTime);
+  }
+
+  render() {
+    const {
+      className,
+      selectable = false,
+      style,
+      hoverStyle,
+      ...restProps
+    } = this.props;
+    const {
+      hover
+    } = this.state;
+    const cls = { ...cssStyle.text,
+      ...(selectable ? cssStyle.textSelectable : {}),
+      ...style,
+      ...(hover ? hoverStyle : {})
+    };
+    return React.createElement("span", {
+      onMouseEnter: this.onTouchStart.bind(this),
+      onMouseLeave: this.onTouchEnd.bind(this),
+      onTouchStart: this.onTouchStart.bind(this),
+      onTouchEnd: this.onTouchEnd.bind(this),
+      style: cls,
+      className: className,
+      onClick: commonEventHander.bind(this)
+    }, this.props.children);
+  }
+
+}
+
+class View extends Component {
+  constructor() {
+    super();
+    this.state = {
+      hover: false
+    };
+  }
+
+  componentDidMount() {
+    this.mounted = true;
+  }
+
+  componentWillUnmount() {
+    this.mounted = false;
+  }
+  /** 当开始点击时 */
+
+
+  onTouchStart() {
+    const {
+      disabled,
+      hoverStartTime = 20
+    } = this.props;
+    if (disabled || !this.mounted) return;
+    this.touch = true;
+    setTimeout(() => {
+      this.setState({
+        hover: true
+      });
+    }, hoverStartTime);
+  }
+  /** 点击结束时 */
+
+
+  onTouchEnd() {
+    const {
+      disabled,
+      hoverStayTime = 70
+    } = this.props;
+    if (disabled || !this.mounted) return;
+    this.touch = false;
+    setTimeout(() => {
+      if (!this.touch) {
+        this.setState({
+          hover: false
+        });
+      }
+    }, hoverStayTime);
+  }
+
+  onMouseEnter(event) {
+    const {
+      onMouseEnter
+    } = this.props;
+    onMouseEnter && onMouseEnter(commonMouseEventCreater(event));
+    this.onTouchStart();
+  }
+
+  onMouseMove(event) {
+    const {
+      onMouseMove
+    } = this.props;
+    onMouseMove && onMouseMove(commonMouseEventCreater(event));
+  }
+
+  onMouseLeave(event) {
+    const {
+      onMouseLeave
+    } = this.props;
+    onMouseLeave && onMouseLeave(commonMouseEventCreater(event));
+    this.onTouchEnd();
+  }
+
+  render() {
+    const {
+      className,
+      style,
+      hoverStyle,
+      ...other
+    } = this.props;
+    const {
+      hover
+    } = this.state;
+    const conStyle = { ...style,
+      ...(hover ? hoverStyle : {})
+    };
+    return React.createElement("div", {
+      onMouseEnter: this.onMouseEnter.bind(this),
+      onMouseLeave: this.onMouseLeave.bind(this),
+      onMouseMove: this.onMouseMove.bind(this),
+      onTouchStart: this.onTouchStart.bind(this),
+      onTouchEnd: this.onTouchEnd.bind(this),
+      className: className,
+      style: conStyle,
+      onClick: commonEventHander.bind(this)
+    }, this.props.children);
+  }
+
+}
+
+/** 组件映射表 */
+
+const componentReflectMap = {
+  button: Button,
+  checkbox: Checkbox,
+  image: Image,
+  input: Input,
+  text: Text,
+  view: View
+};
+/**
+ * @description 拦截下来的react.createElement
+ * @author CHC
+ * @date 2022-03-17 17:03:42
+ * @param {*} type
+ * @param {*} props
+ * @param {*} children
+ */
+
+const naruseCreateElement = (type, props, ...children) => {
+  transformRpx(props);
+
+  if (typeof type === 'string') {
+    const Component = componentReflectMap[type];
+
+    if (!Component) {
+      logger.warn('不支持的组件类型', type);
+      return naruseCreateElement('view', null, `不支持的组件类型-${type}`);
+    }
+
+    return createElement(Component, props, ...children);
+  }
+
+  if (type.prototype instanceof Component) {
+    return createElement(type, props, ...children);
+  }
+
+  if (typeof type === 'function') {
+    props && (props.children = children);
+    return type(props);
+  }
+
+  logger.warn('不支持的组件类型', type);
+};
+
+const rpxReg = /(\d+)\s?rpx/g;
+
+const parsePx = val => {
+  if (typeof val !== 'string') return val;
+  const matchRes = val.match(rpxReg);
+  if (!matchRes) return val;
+  matchRes.forEach(item => {
+    const num = parseFloat(item); // 按照手机和电脑的比例进行换算
+
+    val = val.replace(item, `${(num / 2 * 1.4).toFixed(1)}px`);
+  });
+  return val;
+};
+/**
+ * @description 将所有的rpx转换为px
+ * @author CHC
+ * @date 2022-03-25 15:03:47
+ * @param {*} [props={}]
+ * @returns {*}
+ */
+
+
+const transformRpx = (props = {}) => {
+  if (!props) return;
+  const {
+    style
+  } = props;
+
+  if (style && typeof style === 'object') {
+    for (const key in style) {
+      style[key] = parsePx(style[key]);
+    }
+  }
+};
+
 const types = {
   num: 'num',
   string: 'string',
@@ -1481,993 +2463,6 @@ const run = (code, append_api = {}) => {
   return $exports;
 };
 
-const createLogger = name => {
-  const Logger = {
-    debug() {
-      console.debug(`[${name}][debugger]`, ...arguments);
-    },
-
-    warn() {
-      console.warn(`[${name}][warn]`, ...arguments);
-    },
-
-    info() {
-      console.info(`[${name}][info]`, ...arguments);
-    },
-
-    error() {
-      console.error(`[${name}][error]`, ...arguments);
-    }
-
-  };
-  return Logger;
-};
-
-const logger$1 = createLogger('naurse-error');
-/**
- * @description 期望为某个类型，异步版
- * @author CHC
- * @date 2022-03-30 15:03:05
- * @param {*} { obj, type, name }
- * @returns {*}
- */
-
-const exceptType = (obj, type, name) => {
-  if (typeof obj !== type) {
-    const res = {
-      errMsg: `${name}:fail must has a ${type}`
-    };
-    logger$1.error(res.errMsg);
-    return Promise.reject(res);
-  }
-};
-/**
- * @description 期望为某个类型同步版
- * @author CHC
- * @date 2022-03-30 15:03:22
- * @param {*} obj
- * @param {*} type
- * @param {*} name
- * @returns {*}
- */
-
-const exceptTypeSync = (obj, type, name) => {
-  if (typeof obj !== type) {
-    logger$1.error(`${name}:fail must has a ${type}`);
-    return true;
-  }
-
-  return false;
-};
-
-/** 简易事件中心 */
-class EventBus {
-  constructor() {
-    this.listeners = {};
-  }
-
-  on(eventName, callback) {
-    if (this.listeners[eventName] === undefined) {
-      this.listeners[eventName] = [];
-    }
-
-    this.listeners[eventName].push(callback);
-  }
-
-  off(eventName, callback) {
-    if (this.listeners[eventName] === undefined) {
-      return;
-    }
-
-    const index = this.listeners[eventName].indexOf(callback);
-
-    if (index !== -1) {
-      this.listeners[eventName].splice(index, 1);
-    }
-  }
-
-  emit(eventName, ...args) {
-    if (this.listeners[eventName] === undefined) {
-      return;
-    }
-
-    this.listeners[eventName].forEach(callback => {
-      callback(...args);
-    });
-  }
-
-  clear() {
-    this.listeners = {};
-  }
-
-}
-/** 全局事件中心 */
-
-
-const globalEvent = new EventBus();
-
-class MethodHandler {
-  constructor({
-    name,
-    success,
-    fail,
-    complete
-  }) {
-    this.methodName = name;
-    this.__success = success;
-    this.__fail = fail;
-    this.__complete = complete;
-  }
-  /** 成功 */
-
-
-  success(res = {}, resolve = Promise.resolve.bind(Promise)) {
-    if (!res.errMsg) {
-      res.errMsg = `${this.methodName}:ok`;
-    }
-
-    typeof this.__success === 'function' && this.__success(res);
-    typeof this.__complete === 'function' && this.__complete(res);
-    return resolve(res);
-  }
-  /** 失败 */
-
-
-  fail(res = {}, reject = Promise.reject.bind(Promise)) {
-    if (!res.errMsg) {
-      res.errMsg = `${this.methodName}:fail`;
-    } else {
-      res.errMsg = `${this.methodName}:fail ${res.errMsg}`;
-    }
-
-    console.error(res.errMsg);
-    typeof this.__fail === 'function' && this.__fail(res);
-    typeof this.__complete === 'function' && this.__complete(res);
-    return reject(res);
-  }
-
-}
-
-const deferMap = {};
-
-const getDeferPromise = () => {
-  let resolve, reject;
-  const promise = new Promise((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  promise.resolve = resolve;
-  promise.reject = reject;
-  return promise;
-};
-
-const proxyObject = obj => {
-  if (typeof Proxy !== 'function') {
-    return obj;
-  }
-
-  return new Proxy(obj, {
-    get(target, key) {
-      if (!target[key]) {
-        return obj[key] = getDeferPromise();
-      }
-
-      return obj[key];
-    }
-
-  });
-};
-
-const getDeferred = key => {
-  if (!key) {
-    return proxyObject(deferMap);
-  }
-
-  if (deferMap[key]) {
-    return deferMap[key];
-  } else {
-    return deferMap[key] = getDeferPromise();
-  }
-};
-
-const logger = createLogger('naruse-h5');
-
-const reflectEventMap = {
-  /** 点击事件处理 */
-  click(e) {
-    return {
-      type: 'click',
-      detail: {
-        clientX: e.clientX,
-        clientY: e.clientY,
-        pageX: e.pageX,
-        pageY: e.pageY
-      },
-
-      /** 阻止冒泡 */
-      stopPropagation() {
-        e.stopPropagation();
-      }
-
-    };
-  },
-
-  /** 加载完毕 */
-  load(e) {
-    return {
-      type: 'load',
-      detail: {
-        width: e.target.width,
-        height: e.target.height
-      }
-    };
-  },
-
-  /** 聚焦 */
-  focus(e) {
-    return {
-      type: 'foucs',
-      detail: {
-        value: e.target.value
-      }
-    };
-  },
-
-  /** 失焦 */
-  blur(e) {
-    return {
-      type: 'blur',
-      detail: {
-        value: e.target.value
-      }
-    };
-  },
-
-  /** 按键 */
-  keydown(e) {
-    e.stopPropagation();
-    const {
-      value
-    } = e.target;
-    const keyCode = e.keyCode || e.code;
-    return {
-      type: 'keydown',
-      detail: {
-        value,
-        cursor: value.length,
-        keyCode
-      }
-    };
-  },
-
-  /** 输入 */
-  input(e) {
-    return {
-      type: 'input',
-      detail: e.detail
-    };
-  }
-
-};
-/** 事件名称对应处理名称 */
-
-const reflectEventNameMap = {
-  click: 'onClick',
-  load: 'onLoad',
-  focus: 'onFocus',
-  blur: 'onBlur',
-  keydown: 'onKeyDown',
-  input: 'onInput'
-};
-/**
- * @description 通用事件处理
- * @author CHC
- * @date 2022-03-18 16:03:45
- * @param {React.SyntheticEvent} e
- */
-
-const commonEventHander = function (e) {
-  const handler = this.props[reflectEventNameMap[e.type]];
-  if (!handler || typeof handler !== 'function') return;
-  const event = reflectEventMap[e.type];
-  const res = reflectEventMap[e.type](e);
-  res.timeStamp = new Date().getTime();
-  event && handler(res);
-};
-/**
- * @description
- * @author CHC
- * @date 2022-07-08 15:07:54
- * @param {React.MouseEvent<T, MouseEvent>} event
- * @returns {*} 
- */
-
-const commonMouseEventCreater = event => {
-  const {
-    altKey,
-    ctrlKey,
-    shiftKey,
-    clientX,
-    clientY,
-    pageX,
-    pageY,
-    screenX,
-    screenY,
-    stopPropagation,
-    type
-  } = event;
-  return {
-    type,
-    detail: {
-      altKey,
-      ctrlKey,
-      shiftKey,
-      clientX,
-      clientY,
-      pageX,
-      pageY,
-      screenX,
-      screenY
-    },
-    stopPropagation,
-    timeStamp: new Date().getTime()
-  };
-};
-
-var cssStyle$2 = {"a-button":{"display":"block","outline":"0","WebkitAppearance":"none","boxSizing":"border-box","padding":"0","textAlign":"center","fontSize":"18px","height":"47px","lineHeight":"47px","borderRadius":"2px","overflow":"hidden","textOverflow":"ellipsis","wordBreak":"break-word","whiteSpace":"nowrap","color":"#000","backgroundColor":"#fff","border":"1px solid #eee"},"active":{"backgroundColor":"#ddd","color":"rgba(0,0,0,.3)"},"disabled":{"color":"rgba(0,0,0,.6)","backgroundColor":"rgba(255,255,255,.6)"}};
-
-class Button extends Component {
-  constructor() {
-    super();
-    this.state = {
-      hover: false,
-      active: false
-    };
-    this.touch = false;
-  }
-  /** 当开始点击时 */
-
-
-  onTouchStart() {
-    const {
-      disabled,
-      hoverStartTime = 20
-    } = this.props;
-    if (disabled) return;
-    this.touch = true;
-    setTimeout(() => {
-      this.setState({
-        hover: true
-      });
-    }, hoverStartTime);
-  }
-  /** 点击结束时 */
-
-
-  onTouchEnd() {
-    const {
-      disabled,
-      hoverStayTime = 70
-    } = this.props;
-
-    if (disabled) {
-      return;
-    }
-
-    this.touch = false;
-    setTimeout(() => {
-      if (!this.touch) {
-        this.setState({
-          hover: false
-        });
-      }
-    }, hoverStayTime);
-  }
-  /** 当开始点击时 */
-
-
-  onActiveStart() {
-    const {
-      disabled,
-      hoverStartTime = 20
-    } = this.props;
-    if (disabled) return;
-    this.touch = true;
-    setTimeout(() => {
-      this.setState({
-        active: true
-      });
-    }, hoverStartTime);
-  }
-  /** 点击结束时 */
-
-
-  onActiveEnd() {
-    const {
-      disabled,
-      hoverStayTime = 70
-    } = this.props;
-
-    if (disabled) {
-      return;
-    }
-
-    this.touch = false;
-    setTimeout(() => {
-      if (!this.touch) {
-        this.setState({
-          active: false
-        });
-      }
-    }, hoverStayTime);
-  }
-
-  render() {
-    const {
-      type,
-      disabled,
-      style,
-      className,
-      hoverStyle,
-      activeStyle,
-      ...other
-    } = this.props;
-    const {
-      hover,
-      active
-    } = this.state;
-    const conStyle = { ...cssStyle$2['a-button'],
-      ...(type ? cssStyle$2[type] : {}),
-      ...style,
-      ...(hover ? hoverStyle : {}),
-      ...(active ? { ...cssStyle$2.active,
-        ...activeStyle
-      } : {})
-    };
-    return React.createElement("button", {
-      onMouseEnter: this.onTouchStart.bind(this),
-      onMouseLeave: this.onTouchEnd.bind(this),
-      style: conStyle,
-      disabled: disabled,
-      className: className,
-      onClick: commonEventHander.bind(this),
-      onTouchStart: this.onTouchStart.bind(this),
-      onTouchEnd: this.onTouchEnd.bind(this) // {...other}
-
-    }, this.props.children);
-  }
-
-}
-
-function _extends() {
-  _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-
-class Checkbox extends Component {
-  /** 改变事件 */
-  handleChange(e) {
-    e.stopPropagation();
-    this.props.onChange && this.props.onChange({
-      value: this.value
-    });
-  }
-
-  render() {
-    const {
-      checked,
-      name,
-      color,
-      value,
-      disabled,
-      ...nativeProps
-    } = this.props;
-    return React.createElement("input", _extends({
-      ref: dom => {
-        if (!dom) return;
-        this.inputEl = dom;
-        if (this.id) dom.setAttribute('id', this.id);
-      },
-      type: 'checkbox',
-      value: value,
-      name: name,
-      style: {
-        color
-      },
-      checked: checked,
-      disabled: disabled,
-      onChange: this.handleChange.bind(this)
-    }, nativeProps));
-  }
-
-}
-
-var cssStyle$1 = {"img-empty":{"opacity":"0"},"naruseImg":{"display":"inline-block","overflow":"hidden","position":"relative","fontSize":"0"},"naruseImg__widthfix":{"height":"100%"},"scaletofill":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfit":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfill":{"objectFit":"cover","width":"100%","height":"100%"},"widthfix":{"width":"100%"},"top":{"width":"100%"},"bottom":{"width":"100%","position":"absolute","bottom":"0"},"left":{"height":"100%"},"right":{"position":"absolute","height":"100%","right":"0"},"topright":{"position":"absolute","right":"0"},"bottomleft":{"position":"absolute","bottom":"0"},"bottomright":{"position":"absolute","right":"0","bottom":"0"}};
-
-class Image extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoaded: false
-    };
-    this.imageOnLoad = this.imageOnLoad.bind(this);
-    this.observer = {};
-    this.imgRef = null;
-  }
-
-  componentDidMount() {
-    if (this.props.lazyLoad) {
-      this.observer = new IntersectionObserver(entries => {
-        // 异步 api 关系
-        if (entries[entries.length - 1].isIntersecting) {
-          this.setState({
-            isLoaded: true
-          }, () => {
-            this.imgRef.src = this.props.src;
-          });
-        }
-      }, {
-        rootMargin: '300px 0px'
-      });
-      this.observer.observe(this.imgRef);
-    }
-  }
-
-  componentWillUnmount() {
-    this.observer.disconnect && this.observer.disconnect();
-  }
-  /** 当图片加载完毕 */
-
-
-  imageOnLoad = commonEventHander.bind(this);
-
-  render() {
-    const {
-      className,
-      src,
-      style = {},
-      mode,
-      onError,
-      imgProps
-    } = this.props;
-    const divStyle = { ...cssStyle$1.naruseImg,
-      ...(mode === 'widthFix' ? cssStyle$1.naruseImg__widthfix : {})
-    };
-    const imgStyle = cssStyle$1[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
-    return React.createElement("div", {
-      onClick: commonEventHander.bind(this),
-      className: className,
-      style: { ...divStyle,
-        ...style
-      }
-    }, React.createElement("img", _extends({
-      ref: img => this.imgRef = img,
-      style: imgStyle,
-      src: src,
-      onLoad: this.imageOnLoad,
-      onError: onError
-    }, imgProps)));
-  }
-
-}
-
-/** 是否是支持的type */
-
-const getTrueType = function getTrueType(type, confirmType, password) {
-  if (confirmType === 'search') type = 'search';
-  if (password) type = 'password';
-
-  if (typeof type === 'undefined') {
-    return 'text';
-  }
-
-  if (!type) {
-    throw new Error('unexpected type');
-  }
-
-  if (type === 'digit') type = 'number';
-  return type;
-};
-/** 修复可控值 */
-
-
-const fixControlledValue = function fixControlledValue(value) {
-  return value ?? '';
-};
-
-class Input extends Component {
-  constructor() {
-    super();
-    this.inputRef = null;
-    this.isOnComposition = false;
-    this.onInputExcuted = false;
-    this.el = {};
-    this.state = {
-      _value: ''
-    };
-  }
-
-  componentDidMount() {
-    if (this.props.type === 'file') {
-      this.fileListener = e => {
-        this.props.onInput && this.props.onInput(e);
-      };
-
-      this.inputRef?.addEventListener('change', this.fileListener);
-    }
-
-    Object.defineProperty(this.el, 'value', {
-      get: () => this.inputRef?.value,
-      set: value => {
-        this.setState({
-          _value: value
-        });
-      },
-      configurable: true
-    });
-    setTimeout(() => this.props.focus && this.inputRef?.focus());
-  }
-  /** 输入 */
-
-
-  handleInput(e) {
-    e.stopPropagation();
-    const {
-      type,
-      maxlength,
-      confirmType,
-      password
-    } = this.props;
-    let {
-      value
-    } = e.target;
-    const inputType = getTrueType(type, confirmType, password);
-
-    if (inputType === 'number' && value && maxlength <= value.length) {
-      value = value.substring(0, maxlength);
-      e.target.value = value;
-    }
-
-    this._value = value;
-    this.setState({
-      _value: value
-    });
-    commonEventHander.call(this, {
-      type: 'input',
-      detail: {
-        value,
-        cursor: value.length
-      }
-    });
-  }
-  /** 聚焦 */
-
-
-  handleFocus = commonEventHander.bind(this);
-  /** 脱焦 */
-
-  handleBlur = commonEventHander.bind(this);
-  /** 改变 */
-
-  handleChange = commonEventHander.bind(this);
-  /** 按下 */
-
-  handleKeyDown = e => {
-    const {
-      value
-    } = e.target;
-    const keyCode = e.keyCode || e.code;
-    commonEventHander.call(this, e);
-    keyCode === 13 && this.props.onConfirm && this.props.onConfirm({
-      value
-    });
-  };
-
-  render() {
-    const {
-      type,
-      password,
-      placeholder,
-      disabled,
-      maxlength,
-      confirmType,
-      name,
-      className,
-      value,
-      controlled,
-      ...nativeProps
-    } = this.props;
-    const {
-      _value
-    } = this.state;
-    return React.createElement("input", {
-      ref: input => {
-        this.inputRef = input;
-      },
-      className: className // 受控则只使用外部值，非受控优先使用外部值
-      ,
-      value: fixControlledValue(controlled ? value : value ?? _value),
-      type: getTrueType(type, confirmType, password),
-      placeholder: placeholder,
-      disabled: disabled,
-      maxLength: maxlength,
-      name: name,
-      onInput: this.handleInput.bind(this),
-      onFocus: this.handleFocus.bind(this),
-      onBlur: this.handleBlur.bind(this),
-      onChange: this.handleChange.bind(this),
-      onKeyDown: this.handleKeyDown.bind(this)
-    });
-  }
-
-}
-
-var cssStyle = {"text":{"MozUserSelect":"none","WebkitUserSelect":"none","MsUserSelect":"none","userSelect":"none"},"textSelectable":{"MozUserSelect":"text","WebkitUserSelect":"text","MsUserSelect":"text","userSelect":"text"}};
-
-class Text extends Component {
-  state = {
-    hover: false
-  };
-  /** 当开始点击时 */
-
-  onTouchStart() {
-    const {
-      disabled,
-      hoverStartTime = 20
-    } = this.props;
-    if (disabled) return;
-    this.touch = true;
-    setTimeout(() => {
-      this.setState({
-        hover: true
-      });
-    }, hoverStartTime);
-  }
-  /** 点击结束时 */
-
-
-  onTouchEnd() {
-    const {
-      disabled,
-      hoverStayTime = 70
-    } = this.props;
-
-    if (disabled) {
-      return;
-    }
-
-    this.touch = false;
-    setTimeout(() => {
-      if (!this.touch) {
-        this.setState({
-          hover: false
-        });
-      }
-    }, hoverStayTime);
-  }
-
-  render() {
-    const {
-      className,
-      selectable = false,
-      style,
-      hoverStyle,
-      ...restProps
-    } = this.props;
-    const {
-      hover
-    } = this.state;
-    const cls = { ...cssStyle.text,
-      ...(selectable ? cssStyle.textSelectable : {}),
-      ...style,
-      ...(hover ? hoverStyle : {})
-    };
-    return React.createElement("span", {
-      onMouseEnter: this.onTouchStart.bind(this),
-      onMouseLeave: this.onTouchEnd.bind(this),
-      onTouchStart: this.onTouchStart.bind(this),
-      onTouchEnd: this.onTouchEnd.bind(this),
-      style: cls,
-      className: className,
-      onClick: commonEventHander.bind(this)
-    }, this.props.children);
-  }
-
-}
-
-class View extends Component {
-  constructor() {
-    super();
-    this.state = {
-      hover: false
-    };
-  }
-
-  componentDidMount() {
-    this.mounted = true;
-  }
-
-  componentWillUnmount() {
-    this.mounted = false;
-  }
-  /** 当开始点击时 */
-
-
-  onTouchStart() {
-    const {
-      disabled,
-      hoverStartTime = 20
-    } = this.props;
-    if (disabled || !this.mounted) return;
-    this.touch = true;
-    setTimeout(() => {
-      this.setState({
-        hover: true
-      });
-    }, hoverStartTime);
-  }
-  /** 点击结束时 */
-
-
-  onTouchEnd() {
-    const {
-      disabled,
-      hoverStayTime = 70
-    } = this.props;
-    if (disabled || !this.mounted) return;
-    this.touch = false;
-    setTimeout(() => {
-      if (!this.touch) {
-        this.setState({
-          hover: false
-        });
-      }
-    }, hoverStayTime);
-  }
-
-  onMouseEnter(event) {
-    const {
-      onMouseEnter
-    } = this.props;
-    onMouseEnter && onMouseEnter(commonMouseEventCreater(event));
-    this.onTouchStart();
-  }
-
-  onMouseMove(event) {
-    const {
-      onMouseMove
-    } = this.props;
-    onMouseMove && onMouseMove(commonMouseEventCreater(event));
-  }
-
-  onMouseLeave(event) {
-    const {
-      onMouseLeave
-    } = this.props;
-    onMouseLeave && onMouseLeave(commonMouseEventCreater(event));
-    this.onTouchEnd();
-  }
-
-  render() {
-    const {
-      className,
-      style,
-      hoverStyle,
-      ...other
-    } = this.props;
-    const {
-      hover
-    } = this.state;
-    const conStyle = { ...style,
-      ...(hover ? hoverStyle : {})
-    };
-    return React.createElement("div", {
-      onMouseEnter: this.onMouseEnter.bind(this),
-      onMouseLeave: this.onMouseLeave.bind(this),
-      onMouseMove: this.onMouseMove.bind(this),
-      onTouchStart: this.onTouchStart.bind(this),
-      onTouchEnd: this.onTouchEnd.bind(this),
-      className: className,
-      style: conStyle,
-      onClick: commonEventHander.bind(this)
-    }, this.props.children);
-  }
-
-}
-
-/** 组件映射表 */
-
-const componentReflectMap = {
-  button: Button,
-  checkbox: Checkbox,
-  image: Image,
-  input: Input,
-  text: Text,
-  view: View
-};
-/**
- * @description 拦截下来的react.createElement
- * @author CHC
- * @date 2022-03-17 17:03:42
- * @param {*} type
- * @param {*} props
- * @param {*} children
- */
-
-const naruseCreateElement = (type, props, ...children) => {
-  transformRpx(props);
-
-  if (typeof type === 'string') {
-    const Component = componentReflectMap[type];
-
-    if (!Component) {
-      logger.warn('不支持的组件类型', type);
-      return naruseCreateElement('view', null, `不支持的组件类型-${type}`);
-    }
-
-    return createElement(Component, props, ...children);
-  }
-
-  if (type.prototype instanceof Component) {
-    return createElement(type, props, ...children);
-  }
-
-  if (typeof type === 'function') {
-    props && (props.children = children);
-    return type(props);
-  }
-
-  logger.warn('不支持的组件类型', type);
-};
-
-const rpxReg = /(\d+)\s?rpx/g;
-
-const parsePx = val => {
-  if (typeof val !== 'string') return val;
-  const matchRes = val.match(rpxReg);
-  if (!matchRes) return val;
-  matchRes.forEach(item => {
-    const num = parseFloat(item); // 按照手机和电脑的比例进行换算
-
-    val = val.replace(item, `${(num / 2 * 1.4).toFixed(1)}px`);
-  });
-  return val;
-};
-/**
- * @description 将所有的rpx转换为px
- * @author CHC
- * @date 2022-03-25 15:03:47
- * @param {*} [props={}]
- * @returns {*}
- */
-
-
-const transformRpx = (props = {}) => {
-  if (!props) return;
-  const {
-    style
-  } = props;
-
-  if (style && typeof style === 'object') {
-    for (const key in style) {
-      style[key] = parsePx(style[key]);
-    }
-  }
-};
-
 const getOsInfo = () => {
   const userAgent = navigator.userAgent.toLowerCase();
   let name = 'Unknown';
@@ -2731,7 +2726,9 @@ const getStorage = options => {
     });
   }
 
-  return handle.success(getStorageSync(key));
+  return handle.success({
+    data: getStorageSync(key)
+  });
 };
 /** 同步清除缓存 */
 
@@ -2980,6 +2977,7 @@ const api = { ...system,
 const version = '0.0.5';
 const Naruse = { ...api,
   Component,
+  createElement: naruseCreateElement,
   env: {
     USER_DATA_PATH: '',
     clientName: 'H5',
@@ -2990,61 +2988,168 @@ const Naruse = { ...api,
   getDeferred,
   globalEvent,
   EventBus,
-  version
+  version,
+  unsafe_run: run
 };
 
 if (typeof window !== 'undefined') {
   window.Naruse = Naruse;
 }
 
-const jsEngineEnv = {
-  h: naruseCreateElement,
-  Naruse,
-  my: Naruse
+const _config = {
+  hotPuller: () => {
+    logger.error('未初始化热更新拉取，无法更新组件默认为空');
+    return Promise.resolve({
+      code: '',
+      ctx: {}
+    });
+  },
+  baseCtx: () => {
+    return {};
+  },
+  onRunError: err => {
+    console.error(err);
+  }
+};
+/**
+ * @description 获取初始化
+ * @author CHC
+ * @date 2022-06-14 10:06:50
+ * @returns {{ _config: () => Promise<{ code, ctx }>  }} 
+ */
+
+const getNaruseConfig = () => {
+  return _config;
+};
+/**
+ * @description naruse内部初始化过程
+ * @author CHC
+ * @date 2022-06-14 10:06:36
+ */
+
+
+const naruseInit = ({
+  hotPuller,
+  baseCtx,
+  onRunError
+} = {}) => {
+  if (hotPuller) _config.hotPuller = hotPuller;
+  if (baseCtx) _config.baseCtx = baseCtx;
+  if (onRunError) _config.onRunError = onRunError;
 };
 
 /**
- * @description 根据代码动态的加载组件，使用前请确定代码已经加载完毕
+ * @description 根据props获取naruse组件
  * @author CHC
- * @date 2022-03-17 19:03:51
- * @export
- * @class ReactMiddleware
- * @extends {Component}
+ * @date 2022-06-14 10:06:49
  */
 
-class ReactMiddleware extends Component {
+const getNaruseComponentFromProps = async props => {
+  if (!props || typeof props !== 'object') {
+    logger.error('无效参数，无法生成对应naruse组件');
+    return;
+  }
+
+  const {
+    hotPuller
+  } = getNaruseConfig();
+
+  try {
+    const {
+      code,
+      ctx
+    } = await hotPuller(props);
+    return getNaruseComponentFromCode(code, ctx);
+  } catch (e) {
+    logger.error('加载远程代码资源失败', e);
+  }
+};
+/**
+ * @description 从代码和运行环境内获取对应组件
+ * @author CHC
+ * @date 2022-06-14 16:06:40
+ */
+
+const getNaruseComponentFromCode = async (code, ctx) => {
+  if (!code) return null;
+  const {
+    baseCtx: _baseCtx,
+    onRunError
+  } = getNaruseConfig();
+  const baseCtx = typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx; // 导出变量
+
+  let exports = {};
+
+  try {
+    exports = run(code, {
+      h: Naruse.createElement,
+      Naruse,
+      ...baseCtx,
+      ...ctx
+    });
+  } catch (err) {
+    logger.error('运行时出错，自动继续', err);
+    onRunError(err);
+    return;
+  }
+
+  let component = null; // 默认导出组件存在
+
+  if (exports.default) {
+    component = exports.default;
+  } else {
+    const NaruseComponent = Naruse.Component; // 兼容老版组件
+
+    const compatibleClass = function compatibleClass(...args) {
+      const self = this;
+      NaruseComponent.apply(this, args);
+      exports.constructor && exports.constructor.call(this);
+      Object.entries(exports).forEach(([key, value]) => {
+        if (key === 'constructor') return;
+        self[key] = typeof value === 'function' ? value.bind(self) : value;
+      });
+    };
+
+    compatibleClass.prototype = Object.create(NaruseComponent.prototype);
+    Object.assign(compatibleClass.prototype, {
+      constructor: compatibleClass
+    });
+    component = compatibleClass;
+  }
+
+  return component;
+};
+/**
+ * @description 热更新容器组件
+ * @author CHC
+ * @date 2022-07-19 18:07:44
+ * @class Container
+ * @extends {Component<{}, {loaded: boolean}>}
+ */
+
+class Container extends Component {
   constructor(props) {
     super(props);
-    const exports = run(props.code, { ...(props.env || {}),
-      ...jsEngineEnv
-    });
+    this.state = {
+      loaded: false
+    };
+    this.init(props);
+  }
 
-    if (!exports.default) {
-      // 兼容老版组件
-      const compatibleClass = function compatibleClass(...args) {
-        const self = this;
-        Component.apply(this, args);
-        exports.constructor.call(this);
-        Object.entries(exports).forEach(([key, value]) => {
-          if (key === 'constructor') return;
-          self[key] = typeof value === 'function' ? value.bind(self) : value;
-        });
-      };
+  async init(props) {
+    this.Component = await getNaruseComponentFromProps(props);
 
-      compatibleClass.prototype = Object.create(Component.prototype);
-      Object.assign(compatibleClass.prototype, {
-        constructor: compatibleClass
+    if (this.Component) {
+      this.setState({
+        loaded: true
       });
-      this.compilerComponent = compatibleClass;
-    } else {
-      this.compilerComponent = exports.default;
     }
   }
 
   render() {
-    return React.createElement(this.compilerComponent, null);
+    return this.state.loaded ? Naruse.createElement(this.Component) : null;
   }
 
 }
 
-export { ReactMiddleware as default };
+export { Container, Naruse, Container as default, naruseInit };
