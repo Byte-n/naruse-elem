@@ -48,6 +48,20 @@ const bindRenderEventOnComponent = (miniComponent) => {
 }
 
 /**
+ * @description 当主页面关闭时卸载某个页面组件
+ * @author CHC
+ * @date 2022-08-02 10:08:59
+ * @param {*} miniComponent
+ */
+export const uninstallMainComponentOnSomePage = (miniComponent) => {
+    if (!miniComponent) return;
+    const { route } = miniComponent.$page;
+    if (!bindedPages[route]) return;
+    delete bindedPages[route];
+    miniComponent._naruseEventCenter = null;
+}
+
+/**
  * @description 使用代码渲染组件在某个页面
  * @author CHC
  * @date 2022-06-14 16:06:46

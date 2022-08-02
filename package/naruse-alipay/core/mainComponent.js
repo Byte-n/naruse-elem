@@ -2,7 +2,7 @@ import { miniappEventBehavior } from './domEvents.js';
 import { logger } from './uitl.js';
 import { Middware, propsEquals } from './middware.js';
 import { getNaruseComponentFromProps } from './create.js';
-import { bindRenderEventOnComponent } from '../expand/index.js';
+import { bindRenderEventOnComponent, uninstallMainComponentOnSomePage } from '../expand/index.js';
 
 /**
  * @description 初始化naruse主组件
@@ -16,7 +16,7 @@ const initMainComponent = function () {
             if (!component) {
                 logger.warn('无远程资源，不加载组件')
                 return;
-            };
+            }
             this.$middware = new Middware(this, component, {});
             this.$middware.update();
         })
@@ -83,6 +83,7 @@ const createMainBehavior = (option = {}) => {
          */
         didUnmount() {
             if (!this.$middware) return;
+            uninstallMainComponentOnSomePage(this);
             this.$middware.onUnMount();
         },
     };
