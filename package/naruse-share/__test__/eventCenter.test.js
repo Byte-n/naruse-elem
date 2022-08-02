@@ -153,6 +153,17 @@ describe('eventCenter', () => {
 
             expect(ea.c).equal(123);
         });
+
+        it('should support ...args', () => {
+            const event = [ 'a', 'b' ];
+
+            inst.on('foo', (one, two) => {
+                expect(one).to.equal(event[0]);
+                expect(two).to.equal(event[1]);
+            });
+
+            inst.emit('foo', ...event);
+        })
     });
 
     describe('clear', () => {
@@ -168,6 +179,7 @@ describe('eventCenter', () => {
             expect(events.size).equal(0);
         })
     });
+
 });
 
 
