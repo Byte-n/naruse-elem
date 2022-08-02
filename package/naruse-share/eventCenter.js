@@ -9,12 +9,12 @@ const mitt = function (n) {
             var i = n.get(e);
             i && (t ? i.splice(i.indexOf(t) >>> 0, 1) : n.set(e, []))
         },
-        emit: function (e, t) {
+        emit: function (e, ...t) {
             var i = n.get(e);
             i && i.slice().map(function (n) {
-                n(t)
+                n(...t)
             }), (i = n.get("*")) && i.slice().map(function (n) {
-                n(e, t)
+                typeof n === 'function' && n(e, ...t)
             })
         },
         clear: function () {
