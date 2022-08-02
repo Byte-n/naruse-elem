@@ -1,14 +1,16 @@
 import { naruseCreateElement } from '../components/index';
 import { getDeferred, globalEvent, EventBus } from '../../naruse-share/index';
+import run from '../../naruse-parser/index';
 import { Component } from 'react';
 import api from '../api/index';
 
 const version = '0.0.5'
 
 
-const Naruse = {
+export const Naruse = {
     ...api,
     Component,
+    createElement: naruseCreateElement,
     env: {
         USER_DATA_PATH: '',
         clientName: 'H5',
@@ -20,6 +22,7 @@ const Naruse = {
     globalEvent,
     EventBus,
     version,
+    unsafe_run: run,
 };
 
 if (typeof window !== 'undefined') {
