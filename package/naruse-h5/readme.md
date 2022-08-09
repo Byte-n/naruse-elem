@@ -3,6 +3,10 @@ naruse的h5端运行平台
 
 ## 发布记录
 
+#### 0.1.0
++ #FIX: 【H5】修复getStorage取到空值时错误的问题
++ #FEAT: 【naruse-h5】H5端API对齐初始化
+
 #### 0.0.9
 + #FIX:  修复view组件在卸载后依旧setState的问题
 + #FEAT: 新增`getDeferred` `globalEvent` 等 api 与外部交换数据
