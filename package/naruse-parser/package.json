@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "build": "mocha ./test/* && npx webpack",
+    "start": "rollup -c ./rollup.config.js -w",
+    "build": "rollup -c ./rollup.config.js && mocha ./test/*",
     "test": "mocha ./test/*"
   },
   "type": "module",
@@ -12,5 +13,8 @@
     "test": "test"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "chai-properties": "^1.4.0"
+  }
 }
