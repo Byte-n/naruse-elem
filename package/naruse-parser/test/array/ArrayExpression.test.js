@@ -1,4 +1,4 @@
-import { run } from '../../dist/index.js';
+import { run } from '../../index.js';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 
