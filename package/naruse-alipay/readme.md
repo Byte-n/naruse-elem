@@ -4,6 +4,8 @@
 
 ## history
 #### 0.2.3
+#FEAT: 更新naruse-parser，支持完整的es5与大部分es6
+#### 0.2.3
 #FEAT: 【alipay】新增getDefer api 方便Naruse内部与外部交换数据
 #### 0.2.2
 #FEAT: 【alipay】修改withPage事件挂载机制，新增了更多事件挂载
