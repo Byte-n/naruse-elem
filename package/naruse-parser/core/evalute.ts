@@ -224,7 +224,13 @@ const evaluate_map: baseMap = {
         for (const property of node.properties) {
             if (property.type === Property) {
                 const { kind, computed } = property;
-                let key = computed ? evaluate(property.key, scope) : (property.key as any).name;
+                // fix: { 1: 1 }
+                let key;
+                if (computed || property.key.type === Literal) {
+                    key = evaluate(property.key, scope);
+                } else if (property.key.type === Identifier) {
+                    key = property.key.name;
+                }
                 const value = evaluate(property.value, scope);
                 if (kind === 'init') {
                     object[key] = value;
