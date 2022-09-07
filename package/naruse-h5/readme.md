@@ -3,6 +3,9 @@ naruse的h5端运行平台
 
 ## 发布记录
 
+#### 0.1.1
++ #FEAT: 更新naruse-parser，支持完整的es5与大部分es6语法
+
 #### 0.1.0
 + #FIX: 【H5】修复getStorage取到空值时错误的问题
 + #FEAT: 【naruse-h5】H5端API对齐初始化

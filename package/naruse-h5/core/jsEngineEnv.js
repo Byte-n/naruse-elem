@@ -4,7 +4,7 @@ import run from '../../naruse-parser/index';
 import { Component } from 'react';
 import api from '../api/index';
 
-const version = '0.0.5'
+const version = '0.1.1'
 
 
 export const Naruse = {
