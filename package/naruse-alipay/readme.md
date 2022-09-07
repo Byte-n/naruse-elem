@@ -3,7 +3,9 @@
 这是一个在小程序内模拟WEB的DOM树的基础库
 
 ## history
-#### 0.2.3
+#### 0.2.5
+#FEAT: 切换为ts
+#### 0.2.4
 #FEAT: 更新naruse-parser，支持完整的es5与大部分es6
 #### 0.2.3
 #FEAT: 【alipay】新增getDefer api 方便Naruse内部与外部交换数据
