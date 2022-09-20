@@ -589,6 +589,7 @@ var needPromiseApis = [
     'navigateBack',
     'setClipboard',
     'getClipboard',
+    'getImageInfo',
 ];
 var syncApis = [
     'getStorageSync',
@@ -771,7 +772,7 @@ var withPage = function (component) {
 
 var apis = initNaruseAlipayApi();
 // naruse模块内容
-var Naruse = __assign(__assign(__assign({ Component: NaruseComponent, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
+var Naruse = __assign(__assign(__assign({ Component: NaruseComponent, createElement: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
         clientName: 'alipay',
         clientVersion: version,
         language: 'zh-Hans',

@@ -101,6 +101,7 @@ const needPromiseApis = [
     'navigateBack',
     'setClipboard',
     'getClipboard',
+    'getImageInfo',
 ];
 
 const syncApis = [
