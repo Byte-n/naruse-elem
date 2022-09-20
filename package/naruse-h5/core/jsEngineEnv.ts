@@ -1,4 +1,4 @@
-import { naruseCreateElement } from '../components/index';
+import { naruseCreateElement } from '../components/index.ts';
 import { getDeferred, globalEvent, EventBus } from '../../naruse-share/index';
 import run from '../../naruse-parser/index';
 import { Component } from 'react';

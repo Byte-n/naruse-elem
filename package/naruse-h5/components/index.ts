@@ -1,11 +1,11 @@
 import React, { Component, createElement } from 'react';
 import { logger } from '../utils/log';
-import Button from './button/index.jsx';
-import Checkbox from './checkbox/index.jsx';
-import Image from './image/index.jsx';
-import Input from './input/index.jsx';
-import Text from './text/index.jsx';
-import View from './view/index.jsx';
+import Button from './button/index'
+import Checkbox from './checkbox/index';
+import Image from './image/index'
+import Input from './input/index'
+import Text from './text/index'
+import View from './view/index.js
 
 /** 组件映射表 */
 const componentReflectMap = {

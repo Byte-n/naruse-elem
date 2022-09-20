@@ -2,7 +2,7 @@ import { commonEventHander } from '../../core/event';
 import { Component } from 'react';
 
 /** 是否是支持的type */
-const getTrueType = function getTrueType(type, confirmType, password) {
+const getTrueType = function getTrueType(type: string, confirmType: string, password: any) {
     if (confirmType === 'search') type = 'search';
     if (password) type = 'password';
     if (typeof type === 'undefined') {
@@ -17,11 +17,19 @@ const getTrueType = function getTrueType(type, confirmType, password) {
 };
 
 /** 修复可控值 */
-const fixControlledValue = function fixControlledValue(value) {
+const fixControlledValue = function fixControlledValue(value: any) {
     return value ?? '';
 };
 
 class Input extends Component {
+    inputRef: null;
+    isOnComposition: boolean;
+    onInputExcuted: boolean;
+    el: {};
+    state: { _value: string; };
+    props: any;
+    fileListener: (e: any) => void;
+    _value: any;
     constructor() {
         super();
         this.inputRef = null;
@@ -50,10 +58,13 @@ class Input extends Component {
         });
         setTimeout(() => this.props.focus && this.inputRef?.focus());
     }
+    setState(arg0: { _value: any; }) {
+        throw new Error('Method not implemented.');
+    }
 
 
     /** 输入 */
-    handleInput(e) {
+    handleInput(e: { stopPropagation: () => void; target: { value: any; }; }) {
         e.stopPropagation();
         const {
             type,
@@ -87,7 +98,7 @@ class Input extends Component {
     handleChange = commonEventHander.bind(this);
 
     /** 按下 */
-    handleKeyDown = (e) => {
+    handleKeyDown = (e: { target: { value: any; }; keyCode: any; code: any; }) => {
         const { value } = e.target;
         const keyCode = e.keyCode || e.code;
         commonEventHander.call(this, e);
@@ -113,7 +124,7 @@ class Input extends Component {
 
         return (
             <input
-                ref={input => {
+                ref={(input: null) => {
                     this.inputRef = input;
                 }}
                 className={className}
