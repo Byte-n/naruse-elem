@@ -4,7 +4,7 @@ import { isNaruseComponent } from './component';
  * @description 虚拟dom创建特殊处理map
  * @type {*}
  */
-const vnodeSpecialMap = {
+const vnodeSpecialMap: any = {
     text (props, childNodes) {
         return { content: childNodes ? childNodes[0] : '' };
     },
@@ -19,7 +19,7 @@ const vnodeSpecialMap = {
  * @param {*} childNodes 子节点
  * @returns {*}
  */
-export const createElement = function (type, props, ...childNodes) {
+export const createElement = function (type: any, props: any, ...childNodes: any): any {
     if (isNaruseComponent(type.prototype)) return createClassElement(type, props, childNodes);
     if (typeof type === 'function') return createFuncElement(type, props, childNodes);
     return createBaseElement(type, props, childNodes);
@@ -34,7 +34,7 @@ export const createElement = function (type, props, ...childNodes) {
  * @param {*} props
  * @param {*} childNodes
  */
-const createClassElement = (type, props, childNodes) => {
+const createClassElement = (type: any, props: any, childNodes: any) => {
     props = { ...props, children: childNodes };
     // 先不实例化对象，等待组件装载完成后再实例化
     const component = { actuator: type, props };
@@ -50,7 +50,7 @@ const createClassElement = (type, props, childNodes) => {
  * @param {*} childNodes
  * @returns {*}
  */
-const createBaseElement = (type, props, childNodes) => {
+const createBaseElement = (type: any, props: any, childNodes: any): any => {
     let newNode = {};
     if (vnodeSpecialMap[type]) newNode = vnodeSpecialMap[type](props, childNodes);
     childNodes = (childNodes.flat && childNodes.flat(1)) || childNodes;

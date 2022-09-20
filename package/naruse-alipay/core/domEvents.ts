@@ -13,7 +13,7 @@ const allowPropagetionEventNames = ['onLongClick', 'onClick'];
  * @param {*} randomLength
  * @returns {*}
  */
-const randomId = (randomLength) => {
+const randomId = (randomLength: number | undefined) => {
     let idStr = Date.now().toString(36);
     idStr += (Math.random()).toString(36)
         .slice(2, randomLength);
@@ -29,8 +29,8 @@ const randomId = (randomLength) => {
  * @param {*} vnode
  * @returns {*}
  */
-export const getPathById = function (id, vnode) {
-    const path = [];
+export const getPathById = function (id: any, vnode: { id: any; childNodes: string | any[]; }) {
+    const path: number[] = [];
     if (!vnode) return;
     if (vnode.id === id) return path;
     if (!vnode.childNodes || !vnode.childNodes.length) return;
@@ -61,12 +61,12 @@ export const getPathById = function (id, vnode) {
  * @param {*} vnode
  * @returns {*}
  */
-export const getVnodeById = function (id, vnode) {
+export const getVnodeById = function (id: any, vnode: any) {
     const path = getPathById(id, vnode);
     if (!path) return undefined;
     if (!path.length) return vnode;
     let node = vnode;
-    path.forEach(index => {
+    path.forEach((index: string | number) => {
         node = node.childNodes[index];
     });
     return node;
@@ -81,7 +81,7 @@ export const getVnodeById = function (id, vnode) {
  * @param {*} parentId
  * @returns {*}
  */
-export const initVnodeTree = function (vnode, parentId) {
+export const initVnodeTree = function (vnode: any, parentId?: any) {
     const newNode = vnode;
     if (!vnode || typeof vnode !== 'object') return {};
     // 没有id的挂上id
@@ -89,7 +89,7 @@ export const initVnodeTree = function (vnode, parentId) {
     newNode.parentId = parentId;
     // 递归遍历
     if (Array.isArray(newNode.childNodes)) {
-        newNode.childNodes.forEach((node) => initVnodeTree(node, newNode.id));
+        newNode.childNodes.forEach((node: any) => initVnodeTree(node, newNode.id));
     }
     return newNode;
 };
@@ -115,7 +115,7 @@ const eventNameMap = {
  * @param {*} nodeTree
  * @returns {*}
  */
-export const eventCenter = function (event, nodeTree) {
+export const eventCenter = function (event: { target?: any; stopPropagation?: any; type?: any; }, nodeTree: any) {
     // 是否继续冒泡的标志
     let stopFlag = false;
     // 空事件不响应
@@ -158,7 +158,7 @@ export const eventCenter = function (event, nodeTree) {
  * @date 2022-03-15 14:03:55
  * @param {*} props
  */
-const allEvents = function allEvents (props) {
+const allEvents = function allEvents (props: any) {
     eventCenter(props, this.data.node);
 };
 

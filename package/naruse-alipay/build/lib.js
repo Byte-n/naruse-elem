@@ -1099,6 +1099,9 @@ var Middware = /** @class */ (function () {
         var self = this;
         !this.updating && Promise.resolve().then(function () {
             _this.updating = false;
+            // fix: maybe has unmounted
+            if (!_this.naruseComponent)
+                return;
             if (!_this.naruseComponent.render) {
                 logger.error('组件必须需要一个render函数');
                 return;

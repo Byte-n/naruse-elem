@@ -10,7 +10,7 @@ import { logger, NOOP } from './uitl';
  * @param {*} b
  * @returns {*}
  */
-export const propsEquals = (a, b) => {
+export const propsEquals = (a: { [x: string]: any; }, b: { [x: string]: any; component?: {}; }) => {
     if (Object.is(a, b) && typeof a !== 'object') {
         return true;
     }
@@ -42,7 +42,13 @@ export const propsEquals = (a, b) => {
  * @note 因为是先创建的naruseComponent组件实例，后创建的中间件，所以采用后绑定
  */
 export class Middware {
-    constructor (miniappComponent, NaruseComponentActuator, props) {
+    naruseComponent: any;
+    props: any;
+    component: any;
+    fristRender: boolean;
+    updating: boolean;
+    prevProps: any;
+    constructor(miniappComponent: any, NaruseComponentActuator: any, props: {}) {
         this.props = props;
         this.component = miniappComponent;
         if (NaruseComponentActuator instanceof NaruseComponent) {
@@ -57,10 +63,12 @@ export class Middware {
     }
 
     /** 执行更新 */
-    update (callback = NOOP) {
+    update(callback = NOOP) {
         const self = this;
         !this.updating && Promise.resolve().then(() => {
             this.updating = false;
+            // fix: maybe has unmounted
+            if (!this.naruseComponent) return;
             if (!this.naruseComponent.render) {
                 logger.error('组件必须需要一个render函数');
                 return;
@@ -76,7 +84,7 @@ export class Middware {
     }
 
     /** 更新后 */
-    onUpdated () {
+    onUpdated() {
         if (!this.naruseComponent) return;
         const funcName = this.fristRender ? 'componentDidMount' : 'componentDidUpdate';
         this.naruseComponent[funcName] && this.naruseComponent[funcName]();
@@ -85,9 +93,9 @@ export class Middware {
     }
 
     /** 父组件更新后是否需要更新子组件 */
-    canUpdate (prevProps) {
+    canUpdate(prevProps: any) {
         const c = this.naruseComponent;
-        const flag = this.shouldUpdate(this.props,  c.state);
+        const flag = this.shouldUpdate(this.props, c.state);
         if (flag && !propsEquals(prevProps, this.props)) {
             this.prevProps = prevProps;
             c.props = this.props;
@@ -96,15 +104,15 @@ export class Middware {
     }
 
     /** 是否应该刷新 */
-    shouldUpdate (nextProps, nextState) {
+    shouldUpdate(nextProps: any, nextState: any) {
         const c = this.naruseComponent;
         if (!c || typeof c.shouldComponentUpdate !== 'function') return true;
         const res = c.shouldComponentUpdate.call(c, nextProps, nextState);
-        return  res === undefined ? true : res;
+        return res === undefined ? true : res;
     }
 
     /** 卸载时 */
-    onUnMount () {
+    onUnMount() {
         this.naruseComponent && this.naruseComponent.componentWillUnmount();
         // 解绑对象
         this.component = null;
