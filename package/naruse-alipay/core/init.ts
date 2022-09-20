@@ -8,7 +8,7 @@ const _config = {
     baseCtx: () => {
         return {};
     },
-    onRunError: (err) => {
+    onRunError: (err: Error) => {
         console.error(err);
     },
 };

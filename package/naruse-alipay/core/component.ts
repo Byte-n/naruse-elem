@@ -2,6 +2,7 @@ import {
     logger,
     NOOP
 } from './uitl';
+import type { Middware } from './middware';
 /**
  * @description naruseComponent 实现
  * @author CHC
@@ -9,14 +10,18 @@ import {
  * @class NaruseComponent
  */
 export class NaruseComponent {
-    constructor(props) {
+    state: Record<string, any>;
+    props: Record<string, any>;
+    $mounted: boolean;
+    $updater: Middware | null;
+    constructor(props: Record<string, any>) {
         this.state = {};
         this.props = props;
         this.$mounted = false;
         // 中间件实例
         this.$updater = null;
     }
-    setState(update, callback = NOOP) {
+    setState(update: Record<string, any>, callback = NOOP) {
         if (!this.$updater) {
             logger.error('小程序组件未装载完毕，无法更新！');
             return;
@@ -50,4 +55,4 @@ export class NaruseComponent {
 
 
 /** 判断是否是NaruseComponent */
-export const isNaruseComponent = (obj) => obj instanceof NaruseComponent;
+export const isNaruseComponent = (obj: any) => obj instanceof NaruseComponent;
