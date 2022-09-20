@@ -2,11 +2,12 @@ import { commonEventHander } from '../../core/event';
 import { Component } from 'react';
 import cssStyle from './index.css';
 
-class Text extends Component {
+class Text extends Component<{ disabled: any; hoverStartTime?: 20 | undefined; }> {
 
     state = {
         hover: false
     }
+    touch: boolean = false;
 
     /** 当开始点击时 */
     onTouchStart() {
@@ -17,6 +18,9 @@ class Text extends Component {
         setTimeout(() => {
             this.setState({ hover: true });
         }, hoverStartTime);
+    }
+    setState(arg0: { hover: boolean; }) {
+        throw new Error('Method not implemented.');
     }
 
     /** 点击结束时 */
