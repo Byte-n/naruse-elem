@@ -594,6 +594,9 @@ var Input = /** @class */ (function (_super) {
         });
         setTimeout(function () { var _a; return _this.props.focus && ((_a = _this.inputRef) === null || _a === void 0 ? void 0 : _a.focus()); });
     };
+    Input.prototype.setState = function (arg0) {
+        throw new Error('Method not implemented.');
+    };
     /** 输入 */
     Input.prototype.handleInput = function (e) {
         e.stopPropagation();
@@ -635,6 +638,7 @@ var Text = /** @class */ (function (_super) {
         _this.state = {
             hover: false
         };
+        _this.touch = false;
         return _this;
     }
     /** 当开始点击时 */
@@ -647,6 +651,9 @@ var Text = /** @class */ (function (_super) {
         setTimeout(function () {
             _this.setState({ hover: true });
         }, hoverStartTime);
+    };
+    Text.prototype.setState = function (arg0) {
+        throw new Error('Method not implemented.');
     };
     /** 点击结束时 */
     Text.prototype.onTouchEnd = function () {
