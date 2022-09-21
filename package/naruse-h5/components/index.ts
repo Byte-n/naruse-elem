@@ -5,7 +5,7 @@ import Checkbox from './checkbox/index';
 import Image from './image/index'
 import Input from './input/index'
 import Text from './text/index'
-import View from './view/index.js
+import View from './view/index'
 
 /** 组件映射表 */
 const componentReflectMap = {
@@ -26,7 +26,7 @@ const componentReflectMap = {
  * @param {*} props
  * @param {*} children
  */
-const naruseCreateElement = (type, props, ...children) => {
+const naruseCreateElement = (type: string, props: {} | null | undefined, ...children: string[]) => {
     transformRpx(props);
     if (typeof type === 'string') {
         const Component = componentReflectMap[type];

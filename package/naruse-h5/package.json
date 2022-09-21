@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "rollup -c ./rollup.config.js --environment BUILD:production",
-    "dev": "rollup -c ./rollup.config.js --environment BUILD:development && cp ./dist/index.js ./dist.js",
+    "dev": "rollup -c ./rollup.config.js --watch --environment BUILD:development && cp ./dist/index.js ./dist.js",
     "test": "mocha-phantomjs --path /usr/local/bin/phantomjs  ./test/index.html --ignore-resource-errors "
   },
   "devDependencies": {
