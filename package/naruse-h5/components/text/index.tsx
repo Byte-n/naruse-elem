@@ -1,6 +1,8 @@
 import { commonEventHander } from '../../core/event';
-import { Component } from 'react';
+import React, { Component } from 'react';
 import cssStyle from './index.css';
+
+const h = React.createElement;
 
 class Text extends Component<{ disabled: any; hoverStartTime?: 20 | undefined; }> {
 
@@ -39,7 +41,7 @@ class Text extends Component<{ disabled: any; hoverStartTime?: 20 | undefined; }
     }
 
     render() {
-        const { className, selectable = false, style, hoverStyle, ...restProps } = this.props;
+        const { className,id, selectable = false, style, hoverStyle, ...restProps } = this.props;
         const { hover } = this.state;
         const cls = {
             ...cssStyle.text,
@@ -50,6 +52,7 @@ class Text extends Component<{ disabled: any; hoverStartTime?: 20 | undefined; }
 
         return (
             <span
+                id={id}
                 onMouseEnter={this.onTouchStart.bind(this)}
                 onMouseLeave={this.onTouchEnd.bind(this)}
                 onTouchStart={this.onTouchStart.bind(this)}

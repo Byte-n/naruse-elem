@@ -18,6 +18,7 @@ const config = {
         file: './dist/index.js',
         format: 'es',
     },
+    external: [ 'react' ],
     plugins: [
         // babel({
         //     babelHelpers: 'bundled',
@@ -32,11 +33,11 @@ const config = {
     ],
 };
 
-// if (!isDev) {
-//     config.plugins.push(externalGlobals({ react: 'React' }));
-//     // config.plugins.push(uglify({ mangle: {  toplevel: true}, compress: { toplevel: true } }));
-// } else {
-//     config.plugins.push(inject({ React: 'react' }));
-// }
+if (!isDev) {
+    // config.plugins.push(externalGlobals({ react: 'React' }));
+    // config.plugins.push(uglify({ mangle: {  toplevel: true}, compress: { toplevel: true } }));
+} else {
+    config.plugins.push(inject({ React: 'react' }));
+}
 
 module.exports = config;
