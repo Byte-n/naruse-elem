@@ -1,6 +1,8 @@
 import { commonEventHander, commonMouseEventCreater } from '../../core/event';
 import { Component } from 'react';
 
+const h = React.createElement;
+
 class View extends Component {
     constructor() {
         super();

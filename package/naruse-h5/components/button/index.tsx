@@ -2,6 +2,8 @@ import { commonEventHander } from '../../core/event';
 import React, { Component } from 'react';
 import cssStyle from './index.css';
 
+const h = React.createElement;
+
 class Button extends Component {
     constructor () {
         super();

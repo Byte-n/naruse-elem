@@ -38,6 +38,20 @@ const adData = {
     createTime: 1646813903418,
 };
 
+const _defineProperty = function e (t, r, n) {
+    if (r in t) {
+        Object.defineProperty(t, r, {
+            value: n,
+            enumerable: true,
+            configurable: true,
+            writable: true,
+        });
+    } else {
+        t[r] = n;
+    }
+    return t;
+};
+
 export const ayRequireList = {
     $userInfoChanger,
     $moment: momemt,
@@ -56,5 +70,6 @@ export const ayRequireList = {
         },
     },
     $ayApi,
-    $env
+    $env,
+    _defineProperty
 };

@@ -1,0 +1,11 @@
+.scroll {
+    -webkit-overflow-scrolling: auto;
+}
+
+.scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.scroll-view {
+    overflow: hidden;
+}
