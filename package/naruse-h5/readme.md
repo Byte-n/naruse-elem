@@ -2,7 +2,8 @@
 naruse的h5端运行平台
 
 ## 发布记录
-
+#### 0.1.2
++ #FEAT: 新增scroll-view组件，详细支持请查看文档
 #### 0.1.1
 + #FEAT: 更新naruse-parser，支持完整的es5与大部分es6语法
 
