@@ -2,6 +2,8 @@ import { commonEventHander } from '../../core/event';
 import { Component } from 'react';
 import cssStyle from './index.css'
 
+const h = React.createElement;
+
 class Image extends Component {
     constructor(props) {
         super(props);
@@ -39,6 +41,7 @@ class Image extends Component {
             mode,
             onError,
             imgProps,
+            id,
         } = this.props;
         const divStyle = { ...cssStyle.naruseImg, ...(mode === 'widthFix' ? cssStyle.naruseImg__widthfix : {}) };
         const imgStyle = cssStyle[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
@@ -47,6 +50,7 @@ class Image extends Component {
                 {
                     <img
                         ref={img => (this.imgRef = img)}
+                        id={id}
                         style={imgStyle}
                         src={src}
                         onLoad={this.imageOnLoad}

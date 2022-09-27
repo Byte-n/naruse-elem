@@ -1,6 +1,8 @@
 import { commonEventHander } from '../../core/event';
 import { Component } from 'react';
 
+const h = React.createElement;
+
 /** 是否是支持的type */
 const getTrueType = function getTrueType(type: string, confirmType: string, password: any) {
     if (confirmType === 'search') type = 'search';
