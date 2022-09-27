@@ -1,4 +1,6 @@
 import { Component } from 'react';
+
+const h = React.createElement;
 class Checkbox extends Component {
     /** 改变事件 */
     handleChange (e) {
