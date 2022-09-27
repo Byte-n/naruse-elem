@@ -11,8 +11,10 @@ on:
 
 jobs:
   build-and-test:
-    env:
-      workdir: ./package/naruse-h5
+    defaults:
+      run:
+        shell: bash
+        working-directory: package/naruse-h5
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -25,8 +27,5 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
-      working-directory: ./package/naruse-h5/
     - run: npm run build --if-present
-      working-directory: ./package/naruse-h5/
     - run: npm test
-      working-directory: ./package/naruse-h5/
