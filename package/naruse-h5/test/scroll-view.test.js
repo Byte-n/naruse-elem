@@ -58,7 +58,7 @@ describe('scroll-view 组件', () => {
   it('竖向滚动触发事件', async () => {
     const scrollStyle = { width: '400px', height: '400px' };
     const test1 = { one: false, two: false };
-    const wrapper = await mount(<scroll-view style={scrollStyle} scrollWithAnimation={true} scrollY={true} scrollTop={40} upperThreshold={20} lowerThreshold={800} onScrollToUpper={() => {test1.one = true;}}  onScrollToLower={() => {test1.two = true;}} onScroll={(res) => {console.log('竖向滚动事件！', res.detail)}}>
+    const wrapper = await mount(<scroll-view style={scrollStyle} scrollWithAnimation={true} scrollY={true} scrollTop={40} upperThreshold={20} lowerThreshold={800} onScrollToUpper={() => {test1.one = true;}}  onScrollToLower={() => {test1.two = true;}} onScroll={(res) => {}}>
       <image id='firstImg' style={{ height: '4681px', width: '750px' }} src='//q.aiyongtech.com/ad/images/6auY57qn54mILTI%3D_1663677524622.png'/>
       <image id='lastImg' style={{ height: '6012px', width: '750px' }} src='//q.aiyongtech.com/ad/images/5LiT5Lia54mILTI%3D_1663838345708.png'/>
     </scroll-view>, scratch)
