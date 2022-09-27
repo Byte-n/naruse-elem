@@ -15,10 +15,12 @@ export async function mount(node, wrapper) {
           Component: type,
           props
         }
+        this.component = null;
       }
 
       async componentDidMount() {
         const ref = this.ref.current
+        const component = ref;
         const dom = ref instanceof HTMLElement ? ref : ReactDOM.findDOMNode(ref)
         const { ref: forwardRef } = node
         if (typeof forwardRef === 'function') {
@@ -33,6 +35,7 @@ export async function mount(node, wrapper) {
 
         resolve({
           node: dom,
+          component,
           setState: this.setCompState,
           setProps: this.setProps,
           find: this.find,
