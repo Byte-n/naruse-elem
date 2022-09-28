@@ -20,12 +20,6 @@ const config = {
     },
     external: [ 'react' ],
     plugins: [
-        // babel({
-        //     babelHelpers: 'bundled',
-        //     plugins: [
-        //         [require('babel-plugin-transform-react-jsx')],
-        //     ],
-        // }),
         alias({ customResolver }),
         externalGlobals({ react: 'React' }),
         typescript(),
@@ -34,8 +28,7 @@ const config = {
 };
 
 if (!isDev) {
-    // config.plugins.push(externalGlobals({ react: 'React' }));
-    // config.plugins.push(uglify({ mangle: {  toplevel: true}, compress: { toplevel: true } }));
+    
 } else {
     config.plugins.push(inject({ React: 'react' }));
 }
