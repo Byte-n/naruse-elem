@@ -18,10 +18,10 @@ module.exports = {
     plugins: [
         alias({ customResolver }),
         typescript(),
-        // replace({
-        //     __IS_ALIAPY__: true,
-        //     __IS_H5__: false,
-        // }),
+        replace({
+            __IS_ALIAPY__: true,
+            __IS_H5__: false,
+        }),
         // uglify({ mangle: {  toplevel: true}, compress: { toplevel: true } })
     ],
 };

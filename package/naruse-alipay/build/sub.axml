@@ -94,7 +94,7 @@
 
 <!-- 滚动框 -->
 <template name="scroll-view">
-    <scroll-view class="{{className}}" style="{{style}}" scroll-x="{{scrollX}}" scroll-y="{{scrollY}}" upper-threshold="{{upperThreshold}}" 
+    <scroll-view id="{{id}}" class="{{className}}" style="{{style}}" scroll-x="{{scrollX}}" scroll-y="{{scrollY}}" upper-threshold="{{upperThreshold}}" 
     lower-threshold="{{lowerThreshold}}" scroll-top="{{scrollTop}}" scroll-left="{{scrollLeft}}" scroll-into-view="{{scrollIntoView}}" 
     scroll-with-animation="{{scrollWithAnimation}}" scroll-animation-duration="{{scrollAnimationDuration}}" enable-back-to-top="{{enableBackToTop}}" 
     trap-scroll="{{trapScroll}}" onScrollToUpper="{{onScrollToUpper}}" onScrollToLower="{{onScrollToLower}}" onScroll="{{onScroll}}" 
@@ -112,6 +112,7 @@
         <template a:for="{{ childNodes }}" data="{{ ...item }}" is="{{ item.naruseType }}"></template>
     </block>
 </template>
+
 <template name="naruse-element">
     <naruse-element component="{{ component }}"></naruse-element>
 </template>
