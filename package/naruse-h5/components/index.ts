@@ -7,6 +7,7 @@ import Input from './input/index'
 import Text from './text/index'
 import View from './view/index'
 import ScrollView from './scroll-view/index'
+import Textarea from './textarea/index'
 
 /** 组件映射表 */
 const componentReflectMap = {
@@ -17,8 +18,8 @@ const componentReflectMap = {
     text: Text,
     view: View,
     'scroll-view': ScrollView,
-};
-
+    textarea: Textarea,
+}
 
 /**
  * @description 拦截下来的react.createElement
