@@ -4,20 +4,23 @@
 
 ## history
 #### 0.2.6
-#FEAT: 新增scroll-view组件支持，详细参数参考文档
++ #FEAT: 新增textarea组件支持，详细参数参考文档
++ #FIX: 修复了scroll-view部分缺失属性与事件
+#### 0.2.6
++ #FEAT: 新增scroll-view组件支持，详细参数参考文档
 #### 0.2.5
-#FEAT: 切换为ts
++ #FEAT: 切换为ts
 #### 0.2.4
-#FEAT: 更新naruse-parser，支持完整的es5与大部分es6
++ #FEAT: 更新naruse-parser，支持完整的es5与大部分es6
 #### 0.2.3
-#FEAT: 【alipay】新增getDefer api 方便Naruse内部与外部交换数据
++ #FEAT: 【alipay】新增getDefer api 方便Naruse内部与外部交换数据
 #### 0.2.2
-#FEAT: 【alipay】修改withPage事件挂载机制，新增了更多事件挂载
-#FEAT: 【alipay】新增unsafe_run 在naruse命名空间内
-#FIX: 【alipay】修复了因为容错导致的事件无法触发
-#FIX: 【alipay】修复老组件兼容错误的问题
-#FIX: 【alipay】修复了forceUpdate不会触发shouUpdate生命周期的问题
-#FIX: 【alipay】修复主组件卸载时的错误
++ #FEAT: 【alipay】修改withPage事件挂载机制，新增了更多事件挂载
++ #FEAT: 【alipay】新增unsafe_run 在naruse命名空间内
++ #FIX: 【alipay】修复了因为容错导致的事件无法触发
++ #FIX: 【alipay】修复老组件兼容错误的问题
++ #FIX: 【alipay】修复了forceUpdate不会触发shouUpdate生命周期的问题
++ #FIX: 【alipay】修复主组件卸载时的错误
 #### 0.2.0 && 0.2.1
 + #FIX: 修复了当alipay node为空时导致报错的问题
 #### 0.1.9

@@ -963,17 +963,30 @@ var initVnodeTree = function (vnode, parentId) {
     return newNode;
 };
 /**
+ * @description 事件分发中心
+ * @author CHC
+ * @date 2022-03-15 14:03:55
+ * @param {*} props
+ */
+var allEvents = function allEvents(props) {
+    eventCenter(props, this.data.node);
+};
+/**
  * 小程序事件映射表
  */
-var eventNameMap = {
-    tap: 'onClick',
-    longPress: 'onLongClick',
-    input: 'onChange',
-    blur: 'onBlur',
-    focus: 'onFocus',
-    load: 'onLoad',
-    change: 'onChange',
+var eventNameMap = {};
+var methodsTags = ['tap', 'input', 'blur', 'focus', 'load', 'change', 'confirm', 'keyBoardHeightChange', 'scroll', 'scrollToUpper', 'scrollToLower', 'touchStart', 'touchMove', 'touchEnd', 'touchCancel'];
+var methodTagTransformMap = {
+    'tap': 'click',
+    'longPress': 'longClick'
 };
+var transformFirstApha = function (item) { return 'on' + item.slice(0, 1).toLocaleUpperCase() + item.slice(1); };
+var methods = {};
+methodsTags.forEach(function (item) {
+    var eventName = transformFirstApha(item);
+    methods[eventName] = allEvents;
+    eventNameMap[item] = transformFirstApha(methodTagTransformMap[item] || item);
+});
 /**
  * @description 事件处理中心
  * @author CHC
@@ -1020,30 +1033,13 @@ var eventCenter = function (event, nodeTree) {
     }
 };
 /**
- * @description 事件分发中心
- * @author CHC
- * @date 2022-03-15 14:03:55
- * @param {*} props
- */
-var allEvents = function allEvents(props) {
-    eventCenter(props, this.data.node);
-};
-/**
  * @description 小程序组件事件绑定
  * @type {*}
  * */
 var miniappEventBehavior = {
     props: { component: {} },
     data: { node: {} },
-    methods: {
-        onTap: allEvents,
-        onLongPress: allEvents,
-        onInputInput: allEvents,
-        onInputBlur: allEvents,
-        onInputFocus: allEvents,
-        onImageLoad: allEvents,
-        onCheckboxChange: allEvents,
-    },
+    methods: methods,
 };
 
 /**
