@@ -28,7 +28,7 @@
   },
   "name": "naruse-h5",
   "description": "naruse的h5端运行平台",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "main": "dist/index.js",
   "directories": {
     "test": "test"
