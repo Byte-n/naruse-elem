@@ -4,6 +4,11 @@ const externalGlobals = require('rollup-plugin-external-globals');
 const css = require('../rollup-plugin-naruse/plugin/naruse-css-loader');
 const inject = require('@rollup/plugin-inject');
 const typescript = require('@rollup/plugin-typescript');
+const replace = require('@rollup/plugin-replace');
+
+const fs = require('fs');
+const path = require('path');
+const version = JSON.parse(fs.readFileSync(path.join(__dirname, './package.json'), 'utf-8')).version;
 
 const customResolver = nodeResolve({ extensions: ['.mjs', '.js', '.jsx', '.json', '.sass', '.scss', '.css'] });
 
@@ -17,6 +22,7 @@ const config = {
     },
     external: [ 'react' ],
     plugins: [
+        replace({ __VERSION__: JSON.stringify(version) }),
         alias({ customResolver }),
         externalGlobals({ react: 'React' }),
         inject({ React: 'react' }),

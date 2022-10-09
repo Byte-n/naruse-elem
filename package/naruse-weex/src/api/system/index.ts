@@ -33,6 +33,8 @@ export const getSystemInfoSync = () => {
         version: navigator.appVersion,
         windowHeight: window.screen.availHeight,
         windowWidth: window.screen.availWidth,
+        scaleWith: 750,
+        scaleHeight: Math.ceil((window.screen.availHeight) / (window.screen.availWidth) * 750),
     };
 };
 

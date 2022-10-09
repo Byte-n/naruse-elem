@@ -1,5 +1,5 @@
 import { NaruseComponent } from './component';
-import { globalEvent, EventBus, version, getDeferred } from '../../naruse-share/index';
+import { globalEvent, EventBus, getDeferred, initVersionLogger } from '../../naruse-share/index';
 import { initNaruseAlipayApi } from '../api/index';
 import { withPage } from '../api/HOC/index';
 import run from '../../naruse-parser/index';
@@ -7,6 +7,8 @@ import { createElement } from './createElement';
 
 const apis = initNaruseAlipayApi();
 
+const version = __VERSION__;
+initVersionLogger('naruse-alipay', version);
 
 // naruse模块内容
 export const Naruse = {
@@ -28,7 +30,7 @@ export const Naruse = {
     unsafe_run: run, 
 };
 
-export const naruseExtend = (opt) => {
+export const naruseExtend = (opt: any) => {
     if (typeof opt === 'object') {
         Object.assign(Naruse, opt);
     }
