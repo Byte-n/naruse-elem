@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React,{ Component } from 'react';
 
 const h = React.createElement;
 class Checkbox extends Component {

@@ -1,5 +1,5 @@
 import { commonEventHander } from '../../core/event';
-import { Component } from 'react';
+import React, { Component } from 'react';
 
 const h = React.createElement;
 
@@ -60,10 +60,6 @@ class Input extends Component {
         });
         setTimeout(() => this.props.focus && this.inputRef?.focus());
     }
-    setState(arg0: { _value: any; }) {
-        throw new Error('Method not implemented.');
-    }
-
 
     /** 输入 */
     handleInput(e: { stopPropagation: () => void; target: { value: any; }; }) {

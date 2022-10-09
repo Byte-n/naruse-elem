@@ -1,10 +1,7 @@
 const alias = require('@rollup/plugin-alias');
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const externalGlobals = require('rollup-plugin-external-globals');
-const replace = require('@rollup/plugin-replace');
-const { babel } = require('@rollup/plugin-babel');
 const css = require('../rollup-plugin-naruse/plugin/naruse-css-loader');
-const { uglify } = require('rollup-plugin-uglify');
 const inject = require('@rollup/plugin-inject');
 const typescript = require('@rollup/plugin-typescript');
 
@@ -22,15 +19,10 @@ const config = {
     plugins: [
         alias({ customResolver }),
         externalGlobals({ react: 'React' }),
+        inject({ React: 'react' }),
         typescript(),
         css(),
     ],
 };
-
-if (!isDev) {
-    
-} else {
-    config.plugins.push(inject({ React: 'react' }));
-}
 
 module.exports = config;

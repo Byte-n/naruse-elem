@@ -2,6 +2,8 @@
 naruse的h5端运行平台
 
 ## 发布记录
+#### 0.1.8
++ #FIX: 修复因为TS自动补全导致的text,input组件setState失效的问题
 #### 0.1.7
 + #FEAT: 新增scroll-view & textarea 组件
 #### 0.1.4 & 0.1.5

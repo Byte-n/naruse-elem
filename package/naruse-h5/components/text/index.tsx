@@ -21,10 +21,6 @@ class Text extends Component<{ disabled: any; hoverStartTime?: 20 | undefined; }
             this.setState({ hover: true });
         }, hoverStartTime);
     }
-    setState(arg0: { hover: boolean; }) {
-        throw new Error('Method not implemented.');
-    }
-
     /** 点击结束时 */
     onTouchEnd() {
         const { disabled, hoverStayTime = 70 } = this.props;
