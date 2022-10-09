@@ -323,9 +323,9 @@ const commonMouseEventCreater = (event) => {
     };
 };
 
-var cssStyle$3 = {"a-button":{"display":"block","outline":"0","WebkitAppearance":"none","boxSizing":"border-box","padding":"0","textAlign":"center","fontSize":"18px","height":"47px","lineHeight":"47px","borderRadius":"2px","overflow":"hidden","textOverflow":"ellipsis","wordBreak":"break-word","whiteSpace":"nowrap","color":"#000","backgroundColor":"#fff","border":"1px solid #eee"},"active":{"backgroundColor":"#ddd","color":"rgba(0,0,0,.3)"},"disabled":{"color":"rgba(0,0,0,.6)","backgroundColor":"rgba(255,255,255,.6)"}};
+var cssStyle$4 = {"a-button":{"display":"block","outline":"0","WebkitAppearance":"none","boxSizing":"border-box","padding":"0","textAlign":"center","fontSize":"18px","height":"47px","lineHeight":"47px","borderRadius":"2px","overflow":"hidden","textOverflow":"ellipsis","wordBreak":"break-word","whiteSpace":"nowrap","color":"#000","backgroundColor":"#fff","border":"1px solid #eee"},"active":{"backgroundColor":"#ddd","color":"rgba(0,0,0,.3)"},"disabled":{"color":"rgba(0,0,0,.6)","backgroundColor":"rgba(255,255,255,.6)"}};
 
-const h$7 = React.createElement;
+const h$8 = React.createElement;
 class Button extends React.Component {
     constructor() {
         super();
@@ -381,12 +381,12 @@ class Button extends React.Component {
     render() {
         const _a = this.props, { type, disabled, style, className, hoverStyle, activeStyle } = _a; __rest(_a, ["type", "disabled", "style", "className", "hoverStyle", "activeStyle"]);
         const { hover, active } = this.state;
-        const conStyle = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, cssStyle$3['a-button']), (type ? cssStyle$3[type] : {})), style), (hover ? hoverStyle : {})), (active ? Object.assign(Object.assign({}, cssStyle$3.active), activeStyle) : {}));
-        return (h$7("button", { onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), style: conStyle, disabled: disabled, className: className, onClick: commonEventHander.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this) }, this.props.children));
+        const conStyle = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, cssStyle$4['a-button']), (type ? cssStyle$4[type] : {})), style), (hover ? hoverStyle : {})), (active ? Object.assign(Object.assign({}, cssStyle$4.active), activeStyle) : {}));
+        return (h$8("button", { onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), style: conStyle, disabled: disabled, className: className, onClick: commonEventHander.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this) }, this.props.children));
     }
 }
 
-const h$6 = React.createElement;
+const h$7 = React.createElement;
 class Checkbox extends React.Component {
     /** 改变事件 */
     handleChange(e) {
@@ -395,7 +395,7 @@ class Checkbox extends React.Component {
     }
     render() {
         const _a = this.props, { checked, name, color, value, disabled } = _a, nativeProps = __rest(_a, ["checked", "name", "color", "value", "disabled"]);
-        return (h$6("input", Object.assign({ ref: dom => {
+        return (h$7("input", Object.assign({ ref: dom => {
                 if (!dom)
                     return;
                 this.inputEl = dom;
@@ -405,9 +405,9 @@ class Checkbox extends React.Component {
     }
 }
 
-var cssStyle$2 = {"img-empty":{"opacity":"0"},"naruseImg":{"display":"inline-block","overflow":"hidden","position":"relative","fontSize":"0"},"naruseImg__widthfix":{"height":"100%"},"scaletofill":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfit":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfill":{"objectFit":"cover","width":"100%","height":"100%"},"widthfix":{"width":"100%"},"top":{"width":"100%"},"bottom":{"width":"100%","position":"absolute","bottom":"0"},"left":{"height":"100%"},"right":{"position":"absolute","height":"100%","right":"0"},"topright":{"position":"absolute","right":"0"},"bottomleft":{"position":"absolute","bottom":"0"},"bottomright":{"position":"absolute","right":"0","bottom":"0"}};
+var cssStyle$3 = {"img-empty":{"opacity":"0"},"naruseImg":{"display":"inline-block","overflow":"hidden","position":"relative","fontSize":"0"},"naruseImg__widthfix":{"height":"100%"},"scaletofill":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfit":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfill":{"objectFit":"cover","width":"100%","height":"100%"},"widthfix":{"width":"100%"},"top":{"width":"100%"},"bottom":{"width":"100%","position":"absolute","bottom":"0"},"left":{"height":"100%"},"right":{"position":"absolute","height":"100%","right":"0"},"topright":{"position":"absolute","right":"0"},"bottomleft":{"position":"absolute","bottom":"0"},"bottomright":{"position":"absolute","right":"0","bottom":"0"}};
 
-const h$5 = React.createElement;
+const h$6 = React.createElement;
 class Image$1 extends React.Component {
     constructor(props) {
         super(props);
@@ -436,13 +436,13 @@ class Image$1 extends React.Component {
     }
     render() {
         const { className, src, style = {}, mode, onError, imgProps, id, } = this.props;
-        const divStyle = Object.assign(Object.assign({}, cssStyle$2.naruseImg), (mode === 'widthFix' ? cssStyle$2.naruseImg__widthfix : {}));
-        const imgStyle = cssStyle$2[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
-        return (h$5("div", { onClick: commonEventHander.bind(this), className: className, style: Object.assign(Object.assign({}, divStyle), style) }, h$5("img", Object.assign({ ref: img => (this.imgRef = img), id: id, style: imgStyle, src: src, onLoad: this.imageOnLoad, onError: onError }, imgProps))));
+        const divStyle = Object.assign(Object.assign({}, cssStyle$3.naruseImg), (mode === 'widthFix' ? cssStyle$3.naruseImg__widthfix : {}));
+        const imgStyle = cssStyle$3[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
+        return (h$6("div", { onClick: commonEventHander.bind(this), className: className, style: Object.assign(Object.assign({}, divStyle), style) }, h$6("img", Object.assign({ ref: img => (this.imgRef = img), id: id, style: imgStyle, src: src, onLoad: this.imageOnLoad, onError: onError }, imgProps))));
     }
 }
 
-const h$4 = React.createElement;
+const h$5 = React.createElement;
 /** 是否是支持的type */
 const getTrueType = function getTrueType(type, confirmType, password) {
     if (confirmType === 'search')
@@ -529,7 +529,7 @@ class Input extends React.Component {
     render() {
         const _a = this.props, { type, password, placeholder, disabled, maxlength, confirmType, name, className, value, controlled } = _a; __rest(_a, ["type", "password", "placeholder", "disabled", "maxlength", "confirmType", "name", "className", "value", "controlled"]);
         const { _value } = this.state;
-        return (h$4("input", { ref: (input) => {
+        return (h$5("input", { ref: (input) => {
                 this.inputRef = input;
             }, className: className, 
             // 受控则只使用外部值，非受控优先使用外部值
@@ -537,9 +537,9 @@ class Input extends React.Component {
     }
 }
 
-var cssStyle$1 = {"text":{"MozUserSelect":"none","WebkitUserSelect":"none","MsUserSelect":"none","userSelect":"none"},"textSelectable":{"MozUserSelect":"text","WebkitUserSelect":"text","MsUserSelect":"text","userSelect":"text"}};
+var cssStyle$2 = {"text":{"MozUserSelect":"none","WebkitUserSelect":"none","MsUserSelect":"none","userSelect":"none"},"textSelectable":{"MozUserSelect":"text","WebkitUserSelect":"text","MsUserSelect":"text","userSelect":"text"}};
 
-const h$3 = React.createElement;
+const h$4 = React.createElement;
 class Text extends React.Component {
     constructor() {
         super(...arguments);
@@ -577,12 +577,12 @@ class Text extends React.Component {
     render() {
         const _a = this.props, { className, id, selectable = false, style, hoverStyle } = _a; __rest(_a, ["className", "id", "selectable", "style", "hoverStyle"]);
         const { hover } = this.state;
-        const cls = Object.assign(Object.assign(Object.assign(Object.assign({}, cssStyle$1.text), (selectable ? cssStyle$1.textSelectable : {})), style), (hover ? hoverStyle : {}));
-        return (h$3("span", { id: id, onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), style: cls, className: className, onClick: commonEventHander.bind(this) }, this.props.children));
+        const cls = Object.assign(Object.assign(Object.assign(Object.assign({}, cssStyle$2.text), (selectable ? cssStyle$2.textSelectable : {})), style), (hover ? hoverStyle : {}));
+        return (h$4("span", { id: id, onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), style: cls, className: className, onClick: commonEventHander.bind(this) }, this.props.children));
     }
 }
 
-const h$2 = React.createElement;
+const h$3 = React.createElement;
 class View extends React.Component {
     constructor() {
         super();
@@ -636,13 +636,13 @@ class View extends React.Component {
         const _a = this.props, { className, style, hoverStyle } = _a; __rest(_a, ["className", "style", "hoverStyle"]);
         const { hover } = this.state;
         const conStyle = Object.assign(Object.assign({}, style), (hover ? hoverStyle : {}));
-        return (h$2("div", { onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, this.props.children));
+        return (h$3("div", { onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, this.props.children));
     }
 }
 
-var cssStyle = {"scroll":{"WebkitOverflowScrolling":"auto"},"scroll::-webkit-scrollbar":{"display":"none"},"scroll-view":{"overflow":"hidden"}};
+var cssStyle$1 = {"scroll":{"WebkitOverflowScrolling":"auto"},"scroll::-webkit-scrollbar":{"display":"none"},"scroll-view":{"overflow":"hidden"}};
 
-const h$1 = React.createElement;
+const h$2 = React.createElement;
 function throttle(fn, threshold = 250, scope) {
     let lastTime = 0;
     let deferTimer;
@@ -718,17 +718,17 @@ function scrollHorizontal(left, isAnimation) {
     }
     this._scrollLeft = left;
 }
-const scrollBar = document.createElement('style');
-scrollBar.type = 'text/css';
-scrollBar.id = '_theOnlyScrollBar';
-scrollBar.innerHTML = `
+const scrollBar$1 = document.createElement('style');
+scrollBar$1.type = 'text/css';
+scrollBar$1.id = '_theOnlyScrollBar';
+scrollBar$1.innerHTML = `
     ._scrollView::-webkit-scrollbar {
         display: none
     }
 `;
-const head = document.getElementsByTagName('head').item(0);
+const head$1 = document.getElementsByTagName('head').item(0);
 if (!document.getElementById('_theOnlyScrollBar')) {
-    head.append(scrollBar);
+    head$1.append(scrollBar$1);
 }
 class ScrollView extends React.Component {
     constructor() {
@@ -821,15 +821,21 @@ class ScrollView extends React.Component {
                     scrollWidth,
                 }
             });
-            upperAndLowerThrottle(e);
-            onScroll && onScroll(e);
+            const event = { type: 'scroll', detail: {
+                    scrollLeft,
+                    scrollTop,
+                    scrollHeight,
+                    scrollWidth,
+                }, timestamp: new Date().getTime() };
+            upperAndLowerThrottle(event);
+            onScroll && onScroll(event);
         };
         const _onTouchMove = e => {
             onTouchMove ? onTouchMove(e) : this.onTouchMove(e);
         };
-        return (h$1("div", { className: `${className} _scrollView`, ref: container => {
+        return (h$2("div", { className: `${className} _scrollView`, ref: container => {
                 this.container = container;
-            }, style: Object.assign(Object.assign(Object.assign({}, cssStyle.scroll), style), scrollWhere), onScroll: _onScroll, onTouchMove: _onTouchMove }, this.props.children));
+            }, style: Object.assign(Object.assign(Object.assign({}, cssStyle$1.scroll), style), scrollWhere), onScroll: _onScroll, onTouchMove: _onTouchMove }, this.props.children));
     }
 }
 ScrollView.defaultProps = {
@@ -838,6 +844,163 @@ ScrollView.defaultProps = {
     upperThreshold: 50,
     lowerThreshold: 50,
     scrollWithAnimation: false,
+};
+
+var cssStyle = {"taroTextarea":{"display":"block","appearance":"none","cursor":"auto","lineHeight":"1.5","resize":"none","outline":"none"}};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+const h$1 = React.createElement;
+const scrollBar = document.createElement('style');
+scrollBar.type = 'text/css';
+scrollBar.id = '_theOnlytextarea';
+scrollBar.innerHTML = `
+    .taroTextareaCore {
+        &:focus {
+            outline: none;
+          }
+    }
+    .taroTextareaCore::-webkit-scrollbar {
+        display: none
+    }
+`;
+const head = document.getElementsByTagName('head').item(0);
+if (!document.getElementById('_theOnlytextarea')) {
+    head.append(scrollBar);
+}
+class Textarea extends React.Component {
+    constructor() {
+        super(...arguments);
+        this.textareaRef = null;
+        this.el = null;
+        this.value = '';
+        this.line = 1;
+        this.handleLineChange = () => {
+            const line = this.getNumberOfLines();
+            if (line !== this.line) {
+                this.line = line;
+                this.textareaRef.rows = line;
+            }
+        };
+        this.getNumberOfLines = () => {
+            const ta = this.textareaRef, style = window.getComputedStyle ? window.getComputedStyle(ta) : ta.style, 
+            // This will get the line-height only if it is set in the css,
+            // otherwise it's "normal"
+            taLineHeight = parseInt(style.lineHeight, 10), 
+            // Get the scroll height of the textarea
+            taHeight = this.calculateContentHeight(ta, taLineHeight), 
+            // calculate the number of lines
+            numberOfLines = Math.ceil(taHeight / taLineHeight);
+            return numberOfLines;
+        };
+        this.calculateContentHeight = (ta, scanAmount) => {
+            let cta = getComputedStyle(ta);
+            let origHeight = ta.style.height, height = ta.offsetHeight, scrollHeight = parseFloat(cta.height), overflow = ta.style.overflow, originMinHeight = ta.style.minHeight || null;
+            // scrollHeight -= paddingAll;
+            /// only bother if the ta is bigger than content
+            if (height >= scrollHeight) {
+                ta.style.minHeight = 0;
+                /// check that our browser supports changing dimension
+                /// calculations mid-way through a function call...
+                ta.style.height = height + scanAmount + 'px';
+                /// because the scrollbar can cause calculation problems
+                ta.style.overflow = 'hidden';
+                /// by checking that scrollHeight has updated
+                if (scrollHeight < ta.scrollHeight) {
+                    /// now try and scan the ta's height downwards
+                    /// until scrollHeight becomes larger than height
+                    while (ta.offsetHeight >= ta.scrollHeight) {
+                        ta.style.height = (height -= scanAmount) + 'px';
+                    }
+                    /// be more specific to get the exact height
+                    while (ta.offsetHeight < ta.scrollHeight) {
+                        ta.style.height = height++ + 'px';
+                    }
+                    /// reset the ta back to it's original height
+                    ta.style.height = origHeight;
+                    /// put the overflow back
+                    ta.style.overflow = overflow;
+                    ta.style.minHeight = originMinHeight;
+                    return height;
+                }
+            }
+            else {
+                return scrollHeight;
+            }
+        };
+    }
+    componentDidMount() {
+        const { value = '' } = this.props;
+        if (value != '') {
+            this.textareaRef.value = value;
+        }
+    }
+    render() {
+        const { style, placeholder, disabled, maxLength, autoFocus, autoHeight, name, nativeProps, onInput, onFocus, onBlur, onConfirm } = this.props;
+        const otherProps = {};
+        if (autoHeight) {
+            otherProps.rows = this.line;
+            cssStyle.taroTextarea.height = 'auto';
+        }
+        const _onInput = (e) => {
+            const { value } = this.textareaRef;
+            const event = {
+                type: 'input', detail: {
+                    value,
+                    cursor: value.length,
+                }, timestamp: new Date().getTime()
+            };
+            onInput && onInput(event);
+            if (autoHeight)
+                this.handleLineChange();
+        };
+        const _onFocus = (e) => {
+            const { value } = this.textareaRef;
+            const event = {
+                type: 'focus', detail: {
+                    value,
+                    cursor: value.length,
+                }, timestamp: new Date().getTime()
+            };
+            onFocus && onFocus(event);
+        };
+        const _onBlur = (e) => {
+            const { value } = this.textareaRef;
+            const event = {
+                type: 'blur', detail: {
+                    value,
+                    cursor: value.length,
+                }, timestamp: new Date().getTime()
+            };
+            onBlur && onBlur(event);
+        };
+        const _onConfirm = (e) => {
+            if (e.keyCode === 13) {
+                const { value } = this.textareaRef;
+                const event = {
+                    type: 'confirm', detail: {
+                        value,
+                        cursor: value.length,
+                    }, timestamp: new Date().getTime()
+                };
+                onConfirm && onConfirm(event);
+            }
+        };
+        return (h$1("textarea", Object.assign({ ref: input => {
+                if (input) {
+                    this.textareaRef = input;
+                }
+            }, style: Object.assign(Object.assign({}, style), cssStyle.taroTextarea), className: 'taroTextareaCore', placeholder: placeholder, name: name, disabled: !!disabled, maxLength: maxLength, autoFocus: autoFocus, onInput: _onInput, onFocus: _onFocus, onBlur: _onBlur, onKeyUp: _onConfirm }, nativeProps, otherProps)));
+    }
+}
+Textarea.defaultProps = {
+    disabled: false,
+    maxlength: 140,
+    readonly: false,
+    focus: false,
+    autoHeight: false,
+    showCount: true,
+    controlled: false,
 };
 
 /** 组件映射表 */
@@ -849,6 +1012,7 @@ const componentReflectMap = {
     text: Text,
     view: View,
     'scroll-view': ScrollView,
+    textarea: Textarea,
 };
 /**
  * @description 拦截下来的react.createElement
