@@ -1,5 +1,5 @@
 import { commonEventHander } from '../../core/event';
-import { Component } from 'react';
+import React, { Component } from 'react';
 import cssStyle from './index.css'
 
 const h = React.createElement;

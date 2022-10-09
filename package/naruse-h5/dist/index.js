@@ -1,3 +1,5 @@
+import React from 'react';
+
 const createLogger = (name) => {
     const Logger = {
         debug () {
@@ -504,9 +506,6 @@ class Input extends React.Component {
         });
         setTimeout(() => { var _a; return this.props.focus && ((_a = this.inputRef) === null || _a === void 0 ? void 0 : _a.focus()); });
     }
-    setState(arg0) {
-        throw new Error('Method not implemented.');
-    }
     /** 输入 */
     handleInput(e) {
         e.stopPropagation();
@@ -557,9 +556,6 @@ class Text extends React.Component {
         setTimeout(() => {
             this.setState({ hover: true });
         }, hoverStartTime);
-    }
-    setState(arg0) {
-        throw new Error('Method not implemented.');
     }
     /** 点击结束时 */
     onTouchEnd() {
@@ -847,8 +843,6 @@ ScrollView.defaultProps = {
 };
 
 var cssStyle = {"taroTextarea":{"display":"block","appearance":"none","cursor":"auto","lineHeight":"1.5","resize":"none","outline":"none"}};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 const h$1 = React.createElement;
 const scrollBar = document.createElement('style');
