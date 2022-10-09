@@ -211,8 +211,14 @@ class ScrollView extends React.Component<IProps> {
                     scrollWidth,
                 }
             })
-            upperAndLowerThrottle(e);
-            onScroll && onScroll(e);
+            const event = { type: 'scroll', detail: {
+                scrollLeft,
+                scrollTop,
+                scrollHeight,
+                scrollWidth,
+            }, timestamp: new Date().getTime() };
+            upperAndLowerThrottle(event);
+            onScroll && onScroll(event);
         }
         const _onTouchMove = e => {
             onTouchMove ? onTouchMove(e) : this.onTouchMove(e);
