@@ -1,11 +1,12 @@
 import { naruseCreateElement } from '../components/index';
-import { getDeferred, globalEvent, EventBus } from '../../naruse-share/index';
+import { getDeferred, globalEvent, EventBus, initVersionLogger } from '../../naruse-share/index';
 import run from '../../naruse-parser/index';
 import { Component } from 'react';
 import api from '../api/index';
 
-const version = '0.1.1'
+const version = __VERSION__;
 
+initVersionLogger('naruse-h5', version);
 
 export const Naruse = {
     ...api,

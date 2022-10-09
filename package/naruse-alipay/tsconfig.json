@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",    
+    "target": "ES5",    
     "jsx": "react", /* Specify what JSX code is generated. */
     "jsxFactory": "createElement", /* Specify the JSX factory function used when targeting React JSX emit, e.g. 'React.createElement' or 'h'. */
     "module": "ESNext", /* Specify what module code is generated. */

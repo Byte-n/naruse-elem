@@ -1,8 +1,8 @@
 {
   "name": "naruse-weex",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "",
-  "main": "index.js",
+  "main": "./build/lib.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "rollup -c ./rollup.config.js -w --environment PROJECT_NAME:weex",
@@ -22,11 +22,13 @@
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-inject": "^4.0.4",
     "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^8.3.3",
     "@types/rax": "^1.0.8",
     "rax-components": "^0.6.5",
     "rollup": "^2.75.7",
     "rollup-plugin-external-globals": "^0.6.1",
+    "rollup-plugin-uglify": "^6.0.4",
     "typescript": "^4.7.4"
   }
 }

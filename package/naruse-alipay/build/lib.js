@@ -107,6 +107,15 @@ const createLogger = (name) => {
     return Logger;
 };
 
+const initVersionLogger = (name, version) => {
+    console.log(
+        `%c naruse %c ${name} v${version} %c`,
+        'background:#17c0eb ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
+        'background:#7158e2 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
+        'background:transparent'
+      );
+};
+
 const logger$1 = createLogger('naurse-error');
 
 
@@ -326,8 +335,6 @@ const getDeferred = (key) => {
         return deferMap[key] = getDeferPromise();
     }
 };
-
-const version = '0.0.7';
 
 var logger = createLogger('naruse-element');
 var NOOP = function () { };
@@ -771,6 +778,8 @@ var withPage = function (component) {
 };
 
 var apis = initNaruseAlipayApi();
+var version = "0.2.7";
+initVersionLogger('naruse-alipay', version);
 // naruse模块内容
 var Naruse = __assign(__assign(__assign({ Component: NaruseComponent, createElement: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
         clientName: 'alipay',

@@ -23,10 +23,9 @@ export const getNaruseComponentFromProps = async (props: any) => {
         logger.error('无效参数，无法生成对应naruse组件');
         return;
     }
-    const { hotPuller, baseCtx } = getNaruseConfig();
+    const { hotPuller } = getNaruseConfig();
     try {
-        const { code, ctx } = await hotPuller(props);
-        console.log(baseCtx);
+        const { code, ctx } = (await hotPuller(props)) || {};
         return getNaruseComponentFromCode(code, ctx);
     } catch (e) {
         logger.error('加载远程代码资源失败', e);

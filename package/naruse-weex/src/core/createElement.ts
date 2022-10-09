@@ -1,18 +1,9 @@
-import { createElement } from 'rax';
+import { createElement, Component as RaxComponent } from 'rax';
 import Component from './component'
 import { logger } from '../utils/log';
-import View from '../components/view/index';
-import Text from '../components/text/index';
-import Image from '../components/image/index';
 import { infectionStyleChildren } from './style';
+import { componentReflectMap } from '../components/index'
 
-
-/** 组件映射表 */
-const componentReflectMap: Record<string, any> = {
-    view: View,
-    text: Text,
-    image: Image,
-};
 
 /**
  * @description 拦截下来的rax.createElement
@@ -28,7 +19,7 @@ const naruseCreateElement = (type: string | { (arg0: any): any; prototype: any; 
         }
         return createElement(Component, props, children);
     }
-    if (type.prototype instanceof Component) {
+    if (type.prototype instanceof Component || type.prototype instanceof RaxComponent) {
         return createElement(type, props, children);
     }
     if (typeof type === 'function') {
@@ -44,7 +35,7 @@ const naruseCreateElement = (type: string | { (arg0: any): any; prototype: any; 
 
 
 const emptyElement = (): any => {
-    return createElement(View);
+    return createElement(componentReflectMap['view']);
 }
 
 export { naruseCreateElement, emptyElement };
