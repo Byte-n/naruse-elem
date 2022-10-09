@@ -95,17 +95,37 @@ export const initVnodeTree = function (vnode: any, parentId?: any) {
 };
 
 /**
+ * @description 事件分发中心
+ * @author CHC
+ * @date 2022-03-15 14:03:55
+ * @param {*} props
+ */
+ const allEvents = function allEvents (props: any) {
+    eventCenter(props, this.data.node);
+};
+
+/**
  * 小程序事件映射表
  */
-const eventNameMap = {
-    tap: 'onClick',
-    longPress: 'onLongClick',
-    input: 'onChange',
-    blur: 'onBlur',
-    focus: 'onFocus',
-    load: 'onLoad',
-    change: 'onChange',
-};
+const eventNameMap:Record<string, string> = {};
+
+const methodsTags = ['tap', 'input', 'blur', 'focus', 'load', 'change', 'confirm', 'keyBoardHeightChange', 'scroll', 'scrollToUpper', 'scrollToLower', 'touchStart', 'touchMove', 'touchEnd', 'touchCancel'];
+
+
+const methodTagTransformMap: Record<string, string> = {
+    'tap': 'click',
+    'longPress': 'longClick'
+}
+
+const transformFirstApha = (item: string) =>  'on' + item.slice(0, 1).toLocaleUpperCase() + item.slice(1)
+
+const methods: Record<string, any> = {};
+methodsTags.forEach((item) => {
+    const eventName = transformFirstApha(item);
+    methods[eventName] = allEvents;
+    eventNameMap[item] = transformFirstApha(methodTagTransformMap[item] || item);
+})
+
 
 /**
  * @description 事件处理中心
@@ -153,29 +173,11 @@ export const eventCenter = function (event: { target?: any; stopPropagation?: an
 };
 
 /**
- * @description 事件分发中心
- * @author CHC
- * @date 2022-03-15 14:03:55
- * @param {*} props
- */
-const allEvents = function allEvents (props: any) {
-    eventCenter(props, this.data.node);
-};
-
-/**
  * @description 小程序组件事件绑定
  * @type {*}
  * */
 export const miniappEventBehavior = {
     props: { component: {} },
     data: { node: {} },
-    methods: {
-        onTap: allEvents,
-        onLongPress: allEvents,
-        onInputInput: allEvents,
-        onInputBlur: allEvents,
-        onInputFocus: allEvents,
-        onImageLoad: allEvents,
-        onCheckboxChange: allEvents,
-    },
+    methods,
 };
