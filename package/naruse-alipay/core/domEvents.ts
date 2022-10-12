@@ -7,21 +7,6 @@ const allowPropagetionEventNames = ['onLongClick', 'onClick'];
 
 
 /**
- * @description 为元素生成随机id
- * @author CHC
- * @date 2022-02-23 09:02:25
- * @param {*} randomLength
- * @returns {*}
- */
-const randomId = (randomLength: number | undefined) => {
-    let idStr = Date.now().toString(36);
-    idStr += (Math.random()).toString(36)
-        .slice(2, randomLength);
-    return idStr;
-};
-
-
-/**
  * @description 获取节点的路径
  * @author CHC
  * @date 2022-02-23 09:02:32
@@ -72,6 +57,7 @@ export const getVnodeById = function (id: any, vnode: any) {
     return node;
 };
 
+
 /**
  * @description 初始化节点
  * @author CHC
@@ -81,11 +67,9 @@ export const getVnodeById = function (id: any, vnode: any) {
  * @param {*} parentId
  * @returns {*}
  */
-export const initVnodeTree = function (vnode: any, parentId?: any) {
+ export const initVnodeTree = function (vnode: any, parentId?: any) {
     const newNode = vnode;
     if (!vnode || typeof vnode !== 'object') return {};
-    // 没有id的挂上id
-    if (!newNode.id) newNode.id = randomId(16);
     newNode.parentId = parentId;
     // 递归遍历
     if (Array.isArray(newNode.childNodes)) {
@@ -135,13 +119,14 @@ methodsTags.forEach((item) => {
  * @param {*} nodeTree
  * @returns {*}
  */
-export const eventCenter = function (event: { target?: any; stopPropagation?: any; type?: any; }, nodeTree: any) {
+export const eventCenter = function (event: { target?: any; stopPropagation?: any; type?: any; naruseTarget?: any, narusePropagetion?: boolean }, nodeTree: any) {
     // 是否继续冒泡的标志
     let stopFlag = false;
     // 空事件不响应
     if (!(event && event.target && event.target.id)) return;
     // 空节点不响应
     const eventNode = getVnodeById(event.target.id, nodeTree);
+    event.naruseTarget = eventNode;
     if (!eventNode) return;
     // 获取事件类型
     const { type } = event;

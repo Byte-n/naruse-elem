@@ -3,6 +3,7 @@ import {
     NOOP
 } from './uitl';
 import type { Middware } from './middware';
+import { VNode } from './diff';
 /**
  * @description naruseComponent 实现
  * @author CHC
@@ -44,13 +45,15 @@ export class NaruseComponent {
             logger.error('小程序组件未装载完毕，无法更新！');
             return;
         }
-        const flag = this.$updater.shouldUpdate(this.props, this.state);
-        flag && this.$updater.update(callback)
+        this.$updater.update(callback);
     }
+    // @ts-ignore
+    shouldComponentUpdate ():boolean {}
     componentDidMount() {}
     componentDidUpdate() {}
     componentWillUnmount() {}
-    render() {}
+    // @ts-ignore
+    render(): VNode {}
 }
 
 
