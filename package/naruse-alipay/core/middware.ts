@@ -15,7 +15,7 @@ import { logger, NOOP, propsEquals } from './uitl';
  * @note 因为是先创建的naruseComponent组件实例，后创建的中间件，所以采用后绑定
  */
 export class Middware {
-    naruseComponent: NaruseComponent;
+    naruseComponent: NaruseComponent | null;
     props: any;
     component: any;
     fristRender: boolean = true;
@@ -24,7 +24,7 @@ export class Middware {
     lastUpdateNode: VNode;
     /** diff修改队列 */
     diffQueue: Record<string, any> = {};
-    constructor(miniappComponent: any, NaruseComponentActuator: any, props: {}) {
+    constructor(miniappComponent: any, NaruseComponentActuator: typeof NaruseComponent | NaruseComponent, props: {}) {
         this.props = props;
         this.component = miniappComponent;
         if (NaruseComponentActuator instanceof NaruseComponent) {
@@ -106,10 +106,14 @@ export class Middware {
     }
 
     /** 卸载时 */
-    onUnMount() {
+    onUnMount(isMiniComponentUnmount: boolean = false) {
         this.naruseComponent && this.naruseComponent.componentWillUnmount();
         // 解绑对象
-        this.component = null;
+        // fix: 修复当naruse组件卸载时把小程序组件一起卸载导致后续渲染失败
+        if (isMiniComponentUnmount) {
+            this.component = null;
+        }
+        this.naruseComponent!.$updater = null;
         this.naruseComponent = null;
     }
 }

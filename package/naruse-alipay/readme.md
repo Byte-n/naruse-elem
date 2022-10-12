@@ -1,8 +1,16 @@
-# naruse-element
+# naruse-alipay
 
 这是一个在小程序内模拟WEB的DOM树的基础库
 
+
+## todo
++ [ ] 优化diff函数，key
++ [ ] 增加更多的组件
+
 ## history
+#### 0.3.1
++ #FIX: 修复了组件错误的卸载方式
++ #FIX: 修复了当渲染为空时无法渲染的问题
 #### 0.3.0
 + #FEAT: 新增diff阶段，优化渲染速度与内容
 + #FIX: 修复部分组件属性失效

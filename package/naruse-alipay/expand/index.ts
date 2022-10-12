@@ -1,10 +1,11 @@
+import type { NaruseComponent } from "core/component";
 import { globalEvent } from "../../naruse-share/index";
 import { getNaruseComponentFromCode } from "../core/create";
 import { Middware } from '../core/middware'
 import { logger } from "../core/uitl";
 
 
-const bindedPages = {};
+const bindedPages: Record<string, any> = {};
 
 // 扩展能力，小程序环境内特殊的api
 
@@ -16,7 +17,7 @@ const bindedPages = {};
  * @param {*} page
  * @param {*} Component
  */
-const renderComponentOnPage = (route, Component) => {
+const renderComponentOnPage = (route: string, Component: NaruseComponent) => {
     globalEvent.emit('naruse.renderComponentOnPage', route, Component);
 };
 
@@ -28,7 +29,7 @@ const renderComponentOnPage = (route, Component) => {
  * @param {*} page
  * @param {*} Component
  */
-const bindRenderEventOnComponent = (miniComponent) => {
+const bindRenderEventOnComponent = (miniComponent: any) => {
     if (!miniComponent) return;
     const { route } =  miniComponent.$page;
     if (bindedPages[route]) {
@@ -37,7 +38,7 @@ const bindRenderEventOnComponent = (miniComponent) => {
     }
     bindedPages[route] = miniComponent;
     miniComponent._naruseEventCenter = globalEvent;
-    globalEvent.on('naruse.renderComponentOnPage', (pageName, Component) => {
+    globalEvent.on('naruse.renderComponentOnPage', (pageName: string, Component: NaruseComponent) => {
         if (pageName !== route) return;
         // 卸载已有组件
         miniComponent.$middware && miniComponent.$middware.onUnMount();
@@ -53,7 +54,7 @@ const bindRenderEventOnComponent = (miniComponent) => {
  * @date 2022-08-02 10:08:59
  * @param {*} miniComponent
  */
-export const uninstallMainComponentOnSomePage = (miniComponent) => {
+export const uninstallMainComponentOnSomePage = (miniComponent: any) => {
     if (!miniComponent) return;
     const { route } = miniComponent.$page;
     if (!bindedPages[route]) return;
