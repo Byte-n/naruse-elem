@@ -34,10 +34,13 @@ export type VNode = BaseVNode | null | undefined;
  */
 export const vnodeDiff = (newVnode: VNode, oldVnode: VNode, newParentNode?: VNode, oldParentNode?: VNode, path = 'node', diffRes: DiffRes = {}): DiffRes => {
     const res = diffRes;
-    if (newVnode === oldVnode) return res;
     // just null
-    if (!newVnode) {
+    if (!newVnode || isEmptyObj(newVnode)) {
         res[path] = {};
+        return res;
+    }
+
+    if (newVnode === oldVnode) {
         return res;
     }
 

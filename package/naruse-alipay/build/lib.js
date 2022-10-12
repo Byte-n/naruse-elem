@@ -941,11 +941,12 @@ var vnodeDiff = function (newVnode, oldVnode, newParentNode, oldParentNode, path
     if (path === void 0) { path = 'node'; }
     if (diffRes === void 0) { diffRes = {}; }
     var res = diffRes;
-    if (newVnode === oldVnode)
-        return res;
     // just null
-    if (!newVnode) {
+    if (!newVnode || isEmptyObj(newVnode)) {
         res[path] = {};
+        return res;
+    }
+    if (newVnode === oldVnode) {
         return res;
     }
     // 继承父组件id
@@ -1332,10 +1333,15 @@ var Middware = /** @class */ (function () {
         return res === undefined ? true : res;
     };
     /** 卸载时 */
-    Middware.prototype.onUnMount = function () {
+    Middware.prototype.onUnMount = function (isMiniComponentUnmount) {
+        if (isMiniComponentUnmount === void 0) { isMiniComponentUnmount = false; }
         this.naruseComponent && this.naruseComponent.componentWillUnmount();
         // 解绑对象
-        this.component = null;
+        // fix: 修复当naruse组件卸载时把小程序组件一起卸载导致后续渲染失败
+        if (isMiniComponentUnmount) {
+            this.component = null;
+        }
+        this.naruseComponent.$updater = null;
         this.naruseComponent = null;
     };
     return Middware;
@@ -1498,7 +1504,7 @@ var createMainBehavior = function (option) {
             if (!this.$middware)
                 return;
             uninstallMainComponentOnSomePage(this);
-            this.$middware.onUnMount();
+            this.$middware.onUnMount(true);
         } });
     return naruseBehavior;
 };
@@ -1578,7 +1584,7 @@ var createSubBehavior = function () {
         didUnmount: function () {
             if (!this.$middware)
                 return;
-            this.$middware.onUnMount();
+            this.$middware.onUnMount(true);
         } });
     return naruseBehavior;
 };

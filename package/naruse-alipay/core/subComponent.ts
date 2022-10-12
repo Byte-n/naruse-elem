@@ -79,7 +79,7 @@ const createSubBehavior = () => {
          */
         didUnmount() {
             if (!this.$middware) return;
-            this.$middware.onUnMount();
+            this.$middware.onUnMount(true);
         },
     };
     return naruseBehavior;

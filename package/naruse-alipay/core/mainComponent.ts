@@ -84,7 +84,7 @@ const createMainBehavior = (option = {}) => {
         didUnmount() {
             if (!this.$middware) return;
             uninstallMainComponentOnSomePage(this);
-            this.$middware.onUnMount();
+            this.$middware.onUnMount(true);
         },
     };
     return naruseBehavior;

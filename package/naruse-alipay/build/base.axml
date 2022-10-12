@@ -1,6 +1,6 @@
 <!-- 视图组件 -->
 <template name="view">
-    <view id="{{ id }}" class="{{className || ''}}" style="{{style || ''}}" disable-scroll="{{ disableScroll }}" hidden="{{ hidden }}" 
+    <view key="{{key}}" id="{{ id }}" class="{{className || ''}}" style="{{style || ''}}" disable-scroll="{{ disableScroll }}" hidden="{{ hidden }}" 
         hover-class="{{ hoverClass }}" catchTap="onTap">
         <block a:if="{{ childNodes }}">
             <template a:for="{{ childNodes }}" data="{{ ...item }}" is="{{ item.naruseType }}"></template>
@@ -9,7 +9,7 @@
 </template>
 <!-- 文字 -->
 <template name="text">
-    <text id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" 
+    <text key="{{key}}" id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" 
         catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" catchTap="onTap" catchLongpress="onLongPress" selectable="{{selectable}}" 
         space="{{space}}" decode="{{decode}}">
         {{content}}
@@ -17,26 +17,26 @@
 </template>
 <!-- 富文本 -->
 <template name="rich-text">
-    <rich-text id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" 
+    <rich-text key="{{key}}" id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" 
         catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" catchTap="onTap" catchLongpress="onLongPress" nodes="{{nodes}}" 
         space="{{space}}"></rich-text>
 </template>
 <!-- 图标 -->
 <template name="icon">
-    <icon id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" 
+    <icon key="{{key}}" id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" 
         catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" 
         catchTap="onTap" catchLongpress="onLongPress" type="{{type}}" size="{{size}}" color="{{color}}"></icon>
 </template>
 <!-- 图片 -->
 <template name="image">
-    <image id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" 
+    <image key="{{key}}" id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" 
         catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" 
         catchTap="onTap" catchLongpress="onLongPress" rendering-mode="{{renderingMode}}" src="{{src}}" mode="{{mode}}" webp="{{webp}}" 
         lazy-load="{{lazyLoad}}" show-menu-by-longpress="{{showMenuByLongpress}}" onLoad="onLoad" catchError="onError"></image>
 </template>
 <!-- 视频 -->
 <template name="video">
-    <video id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" 
+    <video key="{{key}}" id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" 
         catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" 
         catchTap="onTap" catchLongpress="onLongPress" src="{{src}}" duration="{{duration}}" controls="{{controls}}" danmu-list="{{danmuList}}" 
         danmu-btn="{{danmuBtn}}" enable-danmu="{{enableDanmu}}" autoplay="{{autoplay}}" loop="{{loop}}" muted="{{muted}}" 
@@ -57,7 +57,7 @@
 </template>
 <!-- 按钮 -->
 <template name="button">
-    <button id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" 
+    <button key="{{key}}" id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" 
         catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" 
         catchTap="onTap" catcLongpress="onLongPress" size="{{size}}" type="{{type}}" plain="{{plain}}" disabled="{{disabled}}" 
         loading="{{loading}}" form-type="{{formType}}" open-type="{{openType}}" hover-class="{{hoverClass}}" hover-stop-propagation="{{hoverStopPropagation}}" 
@@ -73,7 +73,7 @@
     </button>
 </template>
 <template name="checkbox">
-    <checkbox-group id="{{id}}" class="{{className}}" style="{{style}}" data-private-node-id="{{nodeId}}" 
+    <checkbox-group key="{{key}}" id="{{id}}" class="{{className}}" style="{{style}}" data-private-node-id="{{nodeId}}" 
     data-private-page-id="{{pageId}}" onChange="onCheckboxChange">
     <checkbox hidden="{{hidden}}" data-private-node-id="{{nodeId}}" data-private-page-id="{{pageId}}" catchTouchstart="onTouchStart" 
         catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" catchTouchcancel="onTouchCancel" catchTap="onTap" catcLongpress="onLongPress" 
@@ -82,7 +82,7 @@
 </template>
 
 <template name="input">
-    <input hidden="{{hidden}}" id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" 
+    <input key="{{key}}" hidden="{{hidden}}" id="{{id}}" class="{{className}}" style="{{style}}" hidden="{{hidden}}" data-private-node-id="{{nodeId}}" 
     data-private-page-id="{{pageId}}" catchTouchstart="onTouchStart" catchTouchmove="onTouchMove" catchTouchend="onTouchEnd" 
     catchTouchcancel="onTouchCancel" catchTap="onTap" catcLongpress="onLongPress" value="{{value}}" type="{{type}}" password="{{password}}" 
     placeholder="{{placeholder}}" placeholder-style="{{placeholderStyle}}" placeholder-class="{{placeholderClass}}" disabled="{{disabled}}" 
@@ -94,7 +94,7 @@
 
 <!-- 滚动框 -->
 <template name="scroll-view">
-    <scroll-view id="{{id}}" class="{{className}}" style="{{style}}" scroll-x="{{scrollX}}" scroll-y="{{scrollY}}" upper-threshold="{{upperThreshold}}" 
+    <scroll-view key="{{key}}" id="{{id}}" class="{{className}}" style="{{style}}" scroll-x="{{scrollX}}" scroll-y="{{scrollY}}" upper-threshold="{{upperThreshold}}" 
     lower-threshold="{{lowerThreshold}}" scroll-top="{{scrollTop}}" scroll-left="{{scrollLeft}}" scroll-into-view="{{scrollIntoView}}" 
     scroll-with-animation="{{scrollWithAnimation}}" scroll-animation-duration="{{scrollAnimationDuration}}" enable-back-to-top="{{enableBackToTop}}" 
     trap-scroll="{{trapScroll}}" onScrollToUpper="onScrollToUpper" onScrollToLower="onScrollToLower" onScroll="onScroll" 
@@ -108,7 +108,7 @@
 
 <!-- 多行输入框 -->
 <template name="textarea">
-    <textarea id="{{id}}" name="{{name}}" value="{{value}}" style="{{style}}" placeholder="{{placeholder}}" placeholder-style="{{placeholderStyle}}" 
+    <textarea key="{{key}}" id="{{id}}" name="{{name}}" value="{{value}}" style="{{style}}" placeholder="{{placeholder}}" placeholder-style="{{placeholderStyle}}" 
     disabled="{{disabled}}" maxlength="{{maxLength}}" focus="{{focus}}" auto-height="{{autoHeight}}" show-count="{{showCount}}" controlled="{{controlled}}" 
     onInput="onInput" onFocus="onFocus" onBlur="onBlur" onConfirm="onConfirm"></textarea>
 </template>
