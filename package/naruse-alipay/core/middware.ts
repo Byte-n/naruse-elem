@@ -1,37 +1,10 @@
+import { isEmptyObj } from '../../naruse-share';
 import { NaruseComponent } from './component';
+import { VNode, vnodeDiff } from './diff';
 import { initVnodeTree } from './domEvents';
-import { logger, NOOP } from './uitl';
+import { logger, NOOP, propsEquals } from './uitl';
 
-/**
- * @description 两个props是否完全相同
- * @author CHC
- * @date 2022-03-21 18:03:59
- * @param {*} a
- * @param {*} b
- * @returns {*}
- */
-export const propsEquals = (a: { [x: string]: any; }, b: { [x: string]: any; component?: {}; }) => {
-    if (Object.is(a, b) && typeof a !== 'object') {
-        return true;
-    }
 
-    const aProps = Object.getOwnPropertyNames(a);
-    const bProps = Object.getOwnPropertyNames(b);
-
-    if (aProps.length !== bProps.length) {
-        return false;
-    }
-
-    for (let i = 0; i < aProps.length; i++) {
-        const propName = aProps[i];
-
-        if (a[propName] !== b[propName]) {
-            return false;
-        }
-    }
-
-    return true;
-};
 
 
 /**
@@ -42,12 +15,15 @@ export const propsEquals = (a: { [x: string]: any; }, b: { [x: string]: any; com
  * @note 因为是先创建的naruseComponent组件实例，后创建的中间件，所以采用后绑定
  */
 export class Middware {
-    naruseComponent: any;
+    naruseComponent: NaruseComponent;
     props: any;
     component: any;
-    fristRender: boolean;
-    updating: boolean;
+    fristRender: boolean = true;
+    updating: boolean = false;
     prevProps: any;
+    lastUpdateNode: VNode;
+    /** diff修改队列 */
+    diffQueue: Record<string, any> = {};
     constructor(miniappComponent: any, NaruseComponentActuator: any, props: {}) {
         this.props = props;
         this.component = miniappComponent;
@@ -58,8 +34,6 @@ export class Middware {
             this.naruseComponent.props = props;
         }
         this.naruseComponent.$updater = this;
-        this.fristRender = true;
-        this.updating = false;
     }
 
     /** 执行更新 */
@@ -68,17 +42,37 @@ export class Middware {
         !this.updating && Promise.resolve().then(() => {
             this.updating = false;
             // fix: maybe has unmounted
-            if (!this.naruseComponent) return;
+            if (!this.naruseComponent) {
+                logger.error('you are updating a has unmounted component, please check you code');
+                return;
+            };
             if (!this.naruseComponent.render) {
-                logger.error('组件必须需要一个render函数');
+                logger.error('the NaruseComponent must have a render function');
                 return;
             }
             const vnode = this.naruseComponent.render();
-            const node = initVnodeTree(vnode);
-            this.component.setData({ node }, () => {
+            // console.time('diff 花费时间');
+            initVnodeTree(vnode);
+            const diff = vnodeDiff(vnode, this.fristRender ? null : this.component.data.node);
+            const updatedCallBack = () => {
+                // console.log('data', JSON.parse(JSON.stringify(this.component.data.node)));
+                this.lastUpdateNode = vnode;
                 this.onUpdated.call(self);
                 callback();
-            });
+            };
+            
+            // console.timeEnd('diff 花费时间');
+
+            // console.log('new data', JSON.parse(JSON.stringify(vnode)));
+            // console.log('old data', JSON.parse(JSON.stringify(this.component.data.node)));
+            // console.log('diff data', JSON.parse(JSON.stringify(diff)));
+
+            // diff 存在结果才会重新渲染
+            if (!isEmptyObj(diff)) {
+                this.component.setData(diff, updatedCallBack);
+            } else {
+                updatedCallBack();
+            }
         });
         this.updating = true;
     }

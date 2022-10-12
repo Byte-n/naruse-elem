@@ -2,7 +2,7 @@ import { NaruseComponent } from './component';
 import { globalEvent, EventBus, getDeferred, initVersionLogger } from '../../naruse-share/index';
 import { initNaruseAlipayApi } from '../api/index';
 import { withPage } from '../api/HOC/index';
-import run from '../../naruse-parser/index';
+import run from '../../naruse-parser/dev';
 import { createElement } from './createElement';
 
 const apis = initNaruseAlipayApi();
@@ -27,7 +27,7 @@ export const Naruse = {
     ...my,
     ...apis,
     withPage,
-    unsafe_run: run, 
+    unsafe_run: run,
 };
 
 export const naruseExtend = (opt: any) => {

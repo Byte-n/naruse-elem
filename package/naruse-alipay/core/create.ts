@@ -1,6 +1,6 @@
 import { getNaruseConfig } from './init';
 import { logger, NOOP } from './uitl';
-import { run } from '../../naruse-parser/index';
+import { run } from '../../naruse-parser/dev';
 import { createElement } from './createElement';
 import { Naruse } from './naurse';
 

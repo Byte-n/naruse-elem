@@ -1,4 +1,8 @@
 import { isNaruseComponent } from './component';
+import { VNode } from './diff';
+
+
+let uid = 0;
 
 /**
  * @description 虚拟dom创建特殊处理map
@@ -6,7 +10,8 @@ import { isNaruseComponent } from './component';
  */
 const vnodeSpecialMap: any = {
     text (props, childNodes) {
-        return { content: childNodes ? childNodes[0] : '' };
+        const id = `_n_${uid++}`;
+        return { naruseType: 'text', content: childNodes, id, _uid: id };;
     },
 };
 
@@ -50,15 +55,23 @@ const createClassElement = (type: any, props: any, childNodes: any) => {
  * @param {*} childNodes
  * @returns {*}
  */
-const createBaseElement = (type: any, props: any, childNodes: any): any => {
+const createBaseElement = (type: any, props: any, childNodes: any): VNode => {
     let newNode = {};
     if (vnodeSpecialMap[type]) newNode = vnodeSpecialMap[type](props, childNodes);
     childNodes = (childNodes.flat && childNodes.flat(1)) || childNodes;
-    childNodes = childNodes.map(child => {
-        if (typeof child === 'string' || typeof child === 'number') return { naruseType: 'text', content: child };
+    childNodes = childNodes.map((child: any) => {
+        if (typeof child === 'string' || typeof child === 'number') {
+            const id = `_n_${uid++}`;
+            return { naruseType: 'text', content: child, id, _uid: id };
+        };
         return child;
     });
     const node = ({ naruseType: type, ...props, childNodes, ...newNode });
+
+    if (!node.id) {
+        node.id = node._uid = `_n_${uid++}`;
+    }
+
     return node;
 };
 
