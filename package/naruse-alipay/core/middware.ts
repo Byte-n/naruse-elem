@@ -113,7 +113,10 @@ export class Middware {
         if (isMiniComponentUnmount) {
             this.component = null;
         }
-        this.naruseComponent!.$updater = null;
+        // fix: 修复naruseComponent为空的情况
+        if (this.naruseComponent) {
+            this.naruseComponent.$updater = null;
+        }
         this.naruseComponent = null;
     }
 }
