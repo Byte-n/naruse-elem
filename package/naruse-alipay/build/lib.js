@@ -826,7 +826,7 @@ var withPage = function (component) {
 };
 
 var apis = initNaruseAlipayApi();
-var version = "0.3.0";
+var version = "0.3.2";
 initVersionLogger('naruse-alipay', version);
 // naruse模块内容
 var Naruse = __assign(__assign(__assign({ Component: NaruseComponent, createElement: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
@@ -1341,7 +1341,10 @@ var Middware = /** @class */ (function () {
         if (isMiniComponentUnmount) {
             this.component = null;
         }
-        this.naruseComponent.$updater = null;
+        // fix: 修复naruseComponent为空的情况
+        if (this.naruseComponent) {
+            this.naruseComponent.$updater = null;
+        }
         this.naruseComponent = null;
     };
     return Middware;
