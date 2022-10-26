@@ -40,6 +40,8 @@ export const isEmpty = (key) => {
  */
 export const isFunc = (obj) => typeof obj === 'function';
 
+export const isObj = (obj) => obj !== null &&  typeof obj === 'object';
+
 /**
  * @description 不会报错的JSON.parse
  * @author CHC
@@ -53,4 +55,16 @@ export const safeJsonParse = (str) => {
     } catch (e) {
         return null;
     }
+}
+
+/**
+ * @description 是否是一个空对象
+ * @author CHC
+ * @date 2022-10-12 14:10:29
+ */
+export const isEmptyObj = (o) => {
+    for (let i in o) {
+        return false;
+    }
+    return true;
 }
