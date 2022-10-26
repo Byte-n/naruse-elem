@@ -1,4 +1,4 @@
-import { isEmptyObj } from '../../naruse-share';
+import { isEmptyObj, isFunc } from '../../naruse-share';
 import { NaruseComponent } from './component';
 import { VNode, vnodeDiff } from './diff';
 import { initVnodeTree } from './domEvents';
@@ -20,6 +20,7 @@ export class Middware {
     component: any;
     fristRender: boolean = true;
     updating: boolean = false;
+    callbackList: Function[] = [];
     prevProps: any;
     lastUpdateNode: VNode;
     /** diff修改队列 */
@@ -39,6 +40,7 @@ export class Middware {
     /** 执行更新 */
     update(callback = NOOP) {
         const self = this;
+        this.callbackList.push(callback);
         !this.updating && Promise.resolve().then(() => {
             this.updating = false;
             // fix: maybe has unmounted
@@ -58,7 +60,7 @@ export class Middware {
                 // console.log('data', JSON.parse(JSON.stringify(this.component.data.node)));
                 this.lastUpdateNode = vnode;
                 this.onUpdated.call(self);
-                callback();
+                this.executeUpdateList();
             };
             
             // console.timeEnd('diff 花费时间');
@@ -75,6 +77,16 @@ export class Middware {
             }
         });
         this.updating = true;
+    }
+
+    /** 按序执行callbackList中的函数，非函数不执行 */
+    executeUpdateList() {
+        this.callbackList.forEach((item) => {
+            if (isFunc(item)) {
+                item();
+            }
+        });
+        this.callbackList.length = 0;
     }
 
     /** 更新后 */
