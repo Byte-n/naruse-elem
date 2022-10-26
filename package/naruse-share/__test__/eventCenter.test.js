@@ -16,6 +16,7 @@ describe('eventCenter', () => {
             expect(newEvent).to.have.property('on').that.is.a('function');
             expect(newEvent).to.have.property('off').that.is.a('function');
             expect(newEvent).to.have.property('emit').that.is.a('function');
+            expect(newEvent).to.have.property('once').that.is.a('function');
             expect(newEvent).to.have.property('clear').that.is.a('function');
         });
     });
@@ -166,6 +167,22 @@ describe('eventCenter', () => {
         })
     });
 
+    describe('once()', () => {
+        it('should be a function', () => {
+            expect(inst)
+                .to.have.property('once')
+                .that.is.a('function');
+        });
+
+        it('should emit once after remove', () => {
+            const foo = () => {};
+            inst.once('foo', foo);
+            inst.emit('foo',foo);
+            expect(events.get('foo')).to.have.length(0);
+        })
+
+    });
+
     describe('clear', () => {
         it('should be a function', () => {
             expect(inst)
@@ -194,6 +211,9 @@ describe('globalEvent', () => {
         expect(globalEvent)
             .to.have.property('emit')
             .that.is.a('function');
+        expect(globalEvent)
+            .to.have.property('once')
+            .that.is.a('function');  
     });
     it('should can trigger', () => {
         const ea = {};
@@ -206,6 +226,21 @@ describe('globalEvent', () => {
 
         ea.c = undefined;
         globalEvent.off('foo', foo);
+        globalEvent.emit('foo', ea);
+        expect(ea.c).equal(undefined);
+    });
+
+
+    it('once should can trigger', () => {
+        const ea = {};
+        const foo = (arg) => { arg.c = 123 };
+        globalEvent.once('foo', foo);
+        expect(ea.c).equal(undefined);
+
+        globalEvent.emit('foo', ea);
+        expect(ea.c).equal(123);
+
+        ea.c = undefined;
         globalEvent.emit('foo', ea);
         expect(ea.c).equal(undefined);
     });
