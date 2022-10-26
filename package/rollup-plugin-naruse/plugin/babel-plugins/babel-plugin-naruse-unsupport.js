@@ -20,27 +20,7 @@ const unsupportList = [
         desc: '数组解构',
     },
     {
-        name: 'WhileStatement',
-        desc: 'while循环',
-    },
-    {
-        name: 'SwitchStatement',
-        desc: 'switch语句',
-    },
-    {
-        name: 'ForInStatement',
-        desc: 'for in循环',
-    },
-    {
-        name: 'ForOfStatement',
-        desc: 'for of循环',
-    },
-    {
         name: 'AwaitExpression',
         desc: 'await 语句',
-    },
-    {
-        name: 'TryStatement',
-        desc: 'try catch语句',
     },
 ];
