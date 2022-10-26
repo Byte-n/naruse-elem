@@ -17,6 +17,15 @@ const mitt = function (n) {
                 typeof n === 'function' && n(e, ...t)
             })
         },
+        once: function (event, fun) {
+            var i = n.get(event);
+            const funcs = (...args) => {
+                fun(...args);
+                var i = n.get(event);
+                i && i.splice(i.indexOf(funcs) >>> 0, 1);
+            }
+            i ? i.push(funcs) : n.set(event, [funcs])
+        },
         clear: function () {
             n.clear();
         }
