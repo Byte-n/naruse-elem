@@ -1,5 +1,6 @@
 import { isEmptyObj, isObj } from "../../naruse-share";
 import type { NaruseComponent } from "./component";
+
 import { createElement } from "./createElement";
 
 type DiffRes = Record<string, any>;
@@ -26,10 +27,6 @@ export type VNode = BaseVNode | null | undefined;
  * @description 简单的o(n^2)diff操作，同时更新node
  * @author CHC
  * @date 2022-10-11 14:10:32
- * @param {*} newVnode 新生成的vnode
- * @param {*} oldVnode 旧的vnode
- * @param {Middware} middware 中间件
- * @param {string} [path=''] 小程序内部data路径
  * @returns {*} 
  */
 export const vnodeDiff = (newVnode: VNode, oldVnode: VNode, newParentNode?: VNode, oldParentNode?: VNode, path = 'node', diffRes: DiffRes = {}): DiffRes => {
@@ -40,9 +37,11 @@ export const vnodeDiff = (newVnode: VNode, oldVnode: VNode, newParentNode?: VNod
         return res;
     }
 
-    if (newVnode === oldVnode) {
-        return res;
-    }
+    // fix: 复用节点后diff失效的问题，单纯的使用指针判断是否相等在复用节点时会出现问题
+    // 完全相同的对象并不一定内容一定相同
+    // if (newVnode === oldVnode ) {
+    //     return res;
+    // }
 
     // 继承父组件id
     if (oldParentNode) {
