@@ -52,9 +52,9 @@ export const handleSyncApis = function handleSyncApis (key, global, args) {
 
             // 支付宝小程序遗留bug：值可能在data或APDataStorage字段下
             let data = null;
-            if (res.hasOwnProperty('data')) {
+            if (res && res.hasOwnProperty('data')) {
                 data = res.data;
-            } else if (res.hasOwnProperty('APDataStorage')) {
+            } else if (res && res.hasOwnProperty('APDataStorage')) {
                 data = res.APDataStorage;
             }
 

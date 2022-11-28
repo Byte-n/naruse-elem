@@ -8,9 +8,6 @@ const path = require('path');
 const version = JSON.parse(fs.readFileSync(path.join(__dirname, './package.json'), 'utf-8')).version;
 const customResolver = nodeResolve({ extensions: ['.mjs', '.js', '.jsx', '.json', '.sass', '.scss', '.css'] });
 
-
-
-
 /**
  * @type {import('rollup').RollupOptions}
  */
