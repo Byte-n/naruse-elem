@@ -5,12 +5,13 @@
   "main": "./build/lib.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "rollup -c ./rollup.config.js -w --environment PROJECT_NAME:weex",
+    "dev": "rollup -c ./rollup.config.js -w --environment PROJECT_NAME:weex",
     "build": "rollup -c ./rollup.config.js --environment PROJECT_NAME:weex"
   },
   "author": "CHC",
   "license": "ISC",
   "dependencies": {
+    "naruse-parser": "^0.0.8",
     "rax": "^1.1.0",
     "rax-document": "^0.1.0",
     "rax-image": "^2.0.0",

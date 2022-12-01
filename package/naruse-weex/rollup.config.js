@@ -20,7 +20,7 @@ module.exports = {
   },
   plugins: [
     replace({ __VERSION__: JSON.stringify(version) }),
-    alias({ customResolver }),
+    customResolver,
     typescript(),
   ],
   external: ['rax-components', 'rax', 'rax-text', 'rap-sdk'],

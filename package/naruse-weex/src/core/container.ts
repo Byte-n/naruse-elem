@@ -9,7 +9,7 @@
 import { Component, RaxNode } from 'rax';
 import { getNaruseConfig } from './init';
 import { logger } from '../utils/log';
-import { run } from '../../../naruse-parser/index';
+import { run } from 'naruse-parser';
 import { Naruse } from './naruse';
 import { emptyElement, naruseCreateElement } from './createElement';
 
