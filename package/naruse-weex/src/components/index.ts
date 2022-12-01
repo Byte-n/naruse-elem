@@ -1,6 +1,6 @@
-import View from '../components/view/index';
-import Text from '../components/text/index';
-import Image from '../components/image/index';
+import View from './view/index';
+import Text from './text/index';
+import Image from './image/index';
 import { ScrollView, TextInput } from 'rax-components';
 
 
