@@ -8,10 +8,10 @@ let uid = 0;
  * @description 虚拟dom创建特殊处理map
  * @type {*}
  */
-const vnodeSpecialMap: any = {
-    text (props, childNodes) {
+const vnodeSpecialMap: Record<string, Function> = {
+    text (props: any, childNodes: any []) {
         const id = `_n_${uid++}`;
-        return { naruseType: 'text', content: childNodes, id, _uid: id };;
+        return { naruseType: 'text', content: childNodes.join(''), id, _uid: id };;
     },
 };
 
