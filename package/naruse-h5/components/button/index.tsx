@@ -4,15 +4,36 @@ import cssStyle from './index.css';
 
 const h = React.createElement;
 
-class Button extends Component {
-    constructor () {
+class Button extends Component<
+    {
+        disabled,
+        hoverStartTime,
+        hoverStayTime,
+        onMouseEnter,
+        onMouseMove,
+        onMouseLeave,
+        onTransitionEnd,
+        onClick,
+        className,
+        style,
+        hoverStyle,
+        type,
+        activeStyle,
+    }, 
+    {
+        hover: boolean,
+        active: boolean,
+    }
+> {
+    touch = false;
+    constructor() {
         super();
         this.state = { hover: false, active: false };
         this.touch = false;
     }
 
     /** 当开始点击时 */
-    onTouchStart () {
+    onTouchStart() {
         const { disabled, hoverStartTime = 20 } = this.props;
         if (disabled) return;
 
@@ -23,7 +44,7 @@ class Button extends Component {
     }
 
     /** 点击结束时 */
-    onTouchEnd () {
+    onTouchEnd() {
         const { disabled, hoverStayTime = 70 } = this.props;
         if (disabled) {
             return;
@@ -38,7 +59,7 @@ class Button extends Component {
     }
 
     /** 当开始点击时 */
-    onActiveStart () {
+    onActiveStart() {
         const { disabled, hoverStartTime = 20 } = this.props;
         if (disabled) return;
 
@@ -49,7 +70,7 @@ class Button extends Component {
     }
 
     /** 点击结束时 */
-    onActiveEnd () {
+    onActiveEnd() {
         const { disabled, hoverStayTime = 70 } = this.props;
         if (disabled) {
             return;
@@ -63,7 +84,7 @@ class Button extends Component {
         }, hoverStayTime);
     }
 
-    render () {
+    render() {
         const {
             type,
             disabled,
@@ -94,6 +115,7 @@ class Button extends Component {
                 onClick={commonEventHander.bind(this)}
                 onTouchStart={this.onTouchStart.bind(this)}
                 onTouchEnd={this.onTouchEnd.bind(this)}
+                onTransitionEnd={commonEventHander.bind(this)}
             // {...other}
             >
                 {this.props.children}

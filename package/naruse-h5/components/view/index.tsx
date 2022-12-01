@@ -1,9 +1,25 @@
 import { commonEventHander, commonMouseEventCreater } from '../../core/event';
-import { Component } from 'react';
+import React, { Component } from 'react';
 
 const h = React.createElement;
 
-class View extends Component {
+class View extends Component<{ 
+    disabled, 
+    hoverStartTime, 
+    hoverStayTime, 
+    onMouseEnter,
+    onMouseMove,
+    onMouseLeave,
+    onTransitionEnd,
+    onClick,
+    className,
+    style,
+    hoverStyle,
+}, {
+    hover: boolean,
+}> {
+    mounted = false;
+    touch = false;
     constructor() {
         super();
         this.state = {
@@ -81,6 +97,7 @@ class View extends Component {
                 onMouseMove={this.onMouseMove.bind(this)}
                 onTouchStart={this.onTouchStart.bind(this)}
                 onTouchEnd={this.onTouchEnd.bind(this)}
+                onTransitionEnd={commonEventHander.bind(this)}
                 className={className}
                 style={conStyle}
                 onClick={commonEventHander.bind(this)}

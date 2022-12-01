@@ -61,6 +61,16 @@ const reflectEventMap = {
             detail: e.detail,
         };
     },
+    /** 动效结束 */
+    transitionend  (e) {
+        return {
+            type: 'transitionEnd',
+            detail: {
+                elapsedTime: e.elapsedTime,
+                propertyName: e.propertyName,
+            },
+        };
+    }
 };
 
 /** 事件名称对应处理名称 */
@@ -71,6 +81,7 @@ const reflectEventNameMap = {
     blur: 'onBlur',
     keydown: 'onKeyDown',
     input: 'onInput',
+    transitionend : 'onTransitionEnd',
 };
 
 
