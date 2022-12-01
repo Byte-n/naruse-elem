@@ -1,6 +1,6 @@
 import cssStyle from './index.css'
-
 import React from 'react'
+import { commonEventHander } from 'core/event';
 
 const h = React.createElement;
 
@@ -87,10 +87,11 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     scrollIntoView?: string
     scrollWithAnimation: boolean
     enableBackToTop?: boolean
-    onScrollToUpper: (e: React.SyntheticEvent<HTMLDivElement, Event>) => void
-    onScrollToLower: (e: React.SyntheticEvent<HTMLDivElement, Event>) => void
-    onScroll: (e: React.SyntheticEvent<HTMLDivElement, Event>) => void
-    onTouchMove: (e: React.SyntheticEvent<HTMLDivElement, Event>) => void
+    onScrollToUpper: (e: React.SyntheticEvent<HTMLDivElement>) => void
+    onScrollToLower: (e: React.SyntheticEvent<HTMLDivElement>) => void
+    onScroll: (e: React.SyntheticEvent<HTMLDivElement>) => void
+    onTouchMove: (e: React.SyntheticEvent<HTMLDivElement>) => void
+    onTransitionEnd: (e: React.SyntheticEvent<HTMLDivElement>) => void
 }
 
 const scrollId = 'scroll';
@@ -232,6 +233,7 @@ class ScrollView extends React.Component<IProps> {
                 style={{ ...cssStyle.scroll, ...style, ...scrollWhere }}
                 onScroll={_onScroll}
                 onTouchMove={_onTouchMove}
+                onTransitionEnd={commonEventHander.bind(this)}
             >
                 {this.props.children}
             </div>

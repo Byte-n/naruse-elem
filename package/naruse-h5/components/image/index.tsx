@@ -4,7 +4,26 @@ import cssStyle from './index.css'
 
 const h = React.createElement;
 
-class Image extends Component {
+class Image extends Component<
+{
+    lazyLoad,
+    mode,
+    onError,
+    onLoad,
+    src,
+    className,
+    style,
+    onClick,
+    onLongClick,
+    onLongTap,
+    imgProps,
+    id,
+}, {
+    isLoaded: boolean,
+}
+> {
+    observer: any;
+    imgRef: HTMLImageElement | null;
     constructor(props) {
         super(props);
         this.state = { isLoaded: false };
@@ -18,7 +37,7 @@ class Image extends Component {
                 // 异步 api 关系
                 if (entries[entries.length - 1].isIntersecting) {
                     this.setState({ isLoaded: true }, () => {
-                        this.imgRef.src = this.props.src;
+                        this.imgRef && (this.imgRef.src = this.props.src);
                     });
                 }
             }, { rootMargin: '300px 0px' });
@@ -55,6 +74,7 @@ class Image extends Component {
                         src={src}
                         onLoad={this.imageOnLoad}
                         onError={onError}
+                        onTransitionEnd={commonEventHander.bind(this)}
                         {...imgProps}
                     />
                 }
