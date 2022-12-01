@@ -24,7 +24,7 @@ interface BaseVNode {
 export type VNode = BaseVNode | null | undefined;
 
 /**
- * @description 简单的o(n^2)diff操作，同时更新node
+ * @description 简单的o(n^2)diff操作，记录需要更新的node
  * @author CHC
  * @date 2022-10-11 14:10:32
  * @returns {*} 
