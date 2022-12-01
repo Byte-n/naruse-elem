@@ -2,11 +2,11 @@ import { NaruseComponent } from './component';
 import { globalEvent, EventBus, getDeferred, initVersionLogger } from '../../naruse-share/index';
 import { initNaruseAlipayApi } from '../api/index';
 import { withPage } from '../api/HOC/index';
-import run from '../../naruse-parser/dev';
+import { run } from 'naruse-parser';
 import { createElement } from './createElement';
 
 const apis = initNaruseAlipayApi();
-
+// @ts-ignore
 const version = __VERSION__;
 initVersionLogger('naruse-alipay', version);
 

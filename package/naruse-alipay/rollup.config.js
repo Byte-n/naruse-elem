@@ -1,12 +1,18 @@
 const alias = require('@rollup/plugin-alias');
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const replace = require('@rollup/plugin-replace');
+const commonjs = require('@rollup/plugin-commonjs');
+
 
 const typescript = require('@rollup/plugin-typescript');
 const fs = require('fs');
 const path = require('path');
 const version = JSON.parse(fs.readFileSync(path.join(__dirname, './package.json'), 'utf-8')).version;
 const customResolver = nodeResolve({ extensions: ['.mjs', '.js', '.jsx', '.json', '.sass', '.scss', '.css'] });
+const { main: genTemplate } = require('./axml/index');
+
+// 生成对应模版文件
+genTemplate(path.join(__dirname, './build/'));
 
 /**
  * @type {import('rollup').RollupOptions}
@@ -19,6 +25,7 @@ module.exports = {
     },
     plugins: [
         alias({ customResolver }),
+        commonjs(),
         typescript(),
         replace({
             __IS_ALIAPY__: true,
