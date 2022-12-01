@@ -3,7 +3,18 @@
 import { logger } from './uitl';
 
 /** 允许继续冒泡的事件 */
-const allowPropagetionEventNames = ['onLongClick', 'onClick'];
+const allowPropagetionEventNames = [
+    'onClick',
+    'onLongClick',
+    'onTouchStart',
+    'onTouchMove',
+    'onTouchEnd',
+    'onTouchCancel',
+    'onTransitionEnd',
+    'onAnimationStart',
+    'onAnimationIteration',
+    'onAnimationEnd',
+];
 
 
 /**
@@ -67,7 +78,7 @@ export const getVnodeById = function (id: any, vnode: any) {
  * @param {*} parentId
  * @returns {*}
  */
- export const initVnodeTree = function (vnode: any, parentId?: any) {
+export const initVnodeTree = function (vnode: any, parentId?: any) {
     const newNode = vnode;
     if (!vnode || typeof vnode !== 'object') return {};
     newNode.parentId = parentId;
@@ -84,24 +95,42 @@ export const getVnodeById = function (id: any, vnode: any) {
  * @date 2022-03-15 14:03:55
  * @param {*} props
  */
- const allEvents = function allEvents (props: any) {
+const allEvents = function allEvents(props: any) {
     eventCenter(props, this.data.node);
 };
 
 /**
  * 小程序事件映射表
  */
-const eventNameMap:Record<string, string> = {};
+const eventNameMap: Record<string, string> = {};
 
-const methodsTags = ['tap', 'input', 'blur', 'focus', 'load', 'change', 'confirm', 'keyBoardHeightChange', 'scroll', 'scrollToUpper', 'scrollToLower', 'touchStart', 'touchMove', 'touchEnd', 'touchCancel'];
+const methodsTags = [
+    'tap',
+    'longTap',
+    'input',
+    'blur',
+    'focus',
+    'load',
+    'change',
+    'confirm',
+    'keyBoardHeightChange',
+    'scroll',
+    'scrollToUpper',
+    'scrollToLower',
+    'touchStart',
+    'touchMove',
+    'touchEnd',
+    'touchCancel',
+    'transitionEnd'
+];
 
 
 const methodTagTransformMap: Record<string, string> = {
     'tap': 'click',
-    'longPress': 'longClick'
+    'longTap': 'longClick'
 }
 
-const transformFirstApha = (item: string) =>  'on' + item.slice(0, 1).toLocaleUpperCase() + item.slice(1)
+const transformFirstApha = (item: string) => 'on' + item.slice(0, 1).toLocaleUpperCase() + item.slice(1)
 
 const methods: Record<string, any> = {};
 methodsTags.forEach((item) => {

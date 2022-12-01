@@ -1,7 +1,0 @@
-<include src="./base.axml"/>
-
-<template name="naruse-element">
-    <naruse-element component="{{ component }}"></naruse-element>
-</template>
-
-<template is="{{ node.naruseType }}" data="{{ ...node }}" />

@@ -1,6 +1,1 @@
-{
-    "component": true,
-    "usingComponents": {
-      "naruse-element": "./sub"
-    }
-}
+{"component":true,"usingComponents":{"naruse-element":"./sub"}}
