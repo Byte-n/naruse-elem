@@ -1,5 +1,5 @@
 import { globalEvent } from "../../../naruse-share/index";
-import { getNaruseComponentFromCode } from "../core/container";
+import { getNaruseComponentFromCode } from "./container";
 import { logger } from "../utils/log";
 
 
