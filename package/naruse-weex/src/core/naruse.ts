@@ -5,8 +5,9 @@ import * as System from '../api/system/index';
 import { getDeferred, EventBus, globalEvent, initVersionLogger } from '../../../naruse-share'
 import NaruseComponent from './component';
 import { naruseCreateElement } from './createElement';
-import run from '../../../naruse-parser';
+import { run } from 'naruse-parser';
 
+// @ts-ignore
 const version = __VERSION__;
 initVersionLogger('naruse-weex', version);
 
