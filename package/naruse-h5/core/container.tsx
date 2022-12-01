@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import run from '../../naruse-parser/index';
+import { run } from 'naruse-parser';
 import { Naruse } from './jsEngineEnv';
 import { getNaruseConfig } from './init';
 import { logger } from '../utils/log';

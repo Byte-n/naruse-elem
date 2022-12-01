@@ -1,9 +1,10 @@
 import { naruseCreateElement } from '../components/index';
 import { getDeferred, globalEvent, EventBus, initVersionLogger } from '../../naruse-share/index';
-import run from '../../naruse-parser/index';
+import { run } from 'naruse-parser';
 import { Component } from 'react';
 import api from '../api/index';
 
+// @ts-ignore
 const version = __VERSION__;
 
 initVersionLogger('naruse-h5', version);
@@ -24,9 +25,13 @@ export const Naruse = {
     EventBus,
     version,
     unsafe_run: run,
+    withPage: (Component) => {
+        return Component
+    }
 };
 
 if (typeof window !== 'undefined') {
+    // @ts-ignore
     window.Naruse = Naruse;
 }
 
