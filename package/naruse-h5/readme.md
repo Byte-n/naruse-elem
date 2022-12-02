@@ -2,6 +2,9 @@
 naruse的h5端运行平台
 
 ## 发布记录
+#### 0.1.9
++ #FEAT: 升级 naurse-parser 依赖为 0.0.8
++ #FEAT: 所有组件支持 onTransitionEnd 事件
 #### 0.1.8
 + #FIX: 修复因为TS自动补全导致的text,input组件setState失效的问题
 #### 0.1.7
