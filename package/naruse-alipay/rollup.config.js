@@ -24,7 +24,7 @@ module.exports = {
         format: 'es',
     },
     plugins: [
-        alias({ customResolver }),
+        customResolver,
         commonjs(),
         typescript(),
         replace({
