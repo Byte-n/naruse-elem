@@ -25,9 +25,7 @@ export const Naruse = {
     EventBus,
     version,
     unsafe_run: run,
-    withPage: (Component) => {
-        return Component
-    }
+    withPage: (Component) => Component,
 };
 
 if (typeof window !== 'undefined') {

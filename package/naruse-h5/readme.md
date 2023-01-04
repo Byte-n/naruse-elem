@@ -2,6 +2,12 @@
 naruse的h5端运行平台
 
 ## 发布记录
+#### 0.2.0
++ #FEAT: 升级 naurse-parser 依赖为 0.1.1
++ #FEAT: 支持 createAnimaton 组件
++ #FEAT: 支持 getImageInfo API 支持提前加载图片资源与信息
++ #FIX: 修复部分如 withPage 函数在 naruse-h5 内不存在的问题
++ #FIX: 修复部分组件缺少 id 等基本属性的问题
 #### 0.1.9
 + #FEAT: 升级 naurse-parser 依赖为 0.0.8
 + #FEAT: 所有组件支持 onTransitionEnd 事件

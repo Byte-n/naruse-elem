@@ -300,7 +300,7 @@ const getDeferred = (key) => {
     }
 };
 
-const logger = createLogger('naruse-h5');
+var logger = createLogger('naruse-h5');
 
 var reflectEventMap = {
     /** 点击事件处理 */
@@ -345,7 +345,6 @@ var reflectEventMap = {
     },
     /** 按键 */
     keydown: function (e) {
-        e.stopPropagation();
         var value = e.target.value;
         var keyCode = e.keyCode || e.code;
         return {
@@ -354,6 +353,9 @@ var reflectEventMap = {
                 value: value,
                 cursor: value.length,
                 keyCode: keyCode,
+            },
+            stopPropagation: function () {
+                e.stopPropagation();
             },
         };
     },
@@ -371,6 +373,9 @@ var reflectEventMap = {
             detail: {
                 elapsedTime: e.elapsedTime,
                 propertyName: e.propertyName,
+            },
+            stopPropagation: function () {
+                e.stopPropagation();
             },
         };
     }
@@ -709,6 +714,11 @@ var Text = /** @class */ (function (_super) {
     return Text;
 }(React.Component));
 
+/**
+ * 判断是否是 animation 名称
+ */
+var isNaruseAnimaitonName = function (name) { return name && name.substring(0, 19) === 'naruse-h5-poly-fill'; };
+
 var h$2 = React.createElement;
 var View = /** @class */ (function (_super) {
     __extends$1(View, _super);
@@ -723,6 +733,21 @@ var View = /** @class */ (function (_super) {
     }
     View.prototype.componentDidMount = function () {
         this.mounted = true;
+        // 等待装载完毕后再启动animation
+        this.updateAnimation();
+    };
+    View.prototype.componentDidUpdate = function () {
+        this.updateAnimation();
+    };
+    View.prototype.updateAnimation = function () {
+        var _this = this;
+        var animation = this.props.animation;
+        if (animation !== this.lastAnimationName && isNaruseAnimaitonName(animation)) {
+            console.log('装载动画', animation);
+            // 等待组件彻底装载完毕后再启动animation，否则会出现动画不生效的情况
+            setTimeout(function () { var _a; return (_a = _this.ref) === null || _a === void 0 ? void 0 : _a.setAttribute('data-animation', animation); });
+            this.lastAnimationName = animation;
+        }
     };
     View.prototype.componentWillUnmount = function () {
         this.mounted = false;
@@ -766,10 +791,11 @@ var View = /** @class */ (function (_super) {
         this.onTouchEnd();
     };
     View.prototype.render = function () {
-        var _a = this.props, className = _a.className, style = _a.style, hoverStyle = _a.hoverStyle; __rest(_a, ["className", "style", "hoverStyle"]);
+        var _this = this;
+        var _a = this.props, className = _a.className, style = _a.style, hoverStyle = _a.hoverStyle, id = _a.id; __rest(_a, ["className", "style", "hoverStyle", "id"]);
         var hover = this.state.hover;
         var conStyle = __assign(__assign({}, style), (hover ? hoverStyle : {}));
-        return (h$2("div", { onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, this.props.children));
+        return (h$2("div", { id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, this.props.children));
     };
     return View;
 }(React.Component));
@@ -867,7 +893,7 @@ scrollBar$1.id = '_theOnlyScrollBar';
 scrollBar$1.innerHTML = "\n    ._scrollView::-webkit-scrollbar {\n        display: none\n    }\n";
 var head$1 = document.getElementsByTagName('head').item(0);
 if (!document.getElementById('_theOnlyScrollBar')) {
-    head$1.append(scrollBar$1);
+    head$1 === null || head$1 === void 0 ? void 0 : head$1.append(scrollBar$1);
 }
 var ScrollView = /** @class */ (function (_super) {
     __extends$1(ScrollView, _super);
@@ -882,11 +908,21 @@ var ScrollView = /** @class */ (function (_super) {
         return _this;
     }
     ScrollView.prototype.componentDidMount = function () {
-        this.props.children;
         this.handleScroll(this.props, true);
+        this.updateAnimation();
     };
-    ScrollView.prototype.componentDidUpdate = function (prevProps, prevState, snapshot) {
+    ScrollView.prototype.componentDidUpdate = function () {
         this.handleScroll(this.props);
+        this.updateAnimation();
+    };
+    ScrollView.prototype.updateAnimation = function () {
+        var _this = this;
+        var animation = this.props.animation;
+        if (animation !== this.lastAnimationName) {
+            // 等待组件彻底装载完毕后再启动animation，否则会出现动画不生效的情况
+            setTimeout(function () { var _a; return (_a = _this.container) === null || _a === void 0 ? void 0 : _a.setAttribute('data-animation', animation); });
+            this.lastAnimationName = animation;
+        }
     };
     ScrollView.prototype.handleScroll = function (props, isInit) {
         var _this = this;
@@ -927,7 +963,7 @@ var ScrollView = /** @class */ (function (_super) {
     };
     ScrollView.prototype.render = function () {
         var _this = this;
-        var _a = this.props, className = _a.className, _b = _a.style, style = _b === void 0 ? {} : _b, scrollX = _a.scrollX, scrollY = _a.scrollY, onScroll = _a.onScroll, onScrollToUpper = _a.onScrollToUpper, onScrollToLower = _a.onScrollToLower, onTouchMove = _a.onTouchMove;
+        var _a = this.props, className = _a.className, _b = _a.style, style = _b === void 0 ? {} : _b, scrollX = _a.scrollX, scrollY = _a.scrollY, onScroll = _a.onScroll, onScrollToUpper = _a.onScrollToUpper, onScrollToLower = _a.onScrollToLower, onTouchMove = _a.onTouchMove, animation = _a.animation, id = _a.id;
         var _c = this.props, upperThreshold = _c.upperThreshold, lowerThreshold = _c.lowerThreshold;
         upperThreshold = upperThreshold ? Number(upperThreshold) : 0;
         lowerThreshold = lowerThreshold ? Number(lowerThreshold) : 0;
@@ -977,7 +1013,7 @@ var ScrollView = /** @class */ (function (_super) {
         var _onTouchMove = function (e) {
             onTouchMove ? onTouchMove(e) : _this.onTouchMove(e);
         };
-        return (h$1("div", { className: "".concat(className, " _scrollView"), ref: function (container) {
+        return (h$1("div", { id: id, "data-animation": animation, className: "".concat(className, " _scrollView"), ref: function (container) {
                 _this.container = container;
             }, style: __assign(__assign(__assign({}, cssStyle$1.scroll), style), scrollWhere), onScroll: _onScroll, onTouchMove: _onTouchMove, onTransitionEnd: commonEventHander.bind(this) }, this.props.children));
     };
@@ -1376,6 +1412,18 @@ var isYieldResult = function (scope, value) { return isGeneratorFunction(scope) 
 var isReturnResult = function (value) { return value === RETURN_SIGNAL; };
 var isContinueResult = function (value) { return value === CONTINUE_SIGNAL; };
 var isBreakResult = function (value) { return value === BREAK_SIGNAL; };
+/**
+ * 是否是函数提升语句
+ */
+var isPromoteStatement = function (value) {
+    return value.type === FunctionDeclaration;
+};
+/**
+ * 是否是变量提升语句
+ */
+var isVarPromoteStatement = function (value) {
+    return (value === null || value === void 0 ? void 0 : value.type) === VariableDeclaration && value.kind === 'var';
+};
 var BREAK_SIGNAL = {};
 var CONTINUE_SIGNAL = {};
 var RETURN_SIGNAL = { result: undefined };
@@ -1504,6 +1552,11 @@ var Scope = /** @class */ (function () {
         if (!$var) {
             this.content[name] = new ScopeVar('var', value);
             return true;
+            // #fix var 不允许重复声明
+        }
+        else if ($var instanceof ScopeVar) {
+            $var.$set(value);
+            return true;
         }
         return false;
     };
@@ -1525,8 +1578,15 @@ var illegalFun = [setTimeout, setInterval, clearInterval, clearTimeout];
 var isUndefinedOrNull = function (val) { return val === void 0 || val === null; };
 var evaluate_map = (_a = {},
     _a[Program] = function (program, scope) {
-        for (var _i = 0, _a = program.body; _i < _a.length; _i++) {
-            var node = _a[_i];
+        var nonFunctionList = [];
+        var list = program.body;
+        for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
+            var node = list_1[_i];
+            // function 声明语句 会提升到作用域顶部
+            isPromoteStatement(node) ? evaluate(node, scope) : nonFunctionList.push(node);
+        }
+        for (var _a = 0, nonFunctionList_1 = nonFunctionList; _a < nonFunctionList_1.length; _a++) {
+            var node = nonFunctionList_1[_a];
             evaluate(node, scope);
         }
     },
@@ -1547,15 +1607,21 @@ var evaluate_map = (_a = {},
         return indexGeneratorStackDecorate(function (stackData) {
             var new_scope = scope.invasive ? scope : new Scope('block', scope);
             var list = block.body;
-            for (; stackData.index < list.length; stackData.index++) {
-                var node = list[stackData.index];
+            // 非 function 声明语句
+            var nonFunctionList = [];
+            for (var _i = 0, list_2 = list; _i < list_2.length; _i++) {
+                var node = list_2[_i];
+                // 变量提升语句需要提升到作用域顶部执行
+                isPromoteStatement(node) ? evaluate(node, new_scope) : nonFunctionList.push(node);
+            }
+            for (; stackData.index < nonFunctionList.length; stackData.index++) {
+                var node = nonFunctionList[stackData.index];
                 var result = evaluate(node, new_scope);
                 if (isYieldResult(scope, result)
                     || isReturnResult(result)
                     || isContinueResult(result)
-                    || isBreakResult(result)) {
+                    || isBreakResult(result))
                     return result;
-                }
             }
         }, scope);
     },
@@ -1580,10 +1646,10 @@ var evaluate_map = (_a = {},
             return evaluate(node.alternate, scope);
     },
     _a[ForStatement] = function (node, scope) {
-        for (var new_scope = new Scope('loop', scope), init_val = node.init ? evaluate(node.init, new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
+        for (var new_scope = new Scope('loop', scope), init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
             var result = evaluate(node.body, new_scope);
             if (isReturnResult(result))
-                return;
+                return result;
             else if (isContinueResult(result))
                 continue;
             else if (isBreakResult(result))
@@ -1795,17 +1861,40 @@ var evaluate_map = (_a = {},
         // 矫正属性
         Object.defineProperty(func, "length", { value: node.params.length });
         // @ts-ignore
-        Object.defineProperty(func, "toString", { value: function () { return thisRunner.source.slice(node.start, node.end); } });
+        Object.defineProperty(func, "toString", { value: function () { return thisRunner.source.slice(node.start, node.end); }, configurable: true });
         return func;
     },
     _a[UnaryExpression] = function (node, scope) {
-        return ({
-            '-': function () { return -evaluate(node.argument, scope); },
-            '+': function () { return +evaluate(node.argument, scope); },
-            '!': function () { return !evaluate(node.argument, scope); },
-            '~': function () { return ~evaluate(node.argument, scope); },
-            'void': function () { return void evaluate(node.argument, scope); },
-            'typeof': function () {
+        var _a;
+        var sk = 'typeof';
+        return (_a = {
+                '-': function () { return -evaluate(node.argument, scope); },
+                '+': function () { return +evaluate(node.argument, scope); },
+                '!': function () { return !evaluate(node.argument, scope); },
+                '~': function () { return ~evaluate(node.argument, scope); },
+                'void': function () { return void evaluate(node.argument, scope); },
+                'delete': function () {
+                    if (node.argument.type === MemberExpression) {
+                        var _a = node.argument, object = _a.object, property = _a.property, computed = _a.computed;
+                        if (computed) {
+                            return delete evaluate(object, scope)[evaluate(property, scope)];
+                        }
+                        else {
+                            // @ts-ignore
+                            return delete evaluate(object, scope)[(property).name];
+                        }
+                    }
+                    else if (node.argument.type === Identifier) {
+                        var $this = scope.$find('this');
+                        // @ts-ignore
+                        if ($this)
+                            return $this.$get()[node.argument.name];
+                    }
+                }
+            },
+            // 部分老版本 babel 会将 typeof 函数修改为同名的 _typeof 函数，导致循环调用最后栈溢出
+            // 使用特殊的 key 来区分
+            _a[sk] = function () {
                 if (node.argument.type === Identifier) {
                     var $var = scope.$find(node.argument.name);
                     return $var ? typeof $var.$get() : 'undefined';
@@ -1814,25 +1903,7 @@ var evaluate_map = (_a = {},
                     return typeof evaluate(node.argument, scope);
                 }
             },
-            'delete': function () {
-                if (node.argument.type === MemberExpression) {
-                    var _a = node.argument, object = _a.object, property = _a.property, computed = _a.computed;
-                    if (computed) {
-                        return delete evaluate(object, scope)[evaluate(property, scope)];
-                    }
-                    else {
-                        // @ts-ignore
-                        return delete evaluate(object, scope)[(property).name];
-                    }
-                }
-                else if (node.argument.type === Identifier) {
-                    var $this = scope.$find('this');
-                    // @ts-ignore
-                    if ($this)
-                        return $this.$get()[node.argument.name];
-                }
-            }
-        })[node.operator]();
+            _a)[node.operator]();
     },
     _a[UpdateExpression] = function (node, scope) {
         var prefix = node.prefix;
@@ -2031,10 +2102,10 @@ var evaluate_map = (_a = {},
             }
             if (matched) {
                 var result = evaluate($case, new_scope);
-                if (result === BREAK_SIGNAL) {
+                if (isBreakResult(result)) {
                     break;
                 }
-                else if (result === CONTINUE_SIGNAL || result === RETURN_SIGNAL) {
+                else if (isReturnResult(result) || isContinueResult(result)) {
                     return result;
                 }
             }
@@ -2044,9 +2115,7 @@ var evaluate_map = (_a = {},
         for (var _i = 0, _a = node.consequent; _i < _a.length; _i++) {
             var stmt = _a[_i];
             var result = evaluate(stmt, scope);
-            if (result === BREAK_SIGNAL
-                || result === CONTINUE_SIGNAL
-                || result === RETURN_SIGNAL) {
+            if (isReturnResult(result) || isBreakResult(result) || isContinueResult(result)) {
                 return result;
             }
         }
@@ -2056,13 +2125,13 @@ var evaluate_map = (_a = {},
             var new_scope = new Scope('loop', scope);
             new_scope.invasive = true;
             var result = evaluate(node.body, new_scope);
-            if (result === BREAK_SIGNAL) {
+            if (isBreakResult(result)) {
                 break;
             }
-            else if (result === CONTINUE_SIGNAL) {
+            else if (isContinueResult(result)) {
                 continue;
             }
-            else if (result === RETURN_SIGNAL) {
+            else if (isReturnResult(result)) {
                 return result;
             }
         }
@@ -2180,9 +2249,16 @@ var evaluate = function (node, scope, runner) {
         return res;
     }
     catch (err) {
+        // 错误已经冒泡到栈定了，触发错误收集处理
+        if (thisRunner.traceStack[0] === thisId) {
+            thisRunner.onError(err);
+            thisRunner.traceStack.pop();
+        }
+        // 错误已经处理过了，直接抛出
         if (err.isEvaluateError) {
             throw err;
         }
+        // 第一级错误，需要包裹处理
         if (thisRunner.traceStack[thisRunner.traceStack.length - 1] === thisId) {
             throw createError(errorMessageList.runTimeError, err === null || err === void 0 ? void 0 : err.message, node, thisRunner.source);
         }
@@ -5170,16 +5246,22 @@ var Runner = /** @class */ (function () {
         this.source = '';
         this.traceId = 0;
         this.traceStack = [];
-        this.mainScope = new Scope('block');
         this.currentNode = null;
+        this.ast = null;
+        this.mainScope = new Scope('block');
     }
-    Runner.prototype.run = function (code, injectObject) {
+    /** 错误收集中心 */
+    Runner.prototype.onError = function (err) {
+        // console.error(err);
+    };
+    Runner.prototype.run = function (code, injectObject, onError) {
         if (injectObject === void 0) { injectObject = {}; }
         this.source = code;
+        this.onError = onError || this.onError;
         this.initScope(injectObject);
-        var ast = acorn.parse(code, { locations: true, ecmaVersion: 6 });
+        this.parserAst(code);
         try {
-            evaluate(ast, this.mainScope, this);
+            evaluate(this.ast, this.mainScope, this);
         }
         catch (err) {
             throw err;
@@ -5199,12 +5281,16 @@ var Runner = /** @class */ (function () {
             _this.mainScope.$const(name, injectObject[name]);
         });
     };
+    Runner.prototype.parserAst = function (code) {
+        this.ast = acorn.parse(code, { locations: true, ecmaVersion: 6 });
+        return this.ast;
+    };
     return Runner;
 }());
 
-var run = function (code, injectObject) {
+var run = function (code, injectObject, onError) {
     var runner = new Runner();
-    return runner.run(code, injectObject);
+    return runner.run(code, injectObject, onError);
 };
 
 var getOsInfo = function () {
@@ -5966,10 +6052,310 @@ var wxml = /*#__PURE__*/Object.freeze({
     createIntersectionObserver: createIntersectionObserver
 });
 
-var api = __assign(__assign(__assign(__assign(__assign(__assign({}, system), storage), route), device), media), wxml);
+// copy from taro animation  https://github.com/NervJS/taro/blob/next/packages/taro-h5/src/api/ui/animation/index.ts
+/**
+ * H5 下的 styleSheet 操作
+ * @author leeenx
+ */
+var StyleSheet = /** @class */ (function () {
+    function StyleSheet() {
+        var _this = this;
+        this.$style = null;
+        this.sheet = null;
+        this.appendStyleSheet = function () {
+            if (_this.$style) {
+                var head = document.getElementsByTagName('head')[0];
+                _this.$style.setAttribute('type', 'text/css');
+                _this.$style.setAttribute('data-type', 'Taro');
+                head.appendChild(_this.$style);
+                _this.sheet = _this.$style.sheet;
+            }
+            if (_this.sheet && !('insertRule' in _this.sheet)) {
+                console.warn('当前浏览器不支持 stylesheet.insertRule 接口');
+            }
+        };
+        // 添加样式命令
+        this.add = function (cssText, index) {
+            var _a;
+            if (index === void 0) { index = 0; }
+            if (_this.sheet === null) {
+                // $style 未插入到 DOM
+                _this.appendStyleSheet();
+            }
+            (_a = _this.sheet) === null || _a === void 0 ? void 0 : _a.insertRule(cssText, index);
+        };
+        this.$style = document.createElement('style');
+    }
+    return StyleSheet;
+}());
+var styleSheet = new StyleSheet();
+// 监听事件
+var TRANSITION_END = 'transitionend';
+var TRANSFORM = 'transform';
+var $detect = document.createElement('div');
+$detect.style.cssText = '-webkit-animation-name:webkit;-moz-animation-name:moz;-ms-animation-name:ms;animation-name:standard;';
+if ($detect.style['animation-name'] === 'standard') {
+    // 支持标准写法
+    TRANSITION_END = 'transitionend';
+    TRANSFORM = 'transform';
+}
+else if ($detect.style['-webkit-animation-name'] === 'webkit') {
+    // webkit 前缀
+    TRANSITION_END = 'webkitTransitionEnd';
+    TRANSFORM = '-webkit-transform';
+}
+else if ($detect.style['-moz-animation-name'] === 'moz') {
+    // moz 前缀
+    TRANSITION_END = 'mozTransitionEnd';
+    TRANSFORM = '-moz-transform';
+}
+else if ($detect.style['-ms-animation-name'] === 'ms') {
+    // ms 前缀
+    TRANSITION_END = 'msTransitionEnd';
+    TRANSFORM = '-ms-transform';
+}
+var animId = 0;
+var Animation = /** @class */ (function () {
+    function Animation(_a) {
+        var _b = _a === void 0 ? {} : _a, _c = _b.duration, duration = _c === void 0 ? 400 : _c, _d = _b.delay, delay = _d === void 0 ? 0 : _d, _e = _b.timingFunction, timingFunction = _e === void 0 ? 'linear' : _e, _f = _b.transformOrigin, transformOrigin = _f === void 0 ? '50% 50% 0' : _f, _g = _b.unit, unit = _g === void 0 ? 'px' : _g;
+        var _this = this;
+        // 属性组合
+        this.rules = [];
+        // transform 对象
+        this.transform = ["".concat(TRANSFORM, ":")];
+        // 组合动画
+        this.steps = [];
+        // 动画 map ----- 永久保留
+        this.animationMap = {};
+        // animationMap 的长度
+        this.animationMapCount = 0;
+        // 默认值
+        this.setDefault(duration, delay, timingFunction, transformOrigin);
+        this.unit = unit;
+        var animAttr = 'data-animation';
+        // 动画 id
+        this.id = ++animId;
+        // 监听事件
+        document.body.addEventListener(TRANSITION_END, function (e) {
+            var target = e.target;
+            var animData = target.getAttribute(animAttr);
+            // 没有动画存在
+            if (animData === null)
+                return;
+            var _a = animData.split('__'), animName = _a[0], animPath = _a[1];
+            if (animName === "naruse-h5-poly-fill/".concat(_this.id, "/create-animation")) {
+                var _b = animPath.split('--'), animIndex = _b[0], _c = _b[1], __stepIndex = _c === void 0 ? 0 : _c;
+                var stepIndex = Number(__stepIndex);
+                // 动画总的关键帧
+                var animStepsCount = _this.animationMap["".concat(animName, "__").concat(animIndex)];
+                var animStepsMaxIndex = animStepsCount - 1;
+                if (stepIndex < animStepsMaxIndex) {
+                    target.setAttribute(animAttr, "".concat(animName, "__").concat(animIndex, "--").concat(stepIndex + 1));
+                }
+            }
+        });
+    }
+    Animation.prototype.transformUnit = function () {
+        var _this = this;
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var ret = [];
+        args.forEach(function (each) {
+            ret.push(isNaN(each) ? each : "".concat(each).concat(_this.unit));
+        });
+        return ret;
+    };
+    // 设置默认值
+    Animation.prototype.setDefault = function (duration, delay, timingFunction, transformOrigin) {
+        this.DEFAULT = { duration: duration, delay: delay, timingFunction: timingFunction, transformOrigin: transformOrigin };
+    };
+    Animation.prototype.matrix = function (a, b, c, d, tx, ty) {
+        this.transform.push("matrix(".concat(a, ", ").concat(b, ", ").concat(c, ", ").concat(d, ", ").concat(tx, ", ").concat(ty, ")"));
+        return this;
+    };
+    Animation.prototype.matrix3d = function (a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4) {
+        this.transform.push("matrix3d(".concat(a1, ", ").concat(b1, ", ").concat(c1, ", ").concat(d1, ", ").concat(a2, ", ").concat(b2, ", ").concat(c2, ", ").concat(d2, ", ").concat(a3, ", ").concat(b3, ", ").concat(c3, ", ").concat(d3, ", ").concat(a4, ", ").concat(b4, ", ").concat(c4, ", ").concat(d4, ")"));
+        return this;
+    };
+    Animation.prototype.rotate = function (angle) {
+        this.transform.push("rotate(".concat(angle, "deg)"));
+        return this;
+    };
+    Animation.prototype.rotate3d = function (x, y, z, angle) {
+        if (typeof y !== 'number') {
+            this.transform.push("rotate3d(".concat(x, ")"));
+        }
+        else {
+            this.transform.push("rotate3d(".concat(x, ", ").concat(y || 0, ", ").concat(z || 0, ", ").concat(angle || 0, "deg)"));
+        }
+        return this;
+    };
+    Animation.prototype.rotateX = function (angle) {
+        this.transform.push("rotateX(".concat(angle, "deg)"));
+        return this;
+    };
+    Animation.prototype.rotateY = function (angle) {
+        this.transform.push("rotateY(".concat(angle, "deg)"));
+        return this;
+    };
+    Animation.prototype.rotateZ = function (angle) {
+        this.transform.push("rotateZ(".concat(angle, "deg)"));
+        return this;
+    };
+    Animation.prototype.scale = function (x, y) {
+        this.transform.push("scale(".concat([x, y].filter(Boolean).join(','), ")"));
+        return this;
+    };
+    Animation.prototype.scale3d = function (x, y, z) {
+        this.transform.push("scale3d(".concat(x, ", ").concat(y, ", ").concat(z, ")"));
+        return this;
+    };
+    Animation.prototype.scaleX = function (scale) {
+        this.transform.push("scaleX(".concat(scale, ")"));
+        return this;
+    };
+    Animation.prototype.scaleY = function (scale) {
+        this.transform.push("scaleY(".concat(scale, ")"));
+        return this;
+    };
+    Animation.prototype.scaleZ = function (scale) {
+        this.transform.push("scaleZ(".concat(scale, ")"));
+        return this;
+    };
+    Animation.prototype.skew = function (x, y) {
+        this.transform.push("skew(".concat(x, ", ").concat(y, ")"));
+        return this;
+    };
+    Animation.prototype.skewX = function (angle) {
+        this.transform.push("skewX(".concat(angle, ")"));
+        return this;
+    };
+    Animation.prototype.skewY = function (angle) {
+        this.transform.push("skewY(".concat(angle, ")"));
+        return this;
+    };
+    Animation.prototype.translate = function (x, y) {
+        var _a;
+        _a = this.transformUnit(x, y), x = _a[0], y = _a[1];
+        this.transform.push("translate(".concat(x, ", ").concat(y, ")"));
+        return this;
+    };
+    Animation.prototype.translate3d = function (x, y, z) {
+        var _a;
+        _a = this.transformUnit(x, y, z), x = _a[0], y = _a[1], z = _a[2];
+        this.transform.push("translate3d(".concat(x, ", ").concat(y, ", ").concat(z, ")"));
+        return this;
+    };
+    Animation.prototype.translateX = function (translate) {
+        translate = this.transformUnit(translate)[0];
+        this.transform.push("translateX(".concat(translate, ")"));
+        return this;
+    };
+    Animation.prototype.translateY = function (translate) {
+        translate = this.transformUnit(translate)[0];
+        this.transform.push("translateY(".concat(translate, ")"));
+        return this;
+    };
+    Animation.prototype.translateZ = function (translate) {
+        translate = this.transformUnit(translate)[0];
+        this.transform.push("translateZ(".concat(translate, ")"));
+        return this;
+    };
+    Animation.prototype.opacity = function (value) {
+        this.rules.push("opacity: ".concat(value));
+        return this;
+    };
+    Animation.prototype.backgroundColor = function (value) {
+        this.rules.push("background-color: ".concat(value));
+        return this;
+    };
+    Animation.prototype.width = function (value) {
+        value = this.transformUnit(value)[0];
+        this.rules.push("width: ".concat(value));
+        return this;
+    };
+    Animation.prototype.height = function (value) {
+        value = this.transformUnit(value)[0];
+        this.rules.push("height: ".concat(value));
+        return this;
+    };
+    Animation.prototype.top = function (value) {
+        value = this.transformUnit(value)[0];
+        this.rules.push("top: ".concat(value));
+        return this;
+    };
+    Animation.prototype.right = function (value) {
+        value = this.transformUnit(value)[0];
+        this.rules.push("right: ".concat(value));
+        return this;
+    };
+    Animation.prototype.bottom = function (value) {
+        value = this.transformUnit(value)[0];
+        this.rules.push("bottom: ".concat(value));
+        return this;
+    };
+    Animation.prototype.left = function (value) {
+        value = this.transformUnit(value)[0];
+        this.rules.push("left: ".concat(value));
+        return this;
+    };
+    // 关键帧载入
+    Animation.prototype.step = function (arg) {
+        if (arg === void 0) { arg = {}; }
+        var DEFAULT = this.DEFAULT;
+        var _a = arg.duration, duration = _a === void 0 ? DEFAULT.duration : _a, _b = arg.delay, delay = _b === void 0 ? DEFAULT.delay : _b, _c = arg.timingFunction, timingFunction = _c === void 0 ? DEFAULT.timingFunction : _c, _d = arg.transformOrigin, transformOrigin = _d === void 0 ? DEFAULT.transformOrigin : _d;
+        // 生成一条 transition 动画
+        this.steps.push([
+            this.rules.map(function (rule) { return "".concat(rule, "!important"); }).join(';'),
+            "".concat(this.transform.join(' '), "!important"),
+            "".concat(TRANSFORM, "-origin: ").concat(transformOrigin),
+            "transition: all ".concat(duration, "ms ").concat(timingFunction, " ").concat(delay, "ms")
+        ]
+            .filter(function (item) { return item !== '' && item !== "".concat(TRANSFORM, ":"); })
+            .join(';'));
+        // 清空 rules 和 transform
+        this.rules = [];
+        this.transform = ["".concat(TRANSFORM, ":")];
+        return this;
+    };
+    // 创建底层数据
+    Animation.prototype.createAnimationData = function () {
+        var animIndex = "naruse-h5-poly-fill/".concat(this.id, "/create-animation__").concat(this.animationMapCount++);
+        // 记录动画分几个 step
+        this.animationMap[animIndex] = this.steps.length;
+        // 吐出 step
+        this.steps.forEach(function (step, index) {
+            var selector = index === 0
+                ? "[data-animation=\"".concat(animIndex, "\"]")
+                : "[data-animation=\"".concat(animIndex, "--").concat(index, "\"]");
+            styleSheet.add("".concat(selector, " { ").concat(step, " }"));
+        });
+        // 清空 steps
+        this.steps = [];
+        return animIndex;
+    };
+    // 动画数据产出
+    Animation.prototype.export = function () {
+        return this.createAnimationData();
+    };
+    return Animation;
+}());
+// h5 的 createAnimation
+var createAnimation = function (option) {
+    return new Animation(option);
+};
+
+var animation = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    createAnimation: createAnimation
+});
+
+var api = __assign(__assign(__assign(__assign(__assign(__assign(__assign({}, system), storage), route), device), media), wxml), animation);
 
 // @ts-ignore
-var version = "0.1.8";
+var version = "0.2.0";
 initVersionLogger('naruse-h5', version);
 var Naruse = __assign(__assign({}, api), { Component: React.Component, createElement: naruseCreateElement, env: {
         USER_DATA_PATH: '',
@@ -5977,9 +6363,7 @@ var Naruse = __assign(__assign({}, api), { Component: React.Component, createEle
         clientVersion: version,
         language: 'zh-Hans',
         platform: 'H5',
-    }, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, version: version, unsafe_run: run, withPage: function (Component) {
-        return Component;
-    } });
+    }, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, version: version, unsafe_run: run, withPage: function (Component) { return Component; } });
 if (typeof window !== 'undefined') {
     // @ts-ignore
     window.Naruse = Naruse;

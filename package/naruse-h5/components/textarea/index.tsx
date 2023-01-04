@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import cssStyle from './index.scss';
+import cssStyle from './index.css';
 import React from 'react';
 
 const h = React.createElement;
@@ -50,6 +50,7 @@ export default class Textarea extends React.Component<IProps> {
     el: any = null;
     value: any = '';
     line: any = 1;
+    static defaultProps: { disabled: boolean; maxlength: number; readonly: boolean; focus: boolean; autoHeight: boolean; showCount: boolean; controlled: boolean; };
 
     componentDidMount() {
         const { value = '' } = this.props;
