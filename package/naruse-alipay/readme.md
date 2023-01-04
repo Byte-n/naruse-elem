@@ -4,10 +4,15 @@
 
 
 ## todo
-+ [ ] 优化diff函数，key
++ [x] 优化diff函数，key
 + [ ] 增加更多的组件
 
 ## history
+#### 0.3.5
++ #FEAT: 升级 naurse-parser 依赖为 0.1.1
++ #FEAT: 支持 createAnimaton API
++ #FEAT: 支持 getImageInfo API 支持提前加载图片资源与信息
++ #FIX: 修复 key 变化后组件没有刷新的问题
 #### 0.3.4
 + #FIX: 修复编译后依旧带有引入的问题
 #### 0.3.3

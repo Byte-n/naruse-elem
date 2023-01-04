@@ -73,7 +73,8 @@ const scrollView = {
         'scroll-with-animation',
         'scroll-animation-duration',
         'enable-back-to-top',
-        'trap-scroll'
+        'trap-scroll',
+        'animation',
     ],
     events: [
         'onScrollToUpper',
@@ -92,6 +93,7 @@ const text = {
         'space',
         'decode',
         'number-of-lines',
+        'animation',
     ],
     events: [
         ...baseElementEvents
@@ -106,6 +108,7 @@ const image = {
         'src',
         'mode',
         'lazy-load',
+        'animation',
     ],
     events: [
         'onLoad',
@@ -152,6 +155,7 @@ const button = {
         'disabled',
         'loading',
         'form-type',
+        'animation',
     ],
     events: [
         ...baseElementEvents,
@@ -186,6 +190,7 @@ const input = {
         'controlled',
         'cursor',
         'randomNumber',
+        'animation',
     ],
     events: [
         ...baseInputEvents,
@@ -208,6 +213,7 @@ const textarea = {
         'fixed',
         'show-count',
         'controlled',
+        'animation',
     ],
     events: [
         ...baseInputEvents,

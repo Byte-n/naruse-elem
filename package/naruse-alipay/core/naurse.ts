@@ -28,6 +28,7 @@ export const Naruse = {
     ...apis,
     withPage,
     unsafe_run: run,
+    $$debug: false,
 };
 
 export const naruseExtend = (opt: any) => {

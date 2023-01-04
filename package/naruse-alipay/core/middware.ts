@@ -2,10 +2,10 @@ import { isEmptyObj, isFunc } from '../../naruse-share';
 import { NaruseComponent } from './component';
 import { VNode, vnodeDiff } from './diff';
 import { initVnodeTree } from './domEvents';
+import { Naruse } from './naurse';
 import { logger, NOOP, propsEquals } from './uitl';
 
-
-
+let uid = 0;
 
 /**
  * @description 承接小程序组件与NaruseComponent的桥梁，将小程序组件的生命周期映射到naruseComponent上，同时将naruseComponet的行为映射到小程序组件上
@@ -15,6 +15,7 @@ import { logger, NOOP, propsEquals } from './uitl';
  * @note 因为是先创建的naruseComponent组件实例，后创建的中间件，所以采用后绑定
  */
 export class Middware {
+    $$uid = uid++;
     naruseComponent: NaruseComponent | null;
     props: any;
     component: any;
@@ -53,22 +54,23 @@ export class Middware {
                 return;
             }
             const vnode = this.naruseComponent.render();
-            // console.time('diff 花费时间');
+            Naruse.$$debug && console.time(`组件 ${this.$$uid} diff 花费时间`);
             initVnodeTree(vnode);
             const diff = vnodeDiff(vnode, this.fristRender ? null : this.component.data.node);
+            Naruse.$$debug && console.log(`组件 ${this.$$uid}, diff结果`, diff);
             const updatedCallBack = () => {
+                Naruse.$$debug && console.timeEnd(`组件 ${this.$$uid} setData 花费时间`);
                 // console.log('data', JSON.parse(JSON.stringify(this.component.data.node)));
                 this.lastUpdateNode = vnode;
                 this.onUpdated.call(self);
                 this.executeUpdateList();
             };
             
-            // console.timeEnd('diff 花费时间');
-
+            Naruse.$$debug && console.timeEnd(`组件 ${this.$$uid} diff 花费时间`);
             // console.log('new data', JSON.parse(JSON.stringify(vnode)));
             // console.log('old data', JSON.parse(JSON.stringify(this.component.data.node)));
             // console.log('diff data', JSON.parse(JSON.stringify(diff)));
-
+            Naruse.$$debug && console.time(`组件 ${this.$$uid} setData 花费时间`);
             // diff 存在结果才会重新渲染
             if (!isEmptyObj(diff)) {
                 this.component.setData(diff, updatedCallBack);
