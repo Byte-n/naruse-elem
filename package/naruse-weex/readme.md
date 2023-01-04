@@ -4,5 +4,7 @@
 
 
 ## history
+#### 0.0.5
++ #FEAT: 升级 naurse-parser 依赖为 0.1.1
 #### 0.0.4
 + #FEAT: 升级 naurse-parser 依赖为 0.0.8 
