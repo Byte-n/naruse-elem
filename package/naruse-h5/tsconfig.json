@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES5",
+    "lib": ["DOM", "ES5"],
     "noImplicitAny": false,
     "strictNullChecks": true,
     "noUnusedLocals": true,
@@ -15,7 +16,8 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "jsx": "react",
-    "jsxFactory": "h"
+    "jsxFactory": "h",
+    "typeRoots": ["./types"]
   },
   "exclude": [
     "./node_modules",

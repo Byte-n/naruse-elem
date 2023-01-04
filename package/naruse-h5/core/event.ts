@@ -42,7 +42,6 @@ const reflectEventMap = {
     },
     /** 按键 */
     keydown(e) {
-        e.stopPropagation();
         const { value } = e.target;
         const keyCode = e.keyCode || e.code;
         return {
@@ -51,6 +50,9 @@ const reflectEventMap = {
                 value,
                 cursor: value.length,
                 keyCode,
+            },
+            stopPropagation() {
+                e.stopPropagation();
             },
         };
     },
@@ -68,6 +70,9 @@ const reflectEventMap = {
             detail: {
                 elapsedTime: e.elapsedTime,
                 propertyName: e.propertyName,
+            },
+            stopPropagation() {
+                e.stopPropagation();
             },
         };
     }

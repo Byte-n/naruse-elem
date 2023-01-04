@@ -87,6 +87,7 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     scrollIntoView?: string
     scrollWithAnimation: boolean
     enableBackToTop?: boolean
+    animation?: string
     onScrollToUpper: (e: React.SyntheticEvent<HTMLDivElement>) => void
     onScrollToLower: (e: React.SyntheticEvent<HTMLDivElement>) => void
     onScroll: (e: React.SyntheticEvent<HTMLDivElement>) => void
@@ -94,7 +95,6 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     onTransitionEnd: (e: React.SyntheticEvent<HTMLDivElement>) => void
 }
 
-const scrollId = 'scroll';
 const scrollBar = document.createElement('style');
 scrollBar.type = 'text/css';
 scrollBar.id = '_theOnlyScrollBar';
@@ -105,25 +105,38 @@ scrollBar.innerHTML = `
 `;
 const head = document.getElementsByTagName('head').item(0);
 if (!document.getElementById('_theOnlyScrollBar')) {
-    head.append(scrollBar);
+    head?.append(scrollBar);
 }
 
 class ScrollView extends React.Component<IProps> {
     _scrollTop: any = undefined;
     _scrollLeft: any = undefined;
     container: any = null;
+    lastAnimationName?: string;
 
     onTouchMove = e => {
         e.stopPropagation()
     }
 
+    static defaultProps: { scrollX: boolean; scrollY: boolean; upperThreshold: number; lowerThreshold: number; scrollWithAnimation: boolean; };
+
     componentDidMount() {
-        const childNodesList = this.props.children;
         this.handleScroll(this.props, true);
+        this.updateAnimation();
     }
 
-    componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<{}>, snapshot?: any): void {
+    componentDidUpdate(): void {
         this.handleScroll(this.props);
+        this.updateAnimation();
+    }
+
+    updateAnimation () {
+        const {animation} = this.props;
+        if (animation !== this.lastAnimationName) {
+            // 等待组件彻底装载完毕后再启动animation，否则会出现动画不生效的情况
+            setTimeout(() => this.container?.setAttribute('data-animation', animation))
+            this.lastAnimationName = animation;
+        }
     }
 
     handleScroll(props, isInit = false) {
@@ -170,6 +183,8 @@ class ScrollView extends React.Component<IProps> {
             onScrollToUpper,
             onScrollToLower,
             onTouchMove,
+            animation,
+            id,
         } = this.props;
         let { upperThreshold, lowerThreshold } = this.props;
         upperThreshold = upperThreshold ? Number(upperThreshold) : 0;
@@ -226,6 +241,8 @@ class ScrollView extends React.Component<IProps> {
         }
         return (
             <div
+                id={id}
+                data-animation={animation}
                 className={ `${className} _scrollView` }
                 ref={container => {
                     this.container = container;

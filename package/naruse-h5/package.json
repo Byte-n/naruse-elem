@@ -30,7 +30,7 @@
   },
   "name": "naruse-h5",
   "description": "naruse的h5端运行平台",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "main": "dist/index.js",
   "directories": {
     "test": "test"
@@ -38,6 +38,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "naruse-parser": "^0.0.8"
+    "naruse-parser": "^0.1.1"
   }
 }

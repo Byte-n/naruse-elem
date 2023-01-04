@@ -1,5 +1,6 @@
 import { commonEventHander, commonMouseEventCreater } from '../../core/event';
 import React, { Component } from 'react';
+import { isNaruseAnimaitonName } from '../../utils';
 
 const h = React.createElement;
 
@@ -15,11 +16,15 @@ class View extends Component<{
     className,
     style,
     hoverStyle,
+    id,
+    animation,
 }, {
     hover: boolean,
 }> {
     mounted = false;
     touch = false;
+    ref: HTMLDivElement | null;
+    lastAnimationName: string;
     constructor() {
         super();
         this.state = {
@@ -28,7 +33,23 @@ class View extends Component<{
     }
     componentDidMount() {
         this.mounted = true;
+        // 等待装载完毕后再启动animation
+        this.updateAnimation();
     }
+
+    componentDidUpdate() {
+        this.updateAnimation();
+    }
+
+    updateAnimation () {
+        const {animation} = this.props;
+        if (animation !== this.lastAnimationName && isNaruseAnimaitonName(animation)) {
+            // 等待组件彻底装载完毕后再启动animation，否则会出现动画不生效的情况
+            setTimeout(() => this.ref?.setAttribute('data-animation', animation))
+            this.lastAnimationName = animation;
+        }
+    }
+
     componentWillUnmount() {
         this.mounted = false;
     }
@@ -80,6 +101,7 @@ class View extends Component<{
             className,
             style,
             hoverStyle,
+            id,
             ...other
         } = this.props;
         const { hover } = this.state;
@@ -92,6 +114,8 @@ class View extends Component<{
 
         return (
             <div
+                id={id}
+                ref={ref => this.ref = ref}
                 onMouseEnter={this.onMouseEnter.bind(this)}
                 onMouseLeave={this.onMouseLeave.bind(this)}
                 onMouseMove={this.onMouseMove.bind(this)}
