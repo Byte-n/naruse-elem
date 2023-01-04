@@ -4465,14 +4465,14 @@ var NaruseComponent = /** @class */ (function () {
 /** 判断是否是NaruseComponent */
 var isNaruseComponent = function (obj) { return obj instanceof NaruseComponent; };
 
-var uid = 0;
+var uid$1 = 0;
 /**
  * @description 虚拟dom创建特殊处理map
  * @type {*}
  */
 var vnodeSpecialMap = {
     text: function (props, childNodes) {
-        var id = "_n_".concat(uid++);
+        var id = "_n_".concat(uid$1++);
         return { naruseType: 'text', content: childNodes.join(''), id: id, _uid: id };
     },
 };
@@ -4526,14 +4526,14 @@ var createBaseElement = function (type, props, childNodes) {
     childNodes = (childNodes.flat && childNodes.flat(1)) || childNodes;
     childNodes = childNodes.map(function (child) {
         if (typeof child === 'string' || typeof child === 'number') {
-            var id = "_n_".concat(uid++);
+            var id = "_n_".concat(uid$1++);
             return { naruseType: 'text', content: child, id: id, _uid: id };
         }
         return child;
     });
     var node = (__assign(__assign(__assign({ naruseType: type }, props), { childNodes: childNodes }), newNode));
     if (!node.id) {
-        node.id = node._uid = "_n_".concat(uid++);
+        node.id = node._uid = "_n_".concat(uid$1++);
     }
     return node;
 };
@@ -4825,7 +4825,7 @@ var withPage = function (component) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.3.4";
+var version = "0.3.5";
 initVersionLogger('naruse-alipay', version);
 // naruse模块内容
 var Naruse = __assign(__assign(__assign({ Component: NaruseComponent, createElement: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
@@ -4833,7 +4833,7 @@ var Naruse = __assign(__assign(__assign({ Component: NaruseComponent, createElem
         clientVersion: version,
         language: 'zh-Hans',
         platform: 'alipay',
-    }, version: version }, my), apis), { withPage: withPage, unsafe_run: run });
+    }, version: version }, my), apis), { withPage: withPage, unsafe_run: run, $$debug: false });
 var naruseExtend = function (opt) {
     if (typeof opt === 'object') {
         Object.assign(Naruse, opt);
@@ -4967,7 +4967,7 @@ var vnodeDiff = function (newVnode, oldVnode, newParentNode, oldParentNode, path
     // naruse-element 单独判断
     if (newVnode.naruseType === 'naruse-element' && newVnode.component) {
         if (newVnode.component.actuator === ((_a = oldVnode.component) === null || _a === void 0 ? void 0 : _a.actuator)) {
-            var propsChnages_1 = vnodePropsDiff(newVnode.component.props, oldVnode.component.props);
+            var propsChnages_1 = vnodePropsDiff(newVnode.component.props, oldVnode.component.props, true);
             Object.keys(propsChnages_1).forEach(function (key) {
                 res["".concat(path, ".component.props.").concat(key)] = propsChnages_1[key];
             });
@@ -5047,13 +5047,16 @@ var skipPropsKeys = ['naruseType', 'key', 'childNodes'];
  * @author CHC
  * @date 2022-10-11 15:10:52
  */
-var vnodePropsDiff = function (newVnode, oldVnode) {
+var vnodePropsDiff = function (newVnode, oldVnode, isNaruseComponent) {
+    if (isNaruseComponent === void 0) { isNaruseComponent = false; }
     var res = {};
+    // fix: 修复 naruse 组件会忽略部分属性值的问题
+    var realSkipPropsKeys = isNaruseComponent ? [] : skipPropsKeys;
     if (!oldVnode)
         return res;
     // change
     for (var newPropKey in newVnode) {
-        if (skipPropsKeys.includes(newPropKey))
+        if (realSkipPropsKeys.includes(newPropKey))
             continue;
         var newPropValue = newVnode[newPropKey];
         var oldPropValue = oldVnode[newPropKey];
@@ -5064,12 +5067,21 @@ var vnodePropsDiff = function (newVnode, oldVnode) {
                 && isEmptyObj(vnodePropsDiff(newPropValue, oldPropValue))) {
                 continue;
             }
+            // 是 NaruseComponent 的前提下都为空的情况下跳过 diff 子元素
+            if (isNaruseComponent &&
+                newPropKey === 'children'
+                && newPropValue
+                && !newPropValue.length
+                && oldPropValue
+                && !oldPropValue.length) {
+                continue;
+            }
             res[newPropKey] = newPropValue;
         }
     }
     // remove
     for (var oldPropKey in oldVnode) {
-        if (skipPropsKeys.includes(oldPropKey))
+        if (realSkipPropsKeys.includes(oldPropKey))
             continue;
         if (!(oldPropKey in newVnode)) {
             res[oldPropKey] = undefined;
@@ -5266,6 +5278,7 @@ var miniappEventBehavior = {
     methods: methods,
 };
 
+var uid = 0;
 /**
  * @description 承接小程序组件与NaruseComponent的桥梁，将小程序组件的生命周期映射到naruseComponent上，同时将naruseComponet的行为映射到小程序组件上
  * @author CHC
@@ -5275,6 +5288,7 @@ var miniappEventBehavior = {
  */
 var Middware = /** @class */ (function () {
     function Middware(miniappComponent, NaruseComponentActuator, props) {
+        this.$$uid = uid++;
         this.fristRender = true;
         this.updating = false;
         this.callbackList = [];
@@ -5309,19 +5323,22 @@ var Middware = /** @class */ (function () {
                 return;
             }
             var vnode = _this.naruseComponent.render();
-            // console.time('diff 花费时间');
+            Naruse.$$debug && console.time("\u7EC4\u4EF6 ".concat(_this.$$uid, " diff \u82B1\u8D39\u65F6\u95F4"));
             initVnodeTree(vnode);
             var diff = vnodeDiff(vnode, _this.fristRender ? null : _this.component.data.node);
+            Naruse.$$debug && console.log("\u7EC4\u4EF6 ".concat(_this.$$uid, ", diff\u7ED3\u679C"), diff);
             var updatedCallBack = function () {
+                Naruse.$$debug && console.timeEnd("\u7EC4\u4EF6 ".concat(_this.$$uid, " setData \u82B1\u8D39\u65F6\u95F4"));
                 // console.log('data', JSON.parse(JSON.stringify(this.component.data.node)));
                 _this.lastUpdateNode = vnode;
                 _this.onUpdated.call(self);
                 _this.executeUpdateList();
             };
-            // console.timeEnd('diff 花费时间');
+            Naruse.$$debug && console.timeEnd("\u7EC4\u4EF6 ".concat(_this.$$uid, " diff \u82B1\u8D39\u65F6\u95F4"));
             // console.log('new data', JSON.parse(JSON.stringify(vnode)));
             // console.log('old data', JSON.parse(JSON.stringify(this.component.data.node)));
             // console.log('diff data', JSON.parse(JSON.stringify(diff)));
+            Naruse.$$debug && console.time("\u7EC4\u4EF6 ".concat(_this.$$uid, " setData \u82B1\u8D39\u65F6\u95F4"));
             // diff 存在结果才会重新渲染
             if (!isEmptyObj(diff)) {
                 _this.component.setData(diff, updatedCallBack);

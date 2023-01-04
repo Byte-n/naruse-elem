@@ -69,7 +69,7 @@ export const vnodeDiff = (newVnode: VNode, oldVnode: VNode, newParentNode?: VNod
     // naruse-element 单独判断
     if (newVnode.naruseType === 'naruse-element' && newVnode.component) {
         if (newVnode.component.actuator === oldVnode.component?.actuator) {
-            const propsChnages = vnodePropsDiff(newVnode.component.props, oldVnode.component.props);
+            const propsChnages = vnodePropsDiff(newVnode.component.props, oldVnode.component.props, true);
             Object.keys(propsChnages).forEach((key) => {
                 res[`${path}.component.props.${key}`] = propsChnages[key];
             });
@@ -148,7 +148,6 @@ const diffVnodeChildren = (newNode: VNode, oldNode: VNode, path = 'node', diffRe
             }
             continue;
         }
-
         // Morph the old element into the new one, but don't append it to the dom yet
         vnodeDiff(childVNode, oldVNode, newNode, oldNode, `${path}[${i}]`, diffRes);
     }
@@ -159,19 +158,22 @@ const diffVnodeChildren = (newNode: VNode, oldNode: VNode, path = 'node', diffRe
 
 /** 需要跳过的属性名 */
 const skipPropsKeys = ['naruseType', 'key', 'childNodes'];
+
 /**
  * @description shallow props diff
  * @author CHC
  * @date 2022-10-11 15:10:52
  */
-const vnodePropsDiff = (newVnode: any, oldVnode: any): Record<string, any> => {
+const vnodePropsDiff = (newVnode: any, oldVnode: any, isNaruseComponent = false): Record<string, any> => {
     const res: Record<string, any> = {};
+    // fix: 修复 naruse 组件会忽略部分属性值的问题
+    const realSkipPropsKeys = isNaruseComponent ? [] : skipPropsKeys;
 
     if (!oldVnode) return res;
 
     // change
     for (let newPropKey in newVnode) {
-        if (skipPropsKeys.includes(newPropKey)) continue;
+        if (realSkipPropsKeys.includes(newPropKey)) continue;
         const newPropValue = newVnode[newPropKey];
         const oldPropValue = oldVnode[newPropKey];
 
@@ -183,13 +185,24 @@ const vnodePropsDiff = (newVnode: any, oldVnode: any): Record<string, any> => {
                 ) {
                 continue;
             }
+            // 是 NaruseComponent 的前提下都为空的情况下跳过 diff 子元素
+            if (
+                isNaruseComponent &&
+                newPropKey === 'children'
+                && newPropValue
+                && !newPropValue.length
+                && oldPropValue
+                && !oldPropValue.length
+            ) {
+                continue;
+            }
             res[newPropKey] = newPropValue;
         }
     }
 
     // remove
     for (let oldPropKey in oldVnode) {
-        if (skipPropsKeys.includes(oldPropKey)) continue;
+        if (realSkipPropsKeys.includes(oldPropKey)) continue;
         if (!(oldPropKey in newVnode)) {
             res[oldPropKey] = undefined;
         }
