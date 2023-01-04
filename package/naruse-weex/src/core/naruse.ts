@@ -2,7 +2,7 @@ import * as Storage from '../api/storage/index';
 import * as Route from '../api/route/index';
 import * as Device from '../api/device/clipborad'
 import * as System from '../api/system/index';
-import { getDeferred, EventBus, globalEvent, initVersionLogger } from '../../../naruse-share'
+import { getDeferred, EventBus, globalEvent, initVersionLogger, temporarilyNotSupport } from '../../../naruse-share'
 import NaruseComponent from './component';
 import { naruseCreateElement } from './createElement';
 import { run } from 'naruse-parser';
@@ -18,10 +18,13 @@ const Naruse = {
     EventBus,
     unsafe_run: run,
     globalEvent,
+    withPage: (Component: any) => Component,
     ...Storage,
     ...Route,
     ...Device,
     ...System,
+    getImageInfo: temporarilyNotSupport('getImageInfo'),
+    createAnimation: temporarilyNotSupport('createAnimation'),
 };
 
 const naruseExtend = (obj: any) => {

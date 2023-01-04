@@ -143,6 +143,22 @@ const exceptType = (obj, type, name) => {
     }
 };
 
+
+/**
+ * @description 暂时不支持的api
+ * @author CHC
+ * @date 2022-03-30 18:03:04
+ * @param {*} apiName
+ * @returns {*}
+ */
+const temporarilyNotSupport = function temporarilyNotSupport (apiName) {
+    return () => {
+        const errMsg = `暂时不支持 API ${apiName}`;
+        logger.error(errMsg);
+        return Promise.reject({ errMsg });
+    };
+};
+
 const mitt = function (n) {
     return {
         all: n = n || new Map,
@@ -1247,6 +1263,18 @@ var isYieldResult = function (scope, value) { return isGeneratorFunction(scope) 
 var isReturnResult = function (value) { return value === RETURN_SIGNAL; };
 var isContinueResult = function (value) { return value === CONTINUE_SIGNAL; };
 var isBreakResult = function (value) { return value === BREAK_SIGNAL; };
+/**
+ * 是否是函数提升语句
+ */
+var isPromoteStatement = function (value) {
+    return value.type === FunctionDeclaration;
+};
+/**
+ * 是否是变量提升语句
+ */
+var isVarPromoteStatement = function (value) {
+    return (value === null || value === void 0 ? void 0 : value.type) === VariableDeclaration && value.kind === 'var';
+};
 var BREAK_SIGNAL = {};
 var CONTINUE_SIGNAL = {};
 var RETURN_SIGNAL = { result: undefined };
@@ -1375,6 +1403,11 @@ var Scope = /** @class */ (function () {
         if (!$var) {
             this.content[name] = new ScopeVar('var', value);
             return true;
+            // #fix var 不允许重复声明
+        }
+        else if ($var instanceof ScopeVar) {
+            $var.$set(value);
+            return true;
         }
         return false;
     };
@@ -1396,8 +1429,15 @@ var illegalFun = [setTimeout, setInterval, clearInterval, clearTimeout];
 var isUndefinedOrNull = function (val) { return val === void 0 || val === null; };
 var evaluate_map = (_a = {},
     _a[Program] = function (program, scope) {
-        for (var _i = 0, _a = program.body; _i < _a.length; _i++) {
-            var node = _a[_i];
+        var nonFunctionList = [];
+        var list = program.body;
+        for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
+            var node = list_1[_i];
+            // function 声明语句 会提升到作用域顶部
+            isPromoteStatement(node) ? evaluate(node, scope) : nonFunctionList.push(node);
+        }
+        for (var _a = 0, nonFunctionList_1 = nonFunctionList; _a < nonFunctionList_1.length; _a++) {
+            var node = nonFunctionList_1[_a];
             evaluate(node, scope);
         }
     },
@@ -1418,15 +1458,21 @@ var evaluate_map = (_a = {},
         return indexGeneratorStackDecorate(function (stackData) {
             var new_scope = scope.invasive ? scope : new Scope('block', scope);
             var list = block.body;
-            for (; stackData.index < list.length; stackData.index++) {
-                var node = list[stackData.index];
+            // 非 function 声明语句
+            var nonFunctionList = [];
+            for (var _i = 0, list_2 = list; _i < list_2.length; _i++) {
+                var node = list_2[_i];
+                // 变量提升语句需要提升到作用域顶部执行
+                isPromoteStatement(node) ? evaluate(node, new_scope) : nonFunctionList.push(node);
+            }
+            for (; stackData.index < nonFunctionList.length; stackData.index++) {
+                var node = nonFunctionList[stackData.index];
                 var result = evaluate(node, new_scope);
                 if (isYieldResult(scope, result)
                     || isReturnResult(result)
                     || isContinueResult(result)
-                    || isBreakResult(result)) {
+                    || isBreakResult(result))
                     return result;
-                }
             }
         }, scope);
     },
@@ -1451,10 +1497,10 @@ var evaluate_map = (_a = {},
             return evaluate(node.alternate, scope);
     },
     _a[ForStatement] = function (node, scope) {
-        for (var new_scope = new Scope('loop', scope), init_val = node.init ? evaluate(node.init, new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
+        for (var new_scope = new Scope('loop', scope), init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
             var result = evaluate(node.body, new_scope);
             if (isReturnResult(result))
-                return;
+                return result;
             else if (isContinueResult(result))
                 continue;
             else if (isBreakResult(result))
@@ -1666,17 +1712,40 @@ var evaluate_map = (_a = {},
         // 矫正属性
         Object.defineProperty(func, "length", { value: node.params.length });
         // @ts-ignore
-        Object.defineProperty(func, "toString", { value: function () { return thisRunner.source.slice(node.start, node.end); } });
+        Object.defineProperty(func, "toString", { value: function () { return thisRunner.source.slice(node.start, node.end); }, configurable: true });
         return func;
     },
     _a[UnaryExpression] = function (node, scope) {
-        return ({
-            '-': function () { return -evaluate(node.argument, scope); },
-            '+': function () { return +evaluate(node.argument, scope); },
-            '!': function () { return !evaluate(node.argument, scope); },
-            '~': function () { return ~evaluate(node.argument, scope); },
-            'void': function () { return void evaluate(node.argument, scope); },
-            'typeof': function () {
+        var _a;
+        var sk = 'typeof';
+        return (_a = {
+                '-': function () { return -evaluate(node.argument, scope); },
+                '+': function () { return +evaluate(node.argument, scope); },
+                '!': function () { return !evaluate(node.argument, scope); },
+                '~': function () { return ~evaluate(node.argument, scope); },
+                'void': function () { return void evaluate(node.argument, scope); },
+                'delete': function () {
+                    if (node.argument.type === MemberExpression) {
+                        var _a = node.argument, object = _a.object, property = _a.property, computed = _a.computed;
+                        if (computed) {
+                            return delete evaluate(object, scope)[evaluate(property, scope)];
+                        }
+                        else {
+                            // @ts-ignore
+                            return delete evaluate(object, scope)[(property).name];
+                        }
+                    }
+                    else if (node.argument.type === Identifier) {
+                        var $this = scope.$find('this');
+                        // @ts-ignore
+                        if ($this)
+                            return $this.$get()[node.argument.name];
+                    }
+                }
+            },
+            // 部分老版本 babel 会将 typeof 函数修改为同名的 _typeof 函数，导致循环调用最后栈溢出
+            // 使用特殊的 key 来区分
+            _a[sk] = function () {
                 if (node.argument.type === Identifier) {
                     var $var = scope.$find(node.argument.name);
                     return $var ? typeof $var.$get() : 'undefined';
@@ -1685,25 +1754,7 @@ var evaluate_map = (_a = {},
                     return typeof evaluate(node.argument, scope);
                 }
             },
-            'delete': function () {
-                if (node.argument.type === MemberExpression) {
-                    var _a = node.argument, object = _a.object, property = _a.property, computed = _a.computed;
-                    if (computed) {
-                        return delete evaluate(object, scope)[evaluate(property, scope)];
-                    }
-                    else {
-                        // @ts-ignore
-                        return delete evaluate(object, scope)[(property).name];
-                    }
-                }
-                else if (node.argument.type === Identifier) {
-                    var $this = scope.$find('this');
-                    // @ts-ignore
-                    if ($this)
-                        return $this.$get()[node.argument.name];
-                }
-            }
-        })[node.operator]();
+            _a)[node.operator]();
     },
     _a[UpdateExpression] = function (node, scope) {
         var prefix = node.prefix;
@@ -1902,10 +1953,10 @@ var evaluate_map = (_a = {},
             }
             if (matched) {
                 var result = evaluate($case, new_scope);
-                if (result === BREAK_SIGNAL) {
+                if (isBreakResult(result)) {
                     break;
                 }
-                else if (result === CONTINUE_SIGNAL || result === RETURN_SIGNAL) {
+                else if (isReturnResult(result) || isContinueResult(result)) {
                     return result;
                 }
             }
@@ -1915,9 +1966,7 @@ var evaluate_map = (_a = {},
         for (var _i = 0, _a = node.consequent; _i < _a.length; _i++) {
             var stmt = _a[_i];
             var result = evaluate(stmt, scope);
-            if (result === BREAK_SIGNAL
-                || result === CONTINUE_SIGNAL
-                || result === RETURN_SIGNAL) {
+            if (isReturnResult(result) || isBreakResult(result) || isContinueResult(result)) {
                 return result;
             }
         }
@@ -1927,13 +1976,13 @@ var evaluate_map = (_a = {},
             var new_scope = new Scope('loop', scope);
             new_scope.invasive = true;
             var result = evaluate(node.body, new_scope);
-            if (result === BREAK_SIGNAL) {
+            if (isBreakResult(result)) {
                 break;
             }
-            else if (result === CONTINUE_SIGNAL) {
+            else if (isContinueResult(result)) {
                 continue;
             }
-            else if (result === RETURN_SIGNAL) {
+            else if (isReturnResult(result)) {
                 return result;
             }
         }
@@ -2051,9 +2100,16 @@ var evaluate = function (node, scope, runner) {
         return res;
     }
     catch (err) {
+        // 错误已经冒泡到栈定了，触发错误收集处理
+        if (thisRunner.traceStack[0] === thisId) {
+            thisRunner.onError(err);
+            thisRunner.traceStack.pop();
+        }
+        // 错误已经处理过了，直接抛出
         if (err.isEvaluateError) {
             throw err;
         }
+        // 第一级错误，需要包裹处理
         if (thisRunner.traceStack[thisRunner.traceStack.length - 1] === thisId) {
             throw createError(errorMessageList.runTimeError, err === null || err === void 0 ? void 0 : err.message, node, thisRunner.source);
         }
@@ -5041,16 +5097,22 @@ var Runner = /** @class */ (function () {
         this.source = '';
         this.traceId = 0;
         this.traceStack = [];
-        this.mainScope = new Scope('block');
         this.currentNode = null;
+        this.ast = null;
+        this.mainScope = new Scope('block');
     }
-    Runner.prototype.run = function (code, injectObject) {
+    /** 错误收集中心 */
+    Runner.prototype.onError = function (err) {
+        // console.error(err);
+    };
+    Runner.prototype.run = function (code, injectObject, onError) {
         if (injectObject === void 0) { injectObject = {}; }
         this.source = code;
+        this.onError = onError || this.onError;
         this.initScope(injectObject);
-        var ast = acorn.parse(code, { locations: true, ecmaVersion: 6 });
+        this.parserAst(code);
         try {
-            evaluate(ast, this.mainScope, this);
+            evaluate(this.ast, this.mainScope, this);
         }
         catch (err) {
             throw err;
@@ -5070,18 +5132,22 @@ var Runner = /** @class */ (function () {
             _this.mainScope.$const(name, injectObject[name]);
         });
     };
+    Runner.prototype.parserAst = function (code) {
+        this.ast = acorn.parse(code, { locations: true, ecmaVersion: 6 });
+        return this.ast;
+    };
     return Runner;
 }());
 
-var run = function (code, injectObject) {
+var run = function (code, injectObject, onError) {
     var runner = new Runner();
-    return runner.run(code, injectObject);
+    return runner.run(code, injectObject, onError);
 };
 
 // @ts-ignore
-var version = "0.0.3";
+var version = "0.0.5";
 initVersionLogger('naruse-weex', version);
-var Naruse = __assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, globalEvent: globalEvent }, Storage), Route), Device), System);
+var Naruse = __assign(__assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, globalEvent: globalEvent, withPage: function (Component) { return Component; } }, Storage), Route), Device), System), { getImageInfo: temporarilyNotSupport('getImageInfo'), createAnimation: temporarilyNotSupport('createAnimation') });
 var naruseExtend = function (obj) {
     Object.assign(Naruse, obj);
 };

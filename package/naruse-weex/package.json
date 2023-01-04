@@ -1,6 +1,6 @@
 {
   "name": "naruse-weex",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "main": "./build/lib.js",
   "scripts": {
@@ -11,7 +11,7 @@
   "author": "CHC",
   "license": "ISC",
   "dependencies": {
-    "naruse-parser": "^0.0.8",
+    "naruse-parser": "^0.1.1",
     "rax": "^1.1.0",
     "rax-document": "^0.1.0",
     "rax-image": "^2.0.0",
