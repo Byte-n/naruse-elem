@@ -1,7 +1,7 @@
 import { naruseCreateElement } from '../components/index';
 import { getDeferred, globalEvent, EventBus, initVersionLogger } from '../../naruse-share/index';
 import { run } from 'naruse-parser';
-import { Component } from 'react';
+import { Component, cloneElement, isValidElement, Children } from 'react';
 import api from '../api/index';
 
 // @ts-ignore
@@ -26,6 +26,9 @@ export const Naruse = {
     version,
     unsafe_run: run,
     withPage: (Component) => Component,
+    cloneElement,
+    isValidElement,
+    Children,
 };
 
 if (typeof window !== 'undefined') {

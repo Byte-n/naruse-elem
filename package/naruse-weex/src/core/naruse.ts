@@ -6,6 +6,7 @@ import { getDeferred, EventBus, globalEvent, initVersionLogger, temporarilyNotSu
 import NaruseComponent from './component';
 import { naruseCreateElement } from './createElement';
 import { run } from 'naruse-parser';
+import * as elementApi from './element';
 
 // @ts-ignore
 const version = __VERSION__;
@@ -25,6 +26,7 @@ const Naruse = {
     ...System,
     getImageInfo: temporarilyNotSupport('getImageInfo'),
     createAnimation: temporarilyNotSupport('createAnimation'),
+    ...elementApi,
 };
 
 const naruseExtend = (obj: any) => {
