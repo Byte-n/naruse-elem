@@ -1,0 +1,40 @@
+{
+  "appKey": "6541416",
+  "appName": "代发助手王",
+  "version": "1.2.24",
+  "jssdkVersion": "0.1.0",
+  "minClientVersion": {
+    "1688": {
+      "ios": "7.0.0",
+      "android": "7.0.0"
+    }
+  },
+  "pages": [
+    {
+      "isDefault": true,
+      "url": "rap:///index",
+      "config": {
+        "title": {
+          "text": "测试应用",
+          "url": "",
+          "backgroundColor": "",
+          "color": "",
+          "iconImage": ""
+        },
+        "animate": true
+      }
+    },
+    {
+      "url": "rap:///my"
+    }
+  ],
+  "assetsRootUrl": "https://g.alicdn.com/rap/@APPKEY@/@VERSION@/pages/@PATH@/index.weex.js",
+  "webRootUrl": "https://air.1688.com/rap/@APPKEY@/@PATH@.html?wh_weex=true",
+  "iconfonts": [],
+  "clientVersion": {
+    "1688": {
+      "ios": "7.6.0~",
+      "android": "7.6.0~"
+    }
+  }
+}

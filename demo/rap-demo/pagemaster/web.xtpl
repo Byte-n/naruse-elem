@@ -1,0 +1,69 @@
+{{$page.setHeader('Content-Type','text/html')}}
+
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="{{$page.charset}}">
+  <title>{{$page.title}}</title>
+  <meta name="data-spm" content="{{$page.spm[0]}}">
+  <meta name="description" content="{{$page.description}}">
+  <meta name="keyword" content="{{$page.keyword}}">
+  <meta name="aplus-terminal" content="1">
+  <meta name="aplus-touch" content="1">
+  <meta name="aplus-waiting" content="1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+  <meta name="format-detection" content="telephone=no"/>
+  <style>
+    body {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: 0;
+      font-family: Roboto, "Helvetica Neue", Helvetica, Tahoma, Arial, "PingFang SC", "Microsoft YaHei";
+
+    }
+  </style>
+  <!-- fastclick -->
+    <script src="//g.alicdn.com/avengers/fastclick/0.0.1/index.min.js"></script>
+    <script>
+      if ('addEventListener' in document) {
+        document.addEventListener('DOMContentLoaded', function() {
+          FastClick.attach(document.body);
+        }, false);
+      }
+    </script>
+</head>
+<body data-spm="{{$page.spm[1]}}" style="margin: 0; padding: 0;">
+  <script src="//g.alicdn.com/code/npm/web-rax-framework/0.4.3/dist/framework.web.min.js"></script>
+  <script>
+    define('@page/data', function(require, exports, module) {
+      var metaData = {
+        charset:'{{$page.charset}}',
+        title:'{{$page.title}}',
+        spma:'{{$page.spm[0]}}',
+        spmb:'{{$page.spm[1]}}',
+        env: '{{$page.env}}'
+      };
+
+      module.exports = {
+        metaData: metaData
+      };
+    });
+  </script>
+  {{#if ($page.env==='production' || $page.env==='beta')}}
+    {{set (prefix='g.alicdn.com')}}
+  {{else}}
+    {{set (prefix='g-assets.daily.taobao.net')}}
+  {{/if}}
+  <script src="//g.alicdn.com/??tb/tracker/4.2.0/p/index/index.js" async></script>
+  <script src="//{{prefix}}/rap/123/@VERSION@/pages/@PAGE@/index.web.js" async></script>
+
+</body>
+</html>

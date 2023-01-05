@@ -3,7 +3,7 @@ import View from 'rax-view';
 import Text from 'rax-text';
 import styles from './index.module.css';
 import Logo from '@/components/Logo';
-import { createElement as naruseCreateElement } from '../../../../package/naruse-weex/build/lib'
+import { createElement as naruseCreateElement } from '../../../../../package/naruse-weex/build/lib'
 
 export default function Home() {
   return (

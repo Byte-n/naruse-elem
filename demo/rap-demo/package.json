@@ -1,0 +1,84 @@
+{
+  "name": "AgentialEquipment",
+  "appName": "代发助手王",
+  "version": "1.2.24",
+  "description": "代发助手王",
+  "scripts": {
+    "dev": "rap dev",
+    "build": "webpack --config ./webpack/webpack.config.prod.js",
+    "precommit": "lint-staged",
+    "lint": "eslint --ext .js --ext .jsx src/",
+    "dev:distribute": "node build.js 8869440 && rap dev",
+    "dev:distributenew": "rap dev",
+    "build:distribute": "node build.js 8869440",
+    "build:distributenew": "node build.js 6541416 && rap dev && rap archive"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "pre-commit": [
+    "lint"
+  ],
+  "keywords": [
+    "rap",
+    "rap-app",
+    "rap-pkg"
+  ],
+  "just": {
+    "type": "app/mobile-rax",
+    "plugins": {
+      "m-rax": "*"
+    }
+  },
+  "author": {
+    "name": "CitrusLimonc"
+  },
+  "maintainers": [],
+  "dependencies": {
+    "alife-logger": "^1.2.4",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.12.1",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-loader": "^2.1.1",
+    "eslint-plugin-import": "^2.15.0",
+    "eslint-plugin-jsx-a11y": "^6.2.0",
+    "eslint-plugin-react": "^7.12.4",
+    "nuke-biz-moment": "^0.0.6",
+    "nuke-page": "^2.3.12",
+    "nuke-panresponder": "^0.0.1",
+    "pre-commit": "^1.2.2",
+    "rap-sdk": "^0.5.2",
+    "rax": "^1.2.2",
+    "rax-components": "^0.6.5",
+    "rax-image": "^2.2.4",
+    "rox-components": "^0.0.36",
+    "rox-page": "^0.0.36",
+    "webpack": "^4.29.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^7.6.1",
+    "@commitlint/config-conventional": "^7.6.0",
+    "husky": "^2.3.0",
+    "lint-staged": "^8.1.0",
+    "npm-ensure": "^1.1.2",
+    "rax-test-renderer": "0.x.x"
+  },
+  "ensure": {
+    "deps": {
+      "checkDirs": [
+        "src/**/*"
+      ],
+      "ignoreDirs": [
+        "src/__tests__/**/*"
+      ],
+      "ignores": [
+        "@weex-module/*",
+        "@page/data"
+      ]
+    }
+  },
+  "appKey": "6541416"
+}
