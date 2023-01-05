@@ -1,29 +1,6 @@
 {
-  "scripts": {
-    "build": "npx webpack"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.16.7",
-    "@babel/plugin-proposal-object-rest-spread": "^7.17.3",
-    "@babel/plugin-transform-destructuring": "^7.17.7",
-    "@babel/plugin-transform-shorthand-properties": "^7.16.7",
-    "@babel/plugin-transform-template-literals": "^7.16.7",
-    "@babel/preset-env": "^7.16.7",
-    "@rollup/plugin-babel": "^5.3.1",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "chalk": "^4.1.2",
-    "css": "^3.0.0",
-    "css-to-js-object": "^0.0.3",
-    "css-to-react-native-transform": "^2.0.0",
-    "prejss": "^1.4.0",
-    "react-styling": "^1.6.4",
-    "readline": "^1.3.0",
-    "rollup": "^2.70.1",
-    "rollup-pluginutils": "^2.8.2",
-    "uglify-js": "^3.15.2"
-  },
   "name": "rollup-plugin-naruse",
   "description": "将标准的react类组件 转换为  naruse-element 运行的代码",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "index.js"
 }
