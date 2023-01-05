@@ -68,7 +68,9 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "start": "rollup -c ./rollup.config.js -w",
-    "build": "pnpm -r --filter=./package/* run build"
+    "build": "pnpm -r --filter=./package/* run build",
+    "publish": "changeset publish --registry=http://1.15.115.152:4873",
+    "version": "changeset version"
   },
   "repository": {
     "type": "git",
