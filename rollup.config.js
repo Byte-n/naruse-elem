@@ -3,7 +3,7 @@ const { babel } = require('@rollup/plugin-babel');
 const alias = require('@rollup/plugin-alias');
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const path = require('path');
-const config = require('./naruse.config');
+const config = require('./demo/demo-alipay/naruse.config');
 const externalGlobals = require('rollup-plugin-external-globals');
 
 

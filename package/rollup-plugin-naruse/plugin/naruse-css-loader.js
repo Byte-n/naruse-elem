@@ -37,7 +37,7 @@ module.exports = function scss (options = {}) {
         options.include || ['/**/*.css', '/**/*.scss', '/**/*.sass'],
         options.exclude
     );
-    const includePaths = options.includePaths || ['node_modules/'];
+    const includePaths = options.includePaths || [];
     includePaths.push(process.cwd());
 
     return {
