@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es5",    
+    "jsx": "react", /* Specify what JSX code is generated. */
+    "jsxFactory": "createElement", /* Specify the JSX factory function used when targeting React JSX emit, e.g. 'React.createElement' or 'h'. */
+    "module": "ESNext", /* Specify what module code is generated. */
+    "rootDir": "./", /* Specify the root folder within your source files. */
+    "moduleResolution": "node", /* Specify how TypeScript looks up a file from a given module specifier. */
+    "baseUrl": "./", /* Specify the base directory to resolve non-relative module names. */
+    "typeRoots": ["./node_modules/@types", "./package/naruse-types"],
+    "allowJs": true, /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */
+    "esModuleInterop": true, /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
+    "forceConsistentCasingInFileNames": true, /* Ensure that casing is correct in imports. */
+    "strict": false, /* Enable all strict type-checking options. */
+  },
+  "include": [
+    "./package/*",
+  ],
+  "exclude": [
+    "./node_modules",
+    "./demo",
+    "./dist"
+  ]
+}
