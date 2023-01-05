@@ -1,0 +1,4 @@
+<naruse code="{{ code }}" unique="true" />
+<view onLongTap="ccc">
+    <button onTap="qwer" onLongTap="ccc">册书</button>
+</view>

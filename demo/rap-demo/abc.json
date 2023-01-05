@@ -1,0 +1,25 @@
+{
+  "name": "6541416",
+  "group": "rap",
+  "version": "1.2.24",
+  "type": "rax",
+  "builder": "@ali/builder-cbu-rax",
+  "author": "CitrusLimonc",
+  "options": {
+    "builderReflect": true,
+    "babel": true,
+    "devtool": "#source-map",
+    "externalRax": true
+  },
+  "info": {
+    "extraLib": "rax",
+    "platform": [
+      "mobile"
+    ],
+    "project": "app",
+    "workflow": "normal"
+  },
+  "build_ignore": [
+    "./build"
+  ]
+}

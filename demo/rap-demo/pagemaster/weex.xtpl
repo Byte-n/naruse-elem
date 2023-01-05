@@ -1,0 +1,21 @@
+{{$page.setHeader('Content-Type','application/javascript')}}
+
+  (function(){
+
+    define('@page/data', function(require, exports, module) {
+      var metaData = {
+        charset:'{{$page.charset}}',
+        title:'{{$page.title}}',
+        spma:'{{$page.spm[0]}}',
+        spmb:'{{$page.spm[1]}}',
+        env: '{{$page.env}}'
+      };
+
+      module.exports = {
+        metaData: metaData
+      };
+    });
+
+    {{% {{weex_bundlejs}} %}}
+    
+  })()
