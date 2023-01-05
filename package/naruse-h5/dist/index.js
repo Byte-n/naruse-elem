@@ -743,7 +743,6 @@ var View = /** @class */ (function (_super) {
         var _this = this;
         var animation = this.props.animation;
         if (animation !== this.lastAnimationName && isNaruseAnimaitonName(animation)) {
-            console.log('装载动画', animation);
             // 等待组件彻底装载完毕后再启动animation，否则会出现动画不生效的情况
             setTimeout(function () { var _a; return (_a = _this.ref) === null || _a === void 0 ? void 0 : _a.setAttribute('data-animation', animation); });
             this.lastAnimationName = animation;
@@ -6363,7 +6362,7 @@ var Naruse = __assign(__assign({}, api), { Component: React.Component, createEle
         clientVersion: version,
         language: 'zh-Hans',
         platform: 'H5',
-    }, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, version: version, unsafe_run: run, withPage: function (Component) { return Component; } });
+    }, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, version: version, unsafe_run: run, withPage: function (Component) { return Component; }, cloneElement: React.cloneElement, isValidElement: React.isValidElement, Children: React.Children });
 if (typeof window !== 'undefined') {
     // @ts-ignore
     window.Naruse = Naruse;

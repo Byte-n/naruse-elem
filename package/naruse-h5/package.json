@@ -1,43 +1,12 @@
 {
   "scripts": {
-    "build": "rollup -c ./rollup.config.js --environment BUILD:production",
-    "dev": "rollup -c ./rollup.config.js --watch --environment BUILD:development && cp ./dist/index.js ./dist.js",
+    "build": "rollup -c --environment BUILD:production",
+    "dev": "rollup -c --watch --environment BUILD:development && cp ./dist/index.js ./dist.js",
     "test": "karmatic --files 'test/**.test.js,test/**.test.jsx' --coverage false",
     "test:debug": "karmatic debug --files 'test/**.test.js,test/**.test.jsx' --coverage false"
-  },
-  "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@babel/plugin-proposal-object-rest-spread": "^7.18.9",
-    "@babel/preset-react": "^7.18.6",
-    "@rollup/plugin-alias": "^3.1.9",
-    "@rollup/plugin-babel": "^5.3.1",
-    "@rollup/plugin-commonjs": "^23.0.3",
-    "@rollup/plugin-inject": "^4.0.4",
-    "@rollup/plugin-node-resolve": "^13.1.3",
-    "@rollup/plugin-replace": "^4.0.0",
-    "@rollup/plugin-typescript": "^8.5.0",
-    "@types/react": "^15.7.10",
-    "babel-preset-power-assert": "^3.0.0",
-    "karmatic": "^2.1.0",
-    "power-assert": "^1.6.1",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
-    "rollup": "^2.70.1",
-    "rollup-plugin-external-globals": "^0.6.1",
-    "rollup-plugin-uglify": "^6.0.4",
-    "typescript": "^4.8.3",
-    "webpack": "^4.46.0"
   },
   "name": "naruse-h5",
   "description": "naruse的h5端运行平台",
   "version": "0.2.0",
-  "main": "dist/index.js",
-  "directories": {
-    "test": "test"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "naruse-parser": "^0.1.1"
-  }
+  "main": "dist/index.js"
 }

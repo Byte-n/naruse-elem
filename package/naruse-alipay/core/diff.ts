@@ -124,21 +124,11 @@ const diffVnodeChildren = (newNode: VNode, oldNode: VNode, path = 'node', diffRe
     for (i = 0; i < newChildNodes.length; i++) {
         childVNode = newChildNodes[i];
 
-        if (childVNode == null || typeof childVNode == 'boolean') {
-            childVNode = null;
-        } else if (
-            typeof childVNode == 'string' ||
-            typeof childVNode == 'number' ||
-            typeof childVNode == 'bigint'
-        ) {
-            childVNode = createElement('text', null, childVNode);
-        } else if (Array.isArray(childVNode)) {
-            childVNode = createElement('fragment', null, childVNode);
-        }
+        childVNode = cleanChildNode(childVNode);
 
         oldVNode = oldChildren[i];
 
-        if (oldVNode == null ||  typeof oldVNode == 'boolean') {
+        if (oldVNode == null || typeof oldVNode == 'boolean') {
             oldVNode = null;
         }
 
@@ -178,11 +168,11 @@ const vnodePropsDiff = (newVnode: any, oldVnode: any, isNaruseComponent = false)
         const oldPropValue = oldVnode[newPropKey];
 
         if (newPropValue !== oldPropValue) {
-            if (newPropKey === 'style' 
-                && isObj(newPropValue) 
+            if (newPropKey === 'style'
+                && isObj(newPropValue)
                 && isObj(oldPropValue)
                 && isEmptyObj(vnodePropsDiff(newPropValue, oldPropValue))
-                ) {
+            ) {
                 continue;
             }
             // 是 NaruseComponent 的前提下都为空的情况下跳过 diff 子元素
@@ -212,3 +202,20 @@ const vnodePropsDiff = (newVnode: any, oldVnode: any, isNaruseComponent = false)
 }
 
 const isCustomIdNode = (node: any) => !node._uid;
+
+const isBaseTypeComponent = (childVNode: any) => {
+    return typeof childVNode == 'string' ||
+        typeof childVNode == 'number' ||
+        typeof childVNode == 'bigint'
+}
+
+export const cleanChildNode = (childVNode: any) => {
+    if (childVNode == null || typeof childVNode == 'boolean') {
+        childVNode = null;
+    } else if (isBaseTypeComponent(childVNode)) {
+        childVNode = createElement('text', null, childVNode);
+    } else if (Array.isArray(childVNode)) {
+        childVNode = createElement('fragment', null, childVNode);
+    }
+    return childVNode;
+}

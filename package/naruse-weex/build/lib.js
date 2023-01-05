@@ -1,10 +1,10 @@
 import RAP from 'rap-sdk';
-import { createElement, Component } from 'rax';
+import { createElement, Component, shared } from 'rax';
 import { Text, View, Image, ScrollView, TextInput } from 'rax-components';
 
 Array.prototype.flat||Object.defineProperty(Array.prototype,"flat",{configurable:!0,value:function r(){var t=isNaN(arguments[0])?1:Number(arguments[0]);return t?Array.prototype.reduce.call(this,function(a,e){return Array.isArray(e)?a.push.apply(a,r.call(e,t-1)):a.push(e),a},[]):Array.prototype.slice.call(this)},writable:!0}),Array.prototype.flatMap||Object.defineProperty(Array.prototype,"flatMap",{configurable:!0,value:function(r){return Array.prototype.map.apply(this,arguments).flat()},writable:!0});
 
-/*! *****************************************************************************
+/******************************************************************************
 Copyright (c) Microsoft Corporation.
 
 Permission to use, copy, modify, and/or distribute this software for any
@@ -74,7 +74,7 @@ function __generator(thisArg, body) {
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
             if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
             if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
@@ -5144,10 +5144,74 @@ var run = function (code, injectObject, onError) {
     return runner.run(code, injectObject, onError);
 };
 
+function isValidElement(object) {
+    return typeof object === 'object' && object !== null && object.type && object.props;
+}
+var Host = shared.Host, Element = shared.Element, flattenChildren = shared.flattenChildren;
+var RESERVED_PROPS = {
+    key: true,
+    ref: true,
+};
+function cloneElement(element, config) {
+    var children = [];
+    for (var _i = 2; _i < arguments.length; _i++) {
+        children[_i - 2] = arguments[_i];
+    }
+    if (!isValidElement(element)) {
+        throw Error('cloneElement: not a valid element.');
+    }
+    // Original props are copied
+    var props = Object.assign({}, element.props);
+    // Reserved names are extracted
+    var key = element.key;
+    var ref = element.ref;
+    // Owner will be preserved, unless ref is overridden
+    var owner = element._owner;
+    if (config) {
+        // Should reset ref and owner if has a new ref
+        if (config.ref !== undefined) {
+            ref = config.ref;
+            owner = Host.owner;
+        }
+        if (config.key !== undefined) {
+            key = String(config.key);
+        }
+        // Resolve default props
+        var defaultProps = void 0;
+        if (element.type && element.type.defaultProps) {
+            defaultProps = element.type.defaultProps;
+        }
+        // Remaining properties override existing props
+        var propName = void 0;
+        for (propName in config) {
+            if (config.hasOwnProperty(propName) && !RESERVED_PROPS.hasOwnProperty(propName)) {
+                if (config[propName] === undefined && defaultProps !== undefined) {
+                    // Resolve default props
+                    props[propName] = defaultProps[propName];
+                }
+                else {
+                    props[propName] = config[propName];
+                }
+            }
+        }
+    }
+    if (children.length) {
+        props.children = flattenChildren(children);
+    }
+    // @ts-ignore
+    return new Element(element.type, key, ref, props, owner);
+}
+
+var elementApi = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    isValidElement: isValidElement,
+    cloneElement: cloneElement
+});
+
 // @ts-ignore
 var version = "0.0.5";
 initVersionLogger('naruse-weex', version);
-var Naruse = __assign(__assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, globalEvent: globalEvent, withPage: function (Component) { return Component; } }, Storage), Route), Device), System), { getImageInfo: temporarilyNotSupport('getImageInfo'), createAnimation: temporarilyNotSupport('createAnimation') });
+var Naruse = __assign(__assign(__assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, globalEvent: globalEvent, withPage: function (Component) { return Component; } }, Storage), Route), Device), System), { getImageInfo: temporarilyNotSupport('getImageInfo'), createAnimation: temporarilyNotSupport('createAnimation') }), elementApi);
 var naruseExtend = function (obj) {
     Object.assign(Naruse, obj);
 };

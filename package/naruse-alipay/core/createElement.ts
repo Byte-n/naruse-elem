@@ -11,7 +11,7 @@ let uid = 0;
 const vnodeSpecialMap: Record<string, Function> = {
     text (props: any, childNodes: any []) {
         const id = `_n_${uid++}`;
-        return { naruseType: 'text', content: childNodes.join(''), id, _uid: id };;
+        return { naruseType: 'text', content: childNodes.join(''), id, _uid: id };
     },
 };
 
