@@ -5090,7 +5090,7 @@ var elementApi = /*#__PURE__*/Object.freeze({
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.3.6";
+var version = "0.4.1";
 initVersionLogger('naruse-alipay', version);
 // naruse模块内容
 var Naruse = __assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {

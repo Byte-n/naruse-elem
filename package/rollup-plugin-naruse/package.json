@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-naruse",
   "description": "将标准的react类组件 转换为  naruse-element 运行的代码",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "main": "index.js"
 }
