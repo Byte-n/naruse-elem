@@ -5055,17 +5055,32 @@ var cleanChildNode = function (childVNode) {
  * @param {*} children
  */
 var cloneElement = function (element, props) {
+    var _a;
     var children = [];
     for (var _i = 2; _i < arguments.length; _i++) {
         children[_i - 2] = arguments[_i];
     }
     var newProps = __assign(__assign({}, element.props), props);
-    var newChildren = children.length ? children : element.children;
+    // 是否是 naruse 原生组件
+    var isNaruseElement = element.naruseType === 'naruse-element';
+    var newChildren;
+    // 如果有指定children
+    if (children && children.length) {
+        newChildren = children;
+    }
+    else if (isNaruseElement) {
+        // 自定义组件
+        newChildren = (_a = element.component) === null || _a === void 0 ? void 0 : _a.props.children;
+    }
+    else {
+        // 原生组件
+        newChildren = element.childNodes;
+    }
     if (newChildren.length) {
         newChildren = newChildren.map(cleanChildNode);
     }
-    // naruse 组件元素
-    if (element.naruseType === 'naruse-element') {
+    // naruse 原生组件
+    if (isNaruseElement) {
         var oldProps = element === null || element === void 0 ? void 0 : element.component.props;
         var newComponent = __assign(__assign({}, element.component), { props: __assign(__assign(__assign({}, oldProps), newProps), { children: newChildren, key: oldProps.key, ref: oldProps.ref }) });
         return __assign(__assign({}, element), { component: newComponent });
