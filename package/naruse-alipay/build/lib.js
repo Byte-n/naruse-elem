@@ -4749,13 +4749,20 @@ var getPageInstance = function (miniComponent) {
         logger.error('无效组件');
         return;
     }
-    var id = miniComponent.$page && miniComponent.$page.$id;
+    var id = 0;
+    if (miniComponent.$$narusePage) {
+        id = miniComponent.$id;
+    }
+    else {
+        miniComponent.$page && miniComponent.$page.$id;
+    }
     if (!id) {
         logger.error('无效页面id');
         return;
     }
+    var pageInstance = miniComponent.$$narusePage ? miniComponent : miniComponent.$page;
     if (!pageCenter[id]) {
-        pageCenter[id] = new Page(miniComponent.$page);
+        pageCenter[id] = new Page$1(pageInstance);
         return pageCenter[id];
     }
     return pageCenter[id];
@@ -4766,11 +4773,12 @@ var getPageInstance = function (miniComponent) {
  * @date 2022-05-04 18:05:45
  * @class Page
  */
-var Page = /** @class */ (function () {
+var Page$1 = /** @class */ (function () {
     function Page(miniPage) {
         // 小程序实例
         this.miniPage = miniPage;
         // 事件中心
+        // @ts-ignore
         this.eventCenter = new EventBus();
         // 各个原有事件
         this.oldEvents = {};
@@ -4830,6 +4838,9 @@ var Page = /** @class */ (function () {
     };
     Page.prototype.off = function (eventName, func) {
         this.eventCenter.off(eventName, func);
+    };
+    Page.prototype.once = function (eventName, func) {
+        this.eventCenter.once(eventName, func);
     };
     Object.defineProperty(Page.prototype, "route", {
         get: function () {
@@ -5102,108 +5113,6 @@ var elementApi = /*#__PURE__*/Object.freeze({
     cloneElement: cloneElement,
     isValidElement: isValidElement
 });
-
-var apis = initNaruseAlipayApi();
-// @ts-ignore
-var version = "0.4.1";
-initVersionLogger('naruse-alipay', version);
-// naruse模块内容
-var Naruse = __assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
-        clientName: 'alipay',
-        clientVersion: version,
-        language: 'zh-Hans',
-        platform: 'alipay',
-    }, version: version }, my), apis), { withPage: withPage, unsafe_run: run, $$debug: false }), elementApi);
-var naruseExtend = function (opt) {
-    if (typeof opt === 'object') {
-        Object.assign(Naruse, opt);
-    }
-};
-my.Naruse = Naruse;
-
-/**
- * @description 根据props获取naruse组件
- * @author CHC
- * @date 2022-06-14 10:06:49
- */
-var getNaruseComponentFromProps = function (props) { return __awaiter(void 0, void 0, void 0, function () {
-    var hotPuller, _a, code, ctx, e_1;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0:
-                if (!props || typeof props !== 'object') {
-                    logger.error('无效参数，无法生成对应naruse组件');
-                    return [2 /*return*/];
-                }
-                hotPuller = getNaruseConfig().hotPuller;
-                _b.label = 1;
-            case 1:
-                _b.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, hotPuller(props)];
-            case 2:
-                _a = _b.sent(), code = _a.code, ctx = _a.ctx;
-                return [2 /*return*/, getNaruseComponentFromCode(code, ctx)];
-            case 3:
-                e_1 = _b.sent();
-                logger.error('加载远程代码资源失败', e_1);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
-        }
-    });
-}); };
-/**
- * @description 从代码和运行环境内获取对应组件
- * @author CHC
- * @date 2022-06-14 16:06:40
- * @param {*} code
- * @param {*} ctx
- * @returns {*}
- */
-var getNaruseComponentFromCode = function (code, ctx) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, _baseCtx, onRunError, baseCtx, exports, component, NaruseComponent_1, compatibleClass;
-    return __generator(this, function (_b) {
-        if (!code)
-            return [2 /*return*/];
-        _a = getNaruseConfig(), _baseCtx = _a.baseCtx, onRunError = _a.onRunError;
-        baseCtx = typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx;
-        exports = {};
-        try {
-            exports = run(code, __assign(__assign({ h: createElement, Naruse: Naruse, my: typeof my === 'object' ? my : {} }, baseCtx), ctx));
-        }
-        catch (err) {
-            logger.error('运行时出错，自动继续', err);
-            onRunError(err);
-            return [2 /*return*/];
-        }
-        component = null;
-        // 默认导出组件存在
-        if (exports.default) {
-            component = exports.default;
-        }
-        else {
-            NaruseComponent_1 = Naruse.Component;
-            compatibleClass = function compatibleClass() {
-                var args = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    args[_i] = arguments[_i];
-                }
-                var self = this;
-                NaruseComponent_1.apply(this, args);
-                exports.constructor && exports.constructor.call(this);
-                Object.entries(exports).forEach(function (_a) {
-                    var key = _a[0], value = _a[1];
-                    if (key === 'constructor')
-                        return;
-                    self[key] = typeof value === 'function' ? value.bind(self) : value;
-                });
-            };
-            compatibleClass.prototype = Object.create(NaruseComponent_1.prototype);
-            Object.assign(compatibleClass.prototype, { constructor: compatibleClass });
-            component = compatibleClass;
-        }
-        return [2 /*return*/, component];
-    });
-}); };
 
 // naruse事件中心
 /** 允许继续冒泡的事件 */
@@ -5518,6 +5427,144 @@ var Middware = /** @class */ (function () {
     return Middware;
 }());
 
+var createPageComponent = function (config) {
+    var pageConfig = {
+        // 标识是 naruse 页面
+        $$narusePage: true,
+    };
+    // 挂载页面事件
+    ALLOW_EVENT.forEach(function (event) {
+        pageConfig[event] = function () { };
+    });
+    // 初始化属性
+    pageConfig.data = {};
+    // 加载时
+    pageConfig["onLoad"] = function (query) {
+        this.$query = query;
+        // 初始化 naruse 组件
+        var middware = new Middware(this, config.component, {});
+        middware.update();
+        this.$middware = middware;
+    };
+    // @ts-ignore
+    Page(pageConfig);
+};
+
+/**
+ * 创建一个小程序的组件工厂，允许直接传入 Naruse 组件进行开发
+ */
+var createMiniFactory = function (type, config) {
+    if (type === 'page') {
+        // @ts-ignore
+        return createPageComponent(config);
+    }
+    else {
+        logger.error('初始化暂不支持组件');
+    }
+};
+
+var apis = initNaruseAlipayApi();
+// @ts-ignore
+var version = "0.4.3";
+initVersionLogger('naruse-alipay', version);
+// naruse模块内容
+var Naruse = __assign(__assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
+        clientName: 'alipay',
+        clientVersion: version,
+        language: 'zh-Hans',
+        platform: 'alipay',
+    }, version: version }, my), apis), { withPage: withPage, unsafe_run: run, $$debug: false }), elementApi), { createMiniFactory: createMiniFactory });
+var naruseExtend = function (opt) {
+    if (typeof opt === 'object') {
+        Object.assign(Naruse, opt);
+    }
+};
+my.Naruse = Naruse;
+
+/**
+ * @description 根据props获取naruse组件
+ * @author CHC
+ * @date 2022-06-14 10:06:49
+ */
+var getNaruseComponentFromProps = function (props) { return __awaiter(void 0, void 0, void 0, function () {
+    var hotPuller, _a, code, ctx, e_1;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                if (!props || typeof props !== 'object') {
+                    logger.error('无效参数，无法生成对应naruse组件');
+                    return [2 /*return*/];
+                }
+                hotPuller = getNaruseConfig().hotPuller;
+                _b.label = 1;
+            case 1:
+                _b.trys.push([1, 3, , 4]);
+                return [4 /*yield*/, hotPuller(props)];
+            case 2:
+                _a = _b.sent(), code = _a.code, ctx = _a.ctx;
+                return [2 /*return*/, getNaruseComponentFromCode(code, ctx)];
+            case 3:
+                e_1 = _b.sent();
+                logger.error('加载远程代码资源失败', e_1);
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+/**
+ * @description 从代码和运行环境内获取对应组件
+ * @author CHC
+ * @date 2022-06-14 16:06:40
+ * @param {*} code
+ * @param {*} ctx
+ * @returns {*}
+ */
+var getNaruseComponentFromCode = function (code, ctx) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, _baseCtx, onRunError, baseCtx, exports, component, NaruseComponent_1, compatibleClass;
+    return __generator(this, function (_b) {
+        if (!code)
+            return [2 /*return*/];
+        _a = getNaruseConfig(), _baseCtx = _a.baseCtx, onRunError = _a.onRunError;
+        baseCtx = typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx;
+        exports = {};
+        try {
+            exports = run(code, __assign(__assign({ h: createElement, Naruse: Naruse, my: typeof my === 'object' ? my : {} }, baseCtx), ctx));
+        }
+        catch (err) {
+            logger.error('运行时出错，自动继续', err);
+            onRunError(err);
+            return [2 /*return*/];
+        }
+        component = null;
+        // 默认导出组件存在
+        if (exports.default) {
+            component = exports.default;
+        }
+        else {
+            NaruseComponent_1 = Naruse.Component;
+            compatibleClass = function compatibleClass() {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                var self = this;
+                NaruseComponent_1.apply(this, args);
+                exports.constructor && exports.constructor.call(this);
+                Object.entries(exports).forEach(function (_a) {
+                    var key = _a[0], value = _a[1];
+                    if (key === 'constructor')
+                        return;
+                    self[key] = typeof value === 'function' ? value.bind(self) : value;
+                });
+            };
+            compatibleClass.prototype = Object.create(NaruseComponent_1.prototype);
+            Object.assign(compatibleClass.prototype, { constructor: compatibleClass });
+            component = compatibleClass;
+        }
+        return [2 /*return*/, component];
+    });
+}); };
+
 var bindedPages = {};
 // 扩展能力，小程序环境内特殊的api
 /**
@@ -5618,9 +5665,23 @@ var initMainComponent = function () {
     });
 };
 /**
- * @description 初始化组件
+ * @description 初始化子虚拟组件
+ * @author CHC
+ * @date 2022-03-21 16:03:28
+ * @param {*} component
  */
-var createVmContext$1 = function () {
+var initSubComponent = function (args) {
+    if (args === void 0) { args = {}; }
+    var actuator = args.actuator, props = args.props;
+    if (actuator) {
+        this.$middware = new Middware(this, actuator, props || {});
+        this.$middware.update();
+    }
+};
+/**
+ * @description 初始化主组件
+ */
+var createMainVmContext = function () {
     try {
         // 主组件
         initMainComponent.call(this);
@@ -5628,6 +5689,12 @@ var createVmContext$1 = function () {
     catch (error) {
         logger.error('初始化失败', error);
     }
+};
+/**
+ * @description 初始化组件
+ */
+var createVmContext = function () {
+    (!this.isNaruseMainComponent ? initSubComponent : createMainVmContext).call(this, this.props.component);
 };
 /**
  * @description 创建naruse默认行为
@@ -5645,12 +5712,13 @@ var createMainBehavior = function (option) {
          * @date 2022-03-16 10:03:05
          */
         didMount: function () {
+            this.isNaruseMainComponent = isEmpty(this.props.component);
             var _a = (this.props || {}).unique, unique = _a === void 0 ? false : _a;
             // 绑定重新渲染事件
             if (unique)
                 bindRenderEventOnComponent(this);
             this.option = option;
-            createVmContext$1.call(this);
+            createVmContext.call(this);
         }, 
         /**
          * @description 组件更新后
@@ -5658,81 +5726,18 @@ var createMainBehavior = function (option) {
          * @date 2022-03-16 10:03:21
          */
         didUpdate: function (prevProps) {
-            // 参数不同则重新创建元素
-            if (!propsEquals(prevProps, this.props)) {
-                // 卸载
-                this.$middware && this.$middware.onUnMount();
-                // 重新创建
-                createVmContext$1.call(this);
-            }
-        }, 
-        /**
-         * @description 组件卸载后
-         * @author CHC
-         * @date 2022-03-16 10:03:36
-         */
-        didUnmount: function () {
-            if (!this.$middware)
+            // 主组件更新逻辑
+            if (this.isNaruseMainComponent) {
+                // 参数不同则重新创建元素
+                if (!propsEquals(prevProps, this.props)) {
+                    // 卸载
+                    this.$middware && this.$middware.onUnMount();
+                    // 重新创建
+                    createVmContext.call(this);
+                }
                 return;
-            uninstallMainComponentOnSomePage(this);
-            this.$middware.onUnMount(true);
-        } });
-    return naruseBehavior;
-};
-
-/**
- * @description 初始化子虚拟组件
- * @author CHC
- * @date 2022-03-21 16:03:28
- * @param {*} component
- */
-var initSubComponent = function (args) {
-    if (args === void 0) { args = {}; }
-    var actuator = args.actuator, props = args.props;
-    if (actuator) {
-        this.$middware = new Middware(this, actuator, props || {});
-        this.$middware.update();
-    }
-};
-/**
- * @description 初始化组件
- */
-var createVmContext = function () {
-    // 子组件
-    if (!isEmpty(this.props.component)) {
-        initSubComponent.call(this, this.props.component);
-        return;
-    }
-    logger.error('无效空naruse组件');
-};
-/**
- * @description 创建naruse默认行为
- * @author CHC
- * @date 2022-03-15 12:03:14
- * @returns {*}
- */
-var createSubBehavior = function () {
-    // 小程序组件默认minxs对象
-    var naruseBehavior = __assign(__assign({}, miniappEventBehavior), { 
-        /**
-         * @description 装载完毕后
-         * @author CHC
-         * @date 2022-03-16 10:03:05
-         */
-        didMount: function () {
-            try {
-                createVmContext.call(this);
             }
-            catch (error) {
-                logger.error('子组件初始化失败', error);
-            }
-        }, 
-        /**
-         * @description 组件更新后
-         * @author CHC
-         * @date 2022-03-16 10:03:21
-         */
-        didUpdate: function (prevProps) {
+            // 子组件更新逻辑
             if (!isEmpty(this.props.component)) {
                 var _a = prevProps.component, props = _a.props, actuator = _a.actuator;
                 // FIX: 修复了当切换装载器后不会卸载组件重新渲染
@@ -5755,6 +5760,7 @@ var createSubBehavior = function () {
         didUnmount: function () {
             if (!this.$middware)
                 return;
+            uninstallMainComponentOnSomePage(this);
             this.$middware.onUnMount(true);
         } });
     return naruseBehavior;
@@ -5762,4 +5768,4 @@ var createSubBehavior = function () {
 
 naruseExtend({ renderComponentOnPage: renderComponentOnPage });
 
-export { Naruse, createMainBehavior, createSubBehavior, naruseExtend, naruseInit, renderComponentOnPageWithCode };
+export { Naruse, createMainBehavior, naruseExtend, naruseInit, renderComponentOnPageWithCode };

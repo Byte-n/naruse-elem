@@ -1,5 +1,11 @@
 # naruse-weex
 
+## 0.4.3
+
+### Patch Changes
+
+- #FEAT: 三端新增 cloneElement 与 isValidElement 顶级 API
+
 ## 0.4.2
 
 ### Patch Changes
