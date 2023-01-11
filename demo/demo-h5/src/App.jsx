@@ -1,12 +1,24 @@
 import React, { Component } from 'react';
 import './App.css';
-import Container, { naruseInit } from '../../package/naruse-h5/dist/index';
-import Code from '../../dist/naruse.dev.debug';
-import { ayRequireList } from '../../package/naurse-ay-polyfill/index';
+import Container, { naruseInit } from '../../../package/naruse-h5/dist/index';
+import Code from '../../../dist/naruse.dev.debug';
+const _defineProperty = (obj, key, value) => {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+  }
+  
 
 naruseInit({
     hotPuller() {
-        return { code: Code, ctx: ayRequireList }
+        return { code: Code, ctx: { _defineProperty } }
     }
 })
 
