@@ -14,10 +14,16 @@ const skipCode = ['FILE_NAME_CONFLICT'];
 
 module.exports = {
     input: config.input || './src/adverts/test.js',
-    output: {
-        file: './dist/naruse.dev.debug.js',
-        format: 'es',
-    },
+    output: [
+        {
+            file: './demo/demo-alipay/naruse.dev.debug.js',
+            format: 'es',
+        },
+        {
+            file: './dist/naruse.dev.debug.js',
+            format: 'es',
+        }
+    ],
     /** 清除警告 */
     onwarn: (message, hander) => !skipCode.includes(message.code) && hander(message),
     plugins: [
