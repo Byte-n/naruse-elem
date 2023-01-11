@@ -5,6 +5,7 @@ import { withPage } from '../api/HOC/index';
 import { run } from 'naruse-parser';
 import { createElement } from './createElement';
 import * as elementApi from './element';
+import { createMiniFactory } from './hybrid/createMiniFactory';
 
 const apis = initNaruseAlipayApi();
 // @ts-ignore
@@ -31,6 +32,7 @@ export const Naruse = {
     unsafe_run: run,
     $$debug: false,
     ...elementApi,
+    createMiniFactory,
 };
 
 export const naruseExtend = (opt: any) => {
