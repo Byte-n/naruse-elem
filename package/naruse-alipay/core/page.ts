@@ -40,10 +40,12 @@ export const getPageInstance = (miniComponent) => {
         return;
     }
     let id = 0;
+    // 页面获取
     if (miniComponent.$$narusePage) {
         id = miniComponent.$id;
+    // 组件获取
     } else {
-        miniComponent.$page && miniComponent.$page.$id;
+        id = miniComponent.$page && miniComponent.$page.$id;
     }
     if (!id) {
         logger.error('无效页面id');
