@@ -4754,7 +4754,7 @@ var getPageInstance = function (miniComponent) {
         id = miniComponent.$id;
     }
     else {
-        miniComponent.$page && miniComponent.$page.$id;
+        id = miniComponent.$page && miniComponent.$page.$id;
     }
     if (!id) {
         logger.error('无效页面id');
