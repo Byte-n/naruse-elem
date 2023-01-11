@@ -1,5 +1,11 @@
 # naruse-h5
 
+## 0.4.4
+
+### Patch Changes
+
+- #FIX: 【alipay】修复 getPageInstance 获取不到 id 的问题
+
 ## 0.4.3
 
 ### Patch Changes
