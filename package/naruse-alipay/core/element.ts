@@ -10,14 +10,25 @@ import { cleanChildNode, VNode } from "./diff";
  */
 export const cloneElement = (element: VNode, props: Record<string,any>, ...children: VNode[]) => {
     const newProps = { ...element.props, ...props };
-    let newChildren = children.length ? children : element.children;
-
+    // 是否是 naruse 原生组件
+    const isNaruseElement = element.naruseType === 'naruse-element';
+    let newChildren: VNode[];
+    // 如果有指定children
+    if (children && children.length) {
+        newChildren = children;
+    } else if (isNaruseElement) {
+        // 自定义组件
+        newChildren = element.component?.props.children;
+    } else {
+        // 原生组件
+        newChildren = element.childNodes;
+    }
     if (newChildren.length) {
         newChildren = newChildren.map(cleanChildNode);
     }
 
-    // naruse 组件元素
-    if (element.naruseType === 'naruse-element') {
+    // naruse 原生组件
+    if (isNaruseElement) {
         const oldProps = element?.component.props;
         const newComponent = { ...element.component, props: { ...oldProps, ...newProps, children: newChildren, key: oldProps.key, ref: oldProps.ref } };
         return { ...element, component: newComponent };
