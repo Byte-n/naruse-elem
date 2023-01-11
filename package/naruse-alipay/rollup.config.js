@@ -13,16 +13,23 @@ const { main: genTemplate } = require('./axml/index');
 
 // 生成对应模版文件
 genTemplate(path.join(__dirname, './build/'));
-
+// demo 也生成一份
+genTemplate(path.join(__dirname, '../../demo/demo-alipay/naruse-alipay'));
 /**
  * @type {import('rollup').RollupOptions}
  */
 module.exports = {
     input: './core/index.ts',
-    output: {
-        file: './build/lib.js',
-        format: 'es',
-    },
+    output: [
+        {
+            file: './build/lib.js',
+            format: 'es',
+        },
+        {
+            file: '../../demo/demo-alipay/naruse-alipay/lib.js',
+            format: 'es',
+        }
+    ],
     plugins: [
         customResolver,
         commonjs(),

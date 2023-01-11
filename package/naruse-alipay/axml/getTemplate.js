@@ -68,15 +68,40 @@ function generateTemplate(template, speicalConfig) {
 
 const options = { compact: true, ignoreComment: true, spaces: 4 };
 
+/**
+ * @description 获取需要迭代的模版
+ * @author CHC
+ * @date 2023-01-07 15:01:19
+ * @returns {*} 
+ */
 function getBaseTemplate() {
     const data = require('./data.js');
     const { templateList, speicalConfig } = data;
-    const templateJsonList = templateList
-        .map((item) => generateTemplate(item, speicalConfig));
-        templateJsonList.push(getFramentTemplate());
-        templateJsonList.push(getNaruseSelfTemplate());
-    const templateStringList = templateJsonList.map((item) => js2xml(item, options));
-    return templateStringList.join('\n');
+    // 模版分类为可迭代与不可迭代
+    const recursiveTemplate = [];
+    const nonRecursiveTemplate = [];
+    templateList.forEach(template => {
+        if (template.nest) {
+            recursiveTemplate.push(template);
+        } else {
+            nonRecursiveTemplate.push(template);
+        }
+    })
+    // 生成可迭代模版
+    const newRecursiveTemplateList = recursiveTemplate.map((item) => generateTemplate(item, speicalConfig));
+    // 其他三个需要迭代的模版也要加入
+    newRecursiveTemplateList.push(getFramentTemplate());
+    newRecursiveTemplateList.push(getNaruseSelfTemplate());
+    newRecursiveTemplateList.push(getBaseNaruseTemplate());
+    // 生成不可迭代模版
+    const newNonRecursiveTemplateList = nonRecursiveTemplate.map((item) => generateTemplate(item, speicalConfig));
+    // 生成对应的axml模版
+    const recursiveTemplateString = newRecursiveTemplateList.map((item) => js2xml(item, options)).join('\n');
+    const nonRecursiveTemplateString = newNonRecursiveTemplateList.map((item) => js2xml(item, options)).join('\n');
+    return {
+        recursiveTemplateString,
+        nonRecursiveTemplateString,
+    }
 }
 
 function getFramentTemplate () {
@@ -101,6 +126,22 @@ function getNaruseSelfTemplate () {
                     component: genDoubleBracket('component'),
                 }
             },
+        }
+    }
+}
+
+function getBaseNaruseTemplate() {
+    return {
+        template: {
+            _attributes: {
+                name: 'base_template',
+            },
+            template: {
+                _attributes: {
+                    is: genDoubleBracket('i.naruseType'),
+                    data: genDoubleBracket('...i'),
+                }
+            }
         }
     }
 }

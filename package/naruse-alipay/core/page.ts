@@ -7,9 +7,13 @@ import {
     logger
 } from './uitl';
 
-const pageCenter = {};
+const pageCenter: Record<string, Page> = {};
 
-const ALLOW_EVENT = [
+export const getPageCenter = () => {
+    return { ...pageCenter };
+}
+
+export const ALLOW_EVENT = [
     'onLoad',
     'onShow',
     'onReady',
@@ -35,13 +39,19 @@ export const getPageInstance = (miniComponent) => {
         logger.error('无效组件');
         return;
     }
-    const id = miniComponent.$page && miniComponent.$page.$id;
+    let id = 0;
+    if (miniComponent.$$narusePage) {
+        id = miniComponent.$id;
+    } else {
+        miniComponent.$page && miniComponent.$page.$id;
+    }
     if (!id) {
         logger.error('无效页面id');
         return;
     }
+    const pageInstance = miniComponent.$$narusePage ? miniComponent : miniComponent.$page;
     if (!pageCenter[id]) {
-        pageCenter[id] = new Page(miniComponent.$page);
+        pageCenter[id] = new Page(pageInstance);
         return pageCenter[id];
     }
     return pageCenter[id];
@@ -55,10 +65,15 @@ export const getPageInstance = (miniComponent) => {
  * @class Page
  */
 export class Page {
+    miniPage: any;
+    eventCenter: ReturnType<typeof EventBus>;
+    oldEvents: {};
+    hasBind: {};
     constructor(miniPage) {
         // 小程序实例
         this.miniPage = miniPage;
         // 事件中心
+        // @ts-ignore
         this.eventCenter = new EventBus();
         // 各个原有事件
         this.oldEvents = {};
@@ -92,7 +107,7 @@ export class Page {
         });
     }
 
-    on(eventName, func) {
+    on (eventName, func) {
         if (!ALLOW_EVENT.includes(eventName)) {
             logger.error(`无效绑定事件名-${eventName}`);
             return;
@@ -105,8 +120,12 @@ export class Page {
         this.eventCenter.on(eventName, func);
     }
 
-    off(eventName, func) {
+    off (eventName, func) {
         this.eventCenter.off(eventName, func);
+    }
+
+    once (eventName, func) {
+        this.eventCenter.once(eventName, func);
     }
 
     get route() {
