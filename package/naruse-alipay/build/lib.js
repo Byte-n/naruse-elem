@@ -4750,8 +4750,10 @@ var getPageInstance = function (miniComponent) {
         return;
     }
     var id = 0;
+    // 页面获取
     if (miniComponent.$$narusePage) {
         id = miniComponent.$id;
+        // 组件获取
     }
     else {
         id = miniComponent.$page && miniComponent.$page.$id;
@@ -4999,8 +5001,10 @@ var skipPropsKeys = ['naruseType', 'key', 'childNodes'];
 var vnodePropsDiff = function (newVnode, oldVnode, isNaruseComponent) {
     if (isNaruseComponent === void 0) { isNaruseComponent = false; }
     var res = {};
+    // 两者必须都是 naruse 组件
+    var isBothNaruseComponent = isNaruseComponent && oldVnode && oldVnode.naruseType === 'naruse-element';
     // fix: 修复 naruse 组件会忽略部分属性值的问题
-    var realSkipPropsKeys = isNaruseComponent ? [] : skipPropsKeys;
+    var realSkipPropsKeys = isBothNaruseComponent ? [] : skipPropsKeys;
     if (!oldVnode)
         return res;
     // change
@@ -5017,7 +5021,7 @@ var vnodePropsDiff = function (newVnode, oldVnode, isNaruseComponent) {
                 continue;
             }
             // 是 NaruseComponent 的前提下都为空的情况下跳过 diff 子元素
-            if (isNaruseComponent &&
+            if (isBothNaruseComponent &&
                 newPropKey === 'children'
                 && newPropValue
                 && !newPropValue.length
@@ -5203,15 +5207,6 @@ var initVnodeTree = function (vnode, parentId) {
     return newNode;
 };
 /**
- * @description 事件分发中心
- * @author CHC
- * @date 2022-03-15 14:03:55
- * @param {*} props
- */
-var allEvents = function allEvents(props) {
-    eventCenter(props, this.data.node);
-};
-/**
  * 小程序事件映射表
  */
 var eventNameMap = {};
@@ -5239,12 +5234,6 @@ var methodTagTransformMap = {
     'longTap': 'longClick'
 };
 var transformFirstApha = function (item) { return 'on' + item.slice(0, 1).toLocaleUpperCase() + item.slice(1); };
-var methods = {};
-methodsTags.forEach(function (item) {
-    var eventName = transformFirstApha(item);
-    methods[eventName] = allEvents;
-    eventNameMap[item] = transformFirstApha(methodTagTransformMap[item] || item);
-});
 /**
  * @description 事件处理中心
  * @author CHC
@@ -5261,7 +5250,8 @@ var eventCenter = function (event, nodeTree) {
         return;
     // 空节点不响应
     var eventNode = getVnodeById(event.target.id, nodeTree);
-    event.naruseTarget = eventNode;
+    // 浅拷贝下事件对象
+    event.naruseTarget = __assign({}, eventNode);
     if (!eventNode)
         return;
     // 获取事件类型
@@ -5292,13 +5282,22 @@ var eventCenter = function (event, nodeTree) {
     }
 };
 /**
- * @description 小程序组件事件绑定
- * @type {*}
- * */
-var miniappEventBehavior = {
-    props: { component: {} },
-    data: { node: {} },
-    methods: methods,
+ * 获取小程序通用行为
+ */
+var getMiniappEventBehavior = function () {
+    var methods = {};
+    methodsTags.forEach(function (item) {
+        var eventName = transformFirstApha(item);
+        methods[eventName] = function (props) {
+            eventCenter(props, this.data.node);
+        };
+        eventNameMap[item] = transformFirstApha(methodTagTransformMap[item] || item);
+    });
+    return {
+        props: { component: {} },
+        data: { node: {} },
+        methods: methods,
+    };
 };
 
 var uid = 0;
@@ -5465,7 +5464,7 @@ var createMiniFactory = function (type, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.4.3";
+var version = "0.4.5";
 initVersionLogger('naruse-alipay', version);
 // naruse模块内容
 var Naruse = __assign(__assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
@@ -5705,7 +5704,7 @@ var createVmContext = function () {
 var createMainBehavior = function (option) {
     if (option === void 0) { option = {}; }
     // 小程序组件默认minxs对象
-    var naruseBehavior = __assign(__assign({}, miniappEventBehavior), { 
+    var naruseBehavior = __assign(__assign({}, getMiniappEventBehavior()), { 
         /**
          * @description 装载完毕后
          * @author CHC
@@ -5713,10 +5712,12 @@ var createMainBehavior = function (option) {
          */
         didMount: function () {
             this.isNaruseMainComponent = isEmpty(this.props.component);
-            var _a = (this.props || {}).unique, unique = _a === void 0 ? false : _a;
-            // 绑定重新渲染事件
-            if (unique)
-                bindRenderEventOnComponent(this);
+            if (this.isNaruseMainComponent) {
+                var _a = (this.props || {}).unique, unique = _a === void 0 ? false : _a;
+                // 绑定重新渲染事件
+                if (unique)
+                    bindRenderEventOnComponent(this);
+            }
             this.option = option;
             createVmContext.call(this);
         }, 
@@ -5760,7 +5761,7 @@ var createMainBehavior = function (option) {
         didUnmount: function () {
             if (!this.$middware)
                 return;
-            uninstallMainComponentOnSomePage(this);
+            this.isNaruseMainComponent && uninstallMainComponentOnSomePage(this);
             this.$middware.onUnMount(true);
         } });
     return naruseBehavior;

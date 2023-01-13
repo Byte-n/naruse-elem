@@ -1,5 +1,11 @@
 # naruse-types
 
+## 0.4.5
+
+### Patch Changes
+
+- #FEAT: 【alipay】优化生成体积，弃用 mixins 支持非 component2 编译
+
 ## 0.4.4
 
 ### Patch Changes
