@@ -1,5 +1,12 @@
 # naruse-h5
 
+## 0.4.5
+
+### Patch Changes
+
+- #FEAT: 【alipay】优化生成体积，弃用 mixins 支持非 component2 编译
+- #FIX: 【alipay】修复渲染时基础元素与非 naruse 组件渲染时会导致 dom 错乱的问题
+
 ## 0.4.4
 
 ### Patch Changes

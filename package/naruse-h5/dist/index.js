@@ -6354,7 +6354,7 @@ var animation = /*#__PURE__*/Object.freeze({
 var api = __assign(__assign(__assign(__assign(__assign(__assign(__assign({}, system), storage), route), device), media), wxml), animation);
 
 // @ts-ignore
-var version = "0.4.3";
+var version = "0.4.5";
 initVersionLogger('naruse-h5', version);
 var Naruse = __assign(__assign({}, api), { Component: React.Component, createElement: naruseCreateElement, env: {
         USER_DATA_PATH: '',

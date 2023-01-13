@@ -1,6 +1,6 @@
 {
   "name": "naruse-alipay",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "naruse 针对支付宝小程序的基础包",
   "main": "./build/lib.js",
   "scripts": {
