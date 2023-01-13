@@ -156,8 +156,10 @@ const skipPropsKeys = ['naruseType', 'key', 'childNodes'];
  */
 const vnodePropsDiff = (newVnode: any, oldVnode: any, isNaruseComponent = false): Record<string, any> => {
     const res: Record<string, any> = {};
+    // 两者必须都是 naruse 组件
+    const isBothNaruseComponent = isNaruseComponent && oldVnode && oldVnode.naruseType === 'naruse-element';
     // fix: 修复 naruse 组件会忽略部分属性值的问题
-    const realSkipPropsKeys = isNaruseComponent ? [] : skipPropsKeys;
+    const realSkipPropsKeys = isBothNaruseComponent ? [] : skipPropsKeys;
 
     if (!oldVnode) return res;
 
@@ -177,7 +179,7 @@ const vnodePropsDiff = (newVnode: any, oldVnode: any, isNaruseComponent = false)
             }
             // 是 NaruseComponent 的前提下都为空的情况下跳过 diff 子元素
             if (
-                isNaruseComponent &&
+                isBothNaruseComponent &&
                 newPropKey === 'children'
                 && newPropValue
                 && !newPropValue.length
