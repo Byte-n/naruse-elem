@@ -90,16 +90,6 @@ export const initVnodeTree = function (vnode: any, parentId?: any) {
 };
 
 /**
- * @description 事件分发中心
- * @author CHC
- * @date 2022-03-15 14:03:55
- * @param {*} props
- */
-const allEvents = function allEvents(props: any) {
-    eventCenter(props, this.data.node);
-};
-
-/**
  * 小程序事件映射表
  */
 const eventNameMap: Record<string, string> = {};
@@ -132,14 +122,6 @@ const methodTagTransformMap: Record<string, string> = {
 
 const transformFirstApha = (item: string) => 'on' + item.slice(0, 1).toLocaleUpperCase() + item.slice(1)
 
-const methods: Record<string, any> = {};
-methodsTags.forEach((item) => {
-    const eventName = transformFirstApha(item);
-    methods[eventName] = allEvents;
-    eventNameMap[item] = transformFirstApha(methodTagTransformMap[item] || item);
-})
-
-
 /**
  * @description 事件处理中心
  * @author CHC
@@ -155,7 +137,8 @@ export const eventCenter = function (event: { target?: any; stopPropagation?: an
     if (!(event && event.target && event.target.id)) return;
     // 空节点不响应
     const eventNode = getVnodeById(event.target.id, nodeTree);
-    event.naruseTarget = eventNode;
+    // 浅拷贝下事件对象
+    event.naruseTarget = { ...eventNode };
     if (!eventNode) return;
     // 获取事件类型
     const { type } = event;
@@ -186,12 +169,23 @@ export const eventCenter = function (event: { target?: any; stopPropagation?: an
     }
 };
 
+
+
 /**
- * @description 小程序组件事件绑定
- * @type {*}
- * */
-export const miniappEventBehavior = {
-    props: { component: {} },
-    data: { node: {} },
-    methods,
-};
+ * 获取小程序通用行为
+ */
+export const getMiniappEventBehavior = () => {
+    const methods: Record<string, any> = {};
+    methodsTags.forEach((item) => {
+        const eventName = transformFirstApha(item);
+        methods[eventName] = function (props: any) {
+            eventCenter(props, this.data.node);
+        };
+        eventNameMap[item] = transformFirstApha(methodTagTransformMap[item] || item);
+    })
+    return {
+        props: { component: {} },
+        data: { node: {} },
+        methods,
+    };
+}

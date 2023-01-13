@@ -1,4 +1,4 @@
-import { miniappEventBehavior } from './domEvents.js';
+import { getMiniappEventBehavior } from './domEvents.js';
 import { logger, propsEquals } from './uitl.js';
 import { Middware } from './middware.js';
 import { isEmpty } from '../../naruse-share/index';
@@ -13,7 +13,7 @@ import { bindRenderEventOnComponent, uninstallMainComponentOnSomePage } from '..
  */
 const initMainComponent = function () {
     getNaruseComponentFromProps(this.props)
-        .then((component) => { 
+        .then((component) => {
             if (!component) {
                 logger.warn('无远程资源，不加载组件')
                 return;
@@ -32,7 +32,7 @@ const initMainComponent = function () {
  * @date 2022-03-21 16:03:28
  * @param {*} component
  */
-const initSubComponent = function (args: Record<string,any> = {}) {
+const initSubComponent = function (args: Record<string, any> = {}) {
     const { actuator, props } = args;
     if (actuator) {
         this.$middware = new Middware(this, actuator, props || {});
@@ -69,7 +69,7 @@ const createVmContext = function () {
 const createMainBehavior = (option = {}) => {
     // 小程序组件默认minxs对象
     const naruseBehavior = {
-        ...miniappEventBehavior,
+        ...getMiniappEventBehavior(),
         /**
          * @description 装载完毕后
          * @author CHC
@@ -77,9 +77,11 @@ const createMainBehavior = (option = {}) => {
          */
         didMount() {
             this.isNaruseMainComponent = isEmpty(this.props.component);
-            const { unique = false } = this.props || {};
-            // 绑定重新渲染事件
-            if (unique) bindRenderEventOnComponent(this);
+            if (this.isNaruseMainComponent) {
+                const { unique = false } = this.props || {};
+                // 绑定重新渲染事件
+                if (unique) bindRenderEventOnComponent(this);
+            }
             this.option = option;
             createVmContext.call(this);
         },
@@ -121,7 +123,7 @@ const createMainBehavior = (option = {}) => {
          */
         didUnmount() {
             if (!this.$middware) return;
-            uninstallMainComponentOnSomePage(this);
+            this.isNaruseMainComponent && uninstallMainComponentOnSomePage(this);
             this.$middware.onUnMount(true);
         },
     };
