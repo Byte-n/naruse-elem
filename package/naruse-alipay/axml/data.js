@@ -123,7 +123,7 @@ const video = {
     attributes: [
         'src',
         'poster',
-        'objectFit',
+        'object-fit',
         'initial-time',
         'controls',
         'autoplay',
