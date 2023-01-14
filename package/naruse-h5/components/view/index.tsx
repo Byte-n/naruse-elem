@@ -1,16 +1,21 @@
-import { commonEventHander, commonMouseEventCreater } from '../../core/event';
+import {commonEventHander, commonMouseEventCreater, commonTouchEventCreater} from '../../core/event';
 import React, { Component } from 'react';
-import { isNaruseAnimaitonName } from '../../utils';
+import {getPropsDataSet, isNaruseAnimaitonName} from '../../utils';
 
 const h = React.createElement;
 
-class View extends Component<{ 
-    disabled, 
-    hoverStartTime, 
-    hoverStayTime, 
+class View extends Component<{
+    disabled,
+    hoverStartTime,
+    hoverStayTime,
     onMouseEnter,
     onMouseMove,
     onMouseLeave,
+    onMouseUp,
+    onMouseDown,
+    onTouchEnd,
+    onTouchStart,
+    onTouchMove,
     onTransitionEnd,
     onClick,
     className,
@@ -25,6 +30,8 @@ class View extends Component<{
     touch = false;
     ref: HTMLDivElement | null;
     lastAnimationName: string;
+    animationTimer: number;
+    hoverTimer: number;
     constructor() {
         super();
         this.state = {
@@ -45,38 +52,43 @@ class View extends Component<{
         const {animation} = this.props;
         if (animation !== this.lastAnimationName && isNaruseAnimaitonName(animation)) {
             // 等待组件彻底装载完毕后再启动animation，否则会出现动画不生效的情况
-            setTimeout(() => this.ref?.setAttribute('data-animation', animation))
+            clearTimeout(this.animationTimer);
+            this.animationTimer = setTimeout(() => this.ref?.setAttribute('data-animation', animation))
             this.lastAnimationName = animation;
         }
     }
 
     componentWillUnmount() {
         this.mounted = false;
+        clearTimeout(this.hoverTimer);
+        clearTimeout(this.animationTimer);
     }
     /** 当开始点击时 */
-    onTouchStart() {
-        const { disabled, hoverStartTime = 20 } = this.props;
+    onTouchStart(event?: React.TouchEvent<any>) {
+        const { disabled, hoverStartTime = 20, onTouchStart } = this.props;
         if (disabled || !this.mounted) return;
 
         this.touch = true;
-        setTimeout(() => {
+        clearTimeout(this.hoverTimer);
+        this.hoverTimer = setTimeout(() => {
             this.setState({ hover: true });
         }, hoverStartTime);
+        event && onTouchStart && onTouchStart(commonTouchEventCreater(event));
     }
 
     /** 点击结束时 */
-    onTouchEnd() {
-        const { disabled, hoverStayTime = 70 } = this.props;
+    onTouchEnd(event?: React.TouchEvent<any>) {
+        const { disabled, hoverStayTime = 70, onTouchEnd } = this.props;
         if (disabled || !this.mounted) return;
-
         this.touch = false;
-        setTimeout(() => {
+        clearTimeout(this.hoverTimer);
+        this.hoverTimer = setTimeout(() => {
             if (!this.touch) {
                 this.setState({ hover: false });
             }
         }, hoverStayTime);
+        event && onTouchEnd && onTouchEnd(commonTouchEventCreater(event));
     }
-
 
     onMouseEnter(event) {
         const { onMouseEnter } = this.props;
@@ -120,11 +132,15 @@ class View extends Component<{
                 onMouseLeave={this.onMouseLeave.bind(this)}
                 onMouseMove={this.onMouseMove.bind(this)}
                 onTouchStart={this.onTouchStart.bind(this)}
+                onTouchMove={commonEventHander.bind(this)}
                 onTouchEnd={this.onTouchEnd.bind(this)}
                 onTransitionEnd={commonEventHander.bind(this)}
+                onMouseDown={commonEventHander.bind(this)}
+                onMouseUp={commonEventHander.bind(this)}
                 className={className}
                 style={conStyle}
                 onClick={commonEventHander.bind(this)}
+                {...getPropsDataSet(this.props)}
             >
                 {this.props.children}
             </div>
