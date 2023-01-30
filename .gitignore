@@ -29,5 +29,7 @@ yarn-error.log*
 .history
 template/test.js
 
+
+/.idea/
 demo/demo-alipay/naruse-alipay
 demo/demo-alipay/naruse.dev.debug.js
