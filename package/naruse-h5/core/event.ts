@@ -14,6 +14,10 @@ const reflectEventMap = {
             stopPropagation() {
                 e.stopPropagation();
             },
+            // 真正触发事件的元素
+            target: e.target,
+            // 当前元素（冒泡）
+            currentTarget: e.currentTarget
         };
     },
     /** 加载完毕 */
@@ -75,6 +79,27 @@ const reflectEventMap = {
                 e.stopPropagation();
             },
         };
+    },
+    mouseup (e) {
+        return {
+            ...this.click(e),
+            type:'mouseUp'
+        };
+    },
+    mousedown (e) {
+        return {
+            ...this.click(e),
+            type:'mouseDown'
+        }
+    },
+    touchend (e) {
+        return commonTouchEventCreater(e);
+    },
+    touchmove (e) {
+        return commonTouchEventCreater(e);
+    },
+    touchstart (e) {
+        return commonTouchEventCreater(e);
     }
 };
 
@@ -87,6 +112,11 @@ const reflectEventNameMap = {
     keydown: 'onKeyDown',
     input: 'onInput',
     transitionend : 'onTransitionEnd',
+    mousedown: 'onMouseDown',
+    mouseup: 'onMouseUp',
+    touchstart:"onTouchStart",
+    touchmove:"onTouchMove",
+    touchend:"onTouchEnd"
 };
 
 
@@ -97,10 +127,12 @@ const reflectEventNameMap = {
  * @param {React.SyntheticEvent} e
  */
 export const commonEventHander = function (e) {
-    const handler = this.props[reflectEventNameMap[e.type]];
+    const type = e.type;
+    const key = reflectEventNameMap[type];
+    const handler = this.props[key];
     if (!handler || typeof handler !== 'function') return;
-    const event = reflectEventMap[e.type];
-    const res = reflectEventMap[e.type](e);
+    const event = reflectEventMap[type];
+    const res = reflectEventMap[type](e);
     res.timeStamp = new Date().getTime();
     event && handler(res);
 };
@@ -111,10 +143,10 @@ export const commonEventHander = function (e) {
  * @author CHC
  * @date 2022-07-08 15:07:54
  * @param {React.MouseEvent<T, MouseEvent>} event
- * @returns {*} 
+ * @returns {*}
  */
 export const commonMouseEventCreater = (event) => {
-    const { altKey, ctrlKey, shiftKey, clientX, clientY, pageX, pageY, screenX, screenY, stopPropagation, type } = event;
+    const { altKey, ctrlKey, shiftKey, clientX, clientY, pageX, pageY, screenX, screenY, stopPropagation, type, nativeEvent, target, currentTarget } = event;
     return {
         type,
         detail: {
@@ -122,5 +154,29 @@ export const commonMouseEventCreater = (event) => {
         },
         stopPropagation,
         timeStamp: new Date().getTime(),
+        // 真正触发事件的元素
+        target,
+        // 当前元素（冒泡）
+        currentTarget
+    }
+}
+/**
+ * 创建一个 TouchEvent 对象
+ * @param event{React.TouchEvent<T, TouchEvent>}
+ */
+export const commonTouchEventCreater = (event) => {
+    const { type, changedTouches, targetTouches, touches, detail, target, stopPropagation } = event;
+    return {
+        type,
+        // 涉及当前(引发)事件的触摸点的列表
+        changedTouches,
+        // 当前对象上所有触摸点的列表;
+        targetTouches,
+        // 当前屏幕上所有触摸点的列表;
+        touches,
+        detail, // 此值是一个数值，可能会有用
+        // 真正触发事件的元素
+        target,
+        stopPropagation
     }
 }
