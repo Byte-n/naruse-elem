@@ -1,5 +1,5 @@
 import RAP from 'rap-sdk';
-import { createElement, Component, shared } from 'rax';
+import { createElement, Component } from 'rax';
 import { Text, View, Image, ScrollView, TextInput } from 'rax-components';
 
 Array.prototype.flat||Object.defineProperty(Array.prototype,"flat",{configurable:!0,value:function r(){var t=isNaN(arguments[0])?1:Number(arguments[0]);return t?Array.prototype.reduce.call(this,function(a,e){return Array.isArray(e)?a.push.apply(a,r.call(e,t-1)):a.push(e),a},[]):Array.prototype.slice.call(this)},writable:!0}),Array.prototype.flatMap||Object.defineProperty(Array.prototype,"flatMap",{configurable:!0,value:function(r){return Array.prototype.map.apply(this,arguments).flat()},writable:!0});
@@ -96,38 +96,40 @@ function __generator(thisArg, body) {
     }
 }
 
-const createLogger = (name) => {
-    const Logger = {
-        debug () {
-            console.debug(`[${name}][debugger]`, ...arguments);
+function __spreadArray$1(to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+}
+
+var createLogger = function (name) {
+    var Logger = {
+        debug: function () {
+            console.debug.apply(console, __spreadArray$1(["[".concat(name, "][debugger]")], arguments, false));
         },
-        warn () {
-            console.warn(`[${name}][warn]`, ...arguments);
+        warn: function () {
+            console.warn.apply(console, __spreadArray$1(["[".concat(name, "][warn]")], arguments, false));
         },
-        info () {
-            console.info(`[${name}][info]`, ...arguments);
+        info: function () {
+            console.info.apply(console, __spreadArray$1(["[".concat(name, "][info]")], arguments, false));
         },
-        error () {
-            console.error(`[${name}][error]`, ...arguments);
+        error: function () {
+            console.error.apply(console, __spreadArray$1(["[".concat(name, "][error]")], arguments, false));
         },
     };
-
     return Logger;
 };
-
-const initVersionLogger = (name, version) => {
-    console.log(
-        `%c naruse %c ${name} v${version} %c`,
-        'background:#17c0eb ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
-        'background:#7158e2 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
-        'background:transparent'
-      );
+var initVersionLogger = function (name, version) {
+    console.log("%c naruse %c ".concat(name, " v").concat(version, " %c"), 'background:#17c0eb ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff', 'background:#7158e2 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff', 'background:transparent');
 };
 
 var logger$1 = createLogger('naruse-weex');
 
-const logger = createLogger('naurse-error');
-
+var logger = createLogger('naurse-error');
 /**
  * @description 期望为某个类型，异步版
  * @author CHC
@@ -135,15 +137,13 @@ const logger = createLogger('naurse-error');
  * @param {*} { obj, type, name }
  * @returns {*}
  */
-const exceptType = (obj, type, name) => {
+var exceptType = function (obj, type, name) {
     if (typeof obj !== type) {
-        const res = { errMsg: `${name}:fail must has a ${type}` };
+        var res = { errMsg: "".concat(name, ":fail must has a ").concat(type) };
         logger.error(res.errMsg);
         return Promise.reject(res);
     }
 };
-
-
 /**
  * @description 暂时不支持的api
  * @author CHC
@@ -151,15 +151,15 @@ const exceptType = (obj, type, name) => {
  * @param {*} apiName
  * @returns {*}
  */
-const temporarilyNotSupport = function temporarilyNotSupport (apiName) {
-    return () => {
-        const errMsg = `暂时不支持 API ${apiName}`;
+var temporarilyNotSupport = function temporarilyNotSupport(apiName) {
+    return function () {
+        var errMsg = "\u6682\u65F6\u4E0D\u652F\u6301 API ".concat(apiName);
         logger.error(errMsg);
-        return Promise.reject({ errMsg });
+        return Promise.reject({ errMsg: errMsg });
     };
 };
 
-const mitt = function (n) {
+var mitt = function (n) {
     return {
         all: n = n || new Map,
         on: function (e, t) {
@@ -170,18 +170,26 @@ const mitt = function (n) {
             var i = n.get(e);
             i && (t ? i.splice(i.indexOf(t) >>> 0, 1) : n.set(e, []));
         },
-        emit: function (e, ...t) {
+        emit: function (e) {
+            var t = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                t[_i - 1] = arguments[_i];
+            }
             var i = n.get(e);
             i && i.slice().map(function (n) {
-                n(...t);
+                n.apply(void 0, t);
             }), (i = n.get("*")) && i.slice().map(function (n) {
-                typeof n === 'function' && n(e, ...t);
+                typeof n === 'function' && n.apply(void 0, __spreadArray$1([e], t, false));
             });
         },
         once: function (event, fun) {
             var i = n.get(event);
-            const funcs = (...args) => {
-                fun(...args);
+            var funcs = function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                fun.apply(void 0, args);
                 var i = n.get(event);
                 i && i.splice(i.indexOf(funcs) >>> 0, 1);
             };
@@ -190,13 +198,10 @@ const mitt = function (n) {
         clear: function () {
             n.clear();
         }
-    }
+    };
 };
-
-
 /** 全局事件中心 */
-const globalEvent = mitt();
-
+var globalEvent = mitt();
 /**
  * 这里不要改成箭头函数
  * 需要利用 new 来执行(兼容)
@@ -209,63 +214,67 @@ function EventBus(map) {
     return mitt(map);
 }
 
-class MethodHandler {
-    constructor ({ name, success, fail, complete }) {
+var MethodHandler = /** @class */ (function () {
+    function MethodHandler(_a) {
+        var name = _a.name, success = _a.success, fail = _a.fail, complete = _a.complete;
         this.methodName = name;
         this.__success = success;
         this.__fail = fail;
         this.__complete = complete;
     }
-
     /** 成功 */
-    success (res = {}, resolve = Promise.resolve.bind(Promise)) {
+    MethodHandler.prototype.success = function (res, resolve) {
+        if (res === void 0) { res = {}; }
+        if (resolve === void 0) { resolve = Promise.resolve.bind(Promise); }
         if (!res.errMsg) {
-            res.errMsg = `${this.methodName}:ok`;
+            res.errMsg = "".concat(this.methodName, ":ok");
         }
         typeof this.__success === 'function' && this.__success(res);
         typeof this.__complete === 'function' && this.__complete(res);
         return resolve(res);
-    }
-
+    };
     /** 失败 */
-    fail (res = {}, reject = Promise.reject.bind(Promise)) {
+    MethodHandler.prototype.fail = function (res, reject) {
+        if (res === void 0) { res = {}; }
+        if (reject === void 0) { reject = Promise.reject.bind(Promise); }
         if (!res.errMsg) {
-            res.errMsg = `${this.methodName}:fail`;
-        } else {
-            res.errMsg = `${this.methodName}:fail ${res.errMsg}`;
+            res.errMsg = "".concat(this.methodName, ":fail");
+        }
+        else {
+            res.errMsg = "".concat(this.methodName, ":fail ").concat(res.errMsg);
         }
         console.error(res.errMsg);
         typeof this.__fail === 'function' && this.__fail(res);
         typeof this.__complete === 'function' && this.__complete(res);
         return reject(res);
-    }
-}
+    };
+    return MethodHandler;
+}());
 
 /**
  * 去掉前后 空格/空行/tab 的正则 预先定义 避免在函数中重复构造
  * @type {RegExp}
  */
-
 /**
  * @description 不会报错的JSON.parse
  * @author CHC
  * @date 2022-07-14 17:07:45
  * @param {*} str
- * @returns {*} 
+ * @returns {*}
  */
-const safeJsonParse = (str) => {
+var safeJsonParse = function (str) {
     try {
         return JSON.parse(str);
-    } catch (e) {
+    }
+    catch (e) {
         return null;
     }
 };
 
-const deferMap = {};
-
-const getDeferPromise = () => {
-    let resolve, reject;
-    const promise = new Promise((res, rej) => {
+var deferMap = {};
+var getDeferPromise = function () {
+    var resolve, reject;
+    var promise = new Promise(function (res, rej) {
         resolve = res;
         reject = rej;
     });
@@ -273,13 +282,12 @@ const getDeferPromise = () => {
     promise.reject = reject;
     return promise;
 };
-
-const proxyObject = (obj) => {
+var proxyObject = function (obj) {
     if (typeof Proxy !== 'function') {
         return obj;
     }
     return new Proxy(obj, {
-        get(target, key) {
+        get: function (target, key) {
             if (!target[key]) {
                 return obj[key] = getDeferPromise();
             }
@@ -287,14 +295,14 @@ const proxyObject = (obj) => {
         }
     });
 };
-
-const getDeferred = (key) => {
+var getDeferred = function (key) {
     if (!key) {
         return proxyObject(deferMap);
     }
     if (deferMap[key]) {
         return deferMap[key];
-    } else {
+    }
+    else {
         return deferMap[key] = getDeferPromise();
     }
 };
@@ -2208,7 +2216,7 @@ acorn.parseExpressionAt = function (inpt, pos, opts) {
 function setOptions(opts) {
     options = {};
     for (var opt in defaultOptions)
-        options[opt] = opts && has(opts, opt) ? opts[opt] : defaultOptions[opt];
+        options[opt] = opts && has$1(opts, opt) ? opts[opt] : defaultOptions[opt];
     sourceFile = options.sourceFile || null;
     isKeyword = options.ecmaVersion >= 6 ? isEcma6Keyword : isEcma5AndLessKeyword;
 }
@@ -3718,7 +3726,7 @@ function unexpected(pos) {
     raise(pos != null ? pos : tokStart, "Unexpected token");
 }
 // Checks if hash object has a property.
-function has(obj, propName) {
+function has$1(obj, propName) {
     return Object.prototype.hasOwnProperty.call(obj, propName);
 }
 // Convert existing expression atom to assignable pattern
@@ -3847,7 +3855,7 @@ function checkFunctionParam(param, nameHash) {
         case Identifier:
             if (isStrictReservedWord(param.name) || isStrictBadIdWord(param.name))
                 raise(param.start, "Defining '" + param.name + "' in strict mode");
-            if (has(nameHash, param.name))
+            if (has$1(nameHash, param.name))
                 raise(param.start, "Argument name clash in strict mode");
             nameHash[param.name] = true;
             break;
@@ -3885,7 +3893,7 @@ function checkPropClash(prop, propHash) {
             return;
     }
     var kind = prop.kind || "init", other;
-    if (has(propHash, name)) {
+    if (has$1(propHash, name)) {
         other = propHash[name];
         var isGetSet = kind !== "init";
         if ((strict || isGetSet) && other[kind] || !(+isGetSet ^ other.init))
@@ -5144,10 +5152,99 @@ var run = function (code, injectObject, onError) {
     return runner.run(code, injectObject, onError);
 };
 
+// this file is copied from dist of rax in npm package, simplified and modified
 function isValidElement(object) {
     return typeof object === 'object' && object !== null && object.type && object.props;
 }
-var Host = shared.Host, Element = shared.Element, flattenChildren = shared.flattenChildren;
+var has = Function.call.bind(Object.prototype.hasOwnProperty);
+function checkPropTypes(typeSpecs, values, location, componentName) {
+    {
+        for (var typeSpecName in typeSpecs) {
+            if (has(typeSpecs, typeSpecName)) {
+                var error;
+                // Prop type validation may throw. In case they do, we don't want to
+                // fail the render phase where it didn't fail before. So we log it.
+                // After these have been cleaned up, we'll let them throw.
+                try {
+                    // This is intentionally an invariant that gets caught. It's the same
+                    // behavior as without this statement except with a better message.
+                    if (typeof typeSpecs[typeSpecName] !== 'function') {
+                        var err = Error((componentName || 'React class') + ': ' + location + ' type `' + typeSpecName + '` is invalid; ' +
+                            'it must be a function, usually from the `prop-types` package, but received `' + typeof typeSpecs[typeSpecName] + '`.' +
+                            'This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.');
+                        err.name = 'Invariant Violation';
+                        throw err;
+                    }
+                    error = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null);
+                }
+                catch (ex) {
+                    error = ex;
+                }
+            }
+        }
+    }
+}
+function Element(type, key, ref, props, owner) {
+    var element = {
+        // Built-in properties that belong on the element
+        type: type,
+        key: key,
+        ref: ref,
+        props: props,
+        // Record the component responsible for creating this element.
+        _owner: owner
+    };
+    {
+        var propTypes = type.propTypes;
+        // Validate its props provided by the propTypes definition
+        if (propTypes) {
+            var displayName = type.displayName || type.name;
+            checkPropTypes(propTypes, props, 'prop', displayName);
+        }
+        // We make validation flag non-enumerable, so the test framework could ignore it
+        Object.defineProperty(element, '__validated', {
+            configurable: false,
+            enumerable: false,
+            writable: true,
+            value: false
+        });
+        // Props is immutable
+        if (Object.freeze) {
+            Object.freeze(props);
+        }
+    }
+    return element;
+}
+var Host = {
+    __mountID: 1,
+    __isUpdating: false,
+    // Inject
+    driver: null,
+    // Roots
+    rootComponents: {},
+    rootInstances: {},
+    // Current owner component
+    owner: null,
+};
+function traverseChildren(children, result) {
+    if (Array.isArray(children)) {
+        for (var i = 0, l = children.length; i < l; i++) {
+            traverseChildren(children[i], result);
+        }
+    }
+    else {
+        result.push(children);
+    }
+}
+function flattenChildren(children) {
+    if (children == null) {
+        return children;
+    }
+    var result = [];
+    traverseChildren(children, result);
+    // If length equal 1, return the only one.
+    return result.length - 1 ? result : result[0];
+}
 var RESERVED_PROPS = {
     key: true,
     ref: true,
