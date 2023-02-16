@@ -50,6 +50,20 @@ export const getPathById = function (id: any, vnode: { id: any; childNodes: stri
 };
 
 /**
+ * 获取 eventNode 中以 data- 开头的属性，
+ * @param eventNode
+ * @return Object key：value, key 为 data-xxx 去掉 data- 后的 xxx
+ */
+const getEventNodeDataPrefixProperty = (eventNode: any) => {
+    return Object.keys(typeof eventNode === 'object' ? eventNode : {}).reduce((per, cur) => {
+        if (cur.startsWith('data-')) {
+            per[cur.replace('data-', '')] = eventNode[cur];
+        }
+        return per;
+    }, {})
+}
+
+/**
  * @description 获取节点
  * @author CHC
  * @date 2022-02-23 09:02:02
@@ -130,7 +144,7 @@ const transformFirstApha = (item: string) => 'on' + item.slice(0, 1).toLocaleUpp
  * @param {*} nodeTree
  * @returns {*}
  */
-export const eventCenter = function (event: { target?: any; stopPropagation?: any; type?: any; naruseTarget?: any, narusePropagetion?: boolean }, nodeTree: any) {
+export const eventCenter = function (event: { target?: any; currentTarget?: any, changedTouches?: any, stopPropagation?: any; type?: any; naruseTarget?: any, narusePropagetion?: boolean, detail: any }, nodeTree: any) {
     // 是否继续冒泡的标志
     let stopFlag = false;
     // 空事件不响应
@@ -153,6 +167,13 @@ export const eventCenter = function (event: { target?: any; stopPropagation?: an
         event.stopPropagation = () => {
             stopFlag = false;
         };
+    }
+    // 为当前事件对象 填充 dataset 属性
+    if (event.currentTarget && event.currentTarget.id === eventNode.id) {
+        event.currentTarget.dataset = getEventNodeDataPrefixProperty(eventNode);
+    }
+    if (event.target && event.target.id === eventNode.id) {
+        event.target.dataset = getEventNodeDataPrefixProperty(eventNode);
     }
     // 反射事件名称
     const responseFuc = eventNode[reflectedEventName];
