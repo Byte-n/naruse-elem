@@ -1,5 +1,13 @@
 # naruse-types
 
+## 0.4.6
+
+### Patch Changes
+
+- #FEAT: 【share】切换为 TS
+- #FIX:  【weex】修复 weex 端运行时因为缺失 api 导致的页面渲染错误
+- #FEAT: 【PC】PC的MouseEvent 新增target，currentTarget，新增 onMouseDown,onMouseUp,，优化hoverClass导致的更新错误，PC\MB保留dataset，MB Touch 添加 detail
+
 ## 0.4.5
 
 ### Patch Changes

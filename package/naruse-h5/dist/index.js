@@ -317,6 +317,10 @@ var reflectEventMap = {
             stopPropagation: function () {
                 e.stopPropagation();
             },
+            // 真正触发事件的元素
+            target: e.target,
+            // 当前元素（冒泡）
+            currentTarget: e.currentTarget
         };
     },
     /** 加载完毕 */
@@ -378,6 +382,21 @@ var reflectEventMap = {
                 e.stopPropagation();
             },
         };
+    },
+    mouseup: function (e) {
+        return __assign(__assign({}, this.click(e)), { type: 'mouseUp' });
+    },
+    mousedown: function (e) {
+        return __assign(__assign({}, this.click(e)), { type: 'mouseDown' });
+    },
+    touchend: function (e) {
+        return commonTouchEventCreater(e);
+    },
+    touchmove: function (e) {
+        return commonTouchEventCreater(e);
+    },
+    touchstart: function (e) {
+        return commonTouchEventCreater(e);
     }
 };
 /** 事件名称对应处理名称 */
@@ -389,6 +408,11 @@ var reflectEventNameMap = {
     keydown: 'onKeyDown',
     input: 'onInput',
     transitionend: 'onTransitionEnd',
+    mousedown: 'onMouseDown',
+    mouseup: 'onMouseUp',
+    touchstart: "onTouchStart",
+    touchmove: "onTouchMove",
+    touchend: "onTouchEnd"
 };
 /**
  * @description 通用事件处理
@@ -397,11 +421,13 @@ var reflectEventNameMap = {
  * @param {React.SyntheticEvent} e
  */
 var commonEventHander = function (e) {
-    var handler = this.props[reflectEventNameMap[e.type]];
+    var type = e.type;
+    var key = reflectEventNameMap[type];
+    var handler = this.props[key];
     if (!handler || typeof handler !== 'function')
         return;
-    var event = reflectEventMap[e.type];
-    var res = reflectEventMap[e.type](e);
+    var event = reflectEventMap[type];
+    var res = reflectEventMap[type](e);
     res.timeStamp = new Date().getTime();
     event && handler(res);
 };
@@ -413,7 +439,7 @@ var commonEventHander = function (e) {
  * @returns {*}
  */
 var commonMouseEventCreater = function (event) {
-    var altKey = event.altKey, ctrlKey = event.ctrlKey, shiftKey = event.shiftKey, clientX = event.clientX, clientY = event.clientY, pageX = event.pageX, pageY = event.pageY, screenX = event.screenX, screenY = event.screenY, stopPropagation = event.stopPropagation, type = event.type;
+    var altKey = event.altKey, ctrlKey = event.ctrlKey, shiftKey = event.shiftKey, clientX = event.clientX, clientY = event.clientY, pageX = event.pageX, pageY = event.pageY, screenX = event.screenX, screenY = event.screenY, stopPropagation = event.stopPropagation, type = event.type; event.nativeEvent; var target = event.target, currentTarget = event.currentTarget;
     return {
         type: type,
         detail: {
@@ -429,6 +455,30 @@ var commonMouseEventCreater = function (event) {
         },
         stopPropagation: stopPropagation,
         timeStamp: new Date().getTime(),
+        // 真正触发事件的元素
+        target: target,
+        // 当前元素（冒泡）
+        currentTarget: currentTarget
+    };
+};
+/**
+ * 创建一个 TouchEvent 对象
+ * @param event{React.TouchEvent<T, TouchEvent>}
+ */
+var commonTouchEventCreater = function (event) {
+    var type = event.type, changedTouches = event.changedTouches, targetTouches = event.targetTouches, touches = event.touches, detail = event.detail, target = event.target, stopPropagation = event.stopPropagation;
+    return {
+        type: type,
+        // 涉及当前(引发)事件的触摸点的列表
+        changedTouches: changedTouches,
+        // 当前对象上所有触摸点的列表;
+        targetTouches: targetTouches,
+        // 当前屏幕上所有触摸点的列表;
+        touches: touches,
+        detail: detail,
+        // 真正触发事件的元素
+        target: target,
+        stopPropagation: stopPropagation
     };
 };
 
@@ -718,6 +768,16 @@ var Text = /** @class */ (function (_super) {
  * 判断是否是 animation 名称
  */
 var isNaruseAnimaitonName = function (name) { return name && name.substring(0, 19) === 'naruse-h5-poly-fill'; };
+/**
+ * 获取props中以 'data-' 开头的属性
+ * @param props
+ */
+var getPropsDataSet = function (props) { return Object.keys(props || {}).reduce(function (per, cur) {
+    if (cur.indexOf('data-') === 0) {
+        per[cur] = props[cur];
+    }
+    return per;
+}, {}); };
 
 var h$2 = React.createElement;
 var View = /** @class */ (function (_super) {
@@ -744,36 +804,43 @@ var View = /** @class */ (function (_super) {
         var animation = this.props.animation;
         if (animation !== this.lastAnimationName && isNaruseAnimaitonName(animation)) {
             // 等待组件彻底装载完毕后再启动animation，否则会出现动画不生效的情况
-            setTimeout(function () { var _a; return (_a = _this.ref) === null || _a === void 0 ? void 0 : _a.setAttribute('data-animation', animation); });
+            clearTimeout(this.animationTimer);
+            this.animationTimer = setTimeout(function () { var _a; return (_a = _this.ref) === null || _a === void 0 ? void 0 : _a.setAttribute('data-animation', animation); });
             this.lastAnimationName = animation;
         }
     };
     View.prototype.componentWillUnmount = function () {
         this.mounted = false;
+        clearTimeout(this.hoverTimer);
+        clearTimeout(this.animationTimer);
     };
     /** 当开始点击时 */
-    View.prototype.onTouchStart = function () {
+    View.prototype.onTouchStart = function (event) {
         var _this = this;
-        var _a = this.props, disabled = _a.disabled, _b = _a.hoverStartTime, hoverStartTime = _b === void 0 ? 20 : _b;
+        var _a = this.props, disabled = _a.disabled, _b = _a.hoverStartTime, hoverStartTime = _b === void 0 ? 20 : _b, onTouchStart = _a.onTouchStart;
         if (disabled || !this.mounted)
             return;
         this.touch = true;
-        setTimeout(function () {
+        clearTimeout(this.hoverTimer);
+        this.hoverTimer = setTimeout(function () {
             _this.setState({ hover: true });
         }, hoverStartTime);
+        event && onTouchStart && onTouchStart(commonTouchEventCreater(event));
     };
     /** 点击结束时 */
-    View.prototype.onTouchEnd = function () {
+    View.prototype.onTouchEnd = function (event) {
         var _this = this;
-        var _a = this.props, disabled = _a.disabled, _b = _a.hoverStayTime, hoverStayTime = _b === void 0 ? 70 : _b;
+        var _a = this.props, disabled = _a.disabled, _b = _a.hoverStayTime, hoverStayTime = _b === void 0 ? 70 : _b, onTouchEnd = _a.onTouchEnd;
         if (disabled || !this.mounted)
             return;
         this.touch = false;
-        setTimeout(function () {
+        clearTimeout(this.hoverTimer);
+        this.hoverTimer = setTimeout(function () {
             if (!_this.touch) {
                 _this.setState({ hover: false });
             }
         }, hoverStayTime);
+        event && onTouchEnd && onTouchEnd(commonTouchEventCreater(event));
     };
     View.prototype.onMouseEnter = function (event) {
         var onMouseEnter = this.props.onMouseEnter;
@@ -794,7 +861,7 @@ var View = /** @class */ (function (_super) {
         var _a = this.props, className = _a.className, style = _a.style, hoverStyle = _a.hoverStyle, id = _a.id; __rest(_a, ["className", "style", "hoverStyle", "id"]);
         var hover = this.state.hover;
         var conStyle = __assign(__assign({}, style), (hover ? hoverStyle : {}));
-        return (h$2("div", { id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, this.props.children));
+        return (h$2("div", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, getPropsDataSet(this.props)), this.props.children));
     };
     return View;
 }(React.Component));
@@ -6354,7 +6421,7 @@ var animation = /*#__PURE__*/Object.freeze({
 var api = __assign(__assign(__assign(__assign(__assign(__assign(__assign({}, system), storage), route), device), media), wxml), animation);
 
 // @ts-ignore
-var version = "0.4.5";
+var version = "0.4.6";
 initVersionLogger('naruse-h5', version);
 var Naruse = __assign(__assign({}, api), { Component: React.Component, createElement: naruseCreateElement, env: {
         USER_DATA_PATH: '',
