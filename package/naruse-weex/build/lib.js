@@ -5306,7 +5306,7 @@ var elementApi = /*#__PURE__*/Object.freeze({
 });
 
 // @ts-ignore
-var version = "0.4.5";
+var version = "0.4.6";
 initVersionLogger('naruse-weex', version);
 var Naruse = __assign(__assign(__assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, globalEvent: globalEvent, withPage: function (Component) { return Component; } }, Storage), Route), Device), System), { getImageInfo: temporarilyNotSupport('getImageInfo'), createAnimation: temporarilyNotSupport('createAnimation') }), elementApi);
 var naruseExtend = function (obj) {

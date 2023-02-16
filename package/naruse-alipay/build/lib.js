@@ -5167,6 +5167,19 @@ var getPathById = function (id, vnode) {
     }
 };
 /**
+ * 获取 eventNode 中以 data- 开头的属性，
+ * @param eventNode
+ * @return Object key：value, key 为 data-xxx 去掉 data- 后的 xxx
+ */
+var getEventNodeDataPrefixProperty = function (eventNode) {
+    return Object.keys(typeof eventNode === 'object' ? eventNode : {}).reduce(function (per, cur) {
+        if (cur.startsWith('data-')) {
+            per[cur.replace('data-', '')] = eventNode[cur];
+        }
+        return per;
+    }, {});
+};
+/**
  * @description 获取节点
  * @author CHC
  * @date 2022-02-23 09:02:02
@@ -5267,6 +5280,13 @@ var eventCenter = function (event, nodeTree) {
         event.stopPropagation = function () {
             stopFlag = false;
         };
+    }
+    // 为当前事件对象 填充 dataset 属性
+    if (event.currentTarget && event.currentTarget.id === eventNode.id) {
+        event.currentTarget.dataset = getEventNodeDataPrefixProperty(eventNode);
+    }
+    if (event.target && event.target.id === eventNode.id) {
+        event.target.dataset = getEventNodeDataPrefixProperty(eventNode);
     }
     // 反射事件名称
     var responseFuc = eventNode[reflectedEventName];
@@ -5464,7 +5484,7 @@ var createMiniFactory = function (type, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.4.5";
+var version = "0.4.6";
 initVersionLogger('naruse-alipay', version);
 // naruse模块内容
 var Naruse = __assign(__assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
