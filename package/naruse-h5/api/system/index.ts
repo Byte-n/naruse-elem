@@ -1,5 +1,35 @@
 import { MethodHandler } from '../../../naruse-share/index';
 
+/**
+ * 根据 getOsInfo 获取当前系统平台
+ * @return {'Android'|'iOS'|'Windows'|'Mac'|''}
+ */
+const getOSPlatform = () => {
+    const { name } = getOsInfo();
+    switch (name) {
+        case 'Windows':
+            return 'Windows';
+        case 'iPhone':
+            return 'iOS';
+        case 'Mac':
+            return 'Mac';
+        case 'Android':
+            return 'Android';
+        default: // Unix, Linux, Unknown
+            return '';
+    }
+}
+
+const getOSModel = () => {
+    switch (getOSPlatform()) {
+        case 'iOS':
+        case 'Android':
+            return 'MB';
+        default: // Unix, Linux, Unknown,Windows,Mac
+            return 'PC';
+    }
+}
+
 const getOsInfo = () => {
     const userAgent = navigator.userAgent.toLowerCase();
     let name = 'Unknown';
@@ -54,9 +84,9 @@ export const getSystemInfoSync = () => {
         currentBattery: '100%',
         fontSizeSetting: 16,
         language: 'Chinese',
-        model: 'PC',
+        model: getOSModel(), // MB / PC
         pixelRatio: 1.5,
-        platform: 'H5',
+        platform: getOSPlatform(),
         screenHeight: window.screen.height,
         screenWidth: window.screen.width,
         statusBarHeight: 0,
@@ -66,7 +96,7 @@ export const getSystemInfoSync = () => {
         titleBarHeight: 0,
         version: '0.0.1',
         windowHeight: window.innerHeight,
-        windowWidth: window.innerWidth,
+        windowWidth: window.innerWidth
     };
 };
 
