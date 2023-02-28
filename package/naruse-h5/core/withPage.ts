@@ -1,23 +1,22 @@
 import { naruseCreateElement } from "../components";
 import {Component} from "react";
 import {parseURLParam} from "../utils";
+import { EventBus } from '../../naruse-share/index';
 
 export default function withPage (Comp) {
-    return class A extends Component {
+    return class WithPageComponent extends Component {
         render ( ) {
             const page = getCurrentPageInstance();
             const hashs = location.hash.split('?');
             const currentPage = {
                 route: hashs[0],
                 param: parseURLParam(hashs[1]),
-                events: {},
+                events: {
+                    on: page.on.bind(page),
+                    off: page.off.bind(page),
+                    once: page.once.bind(page),
+                },
             };
-            let cp = naruseCreateElement(Comp, { ...this.props, currentPage } );
-            currentPage.events = {
-                on: page.on.bind(page, cp.id),
-                off: page.off.bind(page, cp.id),
-                once: page.once.bind(page, cp.id),
-            }
             return naruseCreateElement(Comp, { ...this.props, currentPage } )
         }
     }
@@ -37,46 +36,35 @@ function getCurrentPageInstance() {
 const PageEventKey = {onShow: 'onShow', onHide: 'onHide', onPageScroll: 'onPageScroll'};
 const PageEventKeys = Object.keys(PageEventKey);
 class Page {
-    // 此页面的所有函数
-    events: Record<string, Record<string, Function>> = {  }
-    on (id: string, event: string, callback: Function) {
+    // @ts-ignore 事件中心
+    private eventCenter = new EventBus();
+    on (event: string, callback: Function) {
         if (PageEventKeys.indexOf(event) === -1){
-            return false;
+            return;
         }
         if (typeof callback !== 'function') {
-            return false;
+            return;
         }
-        if (!this.events[event]) {
-            this.events[event] = {};
-        }
-        this.events[event][id] = callback;
-        return true;
+        this.eventCenter.on(event, callback)
     }
-    off (id: string, event: string) {
+    off (event: string, callback?: Function) {
         if (PageEventKeys.indexOf(event) === -1){
-            return false;
+            return;
         }
-        delete this.events[event][id]
-        return true;
+        this.eventCenter.off(event, callback)
     }
-    once (id: string, event: string, callback: Function) {
-        if (typeof callback !== 'function') {
-            return false;
+    once (event: string, callback: Function) {
+        if (PageEventKeys.indexOf(event) === -1){
+            return;
         }
-        const func = (...args) => {
-            callback(...args);
-            this.off(id, event);
-        };
-        return this.on(id,  event, func);
+        if (typeof callback !== 'function') {
+            return;
+        }
+        this.eventCenter.once(event, callback)
     }
     // 触发指定 事件
     call (eventName, e) {
-        const event = this.events[eventName];
-        const keys = Object.keys(event);
-        if (keys.length === 0) {
-            return;
-        }
-        keys.forEach(k => event[k](e))
+        this.eventCenter.emit(eventName, e)
     }
 }
 
@@ -96,6 +84,9 @@ const getScroll = () => {
     }
 }
 
+/**
+ * 监听地址栏的hash变化
+ */
 window.addEventListener('hashchange', function (event: HashChangeEvent) {
     let keys = Object.keys(pages);
     if (keys.length === 0) {
@@ -118,12 +109,11 @@ function onPageScrollEvent () {
     pages[hash] && pages[hash].call(PageEventKey.onPageScroll, getScroll());
 }
 // 默认window
-let currentPageContainer: Window | HTMLElement = window;
-currentPageContainer.addEventListener('scroll', onPageScrollEvent);
+let currentPageContainer: Window | HTMLElement | null = null;
 export function withPageInit ({ pageContainer = window }) {
     if (pageContainer && pageContainer !== currentPageContainer) {
         // 切换事件 对象
-        currentPageContainer.removeEventListener('scroll', onPageScrollEvent);
+        currentPageContainer && currentPageContainer.removeEventListener('scroll', onPageScrollEvent);
         pageContainer.addEventListener('scroll', onPageScrollEvent);
         currentPageContainer = pageContainer;
     }
