@@ -1,13 +1,15 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "target": "ESNext",
     "baseUrl": ".",
     "outDir": "dist",
     "rootDir": "./src",
     "module": "commonjs",
     "sourceMap": true,
     "esModuleInterop": true,
-    "preserveConstEnums": true
+    "preserveConstEnums": true,
+    "skipLibCheck": true,
   },
   "include": ["./src", "../../types"],
   "exclude": ["./src/__tests__", "./src/template/comp.ts"]

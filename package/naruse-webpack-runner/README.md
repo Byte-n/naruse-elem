@@ -1,3 +1,15 @@
-# `@tarojs/webpack5-runner`
+# `naruse-webpack-runner`
 
-暴露给 `@tarojs/cli` 的小程序/H5 Webpack 启动器。
+
+## TODO
+
+ + [ ] 编译
+   + [x] 页面编译
+   + [ ] 组件编译
+   + [ ] 应用编译
++ [ ] 样式
++ [x] 优化
+  + [x] 代码合并
+  + [x] 共同包提取
++ [ ] 插件
+  + [ ] 支持自定义插件

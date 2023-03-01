@@ -2,12 +2,12 @@
 require("../common.js");
 require("../runtime.js");
 
-(my["webpackJsonp"] = my["webpackJsonp"] || []).push([["/index/index"],{
+(my["webpackJsonp"] = my["webpackJsonp"] || []).push([["/cc/index"],{
 
-/***/ "../../node_modules/.pnpm/babel-loader@8.2.1_5gfccicuqyfmuaxis3rjolnab4/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./demo/pages/index/index.js":
-/*!*****************************************************************************************************************************************************************************!*\
-  !*** ../../node_modules/.pnpm/babel-loader@8.2.1_5gfccicuqyfmuaxis3rjolnab4/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./demo/pages/index/index.js ***!
-  \*****************************************************************************************************************************************************************************/
+/***/ "../../node_modules/.pnpm/babel-loader@8.2.1_5gfccicuqyfmuaxis3rjolnab4/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./demo/pages/cc/index.js":
+/*!**************************************************************************************************************************************************************************!*\
+  !*** ../../node_modules/.pnpm/babel-loader@8.2.1_5gfccicuqyfmuaxis3rjolnab4/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./demo/pages/cc/index.js ***!
+  \**************************************************************************************************************************************************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -152,10 +152,7 @@ var Demo = /*#__PURE__*/function (_Naruse$Component) {
   }, {
     key: "cc",
     value: function cc() {
-      console.log(_common__WEBPACK_IMPORTED_MODULE_1__.cc);
-      Naruse__WEBPACK_IMPORTED_MODULE_0___default().navigateTo({
-        url: '/pages/cc/index'
-      });
+      console.log('cc', _common__WEBPACK_IMPORTED_MODULE_1__.cc);
     }
   }, {
     key: "render",
@@ -169,15 +166,15 @@ var Demo = /*#__PURE__*/function (_Naruse$Component) {
 
 /***/ }),
 
-/***/ "./demo/pages/index/index.js":
-/*!***********************************!*\
-  !*** ./demo/pages/index/index.js ***!
-  \***********************************/
+/***/ "./demo/pages/cc/index.js":
+/*!********************************!*\
+  !*** ./demo/pages/cc/index.js ***!
+  \********************************/
 /***/ (function(__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) {
 
 /* harmony import */ var Naruse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! Naruse */ "Naruse");
 /* harmony import */ var Naruse__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(Naruse__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_pnpm_babel_loader_8_2_1_5gfccicuqyfmuaxis3rjolnab4_node_modules_babel_loader_lib_index_js_ruleSet_1_rules_0_use_0_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../../node_modules/.pnpm/babel-loader@8.2.1_5gfccicuqyfmuaxis3rjolnab4/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./index.js */ "../../node_modules/.pnpm/babel-loader@8.2.1_5gfccicuqyfmuaxis3rjolnab4/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./demo/pages/index/index.js");
+/* harmony import */ var _node_modules_pnpm_babel_loader_8_2_1_5gfccicuqyfmuaxis3rjolnab4_node_modules_babel_loader_lib_index_js_ruleSet_1_rules_0_use_0_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../../node_modules/.pnpm/babel-loader@8.2.1_5gfccicuqyfmuaxis3rjolnab4/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./index.js */ "../../node_modules/.pnpm/babel-loader@8.2.1_5gfccicuqyfmuaxis3rjolnab4/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use[0]!./demo/pages/cc/index.js");
 
 
 var config = {}
@@ -198,7 +195,7 @@ module.exports = require("../../naruse-alipay/lib.js");
 },
 /******/ function(__webpack_require__) { // webpackRuntimeModules
 /******/ var __webpack_exec__ = function(moduleId) { return __webpack_require__(__webpack_require__.s = moduleId); }
-/******/ __webpack_require__.O(0, ["common"], function() { return __webpack_exec__("./demo/pages/index/index.js"); });
+/******/ __webpack_require__.O(0, ["common"], function() { return __webpack_exec__("./demo/pages/cc/index.js"); });
 /******/ var __webpack_exports__ = __webpack_require__.O();
 /******/ }
 ]);;

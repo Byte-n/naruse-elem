@@ -1,6 +1,12 @@
-const { getBaseTemplate } = require('./getTemplate.js');
+const { getBaseTemplate } = require('naruse-webpack-runner/dist/mxml/getTemplate');
 const fs = require('fs');
 const path = require('path');
+
+const componentjsFile = `
+import { createMainBehavior } from './lib.js';
+// eslint-disable-next-line no-undef
+Component(createMainBehavior());
+`
 
 function main(outputPath) {
     // 路径不存在则创建
@@ -27,7 +33,7 @@ function main(outputPath) {
     });
     fs.writeFileSync(path.join(outputPath, 'index.json'), mainTemplateJsonString);
     fs.writeFileSync(path.join(outputPath, 'index.axml'), mainTemplate);
-    fs.copyFileSync(path.join(__dirname, 'componentTemplate.js'), path.join(outputPath, 'index.js'));
+    fs.writeFileSync(path.join(outputPath, 'index.js'), componentjsFile);
 }
 
 module.exports = {

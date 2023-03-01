@@ -2,7 +2,8 @@
   "pages": [
     "pages/index/index",
     "pages/qwer/qwer",
-    "pages/my/my"
+    "pages/my/my",
+    "pages/cc/index"
   ],
   "window": {
     "defaultTitle": "My App"

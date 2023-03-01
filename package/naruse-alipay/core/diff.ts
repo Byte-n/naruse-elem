@@ -27,7 +27,6 @@ export type VNode = BaseVNode | null | undefined;
  * @description 简单的o(n^2)diff操作，记录需要更新的node
  * @author CHC
  * @date 2022-10-11 14:10:32
- * @returns {*} 
  */
 export const vnodeDiff = (newVnode: VNode, oldVnode: VNode, newParentNode?: VNode, oldParentNode?: VNode, path = 'node', diffRes: DiffRes = {}): DiffRes => {
     const res = diffRes;
@@ -205,7 +204,7 @@ const vnodePropsDiff = (newVnode: any, oldVnode: any, isNaruseComponent = false)
 
 const isCustomIdNode = (node: any) => !node._uid;
 
-const isBaseTypeComponent = (childVNode: any) => {
+export const isBaseTypeComponent = (childVNode: any) => {
     return typeof childVNode == 'string' ||
         typeof childVNode == 'number' ||
         typeof childVNode == 'bigint'

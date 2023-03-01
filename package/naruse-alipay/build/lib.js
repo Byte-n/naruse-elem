@@ -4515,6 +4515,180 @@ var NaruseComponent = /** @class */ (function () {
 /** 判断是否是NaruseComponent */
 var isNaruseComponent = function (obj) { return obj instanceof NaruseComponent; };
 
+/**
+ * @description 简单的o(n^2)diff操作，记录需要更新的node
+ * @author CHC
+ * @date 2022-10-11 14:10:32
+ */
+var vnodeDiff = function (newVnode, oldVnode, newParentNode, oldParentNode, path, diffRes) {
+    var _a;
+    if (path === void 0) { path = 'node'; }
+    if (diffRes === void 0) { diffRes = {}; }
+    var res = diffRes;
+    // just null
+    if (!newVnode || isEmptyObj(newVnode)) {
+        res[path] = {};
+        return res;
+    }
+    // fix: 复用节点后diff失效的问题，单纯的使用指针判断是否相等在复用节点时会出现问题
+    // 完全相同的对象并不一定内容一定相同
+    // if (newVnode === oldVnode ) {
+    //     return res;
+    // }
+    // 继承父组件id
+    if (oldParentNode) {
+        newVnode.parentId = oldParentNode.id;
+    }
+    if (!oldVnode) {
+        res[path] = newVnode;
+        return res;
+    }
+    // 非自定义id组件时，继承id
+    if (!isCustomIdNode(newVnode)) {
+        newVnode._uid = newVnode.id = oldVnode.id;
+    }
+    // key & type
+    if (newVnode.key !== oldVnode.key
+        || newVnode.naruseType !== oldVnode.naruseType) {
+        res[path] = newVnode;
+        return res;
+    }
+    // naruse-element 单独判断
+    if (newVnode.naruseType === 'naruse-element' && newVnode.component) {
+        if (newVnode.component.actuator === ((_a = oldVnode.component) === null || _a === void 0 ? void 0 : _a.actuator)) {
+            var propsChnages_1 = vnodePropsDiff(newVnode.component.props, oldVnode.component.props, true);
+            Object.keys(propsChnages_1).forEach(function (key) {
+                res["".concat(path, ".component.props.").concat(key)] = propsChnages_1[key];
+            });
+        }
+        else {
+            res[path] = newVnode;
+            return res;
+        }
+    }
+    else {
+        // 普通元素的props判断
+        var propsChnages_2 = vnodePropsDiff(newVnode, oldVnode);
+        Object.keys(propsChnages_2).forEach(function (key) {
+            res["".concat(path, ".").concat(key)] = propsChnages_2[key];
+        });
+        diffVnodeChildren(newVnode, oldVnode, "".concat(path, ".childNodes"), res);
+    }
+    return res;
+};
+/**
+ * @description 子节点数组之间进行diff
+ * @author CHC
+ * @date 2022-10-11 15:10:18
+ */
+var diffVnodeChildren = function (newNode, oldNode, path, diffRes) {
+    if (path === void 0) { path = 'node'; }
+    if (diffRes === void 0) { diffRes = {}; }
+    var i, oldVNode, childVNode;
+    var oldChildren = __spreadArray$1([], ((oldNode && oldNode.childNodes) || []), true);
+    var oldChildrenLength = oldChildren.length;
+    var newChildNodes = __spreadArray$1([], (newNode && newNode.childNodes) || [], true);
+    if (!newChildNodes.length) {
+        if (oldChildrenLength) {
+            diffRes[path] = [];
+        }
+        return;
+    }
+    if (!oldChildrenLength) {
+        return diffRes[path] = newChildNodes;
+    }
+    // 当新的列表长度小于旧列表时，直接重新设置整个列表，因为小程序的data list只支持增不支持减
+    if (newChildNodes.length < oldChildrenLength) {
+        return diffRes[path] = newChildNodes;
+    }
+    // just same length will diff
+    for (i = 0; i < newChildNodes.length; i++) {
+        childVNode = newChildNodes[i];
+        childVNode = cleanChildNode(childVNode);
+        oldVNode = oldChildren[i];
+        if (oldVNode == null || typeof oldVNode == 'boolean') {
+            oldVNode = null;
+        }
+        if (!childVNode) {
+            if (childVNode !== oldVNode) {
+                diffRes["".concat(path, "[").concat(i, "]")] = null;
+            }
+            continue;
+        }
+        // Morph the old element into the new one, but don't append it to the dom yet
+        vnodeDiff(childVNode, oldVNode, newNode, oldNode, "".concat(path, "[").concat(i, "]"), diffRes);
+    }
+};
+/** 需要跳过的属性名 */
+var skipPropsKeys = ['naruseType', 'key', 'childNodes'];
+/**
+ * @description shallow props diff
+ * @author CHC
+ * @date 2022-10-11 15:10:52
+ */
+var vnodePropsDiff = function (newVnode, oldVnode, isNaruseComponent) {
+    if (isNaruseComponent === void 0) { isNaruseComponent = false; }
+    var res = {};
+    // 两者必须都是 naruse 组件
+    var isBothNaruseComponent = isNaruseComponent && oldVnode && oldVnode.naruseType === 'naruse-element';
+    // fix: 修复 naruse 组件会忽略部分属性值的问题
+    var realSkipPropsKeys = isBothNaruseComponent ? [] : skipPropsKeys;
+    if (!oldVnode)
+        return res;
+    // change
+    for (var newPropKey in newVnode) {
+        if (realSkipPropsKeys.includes(newPropKey))
+            continue;
+        var newPropValue = newVnode[newPropKey];
+        var oldPropValue = oldVnode[newPropKey];
+        if (newPropValue !== oldPropValue) {
+            if (newPropKey === 'style'
+                && isObj(newPropValue)
+                && isObj(oldPropValue)
+                && isEmptyObj(vnodePropsDiff(newPropValue, oldPropValue))) {
+                continue;
+            }
+            // 是 NaruseComponent 的前提下都为空的情况下跳过 diff 子元素
+            if (isBothNaruseComponent &&
+                newPropKey === 'children'
+                && newPropValue
+                && !newPropValue.length
+                && oldPropValue
+                && !oldPropValue.length) {
+                continue;
+            }
+            res[newPropKey] = newPropValue;
+        }
+    }
+    // remove
+    for (var oldPropKey in oldVnode) {
+        if (realSkipPropsKeys.includes(oldPropKey))
+            continue;
+        if (!(oldPropKey in newVnode)) {
+            res[oldPropKey] = undefined;
+        }
+    }
+    return res;
+};
+var isCustomIdNode = function (node) { return !node._uid; };
+var isBaseTypeComponent = function (childVNode) {
+    return typeof childVNode == 'string' ||
+        typeof childVNode == 'number' ||
+        typeof childVNode == 'bigint';
+};
+var cleanChildNode = function (childVNode) {
+    if (childVNode == null || typeof childVNode == 'boolean') {
+        childVNode = null;
+    }
+    else if (isBaseTypeComponent(childVNode)) {
+        childVNode = createElement('text', null, childVNode);
+    }
+    else if (Array.isArray(childVNode)) {
+        childVNode = createElement('fragment', null, childVNode);
+    }
+    return childVNode;
+};
+
 var uid$1 = 0;
 /**
  * @description 虚拟dom创建特殊处理map
@@ -4522,9 +4696,33 @@ var uid$1 = 0;
  */
 var vnodeSpecialMap = {
     text: function (props, childNodes) {
+        var tag = isPureProps(props) ? "pt" /* VnodeType.PureText */ : "text" /* VnodeType.Text */;
         var id = "_n_".concat(uid$1++);
-        return { naruseType: 'text', content: childNodes.join(''), id: id, _uid: id };
+        return { naruseType: tag, content: childNodes.join(''), id: id, _uid: id };
     },
+    view: function (props) {
+        var tag = isPureProps(props) ? "pv" /* VnodeType.PureView */ : "view" /* VnodeType.View */;
+        return { naruseType: tag };
+    }
+};
+var purePropsKeyNames = ['style', 'className'];
+/**
+ * @description 判断节点的 props 是否只有 style 和 class，则切换为纯净节点，用于提高事件反应性能
+ * @author CHC
+ * @date 2023-02-28 16:02:46
+ */
+var isPureProps = function (props) {
+    if (!props)
+        return true;
+    var keys = Object.keys(props);
+    if (keys.length > 2)
+        return false;
+    for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+        var key = keys_1[_i];
+        if (!purePropsKeyNames.includes(key))
+            return false;
+    }
+    return true;
 };
 /**
  * @description 模拟react的创建虚拟节点
@@ -4558,7 +4756,7 @@ var createClassElement = function (type, props, childNodes) {
     props = __assign(__assign({}, props), { children: childNodes });
     // 先不实例化对象，等待组件装载完成后再实例化
     var component = { actuator: type, props: props };
-    return { naruseType: 'naruse-element', component: component };
+    return { naruseType: "naruse-element" /* VnodeType.NaruseComponent */, component: component };
 };
 /**
  * @description 创建基础节点
@@ -4573,15 +4771,18 @@ var createBaseElement = function (type, props, childNodes) {
     var newNode = {};
     if (vnodeSpecialMap[type])
         newNode = vnodeSpecialMap[type](props, childNodes);
-    childNodes = (childNodes.flat && childNodes.flat(1)) || childNodes;
-    childNodes = childNodes.map(function (child) {
-        if (typeof child === 'string' || typeof child === 'number') {
-            var id = "_n_".concat(uid$1++);
-            return { naruseType: 'text', content: child, id: id, _uid: id };
-        }
-        return child;
-    });
-    var node = (__assign(__assign(__assign({ naruseType: type }, props), { childNodes: childNodes }), newNode));
+    // perf: 优化 text 会重复遍历的问题
+    if (!(type == "pt" /* VnodeType.PureText */ || type == "text" /* VnodeType.Text */)) {
+        childNodes = (childNodes.flat && childNodes.flat(1)) || childNodes;
+        childNodes = childNodes.map(function (child) {
+            if (isBaseTypeComponent(child))
+                return createTextElement(child);
+            return child;
+        });
+        newNode.childNodes = childNodes;
+    }
+    var node = __assign(__assign({ naruseType: type }, props), newNode);
+    // 如果处理完毕没有 id 则自动补充上 id
     if (!node.id) {
         node.id = node._uid = "_n_".concat(uid$1++);
     }
@@ -4594,6 +4795,19 @@ var createBaseElement = function (type, props, childNodes) {
  */
 var createFuncElement = function (type, props, childNodes) {
     return type(__assign(__assign({}, props), { children: childNodes }));
+};
+var Fragment = function (props) {
+    var childNodes = props.children;
+    delete props.children;
+    return createBaseElement("fragment" /* VnodeType.Fragment */, props, childNodes);
+};
+/**
+ * @description 单独创建一个文本组件
+ * @author CHC
+ * @date 2023-02-28 17:02:15
+ */
+var createTextElement = function (content) {
+    return createBaseElement("text" /* VnodeType.Text */, null, [content]);
 };
 
 var apiDiff = {
@@ -4887,181 +5101,6 @@ var withPage = function (component) {
 };
 
 /**
- * @description 简单的o(n^2)diff操作，记录需要更新的node
- * @author CHC
- * @date 2022-10-11 14:10:32
- * @returns {*}
- */
-var vnodeDiff = function (newVnode, oldVnode, newParentNode, oldParentNode, path, diffRes) {
-    var _a;
-    if (path === void 0) { path = 'node'; }
-    if (diffRes === void 0) { diffRes = {}; }
-    var res = diffRes;
-    // just null
-    if (!newVnode || isEmptyObj(newVnode)) {
-        res[path] = {};
-        return res;
-    }
-    // fix: 复用节点后diff失效的问题，单纯的使用指针判断是否相等在复用节点时会出现问题
-    // 完全相同的对象并不一定内容一定相同
-    // if (newVnode === oldVnode ) {
-    //     return res;
-    // }
-    // 继承父组件id
-    if (oldParentNode) {
-        newVnode.parentId = oldParentNode.id;
-    }
-    if (!oldVnode) {
-        res[path] = newVnode;
-        return res;
-    }
-    // 非自定义id组件时，继承id
-    if (!isCustomIdNode(newVnode)) {
-        newVnode._uid = newVnode.id = oldVnode.id;
-    }
-    // key & type
-    if (newVnode.key !== oldVnode.key
-        || newVnode.naruseType !== oldVnode.naruseType) {
-        res[path] = newVnode;
-        return res;
-    }
-    // naruse-element 单独判断
-    if (newVnode.naruseType === 'naruse-element' && newVnode.component) {
-        if (newVnode.component.actuator === ((_a = oldVnode.component) === null || _a === void 0 ? void 0 : _a.actuator)) {
-            var propsChnages_1 = vnodePropsDiff(newVnode.component.props, oldVnode.component.props, true);
-            Object.keys(propsChnages_1).forEach(function (key) {
-                res["".concat(path, ".component.props.").concat(key)] = propsChnages_1[key];
-            });
-        }
-        else {
-            res[path] = newVnode;
-            return res;
-        }
-    }
-    else {
-        // 普通元素的props判断
-        var propsChnages_2 = vnodePropsDiff(newVnode, oldVnode);
-        Object.keys(propsChnages_2).forEach(function (key) {
-            res["".concat(path, ".").concat(key)] = propsChnages_2[key];
-        });
-        diffVnodeChildren(newVnode, oldVnode, "".concat(path, ".childNodes"), res);
-    }
-    return res;
-};
-/**
- * @description 子节点数组之间进行diff
- * @author CHC
- * @date 2022-10-11 15:10:18
- */
-var diffVnodeChildren = function (newNode, oldNode, path, diffRes) {
-    if (path === void 0) { path = 'node'; }
-    if (diffRes === void 0) { diffRes = {}; }
-    var i, oldVNode, childVNode;
-    var oldChildren = __spreadArray$1([], ((oldNode && oldNode.childNodes) || []), true);
-    var oldChildrenLength = oldChildren.length;
-    var newChildNodes = __spreadArray$1([], (newNode && newNode.childNodes) || [], true);
-    if (!newChildNodes.length) {
-        if (oldChildrenLength) {
-            diffRes[path] = [];
-        }
-        return;
-    }
-    if (!oldChildrenLength) {
-        return diffRes[path] = newChildNodes;
-    }
-    // 当新的列表长度小于旧列表时，直接重新设置整个列表，因为小程序的data list只支持增不支持减
-    if (newChildNodes.length < oldChildrenLength) {
-        return diffRes[path] = newChildNodes;
-    }
-    // just same length will diff
-    for (i = 0; i < newChildNodes.length; i++) {
-        childVNode = newChildNodes[i];
-        childVNode = cleanChildNode(childVNode);
-        oldVNode = oldChildren[i];
-        if (oldVNode == null || typeof oldVNode == 'boolean') {
-            oldVNode = null;
-        }
-        if (!childVNode) {
-            if (childVNode !== oldVNode) {
-                diffRes["".concat(path, "[").concat(i, "]")] = null;
-            }
-            continue;
-        }
-        // Morph the old element into the new one, but don't append it to the dom yet
-        vnodeDiff(childVNode, oldVNode, newNode, oldNode, "".concat(path, "[").concat(i, "]"), diffRes);
-    }
-};
-/** 需要跳过的属性名 */
-var skipPropsKeys = ['naruseType', 'key', 'childNodes'];
-/**
- * @description shallow props diff
- * @author CHC
- * @date 2022-10-11 15:10:52
- */
-var vnodePropsDiff = function (newVnode, oldVnode, isNaruseComponent) {
-    if (isNaruseComponent === void 0) { isNaruseComponent = false; }
-    var res = {};
-    // 两者必须都是 naruse 组件
-    var isBothNaruseComponent = isNaruseComponent && oldVnode && oldVnode.naruseType === 'naruse-element';
-    // fix: 修复 naruse 组件会忽略部分属性值的问题
-    var realSkipPropsKeys = isBothNaruseComponent ? [] : skipPropsKeys;
-    if (!oldVnode)
-        return res;
-    // change
-    for (var newPropKey in newVnode) {
-        if (realSkipPropsKeys.includes(newPropKey))
-            continue;
-        var newPropValue = newVnode[newPropKey];
-        var oldPropValue = oldVnode[newPropKey];
-        if (newPropValue !== oldPropValue) {
-            if (newPropKey === 'style'
-                && isObj(newPropValue)
-                && isObj(oldPropValue)
-                && isEmptyObj(vnodePropsDiff(newPropValue, oldPropValue))) {
-                continue;
-            }
-            // 是 NaruseComponent 的前提下都为空的情况下跳过 diff 子元素
-            if (isBothNaruseComponent &&
-                newPropKey === 'children'
-                && newPropValue
-                && !newPropValue.length
-                && oldPropValue
-                && !oldPropValue.length) {
-                continue;
-            }
-            res[newPropKey] = newPropValue;
-        }
-    }
-    // remove
-    for (var oldPropKey in oldVnode) {
-        if (realSkipPropsKeys.includes(oldPropKey))
-            continue;
-        if (!(oldPropKey in newVnode)) {
-            res[oldPropKey] = undefined;
-        }
-    }
-    return res;
-};
-var isCustomIdNode = function (node) { return !node._uid; };
-var isBaseTypeComponent = function (childVNode) {
-    return typeof childVNode == 'string' ||
-        typeof childVNode == 'number' ||
-        typeof childVNode == 'bigint';
-};
-var cleanChildNode = function (childVNode) {
-    if (childVNode == null || typeof childVNode == 'boolean') {
-        childVNode = null;
-    }
-    else if (isBaseTypeComponent(childVNode)) {
-        childVNode = createElement('text', null, childVNode);
-    }
-    else if (Array.isArray(childVNode)) {
-        childVNode = createElement('fragment', null, childVNode);
-    }
-    return childVNode;
-};
-
-/**
  * @description 以 Naruse 元素为模板克隆并返回新的 Naruse 元素，将传入的 props 与原始元素的 props 浅层合并后返回新元素的 props。新的子元素将取代现有的子元素，而来自原始元素的 key 和 ref 将被保留。
  * @author CHC
  * @date 2023-01-05 11:01:51
@@ -5302,9 +5341,9 @@ var eventCenter = function (event, nodeTree) {
     }
 };
 /**
- * 获取小程序通用行为
+ * 获取事件所需对象
  */
-var getMiniappEventBehavior = function () {
+var getMethodsObject = function () {
     var methods = {};
     methodsTags.forEach(function (item) {
         var eventName = transformFirstApha(item);
@@ -5313,10 +5352,16 @@ var getMiniappEventBehavior = function () {
         };
         eventNameMap[item] = transformFirstApha(methodTagTransformMap[item] || item);
     });
+    return methods;
+};
+/**
+ * 获取小程序通用行为
+ */
+var getMiniappEventBehavior = function () {
     return {
         props: { component: {} },
         data: { node: {} },
-        methods: methods,
+        methods: getMethodsObject(),
     };
 };
 
@@ -5364,8 +5409,15 @@ var Middware = /** @class */ (function () {
                 logger.error('the NaruseComponent must have a render function');
                 return;
             }
+            // 开始渲染
             var vnode = _this.naruseComponent.render();
+            // 计时
             Naruse.$$debug && console.time("\u7EC4\u4EF6 ".concat(_this.$$uid, " diff \u82B1\u8D39\u65F6\u95F4"));
+            // 单文字节点需要包裹一层text节点
+            if (isBaseTypeComponent(vnode)) {
+                vnode = createTextElement(vnode);
+            }
+            // 初始化vnode
             initVnodeTree(vnode);
             var diff = vnodeDiff(vnode, _this.fristRender ? null : _this.component.data.node);
             Naruse.$$debug && console.log("\u7EC4\u4EF6 ".concat(_this.$$uid, ", diff\u7ED3\u679C"), diff);
@@ -5446,11 +5498,15 @@ var Middware = /** @class */ (function () {
     return Middware;
 }());
 
-var createPageComponent = function (config) {
-    var pageConfig = {
+/**
+ * 创建一个页面组件
+ */
+var createPageComponent = function (instance, config) {
+    var pageConfig = __assign({ 
         // 标识是 naruse 页面
-        $$narusePage: true,
-    };
+        $$narusePage: true, 
+        // 页面配置
+        $config: config }, getMethodsObject());
     // 挂载页面事件
     ALLOW_EVENT.forEach(function (event) {
         pageConfig[event] = function () { };
@@ -5461,7 +5517,7 @@ var createPageComponent = function (config) {
     pageConfig["onLoad"] = function (query) {
         this.$query = query;
         // 初始化 naruse 组件
-        var middware = new Middware(this, config.component, {});
+        var middware = new Middware(this, instance, {});
         middware.update();
         this.$middware = middware;
     };
@@ -5472,10 +5528,10 @@ var createPageComponent = function (config) {
 /**
  * 创建一个小程序的组件工厂，允许直接传入 Naruse 组件进行开发
  */
-var createMiniFactory = function (type, config) {
+var createMiniFactory = function (type, instance, config) {
     if (type === 'page') {
         // @ts-ignore
-        return createPageComponent(config);
+        return createPageComponent(instance, config);
     }
     else {
         logger.error('初始化暂不支持组件');
@@ -5487,12 +5543,12 @@ var apis = initNaruseAlipayApi();
 var version = "0.4.6";
 initVersionLogger('naruse-alipay', version);
 // naruse模块内容
-var Naruse = __assign(__assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
+var Naruse = __assign(__assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: createElement, h: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
         clientName: 'alipay',
         clientVersion: version,
         language: 'zh-Hans',
         platform: 'alipay',
-    }, version: version }, my), apis), { withPage: withPage, unsafe_run: run, $$debug: false }), elementApi), { createMiniFactory: createMiniFactory });
+    }, version: version }, my), apis), { withPage: withPage, unsafe_run: run, $$debug: false }), elementApi), { createMiniFactory: createMiniFactory, Fragment: Fragment });
 var naruseExtend = function (opt) {
     if (typeof opt === 'object') {
         Object.assign(Naruse, opt);
@@ -5787,6 +5843,14 @@ var createMainBehavior = function (option) {
     return naruseBehavior;
 };
 
-naruseExtend({ renderComponentOnPage: renderComponentOnPage });
+naruseExtend({
+    renderComponentOnPage: renderComponentOnPage,
+    createMainBehavior: createMainBehavior,
+    naruseInit: naruseInit,
+    naruseExtend: naruseExtend,
+    renderComponentOnPageWithCode: renderComponentOnPageWithCode,
+    createMiniFactory: createMiniFactory,
+    Naruse: Naruse,
+});
 
-export { Naruse, createMainBehavior, naruseExtend, naruseInit, renderComponentOnPageWithCode };
+export { Naruse as default };

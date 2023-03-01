@@ -220,6 +220,24 @@ const textarea = {
     ]
 }
 
+// 纯净版 view 用于减少代码冗余
+const pureView = {
+    templateName: 'pv',
+    reflectTagName: 'view',
+    attributes: [],
+    events: [],
+    nest: true,
+}
+
+// 纯净版文本，用于增强性能
+const pureText = {
+    templateName: 'pt',
+    reflectTagName: 'text',
+    attributes: [],
+    events: [],
+    nest: true,
+    children: '{{content}}',
+}
 
 
 const templateList = [
@@ -231,9 +249,12 @@ const templateList = [
     button,
     input,
     textarea,
+    pureView,
+    pureText,
 ]
 
-module.exports = {
+export {
     templateList,
     speicalConfig,
 }
+

@@ -1,10 +1,18 @@
+import { genMainTemplate, genBaseTemplate } from "../mxml";
+
 export class NaruseTemplate  {
     isSupportRecursive = true;
+    /**
+     * 生成基础模版
+     */
     buildTemplate () {
-        return 'template';
+        return genBaseTemplate();
     }
 
-    buildPageTemplate () {
-        return 'page';
+    /**
+     * 生成页面模版
+     */
+    buildPageTemplate (importBaseTemplatePath: string) {
+        return genMainTemplate(importBaseTemplatePath);
     }
 }

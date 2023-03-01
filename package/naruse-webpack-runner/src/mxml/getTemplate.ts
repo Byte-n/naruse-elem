@@ -1,6 +1,9 @@
 // 根据数据队列生成axml模版
-const { js2xml } = require("xml-js");
-const humps = require('humps');
+import { js2xml } from 'xml-js';
+import humps from 'humps';
+
+
+
 const camelCase = humps.camelize;
 
 function genDoubleBracket(str) {
@@ -27,7 +30,7 @@ function getNestElement() {
 function generateTemplate(template, speicalConfig) {
     const { templateName, reflectTagName, attributes, events, nest, children } = template;
     const { events: speicalEvent, attributes: speicalAttributes, baseAttributes, bubblingEvents } = speicalConfig;
-    let templateObj = {};
+    let templateObj: Record<string, any> = {};
     templateObj._attributes = {};
     Object.keys(baseAttributes).forEach(attribute => {
         templateObj._attributes[attribute] = genDoubleBracket(camelCase(baseAttributes[attribute]));
@@ -72,7 +75,7 @@ const options = { compact: true, ignoreComment: true, spaces: 4 };
  * @description 获取需要迭代的模版
  * @author CHC
  * @date 2023-01-07 15:01:19
- * @returns {*} 
+ * @returns {*}
  */
 function getBaseTemplate() {
     const data = require('./data.js');
@@ -146,6 +149,7 @@ function getBaseNaruseTemplate() {
     }
 }
 
-module.exports = {
-    getBaseTemplate,
+
+export {
+    getBaseTemplate
 }

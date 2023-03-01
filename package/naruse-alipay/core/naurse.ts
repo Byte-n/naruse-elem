@@ -3,7 +3,7 @@ import { globalEvent, EventBus, getDeferred, initVersionLogger } from '../../nar
 import { initNaruseAlipayApi } from '../api/index';
 import { withPage } from '../api/HOC/index';
 import { run } from 'naruse-parser';
-import { createElement } from './createElement';
+import { createElement, Fragment } from './createElement';
 import * as elementApi from './element';
 import { createMiniFactory } from './hybrid/createMiniFactory';
 
@@ -12,11 +12,13 @@ const apis = initNaruseAlipayApi();
 const version = __VERSION__;
 initVersionLogger('naruse-alipay', version);
 
+
 // naruse模块内容
 export const Naruse = {
     Component: NaruseComponent,
     createElement,
-    getDeferred, 
+    h: createElement,
+    getDeferred,
     globalEvent,
     EventBus,
     env: {
@@ -33,6 +35,7 @@ export const Naruse = {
     $$debug: false,
     ...elementApi,
     createMiniFactory,
+    Fragment,
 };
 
 export const naruseExtend = (opt: any) => {

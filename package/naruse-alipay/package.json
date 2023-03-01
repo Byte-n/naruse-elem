@@ -1,13 +1,16 @@
 {
-  "name": "naruse-alipay",
-  "version": "0.4.6",
-  "description": "naruse 针对支付宝小程序的基础包",
-  "main": "./build/lib.js",
-  "scripts": {
-    "test": "mocha ./__test__",
-    "dev": "rollup -c -w --environment PROJECT_NAME:alipay",
-    "build": "rollup -c --environment PROJECT_NAME:alipay"
-  },
-  "author": "CHC",
-  "license": "ISC"
+    "name": "naruse-alipay",
+    "version": "0.4.6",
+    "description": "naruse 针对支付宝小程序的基础包",
+    "main": "./build/lib.js",
+    "scripts": {
+        "test": "mocha ./__test__",
+        "dev": "rollup -c -w --environment PROJECT_NAME:alipay",
+        "build": "rollup -c --environment PROJECT_NAME:alipay"
+    },
+    "devDependencies": {
+        "naruse-webpack-runner": "workspace:*"
+    },
+    "author": "CHC",
+    "license": "ISC"
 }

@@ -4,7 +4,6 @@ import webpack from 'webpack'
 export default class TaroSingleEntryDependency extends webpack.dependencies.ModuleDependency {
   name: string
   miniType: META_TYPE
-  loc: any
   options: Record<string, any>
 
   constructor (request, name, loc, miniType, options = {}) {
@@ -17,6 +16,6 @@ export default class TaroSingleEntryDependency extends webpack.dependencies.Modu
 
   // @ts-ignore
   get type () {
-    return 'single entry'
+    return this.options.type || 'single entry'
   }
 }

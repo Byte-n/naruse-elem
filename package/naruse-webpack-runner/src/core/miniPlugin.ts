@@ -20,12 +20,13 @@ import EntryDependency from 'webpack/lib/dependencies/EntryDependency'
 import TaroSingleEntryDependency from '../dependencies/TaroSingleEntryDependency'
 import { componentConfig } from '../template/component'
 
-
-import type { RecursiveTemplate, UnRecursiveTemplate } from '@tarojs/shared/dist/template'
 import type { AppConfig, Config } from '@tarojs/taro'
 import type { Compiler } from 'webpack'
 import type { IComponent, IFileType } from '../utils/types'
 import { NaruseTemplate } from './template'
+import TaroNormalModulesPlugin from './TaroNormalModulesPlugin'
+import TaroLoadChunksPlugin from './TaroLoadChunksPlugin'
+import { ComponentEntryConfig } from '../types/options'
 
 const PLUGIN_NAME = 'TaroMiniPlugin'
 const { ConcatSource, RawSource } = sources
@@ -36,15 +37,13 @@ function isLoaderExist(loaders, loaderName: string) {
 
 interface ITaroMiniPluginOptions {
     appEntry?: string
-    pages: string[]
+    pages?: string | string[]
     sourceDir: string
-    pluginConfig?: Record<string, any>
-    pluginMainEntry?: string
-    commonChunks?: string[]
-    frameworkExts?: string[]
     fileType?: IFileType
     template?: NaruseTemplate
     alias?: Record<string, string>
+    components?: string | string [] | ComponentEntryConfig | ComponentEntryConfig []
+    commonChunks?: string []
 }
 
 export interface IComponentObj {
@@ -52,15 +51,13 @@ export interface IComponentObj {
     path: string | null
     type?: string
 }
-
 interface FilesConfig {
     [configName: string]: {
         content: Config
         path: string
     }
 }
-
-export default class TaroMiniPlugin {
+export default class NaruseMiniPlugin {
     /** 插件配置选项 */
     options: ITaroMiniPluginOptions
     context: string
@@ -77,11 +74,12 @@ export default class TaroMiniPlugin {
     /** tabbar icon 图片路径列表 */
     tabBarIcons = new Set<string>()
     dependencies = new Map<string, TaroSingleEntryDependency>()
+    loadChunksPlugin: TaroLoadChunksPlugin
 
     constructor(options = {} as ITaroMiniPluginOptions) {
         this.options = Object.assign({
             sourceDir: '',
-            commonChunks: ['runtime', 'vendors'],
+            commonChunks: ['runtime', 'common', 'vendors'],
             fileType: {
                 style: '.acss',
                 config: '.json',
@@ -116,9 +114,8 @@ export default class TaroMiniPlugin {
 
         this.context = compiler.context
 
-        compiler.hooks.entryOption.tap('MyPlugin', (context, entry) => {
-            console.log('entryOption', context, entry)
-        });
+        // 清理入口文件，由内部自由控制
+        compiler.options.entry = {};
 
         /** build mode */
         compiler.hooks.run.tapAsync(
@@ -137,6 +134,14 @@ export default class TaroMiniPlugin {
                     this.isWatch = true
                 }
                 await this.run(compiler)
+                this.loadChunksPlugin = new TaroLoadChunksPlugin({
+                    commonChunks: this.options.commonChunks,
+                    isBuildPlugin: false,
+                    pages: this.pages,
+                    framework: 'react',
+                })
+
+                this.loadChunksPlugin.apply(compiler)
             })
         )
 
@@ -159,24 +164,41 @@ export default class TaroMiniPlugin {
         )
 
         compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation, { normalModuleFactory }) => {
-            /** For Webpack compilation get factory from compilation.dependencyFactories by denpendence's constructor */
             compilation.dependencyFactories.set(EntryDependency, normalModuleFactory)
             compilation.dependencyFactories.set(TaroSingleEntryDependency as any, normalModuleFactory)
 
+            compiler.webpack.NormalModule.getCompilationHooks(compilation).loader.tap(PLUGIN_NAME, (_loaderContext, module: any) => {
 
-            compiler.webpack.NormalModule.getCompilationHooks(compilation).loader.tap(PLUGIN_NAME, (_loaderContext, module:/** TaroNormalModule */ any) => {
-                const loaderName = '/Users/hashiro/MiniProjects/blank/package/naruse-webpack-runner/dist/core/baseLoader.js';
-                if (!isLoaderExist(module.loaders, '')) {
-                    module.loaders.unshift({
-                        loader: loaderName,
-                        options: {
-                            loaderMeta: {},
-                            naruseSourcePath: '../src',
-                        }
-                    })
+                // 页面loader
+                if (module.miniType === META_TYPE.PAGE) {
+                    const loaderName = path.resolve(__dirname, '../loaders/miniPageLoader.js');
+                    if (!isLoaderExist(module.loaders, loaderName)) {
+                        module.loaders.unshift({
+                            loader: loaderName,
+                            options: {
+                                loaderName,
+                                config: this.filesConfig,
+                            }
+                        })
+                    }
+                }
+
+                // 组件loader
+                if (module.miniType === META_TYPE.COMPONENT) {
+                    const loaderName = path.resolve(__dirname, '../loaders/miniComponentLoader.js');
+                    if (!isLoaderExist(module.loaders, loaderName)) {
+                        module.loaders.unshift({
+                            loader: loaderName,
+                            options: {
+                                loaderName,
+                                config: this.filesConfig,
+                            }
+                        })
+                    }
                 }
             })
 
+            // 自动生成资源文件
             compilation.hooks.processAssets.tapAsync(
                 {
                     name: PLUGIN_NAME,
@@ -187,6 +209,9 @@ export default class TaroMiniPlugin {
                 })
             )
         })
+
+        // TaroDepency 更改为 TaroNormalModule
+        new TaroNormalModulesPlugin().apply(compiler)
     }
 
     getChangedFiles(compiler: Compiler) {
@@ -209,18 +234,16 @@ export default class TaroMiniPlugin {
      * 包括处理分包和 tabbar
      */
     getPages() {
-        const appPages = this.options.pages;
+        const appPages = !Array.isArray(this.options.pages) ? [this.options.pages] : this.options.pages;
         if (!appPages || !appPages.length) {
             throw new Error('全局配置缺少 pages 字段，请检查！')
         }
-
         if (!this.isWatch) {
             printLog(processTypeEnum.COMPILE, '入口路径', this.getShowPath(this.appEntry))
         }
-        const { frameworkExts } = this.options
         this.pages = new Set([
             ...appPages.map<IComponent>(item => {
-                const pagePath = resolveMainFilePath(path.join(this.options.sourceDir, item), frameworkExts)
+                const pagePath = resolveMainFilePath(path.join(this.options.sourceDir, item))
                 const pageTemplatePath = this.getTemplatePath(pagePath)
                 const isNative = this.isNativePageORComponent(pageTemplatePath)
                 return {
@@ -240,7 +263,7 @@ export default class TaroMiniPlugin {
     getPagesConfig() {
         this.pages.forEach(page => {
             if (!this.isWatch) {
-                printLog(processTypeEnum.COMPILE, '发现页面', this.getShowPath(page.path))
+                printLog(processTypeEnum.COMPILE, '页面', this.getShowPath(page.path))
             }
             this.compileFile(page)
         })
@@ -520,8 +543,7 @@ export default class TaroMiniPlugin {
         const source = new ConcatSource(originSource)
 
         Object.keys(assets).forEach(assetName => {
-            const fileName = path.basename(assetName, path.extname(assetName))
-            if ((REG_STYLE.test(assetName) || REG_STYLE_EXT.test(assetName)) && this.options.commonChunks.includes(fileName)) {
+            if ((REG_STYLE.test(assetName) || REG_STYLE_EXT.test(assetName))) {
                 source.add('\n')
                 source.add(`@import ${JSON.stringify(urlToRequest(assetName))};`)
                 assets[appStyle] = source

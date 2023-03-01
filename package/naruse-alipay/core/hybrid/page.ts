@@ -1,11 +1,20 @@
+import { NaruseComponent } from "core/component";
+import { getMethodsObject } from "core/domEvents";
 import { Middware } from "core/middware";
 import { ALLOW_EVENT } from "core/page";
 import { MiniComponentConfig } from "./createMiniFactory";
 
-export const createPageComponent = (config: MiniComponentConfig) => {
+/**
+ * 创建一个页面组件
+ */
+ export const createPageComponent = (instance: NaruseComponent, config: MiniComponentConfig) => {
     const pageConfig: Record<string, any> = {
         // 标识是 naruse 页面
         $$narusePage: true,
+        // 页面配置
+        $config: config,
+        // 事件处理器
+        ...getMethodsObject(),
     };
 
     // 挂载页面事件
@@ -20,7 +29,7 @@ export const createPageComponent = (config: MiniComponentConfig) => {
     pageConfig["onLoad"] = function (query) {
         this.$query = query;
         // 初始化 naruse 组件
-        const middware = new Middware(this, config.component, {});
+        const middware = new Middware(this, instance, {});
         middware.update();
         this.$middware = middware;
     }
