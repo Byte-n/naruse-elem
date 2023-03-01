@@ -1,23 +1,25 @@
 import { MethodHandler } from '../../../naruse-share/index';
 
 /**
+ * getOsInfo().name 映射未 platform
+ */
+const OSNameToPlatformMap = {
+    Windows: 'Windows',
+    iPhone: 'iOS',
+    Mac: 'Mac',
+    Android: 'Android',
+    Unix: '',
+    Linux: '',
+    Unknown: '',
+};
+
+/**
  * 根据 getOsInfo 获取当前系统平台
  * @return {'Android'|'iOS'|'Windows'|'Mac'|''}
  */
 const getOSPlatform = () => {
     const { name } = getOsInfo();
-    switch (name) {
-        case 'Windows':
-            return 'Windows';
-        case 'iPhone':
-            return 'iOS';
-        case 'Mac':
-            return 'Mac';
-        case 'Android':
-            return 'Android';
-        default: // Unix, Linux, Unknown
-            return '';
-    }
+    return OSNameToPlatformMap[name];
 }
 
 const getOSModel = () => {

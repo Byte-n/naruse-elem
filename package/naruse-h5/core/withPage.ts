@@ -38,11 +38,20 @@ const PageEventKeys = Object.keys(PageEventKey);
 class Page {
     // @ts-ignore 事件中心
     private eventCenter = new EventBus();
-    on (event: string, callback: Function) {
+
+    /**
+     * 检查 event 、 callback 是否合理
+     * @param event
+     * @param callback
+     */
+    eventCheck (event: string, callback: Function) {
         if (PageEventKeys.indexOf(event) === -1){
-            return;
+            return false;
         }
-        if (typeof callback !== 'function') {
+        return typeof callback === 'function';
+    }
+    on (event: string, callback: Function) {
+        if (!this.eventCheck(event, callback)) {
             return;
         }
         this.eventCenter.on(event, callback)
@@ -54,10 +63,7 @@ class Page {
         this.eventCenter.off(event, callback)
     }
     once (event: string, callback: Function) {
-        if (PageEventKeys.indexOf(event) === -1){
-            return;
-        }
-        if (typeof callback !== 'function') {
+        if (!this.eventCheck(event, callback)) {
             return;
         }
         this.eventCenter.once(event, callback)
