@@ -1,40 +1,22 @@
 import webpack, { Stats } from 'webpack';
 import { BaseConfig } from './core/baseConfig';
 import { NaruseTemplate } from './core/template';
+import { NaruseWebpackRunnerOptions } from './types/options';
 
 
-export interface NaruseWebpackRunnerOptions {
-    // 编译方式
-    compilerType?: 'app' | 'pages' | 'component';
-    // 输出路径
-    outputPath: string;
-    // 编译模式
-    mode?: 'production' | 'development' | 'none';
-    // 是否监听文件变化
-    isWatch?: boolean;
-    // page模式的配置项
-    pageConfig?: {
-        // 页面入口文件
-        entry: string | string[];
-    };
-    template?: NaruseTemplate;
-    sourceDir: string;
-    // naurse 外部源地址
-    naruseExternalPath?: string;
-}
 
-const defaultConfig = {
+
+const defaultConfig: Partial<NaruseWebpackRunnerOptions> = {
     mode: 'production',
     isWatch: false,
-    compilerType: 'pages',
+    template: new NaruseTemplate(),
 }
 
 export default async function build(options: NaruseWebpackRunnerOptions): Promise<Stats> {
     const config = Object.assign({}, defaultConfig, options);
     return new Promise<Stats>((resolve, reject) => {
         const baseConfig = new BaseConfig(config);
-        const webpackConfig = baseConfig.chain.toConfig();;
-        const compiler = webpack(webpackConfig);
+        const webpackConfig: any = baseConfig.chain.toConfig();;
 
         const callback = async (err: Error, stats: Stats) => {
             if (err || stats.hasErrors()) {
@@ -43,6 +25,8 @@ export default async function build(options: NaruseWebpackRunnerOptions): Promis
             }
             resolve(stats)
         }
+
+        const compiler = webpack(webpackConfig);
 
         if (config.isWatch) {
             compiler.watch({
@@ -60,14 +44,12 @@ export default async function build(options: NaruseWebpackRunnerOptions): Promis
 
 
 build({
-    outputPath: './demo/dist',
-    pageConfig: {
-        entry: 'index.js',
-    },
-    sourceDir: '/Users/hashiro/MiniProjects/blank/package/naruse-webpack-runner/demo',
+    compilerType: 'pages',
+    outputPath: '/Users/hashiro/MiniProjects/blank/demo/demo-alipay/pages/',
+    pages: ['/index/index', '/cc/index'],
+    sourceDir: '/Users/hashiro/MiniProjects/blank/package/naruse-webpack-runner/demo/pages/',
     isWatch: true,
-    template: new NaruseTemplate(),
-    naruseExternalPath: '/Users/hashiro/MiniProjects/blank/package/naruse-webpack-runner/demo',
+    naruseExternal: '/Users/hashiro/MiniProjects/blank/demo/demo-alipay/naruse-alipay',
 }).catch(err => {
     console.error(err);
 })

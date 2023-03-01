@@ -20,6 +20,16 @@
         </block>
     </button>
 </template>
+<template name="pv">
+    <view style="{{style}}" id="{{id}}" class="{{className}}">
+        <block a:if="{{childNodes}}">
+            <template a:for="{{childNodes}}" is="{{item.naruseType}}" data="{{...item}}"/>
+        </block>
+    </view>
+</template>
+<template name="pt">
+    <text style="{{style}}" id="{{id}}" class="{{className}}">{{content}}</text>
+</template>
 <template name="fragment">
     <block a:if="{{childNodes}}">
         <template a:for="{{childNodes}}" is="{{item.naruseType}}" data="{{...item}}"/>

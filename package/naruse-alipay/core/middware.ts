@@ -1,6 +1,7 @@
 import { isEmptyObj, isFunc } from '../../naruse-share';
 import { NaruseComponent } from './component';
-import { VNode, vnodeDiff } from './diff';
+import { createElement, createTextElement, VnodeType } from './createElement';
+import { isBaseTypeComponent, VNode, vnodeDiff } from './diff';
 import { initVnodeTree } from './domEvents';
 import { Naruse } from './naurse';
 import { logger, NOOP, propsEquals } from './uitl';
@@ -53,8 +54,16 @@ export class Middware {
                 logger.error('the NaruseComponent must have a render function');
                 return;
             }
-            const vnode = this.naruseComponent.render();
+            // 开始渲染
+            let vnode: VNode = this.naruseComponent.render();
+            // 计时
             Naruse.$$debug && console.time(`组件 ${this.$$uid} diff 花费时间`);
+
+            // 单文字节点需要包裹一层text节点
+            if (isBaseTypeComponent(vnode)) {
+                vnode = createTextElement(vnode);
+            }
+            // 初始化vnode
             initVnodeTree(vnode);
             const diff = vnodeDiff(vnode, this.fristRender ? null : this.component.data.node);
             Naruse.$$debug && console.log(`组件 ${this.$$uid}, diff结果`, diff);
@@ -65,7 +74,7 @@ export class Middware {
                 this.onUpdated.call(self);
                 this.executeUpdateList();
             };
-            
+
             Naruse.$$debug && console.timeEnd(`组件 ${this.$$uid} diff 花费时间`);
             // console.log('new data', JSON.parse(JSON.stringify(vnode)));
             // console.log('old data', JSON.parse(JSON.stringify(this.component.data.node)));

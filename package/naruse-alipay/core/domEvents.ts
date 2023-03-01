@@ -191,11 +191,10 @@ export const eventCenter = function (event: { target?: any; currentTarget?: any,
 };
 
 
-
 /**
- * 获取小程序通用行为
+ * 获取事件所需对象
  */
-export const getMiniappEventBehavior = () => {
+export const getMethodsObject = () => {
     const methods: Record<string, any> = {};
     methodsTags.forEach((item) => {
         const eventName = transformFirstApha(item);
@@ -204,9 +203,16 @@ export const getMiniappEventBehavior = () => {
         };
         eventNameMap[item] = transformFirstApha(methodTagTransformMap[item] || item);
     })
+    return methods;
+}
+
+/**
+ * 获取小程序通用行为
+ */
+export const getMiniappEventBehavior = () => {
     return {
         props: { component: {} },
         data: { node: {} },
-        methods,
+        methods: getMethodsObject(),
     };
 }
