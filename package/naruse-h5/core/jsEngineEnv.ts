@@ -3,6 +3,7 @@ import { getDeferred, globalEvent, EventBus, initVersionLogger } from '../../nar
 import { run } from 'naruse-parser';
 import { Component, cloneElement, isValidElement, Children } from 'react';
 import api from '../api/index';
+import withPage from "./withPage";
 
 // @ts-ignore
 const version = __VERSION__;
@@ -25,7 +26,7 @@ export const Naruse = {
     EventBus,
     version,
     unsafe_run: run,
-    withPage: (Component) => Component,
+    withPage,
     cloneElement,
     isValidElement,
     Children,

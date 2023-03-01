@@ -8,6 +8,7 @@ import Text from './text/index'
 import View from './view/index'
 import ScrollView from './scroll-view/index'
 import Textarea from './textarea/index'
+import { getNaruseConfig } from "../core/init";
 
 /** 组件映射表 */
 const componentReflectMap = {
@@ -55,11 +56,12 @@ const rpxReg = /(\d+)\s?rpx/g;
 const parsePx = val => {
     if (typeof val !== 'string') return val;
     const matchRes = val.match(rpxReg);
+    const { convertRpx } = getNaruseConfig();
     if (!matchRes) return val;
     matchRes.forEach((item) => {
         const num = parseFloat(item);
         // 按照手机和电脑的比例进行换算
-        val = val.replace(item, `${(num / 2 * 1.4).toFixed(1)}px`);
+        val = val.replace(item, `${convertRpx(num)}px`);
     });
     return val;
 };
