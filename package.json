@@ -54,7 +54,7 @@
     "lodash": "^4.17.21",
     "mocha": "^10.0.0",
     "moment": "^2.29.1",
-    "naruse-parser": "^0.1.1",
+    "naruse-parser": "^0.1.2",
     "power-assert": "^1.6.1",
     "prejss": "^1.4.0",
     "react": "^16.14.0",

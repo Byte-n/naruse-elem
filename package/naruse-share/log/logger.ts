@@ -1,21 +1,19 @@
 
 const createLogger = (name) => {
-    const Logger = {
-        debug () {
-            console.debug(`[${name}][debugger]`, ...arguments);
+    return {
+        debug(...args) {
+            console.debug(`[${name}][debugger]`, ...args);
         },
-        warn () {
-            console.warn(`[${name}][warn]`, ...arguments);
+        warn(...args) {
+            console.warn(`[${name}][warn]`, ...args);
         },
-        info () {
-            console.info(`[${name}][info]`, ...arguments);
+        info(...args) {
+            console.info(`[${name}][info]`, ...args);
         },
-        error () {
-            console.error(`[${name}][error]`, ...arguments);
+        error(...args) {
+            console.error(`[${name}][error]`, ...args);
         },
-    }
-
-    return Logger;
+    };
 }
 
 export const initVersionLogger = (name, version) => {
