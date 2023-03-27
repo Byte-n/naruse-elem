@@ -7,12 +7,14 @@ import NaruseComponent from './component';
 import { naruseCreateElement } from './createElement';
 import { run } from 'naruse-parser';
 import * as elementApi from './element';
+import { Hooks } from './hooks';
 
 // @ts-ignore
 const version = __VERSION__;
 initVersionLogger('naruse-weex', version);
 
 const Naruse = {
+    ...Hooks,
     Component: NaruseComponent,
     createElement: naruseCreateElement,
     getDeferred,
