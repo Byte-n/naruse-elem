@@ -678,26 +678,57 @@ var Scope = /** @class */ (function () {
     return Scope;
 }());
 
-var _a;
+var _a, _b;
 var anonymousId = 0;
 var thisRunner;
 var illegalFun = [setTimeout, setInterval, clearInterval, clearTimeout];
 var isUndefinedOrNull = function (val) { return val === void 0 || val === null; };
-var evaluate_map = (_a = {},
-    _a[Program] = function (program, scope) {
-        var nonFunctionList = [];
-        var list = program.body;
-        for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
-            var node = list_1[_i];
-            // function 声明语句 会提升到作用域顶部
-            isPromoteStatement(node) ? evaluate(node, scope) : nonFunctionList.push(node);
+/**
+ * 提炼 for语句中的变量提升
+ * k: 语句
+ * v: 对应的属性名
+ */
+var RefineForPromoteNameMap = (_a = {},
+    _a[ForStatement] = 'init',
+    _a[ForInStatement] = 'left',
+    _a[ForOfStatement] = 'left',
+    _a);
+/**
+ * 提炼非函数声明语句，并执行函数声明语句 与 初始化 var 变量
+ */
+var refinePromteStatements = function (nodes, scope) {
+    var nonPromoteList = [];
+    for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
+        var node = nodes_1[_i];
+        // function 声明语句 提升到作用域顶部直接执行
+        if (isPromoteStatement(node)) {
+            evaluate(node, scope);
         }
-        for (var _a = 0, nonFunctionList_1 = nonFunctionList; _a < nonFunctionList_1.length; _a++) {
-            var node = nonFunctionList_1[_a];
+        else {
+            // 如果是 var 则需要先声明变量为 undefined
+            if (isVarPromoteStatement(node))
+                evaluate_map[VariableDeclaration](node, scope, true);
+            // for,forin,forof 循环中的 var 声明语句也需要提升
+            if (RefineForPromoteNameMap[node.type]) {
+                var initNode = node[RefineForPromoteNameMap[node.type]];
+                if (isVarPromoteStatement(initNode))
+                    evaluate_map[VariableDeclaration](initNode, scope, true);
+            }
+            nonPromoteList.push(node);
+        }
+    }
+    return nonPromoteList;
+};
+var evaluate_map = (_b = {},
+    _b[Program] = function (program, scope) {
+        var list = program.body;
+        var nonFunctionList = refinePromteStatements(list, scope);
+        for (var _i = 0, nonFunctionList_1 = nonFunctionList; _i < nonFunctionList_1.length; _i++) {
+            var node = nonFunctionList_1[_i];
             evaluate(node, scope);
         }
     },
-    _a[Identifier] = function (node, scope) {
+    _b[Identifier] = function (node, scope) {
         if (node.name === 'undefined') {
             return undefined;
         }
@@ -707,20 +738,15 @@ var evaluate_map = (_a = {},
         }
         throw createError(errorMessageList.notYetDefined, node.name, node, thisRunner.source);
     },
-    _a[Literal] = function (node) {
+    _b[Literal] = function (node) {
         return node.value;
     },
-    _a[BlockStatement] = function (block, scope) {
+    _b[BlockStatement] = function (block, scope) {
         return indexGeneratorStackDecorate(function (stackData) {
             var new_scope = scope.invasive ? scope : new Scope('block', scope);
             var list = block.body;
             // 非 function 声明语句
-            var nonFunctionList = [];
-            for (var _i = 0, list_2 = list; _i < list_2.length; _i++) {
-                var node = list_2[_i];
-                // 变量提升语句需要提升到作用域顶部执行
-                isPromoteStatement(node) ? evaluate(node, new_scope) : nonFunctionList.push(node);
-            }
+            var nonFunctionList = refinePromteStatements(list, new_scope);
             for (; stackData.index < nonFunctionList.length; stackData.index++) {
                 var node = nonFunctionList[stackData.index];
                 var result = evaluate(node, new_scope);
@@ -732,28 +758,30 @@ var evaluate_map = (_a = {},
             }
         }, scope);
     },
-    _a[EmptyStatement] = function () { },
-    _a[ExpressionStatement] = function (node, scope) {
+    _b[EmptyStatement] = function () { },
+    _b[ExpressionStatement] = function (node, scope) {
         return evaluate(node.expression, scope);
     },
-    _a[ReturnStatement] = function (node, scope) {
+    _b[ReturnStatement] = function (node, scope) {
         RETURN_SIGNAL.result = node.argument ? evaluate(node.argument, scope) : undefined;
         return RETURN_SIGNAL;
     },
-    _a[BreakStatement] = function () {
+    _b[BreakStatement] = function () {
         return BREAK_SIGNAL;
     },
-    _a[ContinueStatement] = function () {
+    _b[ContinueStatement] = function () {
         return CONTINUE_SIGNAL;
     },
-    _a[IfStatement] = function (node, scope) {
+    _b[IfStatement] = function (node, scope) {
         if (evaluate(node.test, scope))
             return evaluate(node.consequent, scope);
         else if (node.alternate)
             return evaluate(node.alternate, scope);
     },
-    _a[ForStatement] = function (node, scope) {
-        for (var new_scope = new Scope('loop', scope), init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
+    _b[ForStatement] = function (node, scope) {
+        for (var new_scope = new Scope('loop', scope), 
+        // 只有 var 变量才会被提高到上一作用域
+        init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
             var result = evaluate(node.body, new_scope);
             if (isReturnResult(result))
                 return result;
@@ -763,7 +791,7 @@ var evaluate_map = (_a = {},
                 break;
         }
     },
-    _a[FunctionDeclaration] = function (node, scope) {
+    _b[FunctionDeclaration] = function (node, scope) {
         var func = evaluate_map[FunctionExpression](node, scope);
         var func_name = (node.id || { name: "anonymous".concat(anonymousId++) }).name;
         if (!scope.$var(func_name, func)) {
@@ -771,14 +799,16 @@ var evaluate_map = (_a = {},
         }
         return func;
     },
-    _a[VariableDeclaration] = function (node, scope) {
+    _b[VariableDeclaration] = function (node, scope, isVarPromote) {
+        if (isVarPromote === void 0) { isVarPromote = false; }
         var kind = node.kind;
         return indexGeneratorStackDecorate(function (stackData) {
             var list = node.declarations;
             for (; stackData.index < list.length; stackData.index++) {
                 var declaration = list[stackData.index];
                 var id = declaration.id, init = declaration.init;
-                var value = init ? evaluate(init, scope) : undefined;
+                // 如果是变量提升语句，需要先声明一个 undefined 变量，等待后续的重新赋值语句
+                var value = !isVarPromote && init ? evaluate(init, scope) : undefined;
                 // 迭代器变量中断
                 if (isYieldResult(scope, value))
                     return value;
@@ -797,7 +827,7 @@ var evaluate_map = (_a = {},
             }
         }, scope);
     },
-    _a[ArrayPattern] = function (node, scope, kind, value) {
+    _b[ArrayPattern] = function (node, scope, kind, value) {
         var elements = node.elements;
         if (!Array.isArray(value)) {
             throw createError(errorMessageList.deconstructNotArray, value, node, thisRunner.source);
@@ -816,7 +846,7 @@ var evaluate_map = (_a = {},
             }
         });
     },
-    _a[ObjectPattern] = function (node, scope, kind, object) {
+    _b[ObjectPattern] = function (node, scope, kind, object) {
         var properties = node.properties;
         properties.forEach(function (property) {
             if (property.type === Property) {
@@ -834,7 +864,7 @@ var evaluate_map = (_a = {},
             }
         });
     },
-    _a[AssignmentPattern] = function (node, scope, kind, init) {
+    _b[AssignmentPattern] = function (node, scope, kind, init) {
         var left = node.left, right = node.right;
         var value = init === void 0 ? evaluate(right, scope) : init;
         if (left.type === Identifier) {
@@ -847,14 +877,14 @@ var evaluate_map = (_a = {},
             evaluate_map[left.type](left, scope, kind, value);
         }
     },
-    _a[ThisExpression] = function (node, scope) {
+    _b[ThisExpression] = function (node, scope) {
         var this_val = scope.$find('this');
         return this_val ? this_val.$get() : null;
     },
-    _a[ArrayExpression] = function (node, scope) {
+    _b[ArrayExpression] = function (node, scope) {
         return node.elements.map(function (item) { return item ? evaluate(item, scope) : null; });
     },
-    _a[ObjectExpression] = function (node, scope) {
+    _b[ObjectExpression] = function (node, scope) {
         var object = {};
         for (var _i = 0, _a = node.properties; _i < _a.length; _i++) {
             var property = _a[_i];
@@ -885,7 +915,7 @@ var evaluate_map = (_a = {},
         }
         return object;
     },
-    _a[FunctionExpression] = function (node, scope, isArrowFunction) {
+    _b[FunctionExpression] = function (node, scope, isArrowFunction) {
         if (isArrowFunction === void 0) { isArrowFunction = false; }
         var func;
         if (node.generator) {
@@ -971,7 +1001,7 @@ var evaluate_map = (_a = {},
         Object.defineProperty(func, "toString", { value: function () { return thisRunner.source.slice(node.start, node.end); }, configurable: true });
         return func;
     },
-    _a[UnaryExpression] = function (node, scope) {
+    _b[UnaryExpression] = function (node, scope) {
         var _a;
         var sk = 'typeof';
         return (_a = {
@@ -1012,7 +1042,7 @@ var evaluate_map = (_a = {},
             },
             _a)[node.operator]();
     },
-    _a[UpdateExpression] = function (node, scope) {
+    _b[UpdateExpression] = function (node, scope) {
         var prefix = node.prefix;
         var $var;
         if (node.argument.type === Identifier) {
@@ -1042,7 +1072,7 @@ var evaluate_map = (_a = {},
             '++': function (v) { return ($var.$set(v + 1), (prefix ? ++v : v++)); },
         })[node.operator](evaluate(node.argument, scope));
     },
-    _a[BinaryExpression] = function (node, scope) {
+    _b[BinaryExpression] = function (node, scope) {
         return ({
             '==': function (a, b) { return a == b; },
             '!=': function (a, b) { return a != b; },
@@ -1068,7 +1098,7 @@ var evaluate_map = (_a = {},
             instanceof: function (a, b) { return a instanceof b; },
         })[node.operator](evaluate(node.left, scope), evaluate(node.right, scope));
     },
-    _a[AssignmentExpression] = function (node, scope) {
+    _b[AssignmentExpression] = function (node, scope) {
         var $var;
         var left = node.left;
         if (left.type === Identifier) {
@@ -1113,26 +1143,26 @@ var evaluate_map = (_a = {},
             '&=': function (v) { return ($var.$set($var.$get() & v), $var.$get()); },
         })[node.operator](evaluate(node.right, scope));
     },
-    _a[LogicalExpression] = function (node, scope) {
+    _b[LogicalExpression] = function (node, scope) {
         return ({
             '||': function () { return evaluate(node.left, scope) || evaluate(node.right, scope); },
             '&&': function () { return evaluate(node.left, scope) && evaluate(node.right, scope); },
             '??': function () { var _a; return (_a = evaluate(node.left, scope)) !== null && _a !== void 0 ? _a : evaluate(node.right, scope); },
         })[node.operator]();
     },
-    _a[MemberExpression] = function (node, scope) {
+    _b[MemberExpression] = function (node, scope) {
         var object = node.object, property = node.property, computed = node.computed;
         if (computed) {
             return evaluate(object, scope)[evaluate(property, scope)];
         }
         return evaluate(object, scope)[property.name];
     },
-    _a[ConditionalExpression] = function (node, scope) {
+    _b[ConditionalExpression] = function (node, scope) {
         return (evaluate(node.test, scope)
             ? evaluate(node.consequent, scope)
             : evaluate(node.alternate, scope));
     },
-    _a[CallExpression] = function (node, scope) {
+    _b[CallExpression] = function (node, scope) {
         var this_val = null;
         var func = null;
         // fix: ww().ww().ww()
@@ -1156,12 +1186,12 @@ var evaluate_map = (_a = {},
             this_val = null;
         return func.apply(this_val, node.arguments.map(function (arg) { return evaluate(arg, scope); }));
     },
-    _a[NewExpression] = function (node, scope) {
+    _b[NewExpression] = function (node, scope) {
         var Func = evaluate(node.callee, scope);
         var args = node.arguments.map(function (arg) { return evaluate(arg, scope); });
         return new (Func.bind.apply(Func, __spreadArray([void 0], args, false)))();
     },
-    _a[SequenceExpression] = function (node, scope) {
+    _b[SequenceExpression] = function (node, scope) {
         var last;
         for (var _i = 0, _a = node.expressions; _i < _a.length; _i++) {
             var expr = _a[_i];
@@ -1169,10 +1199,10 @@ var evaluate_map = (_a = {},
         }
         return last;
     },
-    _a[ThrowStatement] = function (node, scope) {
+    _b[ThrowStatement] = function (node, scope) {
         throw evaluate(node.argument, scope);
     },
-    _a[TryStatement] = function (node, scope) {
+    _b[TryStatement] = function (node, scope) {
         try {
             return evaluate(node.block, scope);
         }
@@ -1193,10 +1223,10 @@ var evaluate_map = (_a = {},
                 return evaluate(node.finalizer, scope);
         }
     },
-    _a[CatchClause] = function (node, scope) {
+    _b[CatchClause] = function (node, scope) {
         return evaluate(node.body, scope);
     },
-    _a[SwitchStatement] = function (node, scope) {
+    _b[SwitchStatement] = function (node, scope) {
         var discriminant = evaluate(node.discriminant, scope);
         var new_scope = new Scope('switch', scope);
         var matched = false;
@@ -1218,7 +1248,7 @@ var evaluate_map = (_a = {},
             }
         }
     },
-    _a[SwitchCase] = function (node, scope) {
+    _b[SwitchCase] = function (node, scope) {
         for (var _i = 0, _a = node.consequent; _i < _a.length; _i++) {
             var stmt = _a[_i];
             var result = evaluate(stmt, scope);
@@ -1227,7 +1257,7 @@ var evaluate_map = (_a = {},
             }
         }
     },
-    _a[WhileStatement] = function (node, scope) {
+    _b[WhileStatement] = function (node, scope) {
         while (evaluate(node.test, scope)) {
             var new_scope = new Scope('loop', scope);
             new_scope.invasive = true;
@@ -1243,7 +1273,7 @@ var evaluate_map = (_a = {},
             }
         }
     },
-    _a[DoWhileStatement] = function (node, scope) {
+    _b[DoWhileStatement] = function (node, scope) {
         do {
             var new_scope = new Scope('loop', scope);
             new_scope.invasive = true;
@@ -1259,10 +1289,10 @@ var evaluate_map = (_a = {},
             }
         } while (evaluate(node.test, scope));
     },
-    _a[ArrowFunctionExpression] = function (node, scope) {
+    _b[ArrowFunctionExpression] = function (node, scope) {
         return evaluate_map[FunctionExpression](node, scope, true);
     },
-    _a[ForInStatement] = function (node, scope, isForOf) {
+    _b[ForInStatement] = function (node, scope, isForOf) {
         if (isForOf === void 0) { isForOf = false; }
         var kind = node.left.kind;
         var id = node.left.declarations[0].id;
@@ -1308,7 +1338,7 @@ var evaluate_map = (_a = {},
             }
         }
     },
-    _a[TemplateLiteral] = function (node, scope) {
+    _b[TemplateLiteral] = function (node, scope) {
         var result = node.quasis.map(function (quasi, index) {
             if (!quasi.tail)
                 return quasi.value.raw + evaluate(node.expressions[index], scope);
@@ -1316,17 +1346,17 @@ var evaluate_map = (_a = {},
         });
         return result.join('');
     },
-    _a[ImportExpression] = function (node, scope) {
+    _b[ImportExpression] = function (node, scope) {
         var source = evaluate(node.source, scope);
         var importer = scope.$find('$$import');
         if (!importer)
             throw createError(errorMessageList.notHasImport, '$$import', node, thisRunner.source);
         return importer.$get()(source);
     },
-    _a[ForOfStatement] = function (node, scope) {
+    _b[ForOfStatement] = function (node, scope) {
         return evaluate_map[ForInStatement](node, scope, true);
     },
-    _a[YieldExpression] = function (node, scope) {
+    _b[YieldExpression] = function (node, scope) {
         var _a;
         if (!isGeneratorFunction(scope))
             throw createError(errorMessageList.notGeneratorFunction, '', node, thisRunner.source);
@@ -1336,7 +1366,7 @@ var evaluate_map = (_a = {},
         YIELD_SIGNAL.result = evaluate(node.argument, scope);
         return YIELD_SIGNAL;
     },
-    _a);
+    _b);
 var _evaluate = function (node, scope) {
     var func = evaluate_map[node.type];
     if (!func)
@@ -1351,25 +1381,21 @@ var evaluate = function (node, scope, runner) {
     var thisId = thisRunner.traceId++;
     thisRunner.traceStack.push(thisId);
     try {
-        var res = _evaluate(node, scope);
-        thisRunner.traceStack.pop();
-        return res;
+        return _evaluate(node, scope);
     }
     catch (err) {
         // 错误已经冒泡到栈定了，触发错误收集处理
         if (thisRunner.traceStack[0] === thisId) {
             thisRunner.onError(err);
-            thisRunner.traceStack.pop();
         }
         // 错误已经处理过了，直接抛出
         if (err.isEvaluateError) {
             throw err;
         }
-        // 第一级错误，需要包裹处理
-        if (thisRunner.traceStack[thisRunner.traceStack.length - 1] === thisId) {
-            throw createError(errorMessageList.runTimeError, err === null || err === void 0 ? void 0 : err.message, node, thisRunner.source);
-        }
-        throw err;
+        throw createError(errorMessageList.runTimeError, err === null || err === void 0 ? void 0 : err.message, node, thisRunner.source);
+    }
+    finally {
+        thisRunner.traceStack.pop();
     }
 };
 
@@ -4464,6 +4490,379 @@ var naruseInit = function (_a) {
         _config.onRunError = onRunError;
 };
 
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  }, _typeof(obj);
+}
+
+var isProduction = process.env.NODE_ENV === 'production';
+var prefix = 'Invariant failed';
+function invariant(condition, message) {
+  if (condition) {
+    return;
+  }
+  if (isProduction) {
+    throw new Error(prefix);
+  }
+  throw new Error(prefix + ": " + (message || ''));
+}
+
+invariant(typeof Symbol === 'function' && Symbol["for"], 'react-class-hooks needs Symbols!');
+
+// Separate objects for better debugging.
+var MAGIC_STATES = Symbol["for"]('States');
+var MAGIC_EFFECTS = Symbol["for"]('Effects');
+var MAGIC_MEMOS = Symbol["for"]('Memos');
+var MAGIC_REFS = Symbol["for"]('Refs');
+var MAGIC_STACKS = Symbol["for"]('Stacks');
+var mustFristInit = function mustFristInit() {
+  throw new Error('You must call reactLikeHooksInit first!');
+};
+var defaultConfig = {
+  isOrginReact: false,
+  getDispatcher: mustFristInit,
+  getSelfComponent: mustFristInit
+};
+function getMagicSelf() {
+  invariant(defaultConfig.getSelfComponent(), 'You are using Hooks outside of "render" Component Method!');
+  return defaultConfig.getSelfComponent();
+}
+function checkSymbol(name, keySymbol) {
+  invariant(_typeof(keySymbol) === 'symbol', "".concat(name, " - Expected a Symbol for key!"));
+}
+
+/**
+ * @description 初始化 react like hooks
+ * @author CHC
+ * @date 2023-03-22 20:03:49
+ * @param {*} FacotoryObject
+ * @param {*} specialCurrentObjectPath
+ * @param {boolean} [isOrginReact=false]
+ */
+var reactLikeHooksInit = function reactLikeHooksInit(_ref) {
+  var getDispatcher = _ref.getDispatcher,
+    getSelfComponent = _ref.getSelfComponent,
+    _ref$isOrginReact = _ref.isOrginReact,
+    isOrginReact = _ref$isOrginReact === void 0 ? false : _ref$isOrginReact;
+  defaultConfig.getDispatcher = getDispatcher;
+  defaultConfig.getSelfComponent = getSelfComponent;
+  defaultConfig.isOrginReact = isOrginReact;
+};
+
+/**
+ *  https://github.com/salvoravida/react-class-hooks
+ */
+function MagicStack(StackName) {
+  var _this = this;
+  this.name = StackName;
+  this.symbol = Symbol("".concat(this.name, ".Stack"));
+  // this.cleanSymbol = Symbol(`${this.name}.Stack.Cleaner`);
+  this.keys = [];
+  this.getKey = function (stackIndex) {
+    var len = _this.keys.length;
+    // create if not exist
+    if (stackIndex > len) {
+      for (var i = len; i < stackIndex; i += 1) _this.keys.push(Symbol("".concat(_this.name, "-").concat(i)));
+    }
+    return _this.keys[stackIndex - 1];
+  };
+}
+function useMagicStack(magicStack, hook) {
+  // inject next renders stack counter cleaner
+  var self = getMagicSelf();
+  if (!self[MAGIC_STACKS]) {
+    self[MAGIC_STACKS] = {};
+    var renderFunc = self.render.bind(self);
+    self.render = function () {
+      Object.getOwnPropertySymbols(self[MAGIC_STACKS]).forEach(function (k) {
+        self[MAGIC_STACKS][k] = 0;
+      });
+      return renderFunc.apply(void 0, arguments);
+    };
+  }
+
+  // stack counter init
+  if (!self[MAGIC_STACKS][magicStack.symbol]) {
+    self[MAGIC_STACKS][magicStack.symbol] = 0;
+  }
+
+  // stack counter update
+  self[MAGIC_STACKS][magicStack.symbol] += 1;
+  for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+    args[_key - 2] = arguments[_key];
+  }
+  return hook.apply(void 0, [magicStack.getKey(self[MAGIC_STACKS][magicStack.symbol])].concat(args));
+}
+
+function createHook(stackName, hook) {
+  var stack = new MagicStack(stackName);
+  return function () {
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+    if (args && args.length && _typeof(args[0]) === 'symbol') return hook.apply(void 0, args);
+    return useMagicStack.apply(void 0, [stack, hook].concat(args));
+  };
+}
+function createNamedHook(name, hook) {
+  var keySymbol = Symbol(name);
+  return hook.bind(null, keySymbol);
+}
+
+function setDevToolsHookState(name, state) {
+}
+
+/**
+ *  https://github.com/salvoravida/react-class-hooks
+ */
+function useClassStateKey(keySymbol, initialValue) {
+  checkSymbol('useClassStateKey', keySymbol);
+  var self = getMagicSelf();
+
+  // first time Render && first Hook
+  if (!self[MAGIC_STATES]) self[MAGIC_STATES] = {};
+
+  // first time Render -> assign initial Value and create Setter
+  if (!self[MAGIC_STATES].hasOwnProperty(keySymbol)) {
+    self[MAGIC_STATES][keySymbol] = {
+      value: typeof initialValue === 'function' ? initialValue() : initialValue,
+      setValue: function setValue(value, callback) {
+        var newState = typeof value === 'function' ? value(self[MAGIC_STATES][keySymbol].value) : value;
+        if (self[MAGIC_STATES][keySymbol].value !== newState) {
+          self[MAGIC_STATES][keySymbol].value = newState;
+          if (self.updater.isMounted(self)) {
+            self.updater.enqueueForceUpdate(self, callback);
+          }
+        }
+      }
+    };
+  }
+  var _self$MAGIC_STATES$ke = self[MAGIC_STATES][keySymbol],
+    value = _self$MAGIC_STATES$ke.value,
+    setValue = _self$MAGIC_STATES$ke.setValue;
+  setDevToolsHookState(keySymbol.description);
+  return [value, setValue];
+}
+
+/**
+ *  https://github.com/salvoravida/react-class-hooks
+ */
+var useClassState = createHook('States', useClassStateKey);
+useClassState.create = function (name) {
+  return createNamedHook(name, useClassStateKey);
+};
+useClassState.createStack = function (stackName) {
+  return createHook(stackName, useClassStateKey);
+};
+
+function inputsArrayEqual(inputs, prevInputs) {
+  invariant(inputs.length === prevInputs.length, 'Hooks inputs array length should be constant between renders!');
+
+  // Object.is polyfill
+  for (var i = 0; i < inputs.length; i += 1) {
+    var val1 = inputs[i];
+    var val2 = prevInputs[i];
+    if (!(val1 === val2 && (val1 !== 0 || 1 / val1 === 1 / val2) || val1 !== val1 && val2 !== val2)) {
+      // eslint-disable-line
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ *  https://github.com/salvoravida/react-class-hooks
+ */
+var useClassEffectKey = function useClassEffectKey(keySymbol, creator, inputs) {
+  var onlyDidUpdate = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  checkSymbol('useClassEffect', keySymbol);
+  invariant(typeof creator === 'function', 'Creator should be a function!');
+  invariant(!inputs || Array.isArray(inputs), 'inputs should be an array!');
+  var self = getMagicSelf();
+
+  // create MAGIC_EFFECTS if not exists
+  if (!self[MAGIC_EFFECTS]) self[MAGIC_EFFECTS] = {};
+
+  // First Render -> Assign creator, inputs and inject methods
+  // TODO didCatch
+  if (!self[MAGIC_EFFECTS].hasOwnProperty(keySymbol)) {
+    self[MAGIC_EFFECTS][keySymbol] = {
+      creator: creator,
+      inputs: inputs
+    };
+    if (!onlyDidUpdate) {
+      // inject componentDidMount
+      var didMount = typeof self.componentDidMount === 'function' ? self.componentDidMount.bind(self) : undefined;
+      self.componentDidMount = function () {
+        if (didMount) didMount();
+        self[MAGIC_EFFECTS][keySymbol].cleaner = self[MAGIC_EFFECTS][keySymbol].creator();
+        // save last executed inputs
+        self[MAGIC_EFFECTS][keySymbol].prevInputs = self[MAGIC_EFFECTS][keySymbol].inputs;
+        invariant(!self[MAGIC_EFFECTS][keySymbol].cleaner || typeof self[MAGIC_EFFECTS][keySymbol].cleaner === 'function', 'useClassEffect return (Effect Cleaner) should be Function or Void !');
+      };
+    }
+
+    // inject componentDidUpdate
+    var didUpdate = typeof self.componentDidUpdate === 'function' ? self.componentDidUpdate.bind(self) : undefined;
+    self.componentDidUpdate = function () {
+      if (didUpdate) didUpdate.apply(void 0, arguments);
+
+      // execute if no inputs || inputs array has values and values changed
+      var execute = !self[MAGIC_EFFECTS][keySymbol].inputs || !inputsArrayEqual(self[MAGIC_EFFECTS][keySymbol].inputs, self[MAGIC_EFFECTS][keySymbol].prevInputs);
+      if (execute) {
+        if (typeof self[MAGIC_EFFECTS][keySymbol].cleaner === 'function') self[MAGIC_EFFECTS][keySymbol].cleaner();
+        self[MAGIC_EFFECTS][keySymbol].cleaner = self[MAGIC_EFFECTS][keySymbol].creator();
+        // save last executed inputs!
+        self[MAGIC_EFFECTS][keySymbol].prevInputs = self[MAGIC_EFFECTS][keySymbol].inputs;
+        invariant(!self[MAGIC_EFFECTS][keySymbol].cleaner || typeof self[MAGIC_EFFECTS][keySymbol].cleaner === 'function', 'useClassEffect return (Effect Cleaner) should be Function or Void !');
+      }
+    };
+
+    // inject componentWillUnmount
+    var unmount = typeof self.componentWillUnmount === 'function' ? self.componentWillUnmount.bind(self) : undefined;
+    self.componentWillUnmount = function () {
+      if (unmount) unmount();
+      if (typeof self[MAGIC_EFFECTS][keySymbol].cleaner === 'function') self[MAGIC_EFFECTS][keySymbol].cleaner();
+    };
+  } else {
+    // next renders
+    self[MAGIC_EFFECTS][keySymbol].creator = creator;
+    self[MAGIC_EFFECTS][keySymbol].inputs = inputs;
+  }
+};
+
+var useClassEffect = createHook('Effects', useClassEffectKey);
+useClassEffect.create = function (name) {
+  return createNamedHook(name, useClassEffectKey);
+};
+useClassEffect.createStack = function (stackName) {
+  return createHook(stackName, useClassEffectKey);
+};
+
+/**
+ *  https://github.com/salvoravida/react-class-hooks
+ */
+var useClassMemoKey = function useClassMemoKey(keySymbol, creator, inputs) {
+  checkSymbol('useClassMemo', keySymbol);
+  invariant(typeof creator === 'function', 'Creator should be a function!');
+  invariant(!inputs || Array.isArray(inputs), 'inputs should be an array!');
+  var self = getMagicSelf();
+
+  // create magic Memos if not exists
+  if (!self[MAGIC_MEMOS]) self[MAGIC_MEMOS] = {};
+
+  // First Render -> assign creator, inputs, value
+  if (!self[MAGIC_MEMOS].hasOwnProperty(keySymbol)) {
+    self[MAGIC_MEMOS][keySymbol] = {
+      creator: creator,
+      inputs: inputs,
+      value: creator()
+    };
+  } else {
+    // next renders
+    var execute = false;
+    if (!inputs) {
+      if (creator !== self[MAGIC_MEMOS][keySymbol].creator) {
+        execute = true;
+      }
+    } else {
+      execute = !inputsArrayEqual(inputs, self[MAGIC_MEMOS][keySymbol].inputs);
+    }
+    if (execute) {
+      self[MAGIC_MEMOS][keySymbol] = {
+        creator: creator,
+        inputs: inputs,
+        value: creator()
+      };
+    }
+  }
+  var returnValue = self[MAGIC_MEMOS][keySymbol].value;
+  setDevToolsHookState(keySymbol.description);
+  return returnValue;
+};
+var useClassMemo = createHook('Memos', useClassMemoKey);
+useClassMemo.create = function (name) {
+  return createNamedHook(name, useClassMemoKey);
+};
+useClassMemo.createStack = function (stackName) {
+  return createHook(stackName, useClassMemoKey);
+};
+
+/**
+ *  https://github.com/salvoravida/react-class-hooks
+ */
+function useClassCallbackKey(keySymbol, callback, inputs) {
+  return useClassMemoKey(keySymbol, function () {
+    return callback;
+  }, inputs);
+}
+var useClassCallback = createHook('Callbacks', useClassCallbackKey);
+useClassCallback.create = function (name) {
+  return createNamedHook(name, useClassCallbackKey);
+};
+useClassCallback.createStack = function (stackName) {
+  return createHook(stackName, useClassCallbackKey);
+};
+
+/**
+ *  https://github.com/salvoravida/react-class-hooks
+ */
+var useClassReducerKey = function useClassReducerKey(keySymbol, reducer, initialState) {
+  var stateSetState = useClassStateKey(keySymbol, initialState);
+  var state = stateSetState[0];
+  var setState = stateSetState[1];
+  function dispatch(action) {
+    var nextState = reducer(state, action);
+    setState(nextState);
+  }
+  return [state, dispatch];
+};
+var useClassReducer = createHook('Reducers', useClassReducerKey);
+useClassReducer.create = function (name) {
+  return createNamedHook(name, useClassReducerKey);
+};
+
+/**
+ *  https://github.com/salvoravida/react-class-hooks
+ */
+function useClassRefKey(keySymbol, initialValue) {
+  checkSymbol('useClassRefKey', keySymbol);
+  var self = getMagicSelf();
+
+  // first time Render && first Hook
+  if (!self[MAGIC_REFS]) self[MAGIC_REFS] = {};
+
+  // first time Render -> assign initial Value
+  if (!self[MAGIC_REFS].hasOwnProperty(keySymbol)) {
+    var ref = {
+      current: initialValue
+    };
+    Object.seal(ref);
+    self[MAGIC_REFS][keySymbol] = ref;
+  }
+  var returnValue = self[MAGIC_REFS][keySymbol];
+  setDevToolsHookState(keySymbol.description);
+  return returnValue;
+}
+
+/**
+ *  https://github.com/salvoravida/react-class-hooks
+ */
+var useClassRef = createHook('Refs', useClassRefKey);
+useClassRef.create = function (name) {
+  return createNamedHook(name, useClassRefKey);
+};
+useClassRef.createStack = function (stackName) {
+  return createHook(stackName, useClassRefKey);
+};
+
+var useClassLayoutEffect = useClassEffect;
+
 /**
  * @description naruseComponent 实现
  * @author CHC
@@ -4476,32 +4875,35 @@ var NaruseComponent = /** @class */ (function () {
         this.props = props;
         this.$mounted = false;
         // 中间件实例
-        this.$updater = null;
+        this.updater = null;
     }
     NaruseComponent.prototype.setState = function (update, callback) {
         if (callback === void 0) { callback = NOOP; }
-        if (!this.$updater) {
+        if (!this.updater) {
+            // @ts-ignore
             logger.error('小程序组件未装载完毕，无法更新！');
             return;
         }
         if (typeof update !== 'object') {
+            // @ts-ignore
             logger.error('setState 不支持的数据格式！', update);
             return;
         }
         if (this.state === update)
             return;
         var newState = __assign(__assign({}, this.state), update);
-        var flag = this.$updater.shouldUpdate(this.props, newState);
+        var flag = this.updater.shouldUpdate(this.props, newState);
         this.state = newState;
-        flag && this.$updater.update(callback);
+        flag && this.updater.enqueueUpdate(callback);
     };
     NaruseComponent.prototype.forceUpdate = function (callback) {
         if (callback === void 0) { callback = NOOP; }
-        if (!this.$updater) {
+        if (!this.updater) {
+            // @ts-ignore
             logger.error('小程序组件未装载完毕，无法更新！');
             return;
         }
-        this.$updater.update(callback);
+        this.updater.enqueueUpdate(callback);
     };
     // @ts-ignore
     NaruseComponent.prototype.shouldComponentUpdate = function () { };
@@ -4510,10 +4912,49 @@ var NaruseComponent = /** @class */ (function () {
     NaruseComponent.prototype.componentWillUnmount = function () { };
     // @ts-ignore
     NaruseComponent.prototype.render = function () { };
+    NaruseComponent.$isNaruseComponent = true;
     return NaruseComponent;
 }());
+/**
+ * 与环境相关的全局变量
+ */
+var __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = {
+    /** naruse 渲染时留下的全局渲染变量 */
+    NaruseCurrentOwner: {
+        current: null
+    }
+};
+// 初始化
+reactLikeHooksInit({
+    getSelfComponent: function () { return __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.NaruseCurrentOwner.current; },
+    getDispatcher: function () { return null; },
+});
+var Hooks = {
+    useCallback: useClassCallback,
+    useEffect: useClassEffect,
+    useLayoutEffect: useClassLayoutEffect,
+    useMemo: useClassMemo,
+    useReducer: useClassReducer,
+    useState: useClassState,
+    useRef: useClassRef
+};
 /** 判断是否是NaruseComponent */
 var isNaruseComponent = function (obj) { return obj instanceof NaruseComponent; };
+/**
+ * 将函数组件转换为类组件
+ */
+var functionalizae = function (fn) {
+    return /** @class */ (function (_super) {
+        __extends$1(class_1, _super);
+        function class_1() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        class_1.prototype.render = function () {
+            return fn(this.props);
+        };
+        return class_1;
+    }(NaruseComponent));
+};
 
 /**
  * @description 简单的o(n^2)diff操作，记录需要更新的node
@@ -4794,7 +5235,7 @@ var createBaseElement = function (type, props, childNodes) {
  * @date 2022-03-15 12:03:45
  */
 var createFuncElement = function (type, props, childNodes) {
-    return type(__assign(__assign({}, props), { children: childNodes }));
+    return createClassElement(functionalizae(type), props, childNodes);
 };
 var Fragment = function (props) {
     var childNodes = props.children;
@@ -5086,7 +5527,7 @@ var withPage = function (component) {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         class_1.prototype.render = function () {
-            var page = getPageInstance(this.$updater && this.$updater.component);
+            var page = getPageInstance(this.updater && this.updater.component);
             var currentPage = {
                 route: page.route,
                 events: {
@@ -5286,6 +5727,10 @@ var methodTagTransformMap = {
     'longTap': 'longClick'
 };
 var transformFirstApha = function (item) { return 'on' + item.slice(0, 1).toLocaleUpperCase() + item.slice(1); };
+// 处理事件映射表
+methodsTags.forEach(function (tag) {
+    eventNameMap[tag] = transformFirstApha(methodTagTransformMap[tag] || tag);
+});
 /**
  * @description 事件处理中心
  * @author CHC
@@ -5344,15 +5789,11 @@ var eventCenter = function (event, nodeTree) {
  * 获取事件所需对象
  */
 var getMethodsObject = function () {
-    var methods = {};
-    methodsTags.forEach(function (item) {
-        var eventName = transformFirstApha(item);
-        methods[eventName] = function (props) {
-            eventCenter(props, this.data.node);
-        };
-        eventNameMap[item] = transformFirstApha(methodTagTransformMap[item] || item);
-    });
-    return methods;
+    return {
+        ec: function (event) {
+            eventCenter.call(null, event, this.data.node);
+        },
+    };
 };
 /**
  * 获取小程序通用行为
@@ -5375,73 +5816,133 @@ var uid = 0;
  */
 var Middware = /** @class */ (function () {
     function Middware(miniappComponent, NaruseComponentActuator, props) {
+        var _this = this;
+        /** 唯一id */
         this.$$uid = uid++;
+        /** 是否是首次渲染 */
         this.fristRender = true;
+        /** 是否正在更新的标志 */
         this.updating = false;
+        /** 更新完毕的回调队列 */
         this.callbackList = [];
+        /** 最近重新刷新的次数 */
+        this.$updateCount = 0;
         /** diff修改队列 */
         this.diffQueue = {};
+        /**
+         * 判断是否已经挂载
+         */
+        this.isMounted = function () {
+            return _this.naruseComponent.$mounted;
+        };
+        /** 与 React Api 保持一致 */
+        this.enqueueForceUpdate = this.enqueueUpdate;
+        /** 更新后 */
+        this.onUpdated = function () {
+            if (!_this.naruseComponent)
+                return;
+            if (_this.fristRender)
+                _this.naruseComponent.$mounted = true;
+            var funcName = _this.fristRender ? 'componentDidMount' : 'componentDidUpdate';
+            _this.naruseComponent[funcName] && _this.naruseComponent[funcName]();
+            _this.fristRender = false;
+        };
         this.props = props;
         this.component = miniappComponent;
         if (NaruseComponentActuator instanceof NaruseComponent) {
             this.naruseComponent = NaruseComponentActuator;
         }
-        else {
+        else if (NaruseComponentActuator.$isNaruseComponent === true) {
             this.naruseComponent = new NaruseComponentActuator(props);
             this.naruseComponent.props = props;
         }
-        this.naruseComponent.$updater = this;
+        else if (typeof NaruseComponentActuator === 'function') {
+            var newClass = functionalizae(NaruseComponentActuator);
+            this.naruseComponent = new newClass(props);
+        }
+        this.naruseComponent.updater = this;
     }
-    /** 执行更新 */
-    Middware.prototype.update = function (callback) {
+    /** 进入更新队列在下一个时刻准备更新 */
+    Middware.prototype.enqueueUpdate = function (callback, callbackMaybe) {
         var _this = this;
         if (callback === void 0) { callback = NOOP; }
-        var self = this;
+        if (callbackMaybe === void 0) { callbackMaybe = NOOP; }
+        // @ts-ignore
+        // polyfill react-like-hooks
+        if (callback === this) {
+            callback = callbackMaybe;
+        }
         this.callbackList.push(callback);
         !this.updating && Promise.resolve().then(function () {
             _this.updating = false;
-            // fix: maybe has unmounted
-            if (!_this.naruseComponent) {
-                logger.error('you are updating a has unmounted component, please check you code');
-                return;
-            }
-            if (!_this.naruseComponent.render) {
-                logger.error('the NaruseComponent must have a render function');
-                return;
-            }
-            // 开始渲染
-            var vnode = _this.naruseComponent.render();
-            // 计时
-            Naruse.$$debug && console.time("\u7EC4\u4EF6 ".concat(_this.$$uid, " diff \u82B1\u8D39\u65F6\u95F4"));
-            // 单文字节点需要包裹一层text节点
-            if (isBaseTypeComponent(vnode)) {
-                vnode = createTextElement(vnode);
-            }
-            // 初始化vnode
-            initVnodeTree(vnode);
-            var diff = vnodeDiff(vnode, _this.fristRender ? null : _this.component.data.node);
-            Naruse.$$debug && console.log("\u7EC4\u4EF6 ".concat(_this.$$uid, ", diff\u7ED3\u679C"), diff);
-            var updatedCallBack = function () {
-                Naruse.$$debug && console.timeEnd("\u7EC4\u4EF6 ".concat(_this.$$uid, " setData \u82B1\u8D39\u65F6\u95F4"));
-                // console.log('data', JSON.parse(JSON.stringify(this.component.data.node)));
-                _this.lastUpdateNode = vnode;
-                _this.onUpdated.call(self);
-                _this.executeUpdateList();
-            };
-            Naruse.$$debug && console.timeEnd("\u7EC4\u4EF6 ".concat(_this.$$uid, " diff \u82B1\u8D39\u65F6\u95F4"));
-            // console.log('new data', JSON.parse(JSON.stringify(vnode)));
-            // console.log('old data', JSON.parse(JSON.stringify(this.component.data.node)));
-            // console.log('diff data', JSON.parse(JSON.stringify(diff)));
-            Naruse.$$debug && console.time("\u7EC4\u4EF6 ".concat(_this.$$uid, " setData \u82B1\u8D39\u65F6\u95F4"));
-            // diff 存在结果才会重新渲染
-            if (!isEmptyObj(diff)) {
-                _this.component.setData(diff, updatedCallBack);
-            }
-            else {
-                updatedCallBack();
-            }
+            _this.update();
         });
         this.updating = true;
+    };
+    /**
+     * 直接更新，不进入队列
+     */
+    Middware.prototype.update = function () {
+        var _this = this;
+        this.checkExecessiveUpdate();
+        // fix: maybe has unmounted
+        if (!this.naruseComponent) {
+            // @ts-ignore
+            logger.error('you are updating a has unmounted component, please check you code');
+            return;
+        }
+        if (!this.naruseComponent.render) {
+            // @ts-ignore
+            logger.error('the NaruseComponent must have a render function');
+            return;
+        }
+        // 注入当前组件
+        var extrnalCurrentOwner = Naruse.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.NaruseCurrentOwner;
+        extrnalCurrentOwner.current = this.naruseComponent;
+        // 开始渲染
+        var vnode = this.naruseComponent.render();
+        // 取消注入
+        extrnalCurrentOwner.current = null;
+        // 计时
+        Naruse.$$debug && console.time("\u7EC4\u4EF6 ".concat(this.$$uid, " diff \u82B1\u8D39\u65F6\u95F4"));
+        // 单文字节点需要包裹一层text节点
+        if (isBaseTypeComponent(vnode))
+            vnode = createTextElement(vnode);
+        // 初始化vnode
+        initVnodeTree(vnode);
+        var diff = vnodeDiff(vnode, this.fristRender ? null : this.component.data.node);
+        Naruse.$$debug && console.log("\u7EC4\u4EF6 ".concat(this.$$uid, ", diff\u7ED3\u679C"), diff);
+        var updatedCallBack = function () {
+            Naruse.$$debug && console.timeEnd("\u7EC4\u4EF6 ".concat(_this.$$uid, " setData \u82B1\u8D39\u65F6\u95F4"));
+            _this.lastUpdateNode = vnode;
+            _this.onUpdated.call(self);
+            _this.executeUpdateList();
+        };
+        Naruse.$$debug && console.timeEnd("\u7EC4\u4EF6 ".concat(this.$$uid, " diff \u82B1\u8D39\u65F6\u95F4"));
+        Naruse.$$debug && console.time("\u7EC4\u4EF6 ".concat(this.$$uid, " setData \u82B1\u8D39\u65F6\u95F4"));
+        // diff 存在结果才会重新渲染
+        if (!isEmptyObj(diff)) {
+            this.component.setData(diff, updatedCallBack);
+        }
+        else {
+            updatedCallBack();
+        }
+    };
+    /**
+     * 检查短时间内 (50ms内) 是否更新超过20次 有过多的更新，如果存在则报错
+     */
+    Middware.prototype.checkExecessiveUpdate = function () {
+        var now = Date.now();
+        if (now - this.lastUpdatedTime < 50) {
+            this.$updateCount++;
+        }
+        else {
+            this.$updateCount = 0;
+        }
+        this.lastUpdatedTime = now;
+        if (this.$updateCount > 20) {
+            throw new Error('too many re-renders. Naruse limits the number of renders to prevent an infinite loop.');
+        }
     };
     /** 按序执行callbackList中的函数，非函数不执行 */
     Middware.prototype.executeUpdateList = function () {
@@ -5451,16 +5952,6 @@ var Middware = /** @class */ (function () {
             }
         });
         this.callbackList.length = 0;
-    };
-    /** 更新后 */
-    Middware.prototype.onUpdated = function () {
-        if (!this.naruseComponent)
-            return;
-        var funcName = this.fristRender ? 'componentDidMount' : 'componentDidUpdate';
-        this.naruseComponent[funcName] && this.naruseComponent[funcName]();
-        if (this.fristRender)
-            this.naruseComponent.$mounted = true;
-        this.fristRender = false;
     };
     /** 父组件更新后是否需要更新子组件 */
     Middware.prototype.canUpdate = function (prevProps) {
@@ -5491,7 +5982,7 @@ var Middware = /** @class */ (function () {
         }
         // fix: 修复naruseComponent为空的情况
         if (this.naruseComponent) {
-            this.naruseComponent.$updater = null;
+            this.naruseComponent.updater = null;
         }
         this.naruseComponent = null;
     };
@@ -5543,12 +6034,12 @@ var apis = initNaruseAlipayApi();
 var version = "0.4.6";
 initVersionLogger('naruse-alipay', version);
 // naruse模块内容
-var Naruse = __assign(__assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: createElement, h: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
+var Naruse = __assign(__assign(__assign(__assign(__assign(__assign(__assign({}, Hooks), { Component: NaruseComponent, createElement: createElement, h: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
         clientName: 'alipay',
         clientVersion: version,
         language: 'zh-Hans',
         platform: 'alipay',
-    }, version: version }, my), apis), { withPage: withPage, unsafe_run: run, $$debug: false }), elementApi), { createMiniFactory: createMiniFactory, Fragment: Fragment });
+    }, version: version }), my), apis), { withPage: withPage, unsafe_run: run, $$debug: false }), elementApi), { createMiniFactory: createMiniFactory, Fragment: Fragment, __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED });
 var naruseExtend = function (opt) {
     if (typeof opt === 'object') {
         Object.assign(Naruse, opt);
