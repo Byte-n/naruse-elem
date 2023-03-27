@@ -136,6 +136,12 @@ const methodTagTransformMap: Record<string, string> = {
 
 const transformFirstApha = (item: string) => 'on' + item.slice(0, 1).toLocaleUpperCase() + item.slice(1)
 
+// 处理事件映射表
+methodsTags.forEach((tag) => {
+    eventNameMap[tag] = transformFirstApha(methodTagTransformMap[tag] || tag);
+});
+
+
 /**
  * @description 事件处理中心
  * @author CHC
@@ -191,19 +197,17 @@ export const eventCenter = function (event: { target?: any; currentTarget?: any,
 };
 
 
+
+
 /**
  * 获取事件所需对象
  */
 export const getMethodsObject = () => {
-    const methods: Record<string, any> = {};
-    methodsTags.forEach((item) => {
-        const eventName = transformFirstApha(item);
-        methods[eventName] = function (props: any) {
-            eventCenter(props, this.data.node);
-        };
-        eventNameMap[item] = transformFirstApha(methodTagTransformMap[item] || item);
-    })
-    return methods;
+    return {
+        ec (event: any) {
+            eventCenter.call(null, event, this.data.node);
+        },
+    }
 }
 
 /**
