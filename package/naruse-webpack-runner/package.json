@@ -4,7 +4,9 @@
   "description": "naruse-webpack-runner",
   "main": "index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc -w",
+    "dev:demo": "node ./index.js"
   },
   "author": "SHIROHA",
   "dependencies": {
