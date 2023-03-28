@@ -3,6 +3,13 @@ import { getNaruseConfig } from './init';
 import { logger } from './uitl';
 import { createElement } from './createElement';
 import { Naruse } from './naurse';
+import {
+    AdRunningContext, PluginApplyParams,
+    pluginEvent,
+    PluginMethod,
+    PluginOnErrorParams,
+    RunningCodeErrorSource
+} from '../../naruse-share/index';
 
 /**
  * @description 根据props获取naruse组件
@@ -33,23 +40,34 @@ export const getNaruseComponentFromProps = async (props: any) => {
  * @param {*} ctx
  * @returns {*} 
  */
-export const getNaruseComponentFromCode = async (code: string, ctx: {}) => {
+export const getNaruseComponentFromCode = async (code: string, ctx: AdRunningContext | {}) => {
     if (!code) return;
-    const {  baseCtx: _baseCtx, onRunError } = getNaruseConfig();
-    const baseCtx = typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx;
+    const naruseConfig = getNaruseConfig();
+    const {  baseCtx: _baseCtx, onRunError } = naruseConfig;
+    const baseCtx = <AdRunningContext>(typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx);
+    const context: AdRunningContext = {
+        h: createElement,
+        Naruse,
+        // @ts-ignore
+        my: typeof my === 'object' ? my : {},
+        ...baseCtx,
+        ...ctx,
+    };
+    const onError = (source: RunningCodeErrorSource, error: Error) => {
+        const params: PluginOnErrorParams = { config: naruseConfig, context, error, source };
+        pluginEvent.emit(PluginMethod.onError, params);
+        onRunError(error, source);
+    }
+    // 触发插件的生命周期 apply
+    const params: PluginApplyParams = { config: naruseConfig, context };
+    pluginEvent.emit(PluginMethod.apply, params);
     // 导出变量
     let exports: Record<string, any> = {};
     try {
-        exports = run(code, {
-            h: createElement,
-            Naruse,
-            my: typeof my === 'object' ? my : {},
-            ...baseCtx,
-            ...ctx,
-        });
+        exports = run(code, context, onError.bind(null, RunningCodeErrorSource.errorCenter));
     } catch (err) {
         logger.error('运行时出错，自动继续', err);
-        onRunError(err);
+        onError(RunningCodeErrorSource.tryCatch, err);
         return;
     }
     let component = null;

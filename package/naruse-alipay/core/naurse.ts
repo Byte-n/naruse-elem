@@ -28,6 +28,7 @@ export const Naruse = {
         platform: 'alipay',
     },
     version,
+    // @ts-ignore
     ...my,
     ...apis,
     withPage,
@@ -45,4 +46,5 @@ export const naruseExtend = (opt: any) => {
     }
 }
 
+// @ts-ignore
 my.Naruse = Naruse;

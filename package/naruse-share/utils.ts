@@ -31,7 +31,19 @@ export const isEmpty = (key) => {
     }
 };
 
-
+/** 移除对象的中空值 */
+export function removeObjectNullValue (obj) {
+    if (typeof obj !== 'object' || obj === null) {
+        return obj;
+    }
+    Object.keys(obj)
+        .forEach(k => {
+            if (isEmpty(obj[k])) {
+                delete obj[k];
+            }
+        });
+    return obj;
+}
 /**
  * @description 判断是否是函数
  * @author CHC
