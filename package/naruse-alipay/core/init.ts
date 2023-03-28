@@ -1,6 +1,7 @@
 import { logger } from "./uitl";
+import { NaruseConfig, NaruseInitParams } from '../../naruse-share/index';
 
-const _config = {
+const _config: NaruseConfig = {
     hotPuller: () => {
         logger.error('未初始化热更新拉取，无法更新组件默认为空');
         return Promise.resolve({ code: '', ctx: {} });
@@ -28,7 +29,8 @@ const getNaruseConfig = () => {
  * @author CHC
  * @date 2022-06-14 10:06:36
  */
-const naruseInit = ({ hotPuller, baseCtx, onRunError } = {}) => {
+const naruseInit = (params: NaruseInitParams) => {
+    const { hotPuller, baseCtx, onRunError } = (params || {});
     if (hotPuller) _config.hotPuller = hotPuller;
     if (baseCtx) _config.baseCtx = baseCtx;
     if (onRunError) _config.onRunError = onRunError;
