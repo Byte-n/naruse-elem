@@ -1,5 +1,5 @@
 import RAP from 'rap-sdk';
-import { createElement, Component } from 'rax';
+import { createElement, Component, useCallback, useContext, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState, createContext } from 'rax';
 import { Text, View, Image, ScrollView, TextInput } from 'rax-components';
 
 Array.prototype.flat||Object.defineProperty(Array.prototype,"flat",{configurable:!0,value:function r(){var t=isNaN(arguments[0])?1:Number(arguments[0]);return t?Array.prototype.reduce.call(this,function(a,e){return Array.isArray(e)?a.push.apply(a,r.call(e,t-1)):a.push(e),a},[]):Array.prototype.slice.call(this)},writable:!0}),Array.prototype.flatMap||Object.defineProperty(Array.prototype,"flatMap",{configurable:!0,value:function(r){return Array.prototype.map.apply(this,arguments).flat()},writable:!0});
@@ -1430,26 +1430,57 @@ var Scope = /** @class */ (function () {
     return Scope;
 }());
 
-var _a;
+var _a, _b;
 var anonymousId = 0;
 var thisRunner;
 var illegalFun = [setTimeout, setInterval, clearInterval, clearTimeout];
 var isUndefinedOrNull = function (val) { return val === void 0 || val === null; };
-var evaluate_map = (_a = {},
-    _a[Program] = function (program, scope) {
-        var nonFunctionList = [];
-        var list = program.body;
-        for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
-            var node = list_1[_i];
-            // function 声明语句 会提升到作用域顶部
-            isPromoteStatement(node) ? evaluate(node, scope) : nonFunctionList.push(node);
+/**
+ * 提炼 for语句中的变量提升
+ * k: 语句
+ * v: 对应的属性名
+ */
+var RefineForPromoteNameMap = (_a = {},
+    _a[ForStatement] = 'init',
+    _a[ForInStatement] = 'left',
+    _a[ForOfStatement] = 'left',
+    _a);
+/**
+ * 提炼非函数声明语句，并执行函数声明语句 与 初始化 var 变量
+ */
+var refinePromteStatements = function (nodes, scope) {
+    var nonPromoteList = [];
+    for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
+        var node = nodes_1[_i];
+        // function 声明语句 提升到作用域顶部直接执行
+        if (isPromoteStatement(node)) {
+            evaluate(node, scope);
         }
-        for (var _a = 0, nonFunctionList_1 = nonFunctionList; _a < nonFunctionList_1.length; _a++) {
-            var node = nonFunctionList_1[_a];
+        else {
+            // 如果是 var 则需要先声明变量为 undefined
+            if (isVarPromoteStatement(node))
+                evaluate_map[VariableDeclaration](node, scope, true);
+            // for,forin,forof 循环中的 var 声明语句也需要提升
+            if (RefineForPromoteNameMap[node.type]) {
+                var initNode = node[RefineForPromoteNameMap[node.type]];
+                if (isVarPromoteStatement(initNode))
+                    evaluate_map[VariableDeclaration](initNode, scope, true);
+            }
+            nonPromoteList.push(node);
+        }
+    }
+    return nonPromoteList;
+};
+var evaluate_map = (_b = {},
+    _b[Program] = function (program, scope) {
+        var list = program.body;
+        var nonFunctionList = refinePromteStatements(list, scope);
+        for (var _i = 0, nonFunctionList_1 = nonFunctionList; _i < nonFunctionList_1.length; _i++) {
+            var node = nonFunctionList_1[_i];
             evaluate(node, scope);
         }
     },
-    _a[Identifier] = function (node, scope) {
+    _b[Identifier] = function (node, scope) {
         if (node.name === 'undefined') {
             return undefined;
         }
@@ -1459,20 +1490,15 @@ var evaluate_map = (_a = {},
         }
         throw createError(errorMessageList.notYetDefined, node.name, node, thisRunner.source);
     },
-    _a[Literal] = function (node) {
+    _b[Literal] = function (node) {
         return node.value;
     },
-    _a[BlockStatement] = function (block, scope) {
+    _b[BlockStatement] = function (block, scope) {
         return indexGeneratorStackDecorate(function (stackData) {
             var new_scope = scope.invasive ? scope : new Scope('block', scope);
             var list = block.body;
             // 非 function 声明语句
-            var nonFunctionList = [];
-            for (var _i = 0, list_2 = list; _i < list_2.length; _i++) {
-                var node = list_2[_i];
-                // 变量提升语句需要提升到作用域顶部执行
-                isPromoteStatement(node) ? evaluate(node, new_scope) : nonFunctionList.push(node);
-            }
+            var nonFunctionList = refinePromteStatements(list, new_scope);
             for (; stackData.index < nonFunctionList.length; stackData.index++) {
                 var node = nonFunctionList[stackData.index];
                 var result = evaluate(node, new_scope);
@@ -1484,28 +1510,30 @@ var evaluate_map = (_a = {},
             }
         }, scope);
     },
-    _a[EmptyStatement] = function () { },
-    _a[ExpressionStatement] = function (node, scope) {
+    _b[EmptyStatement] = function () { },
+    _b[ExpressionStatement] = function (node, scope) {
         return evaluate(node.expression, scope);
     },
-    _a[ReturnStatement] = function (node, scope) {
+    _b[ReturnStatement] = function (node, scope) {
         RETURN_SIGNAL.result = node.argument ? evaluate(node.argument, scope) : undefined;
         return RETURN_SIGNAL;
     },
-    _a[BreakStatement] = function () {
+    _b[BreakStatement] = function () {
         return BREAK_SIGNAL;
     },
-    _a[ContinueStatement] = function () {
+    _b[ContinueStatement] = function () {
         return CONTINUE_SIGNAL;
     },
-    _a[IfStatement] = function (node, scope) {
+    _b[IfStatement] = function (node, scope) {
         if (evaluate(node.test, scope))
             return evaluate(node.consequent, scope);
         else if (node.alternate)
             return evaluate(node.alternate, scope);
     },
-    _a[ForStatement] = function (node, scope) {
-        for (var new_scope = new Scope('loop', scope), init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
+    _b[ForStatement] = function (node, scope) {
+        for (var new_scope = new Scope('loop', scope), 
+        // 只有 var 变量才会被提高到上一作用域
+        init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
             var result = evaluate(node.body, new_scope);
             if (isReturnResult(result))
                 return result;
@@ -1515,7 +1543,7 @@ var evaluate_map = (_a = {},
                 break;
         }
     },
-    _a[FunctionDeclaration] = function (node, scope) {
+    _b[FunctionDeclaration] = function (node, scope) {
         var func = evaluate_map[FunctionExpression](node, scope);
         var func_name = (node.id || { name: "anonymous".concat(anonymousId++) }).name;
         if (!scope.$var(func_name, func)) {
@@ -1523,14 +1551,16 @@ var evaluate_map = (_a = {},
         }
         return func;
     },
-    _a[VariableDeclaration] = function (node, scope) {
+    _b[VariableDeclaration] = function (node, scope, isVarPromote) {
+        if (isVarPromote === void 0) { isVarPromote = false; }
         var kind = node.kind;
         return indexGeneratorStackDecorate(function (stackData) {
             var list = node.declarations;
             for (; stackData.index < list.length; stackData.index++) {
                 var declaration = list[stackData.index];
                 var id = declaration.id, init = declaration.init;
-                var value = init ? evaluate(init, scope) : undefined;
+                // 如果是变量提升语句，需要先声明一个 undefined 变量，等待后续的重新赋值语句
+                var value = !isVarPromote && init ? evaluate(init, scope) : undefined;
                 // 迭代器变量中断
                 if (isYieldResult(scope, value))
                     return value;
@@ -1549,7 +1579,7 @@ var evaluate_map = (_a = {},
             }
         }, scope);
     },
-    _a[ArrayPattern] = function (node, scope, kind, value) {
+    _b[ArrayPattern] = function (node, scope, kind, value) {
         var elements = node.elements;
         if (!Array.isArray(value)) {
             throw createError(errorMessageList.deconstructNotArray, value, node, thisRunner.source);
@@ -1568,7 +1598,7 @@ var evaluate_map = (_a = {},
             }
         });
     },
-    _a[ObjectPattern] = function (node, scope, kind, object) {
+    _b[ObjectPattern] = function (node, scope, kind, object) {
         var properties = node.properties;
         properties.forEach(function (property) {
             if (property.type === Property) {
@@ -1586,7 +1616,7 @@ var evaluate_map = (_a = {},
             }
         });
     },
-    _a[AssignmentPattern] = function (node, scope, kind, init) {
+    _b[AssignmentPattern] = function (node, scope, kind, init) {
         var left = node.left, right = node.right;
         var value = init === void 0 ? evaluate(right, scope) : init;
         if (left.type === Identifier) {
@@ -1599,14 +1629,14 @@ var evaluate_map = (_a = {},
             evaluate_map[left.type](left, scope, kind, value);
         }
     },
-    _a[ThisExpression] = function (node, scope) {
+    _b[ThisExpression] = function (node, scope) {
         var this_val = scope.$find('this');
         return this_val ? this_val.$get() : null;
     },
-    _a[ArrayExpression] = function (node, scope) {
+    _b[ArrayExpression] = function (node, scope) {
         return node.elements.map(function (item) { return item ? evaluate(item, scope) : null; });
     },
-    _a[ObjectExpression] = function (node, scope) {
+    _b[ObjectExpression] = function (node, scope) {
         var object = {};
         for (var _i = 0, _a = node.properties; _i < _a.length; _i++) {
             var property = _a[_i];
@@ -1637,7 +1667,7 @@ var evaluate_map = (_a = {},
         }
         return object;
     },
-    _a[FunctionExpression] = function (node, scope, isArrowFunction) {
+    _b[FunctionExpression] = function (node, scope, isArrowFunction) {
         if (isArrowFunction === void 0) { isArrowFunction = false; }
         var func;
         if (node.generator) {
@@ -1723,7 +1753,7 @@ var evaluate_map = (_a = {},
         Object.defineProperty(func, "toString", { value: function () { return thisRunner.source.slice(node.start, node.end); }, configurable: true });
         return func;
     },
-    _a[UnaryExpression] = function (node, scope) {
+    _b[UnaryExpression] = function (node, scope) {
         var _a;
         var sk = 'typeof';
         return (_a = {
@@ -1764,7 +1794,7 @@ var evaluate_map = (_a = {},
             },
             _a)[node.operator]();
     },
-    _a[UpdateExpression] = function (node, scope) {
+    _b[UpdateExpression] = function (node, scope) {
         var prefix = node.prefix;
         var $var;
         if (node.argument.type === Identifier) {
@@ -1794,7 +1824,7 @@ var evaluate_map = (_a = {},
             '++': function (v) { return ($var.$set(v + 1), (prefix ? ++v : v++)); },
         })[node.operator](evaluate(node.argument, scope));
     },
-    _a[BinaryExpression] = function (node, scope) {
+    _b[BinaryExpression] = function (node, scope) {
         return ({
             '==': function (a, b) { return a == b; },
             '!=': function (a, b) { return a != b; },
@@ -1820,7 +1850,7 @@ var evaluate_map = (_a = {},
             instanceof: function (a, b) { return a instanceof b; },
         })[node.operator](evaluate(node.left, scope), evaluate(node.right, scope));
     },
-    _a[AssignmentExpression] = function (node, scope) {
+    _b[AssignmentExpression] = function (node, scope) {
         var $var;
         var left = node.left;
         if (left.type === Identifier) {
@@ -1865,26 +1895,26 @@ var evaluate_map = (_a = {},
             '&=': function (v) { return ($var.$set($var.$get() & v), $var.$get()); },
         })[node.operator](evaluate(node.right, scope));
     },
-    _a[LogicalExpression] = function (node, scope) {
+    _b[LogicalExpression] = function (node, scope) {
         return ({
             '||': function () { return evaluate(node.left, scope) || evaluate(node.right, scope); },
             '&&': function () { return evaluate(node.left, scope) && evaluate(node.right, scope); },
             '??': function () { var _a; return (_a = evaluate(node.left, scope)) !== null && _a !== void 0 ? _a : evaluate(node.right, scope); },
         })[node.operator]();
     },
-    _a[MemberExpression] = function (node, scope) {
+    _b[MemberExpression] = function (node, scope) {
         var object = node.object, property = node.property, computed = node.computed;
         if (computed) {
             return evaluate(object, scope)[evaluate(property, scope)];
         }
         return evaluate(object, scope)[property.name];
     },
-    _a[ConditionalExpression] = function (node, scope) {
+    _b[ConditionalExpression] = function (node, scope) {
         return (evaluate(node.test, scope)
             ? evaluate(node.consequent, scope)
             : evaluate(node.alternate, scope));
     },
-    _a[CallExpression] = function (node, scope) {
+    _b[CallExpression] = function (node, scope) {
         var this_val = null;
         var func = null;
         // fix: ww().ww().ww()
@@ -1908,12 +1938,12 @@ var evaluate_map = (_a = {},
             this_val = null;
         return func.apply(this_val, node.arguments.map(function (arg) { return evaluate(arg, scope); }));
     },
-    _a[NewExpression] = function (node, scope) {
+    _b[NewExpression] = function (node, scope) {
         var Func = evaluate(node.callee, scope);
         var args = node.arguments.map(function (arg) { return evaluate(arg, scope); });
         return new (Func.bind.apply(Func, __spreadArray([void 0], args, false)))();
     },
-    _a[SequenceExpression] = function (node, scope) {
+    _b[SequenceExpression] = function (node, scope) {
         var last;
         for (var _i = 0, _a = node.expressions; _i < _a.length; _i++) {
             var expr = _a[_i];
@@ -1921,10 +1951,10 @@ var evaluate_map = (_a = {},
         }
         return last;
     },
-    _a[ThrowStatement] = function (node, scope) {
+    _b[ThrowStatement] = function (node, scope) {
         throw evaluate(node.argument, scope);
     },
-    _a[TryStatement] = function (node, scope) {
+    _b[TryStatement] = function (node, scope) {
         try {
             return evaluate(node.block, scope);
         }
@@ -1945,10 +1975,10 @@ var evaluate_map = (_a = {},
                 return evaluate(node.finalizer, scope);
         }
     },
-    _a[CatchClause] = function (node, scope) {
+    _b[CatchClause] = function (node, scope) {
         return evaluate(node.body, scope);
     },
-    _a[SwitchStatement] = function (node, scope) {
+    _b[SwitchStatement] = function (node, scope) {
         var discriminant = evaluate(node.discriminant, scope);
         var new_scope = new Scope('switch', scope);
         var matched = false;
@@ -1970,7 +2000,7 @@ var evaluate_map = (_a = {},
             }
         }
     },
-    _a[SwitchCase] = function (node, scope) {
+    _b[SwitchCase] = function (node, scope) {
         for (var _i = 0, _a = node.consequent; _i < _a.length; _i++) {
             var stmt = _a[_i];
             var result = evaluate(stmt, scope);
@@ -1979,7 +2009,7 @@ var evaluate_map = (_a = {},
             }
         }
     },
-    _a[WhileStatement] = function (node, scope) {
+    _b[WhileStatement] = function (node, scope) {
         while (evaluate(node.test, scope)) {
             var new_scope = new Scope('loop', scope);
             new_scope.invasive = true;
@@ -1995,7 +2025,7 @@ var evaluate_map = (_a = {},
             }
         }
     },
-    _a[DoWhileStatement] = function (node, scope) {
+    _b[DoWhileStatement] = function (node, scope) {
         do {
             var new_scope = new Scope('loop', scope);
             new_scope.invasive = true;
@@ -2011,10 +2041,10 @@ var evaluate_map = (_a = {},
             }
         } while (evaluate(node.test, scope));
     },
-    _a[ArrowFunctionExpression] = function (node, scope) {
+    _b[ArrowFunctionExpression] = function (node, scope) {
         return evaluate_map[FunctionExpression](node, scope, true);
     },
-    _a[ForInStatement] = function (node, scope, isForOf) {
+    _b[ForInStatement] = function (node, scope, isForOf) {
         if (isForOf === void 0) { isForOf = false; }
         var kind = node.left.kind;
         var id = node.left.declarations[0].id;
@@ -2060,7 +2090,7 @@ var evaluate_map = (_a = {},
             }
         }
     },
-    _a[TemplateLiteral] = function (node, scope) {
+    _b[TemplateLiteral] = function (node, scope) {
         var result = node.quasis.map(function (quasi, index) {
             if (!quasi.tail)
                 return quasi.value.raw + evaluate(node.expressions[index], scope);
@@ -2068,17 +2098,17 @@ var evaluate_map = (_a = {},
         });
         return result.join('');
     },
-    _a[ImportExpression] = function (node, scope) {
+    _b[ImportExpression] = function (node, scope) {
         var source = evaluate(node.source, scope);
         var importer = scope.$find('$$import');
         if (!importer)
             throw createError(errorMessageList.notHasImport, '$$import', node, thisRunner.source);
         return importer.$get()(source);
     },
-    _a[ForOfStatement] = function (node, scope) {
+    _b[ForOfStatement] = function (node, scope) {
         return evaluate_map[ForInStatement](node, scope, true);
     },
-    _a[YieldExpression] = function (node, scope) {
+    _b[YieldExpression] = function (node, scope) {
         var _a;
         if (!isGeneratorFunction(scope))
             throw createError(errorMessageList.notGeneratorFunction, '', node, thisRunner.source);
@@ -2088,7 +2118,7 @@ var evaluate_map = (_a = {},
         YIELD_SIGNAL.result = evaluate(node.argument, scope);
         return YIELD_SIGNAL;
     },
-    _a);
+    _b);
 var _evaluate = function (node, scope) {
     var func = evaluate_map[node.type];
     if (!func)
@@ -2103,25 +2133,21 @@ var evaluate = function (node, scope, runner) {
     var thisId = thisRunner.traceId++;
     thisRunner.traceStack.push(thisId);
     try {
-        var res = _evaluate(node, scope);
-        thisRunner.traceStack.pop();
-        return res;
+        return _evaluate(node, scope);
     }
     catch (err) {
         // 错误已经冒泡到栈定了，触发错误收集处理
         if (thisRunner.traceStack[0] === thisId) {
             thisRunner.onError(err);
-            thisRunner.traceStack.pop();
         }
         // 错误已经处理过了，直接抛出
         if (err.isEvaluateError) {
             throw err;
         }
-        // 第一级错误，需要包裹处理
-        if (thisRunner.traceStack[thisRunner.traceStack.length - 1] === thisId) {
-            throw createError(errorMessageList.runTimeError, err === null || err === void 0 ? void 0 : err.message, node, thisRunner.source);
-        }
-        throw err;
+        throw createError(errorMessageList.runTimeError, err === null || err === void 0 ? void 0 : err.message, node, thisRunner.source);
+    }
+    finally {
+        thisRunner.traceStack.pop();
     }
 };
 
@@ -5305,10 +5331,23 @@ var elementApi = /*#__PURE__*/Object.freeze({
     cloneElement: cloneElement
 });
 
+var Hooks = {
+    useCallback: useCallback,
+    useContext: useContext,
+    useEffect: useEffect,
+    useImperativeHandle: useImperativeHandle,
+    useLayoutEffect: useLayoutEffect,
+    useMemo: useMemo,
+    useReducer: useReducer,
+    useRef: useRef,
+    useState: useState,
+    createContext: createContext
+};
+
 // @ts-ignore
 var version = "0.4.6";
 initVersionLogger('naruse-weex', version);
-var Naruse = __assign(__assign(__assign(__assign(__assign(__assign({ Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, globalEvent: globalEvent, withPage: function (Component) { return Component; } }, Storage), Route), Device), System), { getImageInfo: temporarilyNotSupport('getImageInfo'), createAnimation: temporarilyNotSupport('createAnimation') }), elementApi);
+var Naruse = __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({}, Hooks), { Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, globalEvent: globalEvent, withPage: function (Component) { return Component; } }), Storage), Route), Device), System), { getImageInfo: temporarilyNotSupport('getImageInfo'), createAnimation: temporarilyNotSupport('createAnimation') }), elementApi);
 var naruseExtend = function (obj) {
     Object.assign(Naruse, obj);
 };

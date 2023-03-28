@@ -1,4 +1,4 @@
-import { NaruseComponent } from './component';
+import { Hooks, NaruseComponent, __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } from './component';
 import { globalEvent, EventBus, getDeferred, initVersionLogger } from '../../naruse-share/index';
 import { initNaruseAlipayApi } from '../api/index';
 import { withPage } from '../api/HOC/index';
@@ -12,9 +12,9 @@ const apis = initNaruseAlipayApi();
 const version = __VERSION__;
 initVersionLogger('naruse-alipay', version);
 
-
 // naruse模块内容
 export const Naruse = {
+    ...Hooks,
     Component: NaruseComponent,
     createElement,
     h: createElement,
@@ -37,6 +37,7 @@ export const Naruse = {
     ...elementApi,
     createMiniFactory,
     Fragment,
+    __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED,
 };
 
 export const naruseExtend = (opt: any) => {
