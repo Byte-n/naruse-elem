@@ -1,9 +1,9 @@
-import { renderComponentOnPage, renderComponentOnPageWithCode } from "../expand/index";
+import { renderComponentOnPage, renderComponentOnPageWithCode } from "../expand";
 import { createMiniFactory } from "./hybrid/createMiniFactory";
-import { naruseInit } from "./init";
+import { getNaruseConfig, naruseInit } from "./init";
 import { createMainBehavior } from "./mainComponent";
 import { Naruse, naruseExtend } from "./naurse";
-import { Plugin, registerPlugin, LoggerLevel, LoggerLanding, LoggerPlus, LoggerPlugin } from '../../naruse-share/index';
+import { Plugin, registerPlugin as _registerPlugin, LoggerLevel, LoggerLanding, LoggerPlus, LoggerPlugin } from 'naruse-plugin';
 
 naruseExtend({
     renderComponentOnPage,
@@ -18,5 +18,9 @@ naruseExtend({
 export default Naruse;
 export {
     Naruse, createMainBehavior, naruseExtend, naruseInit, renderComponentOnPageWithCode,
-    Plugin, registerPlugin, LoggerLevel, LoggerLanding, LoggerPlus, LoggerPlugin,
+    Plugin, LoggerLevel, LoggerLanding, LoggerPlus, LoggerPlugin,
 };
+export const registerPlugin = (name: string, plugin: typeof Plugin, ...params: any []) => {
+    const config = getNaruseConfig();
+    return _registerPlugin(name, plugin, { config }, ...params)
+}

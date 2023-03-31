@@ -9,7 +9,9 @@
         "build": "rollup -c --environment PROJECT_NAME:alipay"
     },
     "devDependencies": {
-        "naruse-webpack-runner": "workspace:*"
+        "naruse-webpack-runner": "workspace:*",
+        "naruse-plugin": "workspace:*",
+        "naruse-share": "workspace:*"
     },
     "author": "CHC",
     "license": "ISC"
