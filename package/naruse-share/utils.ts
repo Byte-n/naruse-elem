@@ -59,7 +59,7 @@ export const isObj = (obj) => obj !== null &&  typeof obj === 'object';
  * @author CHC
  * @date 2022-07-14 17:07:45
  * @param {*} str
- * @returns {*} 
+ * @returns {*}
  */
 export const safeJsonParse = (str) => {
     try {
@@ -80,3 +80,8 @@ export const isEmptyObj = (o) => {
     }
     return true;
 }
+/** 判断是不是箭头函数 */
+export const isArrowFunction = (fn) => {
+    const fnStr = fn.toString();
+    return /^(\([^)]*\)|[a-zA-Z0-9$_]+\s*[=:]\s*)?=>/.test(fnStr)
+};

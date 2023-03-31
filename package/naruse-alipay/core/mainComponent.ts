@@ -1,9 +1,10 @@
 import { getMiniappEventBehavior } from './domEvents.js';
 import { logger, propsEquals } from './uitl.js';
 import { Middware } from './middware.js';
-import { isEmpty } from '../../naruse-share/index';
+import { globalEvent, isEmpty } from '../../naruse-share/index';
 import { getNaruseComponentFromProps } from './create.js';
-import { bindRenderEventOnComponent, uninstallMainComponentOnSomePage } from '../expand/index.js';
+import { bindRenderEventOnComponent, uninstallMainComponentOnSomePage } from '../expand';
+import { Page } from "./page";
 
 /**
  * @description 初始化naruse主组件
@@ -78,9 +79,19 @@ const createMainBehavior = (option = {}) => {
         didMount() {
             this.isNaruseMainComponent = isEmpty(this.props.component);
             if (this.isNaruseMainComponent) {
-                const { unique = false } = this.props || {};
-                // 绑定重新渲染事件
-                if (unique) bindRenderEventOnComponent(this);
+                const { unique = false, pagePath } = this.props || {};
+                if (unique) {
+                    // 绑定重新渲染事件
+                    bindRenderEventOnComponent(this)
+                    // 触发自定义事件
+                    const page = new Page(this.$page)
+                    // 开发环境下没有这玩意（）
+                    const path = Object.getPrototypeOf(this.$page).route;
+                    page.on('onShow', () => {
+                        globalEvent.emit('uniqueComponentPageShow', { path, event: 'onShow' });
+                    })
+                    globalEvent.emit('uniqueComponentPageShow', { path, event: 'didMount' });
+                }
             }
             this.option = option;
             createVmContext.call(this);

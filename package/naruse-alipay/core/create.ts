@@ -3,13 +3,8 @@ import { getNaruseConfig } from './init';
 import { logger } from './uitl';
 import { createElement } from './createElement';
 import { Naruse } from './naurse';
-import {
-    AdRunningContext, PluginApplyParams,
-    pluginEvent,
-    PluginMethod,
-    PluginOnErrorParams,
-    RunningCodeErrorSource
-} from '../../naruse-share/index';
+import { AdRunningContext, RunningCodeErrorSource } from 'naruse-share';
+import { PluginApplyParams, pluginEvent, PluginMethod, PluginOnErrorParams } from 'naruse-plugin';
 
 /**
  * @description 根据props获取naruse组件
@@ -38,7 +33,7 @@ export const getNaruseComponentFromProps = async (props: any) => {
  * @date 2022-06-14 16:06:40
  * @param {*} code
  * @param {*} ctx
- * @returns {*} 
+ * @returns {*}
  */
 export const getNaruseComponentFromCode = async (code: string, ctx: AdRunningContext | {}) => {
     if (!code) return;
