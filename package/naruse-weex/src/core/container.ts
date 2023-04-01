@@ -2,9 +2,9 @@
 // 2. z-index的问题 ✅
 // 3. 必须写完整，如background:#000需要写成background-color:#000 ✅
 // 4. 自动转换rpx ✅
-// 5. 不支持view滚动 
+// 5. 不支持view滚动
 // 6. 事件冒泡 ✅
-// 7. 不支持百分比 
+// 7. 不支持百分比
 
 import { Component, RaxNode } from 'rax';
 import { getNaruseConfig } from './init';
@@ -12,6 +12,8 @@ import { logger } from '../utils/log';
 import { run } from 'naruse-parser';
 import { Naruse } from './naruse';
 import { emptyElement, naruseCreateElement } from './createElement';
+import { AdRunningContext } from '../../../naruse-share';
+import RAP from 'rap-sdk';
 
 /**
  * @description 根据props获取naruse组件
@@ -37,19 +39,40 @@ export const getNaruseComponentFromProps = async (props: any) => {
  * @author CHC
  * @date 2022-06-14 16:06:40
  */
-export const getNaruseComponentFromCode = async (code: string, ctx: Record<string, any>) => {
+export const getNaruseComponentFromCode = async (code: string, ctx: AdRunningContext) => {
     if (!code) return emptyElement;
-    const {  baseCtx: _baseCtx, onRunError } = getNaruseConfig();
+    const { baseCtx: _baseCtx, onRunError, hotImport } = getNaruseConfig();
     const baseCtx = typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx;
+
+    // 用于隔离多个 webpack 打包的代码
+    const $webpack = {};
+
+    // 热加载导入
+    const $$import = async (...args) => {
+        // @ts-ignore
+        const code = await hotImport(...args);
+        return executeCode(code);
+    };
+
+    // 运行时上下文
+    const context: AdRunningContext = {
+        h: Naruse.createElement,
+        Naruse,
+        ...baseCtx,
+        ...ctx,
+        // 热加载导入
+        $$import,
+        $webpack,
+        RAP,
+        window,
+    };
+    // 执行代码
+    const executeCode = (code: string) => run(code, context, onRunError);
+
     // 导出变量
     let exports: Record<string, any> = {};
     try {
-        exports = run(code, {
-            h: naruseCreateElement,
-            Naruse,
-            ...baseCtx,
-            ...ctx,
-        });
+        exports = executeCode(code);
     } catch (err) {
         logger.error('运行时出错，自动继续', err);
         onRunError(err);
@@ -62,7 +85,7 @@ export const getNaruseComponentFromCode = async (code: string, ctx: Record<strin
     } else {
         const NaruseComponent = Naruse.Component;
         // 兼容老版组件
-        const compatibleClass = function compatibleClass (...args: any[]) {
+        const compatibleClass = function compatibleClass(...args: any[]) {
             const self = this;
             NaruseComponent.apply(this, args);
             exports.constructor && exports.constructor.call(this);
@@ -87,15 +110,15 @@ export const getNaruseComponentFromCode = async (code: string, ctx: Record<strin
  * @class Container
  * @extends {Component<{}, {loaded: boolean}>}
  */
-class Container extends Component<{}, {loaded: boolean}> {
+class Container extends Component<{}, { loaded: boolean }> {
     private Component: any;
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.state = { loaded: false };
         this.init(props);
     }
 
-    async init (props) {
+    async init(props) {
         this.Component = await getNaruseComponentFromProps(props);
         if (this.Component) {
             this.setState({ loaded: true });

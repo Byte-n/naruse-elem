@@ -1,6 +1,7 @@
+import { NaruseConfig } from "../../../naruse-share";
 import { logger } from "../utils/log";
 
-const _config = {
+const _config: NaruseConfig = {
     hotPuller: (...args: any []) => {
         logger.error('未初始化热更新拉取，无法更新组件默认为空');
         return Promise.resolve({ code: '', ctx: {} });
@@ -11,6 +12,10 @@ const _config = {
     onRunError: (err) => {
         console.error(err);
     },
+    hotImport: (...args: any []) => {
+        logger.error('未初始化热更新导入，无法更新组件默认为空');
+        return Promise.resolve('');
+    }
 };
 
 /**
@@ -27,11 +32,8 @@ const getNaruseConfig = () => {
  * @author CHC
  * @date 2022-06-14 10:06:36
  */
-const naruseInit = (props = {}) => {
-    const { hotPuller, baseCtx, onRunError } = props as typeof _config;
-    if (hotPuller) _config.hotPuller = hotPuller;
-    if (baseCtx) _config.baseCtx = baseCtx;
-    if (onRunError) _config.onRunError = onRunError;
+const naruseInit = (props?: NaruseConfig) => {
+    Object.assign(_config, props);
 }
 
 

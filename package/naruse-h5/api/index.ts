@@ -5,6 +5,7 @@ import device from './device/index';
 import * as media from './media/index';
 import * as wxml from './wxml/index';
 import * as animation from './ui/animation/index';
+import * as uiInteraction from './ui/interaction/index';
 
 const api = {
     ...system,
@@ -14,6 +15,7 @@ const api = {
     ...media,
     ...wxml,
     ...animation,
+    ...uiInteraction,
 };
 
 export default api;
