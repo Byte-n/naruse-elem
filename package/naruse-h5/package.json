@@ -7,6 +7,12 @@
   },
   "name": "naruse-h5",
   "description": "naruse的h5端运行平台",
-  "version": "0.4.6",
-  "main": "dist/index.js"
+  "version": "0.4.7",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "react": "15.6.1",
+    "react-dom": "15.6.1",
+    "react-like-hooks": "workspace:*",
+    "naruse-types": "workspace:*"
+  }
 }

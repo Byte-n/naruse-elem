@@ -4,6 +4,7 @@ import { run } from 'naruse-parser';
 import { Component, cloneElement, isValidElement, Children } from 'react';
 import api from '../api/index';
 import withPage from "./withPage";
+import { getHooks } from './Component';
 
 // @ts-ignore
 const version = __VERSION__;
@@ -12,6 +13,7 @@ initVersionLogger('naruse-h5', version);
 
 export const Naruse = {
     ...api,
+    ...getHooks(),
     Component,
     createElement: naruseCreateElement,
     env: {

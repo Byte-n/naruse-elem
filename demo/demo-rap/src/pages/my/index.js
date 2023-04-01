@@ -1,6 +1,5 @@
 import { createElement, Component, render, createRef } from 'rax';
 import { View, Text } from 'rax-components';
-import { Naruse } from '../../../../packages/naruse-weex/build/lib'
 
 const bc = new BroadcastChannel('007');
 console.log(window);
