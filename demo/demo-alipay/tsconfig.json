@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "ES5",
+        "baseUrl": "advert",
+        "rootDir": ".",
+        "module": "es2020",
+        "sourceMap": true,
+        "esModuleInterop": true,
+        "preserveConstEnums": true,
+        "skipLibCheck": true,
+        "lib": ["ESNext", "dom"],
+        "strict": false,
+        "allowJs": true,
+        "jsx": "react",
+        "jsxFactory": "Naruse.createElement",
+    },
+    "include": ["advert/**/*"],
+    "exclude": ["node_modules", "dist"]
+}

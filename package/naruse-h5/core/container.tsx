@@ -16,7 +16,7 @@ export const getNaruseComponentFromProps = async (props) => {
     }
     const { hotPuller } = getNaruseConfig();
     try {
-        const { code, ctx } = await hotPuller(props);
+        const { code, ctx } = await hotPuller!(props);
         return getNaruseComponentFromCode(code, ctx);
     } catch (e) {
         logger.error('加载远程代码资源失败', e);
@@ -30,23 +30,37 @@ export const getNaruseComponentFromProps = async (props) => {
  */
 export const getNaruseComponentFromCode = async (code, ctx) => {
     if (!code) return null;
-    const { baseCtx: _baseCtx, onRunError } = getNaruseConfig();
+    const { baseCtx: _baseCtx, onRunError, hotImport } = getNaruseConfig();
     const baseCtx = typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx;
+
+    // 主动注入一个全局变量供 webpack 挂载，防止多个不同环境的代码混合
+    // 每次加载新的组件都需要创建一个用于隔离环境
+    // 详细可以见 naruse-webpack-runner
+    const $webpack = {};
+    const $$import = async (...args) => {
+        // @ts-ignore
+        const code = await hotImport(...args);
+        return executeCode(code);
+    };
+    const executeCode = (code) => run(code, {
+        h: Naruse.createElement,
+        Naruse,
+        ...baseCtx,
+        ...ctx,
+        // 热加载导入
+        $$import,
+        $webpack,
+    })
     // 导出变量
-    let exports = {};
+    let exports: any = {};
     try {
-        exports = run(code, {
-            h: Naruse.createElement,
-            Naruse,
-            ...baseCtx,
-            ...ctx,
-        });
+        exports = executeCode(code);
     } catch (err) {
         logger.error('运行时出错，自动继续', err);
-        onRunError(err);
+        onRunError!(err);
         return;
     }
-    let component = null;
+    let component: any = null;
     // 默认导出组件存在
     if (exports.default) {
         component = exports.default;
@@ -85,6 +99,8 @@ class Container extends Component {
         this.init(props);
     }
 
+    Component: any;
+
     async init(props) {
         this.Component = await getNaruseComponentFromProps(props);
         if (this.Component) {
@@ -93,6 +109,7 @@ class Container extends Component {
     }
 
     render() {
+        // @ts-ignore
         return this.state.loaded ? Naruse.createElement(this.Component) : null;
     }
 }

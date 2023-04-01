@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ESNext",
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "outDir": "dist",
     "rootDir": "./src",
     "module": "commonjs",
@@ -10,6 +10,7 @@
     "esModuleInterop": true,
     "preserveConstEnums": true,
     "skipLibCheck": true,
+    "declaration": true
   },
   "include": ["./src", "../../types"],
   "exclude": ["./src/__tests__", "./src/template/comp.ts"]

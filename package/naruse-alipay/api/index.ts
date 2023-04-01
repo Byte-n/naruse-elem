@@ -11,6 +11,17 @@ const apiDiff = {
             }],
         },
     },
+    showToast: {
+        options: {
+            change: [{
+                old: 'title',
+                new: 'content'
+            }, {
+                old: 'icon',
+                new: 'type'
+            }]
+        }
+    }
 };
 
 export const transformMeta = (api, options) => {
@@ -44,7 +55,7 @@ export const transformMeta = (api, options) => {
     };
 };
 
-export const handleSyncApis = function handleSyncApis (key, global, args) {
+export const handleSyncApis = function handleSyncApis(key, global, args) {
     if (key === 'getStorageSync') {
         const arg1 = args[0];
         if (arg1 != null) {
@@ -102,6 +113,8 @@ const needPromiseApis = [
     'setClipboard',
     'getClipboard',
     'getImageInfo',
+    'showToast',
+    'hideToast',
 ];
 
 const syncApis = [
