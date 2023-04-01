@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "target": "ES5",
+        "baseUrl": ".",
+        "outDir": "dist",
+        "rootDir": ".",
+        "module": "es2020",
+        "sourceMap": true,
+        "esModuleInterop": true,
+        "preserveConstEnums": true,
+        "skipLibCheck": true,
+        "jsx": "react",
+        "jsxFactory": "Naruse.createElement",
+        "typeRoots": ["./types"],
+        "types": ["./types"],
+        "lib": ["ESNext", "dom"],
+    }
+}

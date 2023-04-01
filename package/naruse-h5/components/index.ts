@@ -1,4 +1,4 @@
-import React, { Component, createElement } from 'react';
+import { Component, createElement } from 'react';
 import { logger } from '../utils/log';
 import Button from './button/index'
 import Checkbox from './checkbox/index';
@@ -9,6 +9,7 @@ import View from './view/index'
 import ScrollView from './scroll-view/index'
 import Textarea from './textarea/index'
 import { getNaruseConfig } from "../core/init";
+import { functionalizae } from 'core/Component';
 
 /** 组件映射表 */
 const componentReflectMap = {
@@ -30,13 +31,13 @@ const componentReflectMap = {
  * @param {*} props
  * @param {*} children
  */
-const naruseCreateElement = (type: string, props: {} | null | undefined, ...children: string[]) => {
+const naruseCreateElement = (type: string, props: any, ...children: string[]) => {
     transformRpx(props);
     if (typeof type === 'string') {
         const Component = componentReflectMap[type];
         if (!Component) {
             logger.warn('不支持的组件类型', type);
-            return naruseCreateElement('view', null, `不支持的组件类型-${type}`);
+            return naruseCreateElement('view', undefined, `不支持的组件类型-${type}`);
         }
         return createElement(Component, props, ...children);
     }
@@ -45,7 +46,7 @@ const naruseCreateElement = (type: string, props: {} | null | undefined, ...chil
     }
     if (typeof type === 'function') {
         props && (props.children = children);
-        return type(props);
+        return createElement(functionalizae(type), props);
     }
     logger.warn('不支持的组件类型', type);
 };
