@@ -12,13 +12,15 @@ const _config: NaruseConfig = {
     onRunError: (err: Error) => {
         console.error(err);
     },
+    hotImport: (path) => {
+        throw new Error('尚未初始化 hotImport 函数');
+    }
 };
 
 /**
  * @description 获取初始化
  * @author CHC
  * @date 2022-06-14 10:06:50
- * @returns {{ _config: () => Promise<{ code, ctx }>  }} 
  */
 const getNaruseConfig = () => {
     return _config;
@@ -29,11 +31,8 @@ const getNaruseConfig = () => {
  * @author CHC
  * @date 2022-06-14 10:06:36
  */
-const naruseInit = (params: NaruseInitParams) => {
-    const { hotPuller, baseCtx, onRunError } = (params || {});
-    if (hotPuller) _config.hotPuller = hotPuller;
-    if (baseCtx) _config.baseCtx = baseCtx;
-    if (onRunError) _config.onRunError = onRunError;
+const naruseInit = (params: NaruseInitParams = {}) => {
+    Object.assign(_config, params);
 }
 
 
