@@ -3,13 +3,11 @@ import { BaseConfig } from './core/baseConfig';
 import { NaruseTemplate } from './core/template';
 import { NaruseWebpackRunnerOptions } from './types/options';
 
-
-
-
 const defaultConfig: Partial<NaruseWebpackRunnerOptions> = {
     mode: 'production',
     isWatch: false,
     template: new NaruseTemplate(),
+    naruseExternal: false,
 }
 
 export default async function build(options: NaruseWebpackRunnerOptions): Promise<Stats> {
@@ -41,15 +39,26 @@ export default async function build(options: NaruseWebpackRunnerOptions): Promis
     })
 }
 
-
-
-build({
+const pageBuildExample = {
     compilerType: 'pages',
     outputPath: '/Users/hashiro/MiniProjects/blank/demo/demo-alipay/pages/',
     pages: ['/index/index', '/cc/index'],
     sourceDir: '/Users/hashiro/MiniProjects/blank/package/naruse-webpack-runner/demo/pages/',
     isWatch: true,
     naruseExternal: '/Users/hashiro/MiniProjects/blank/demo/demo-alipay/naruse-alipay',
-}).catch(err => {
-    console.error(err);
+}
+
+const singleHotComponentBuildExample: NaruseWebpackRunnerOptions = {
+    mode: 'production',
+    compilerType: 'singleHotComponent',
+    sourceDir: '/Users/hashiro/MiniProjects/blank/package/naruse-webpack-runner/demo/singleAdvert',
+    outputPath: '/Users/hashiro/MiniProjects/blank/dist',
+    naruseExternal: false,
+    isExportDefaultString: false,
+    isWatch: true,
+}
+
+// webpack 打印内部错误
+build(singleHotComponentBuildExample).catch(err => {
+    console.log(err)
 })

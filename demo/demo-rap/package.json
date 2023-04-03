@@ -4,7 +4,7 @@
   "version": "1.2.24",
   "description": "代发助手王",
   "scripts": {
-    "dev": "rap dev",
+    "dev": "pnpm concurrently --kill-others-on-fail \" rap dev\" \"node index.js\" \"node web.js \"",
     "build": "webpack --config ./webpack/webpack.config.prod.js",
     "precommit": "lint-staged",
     "lint": "eslint --ext .js --ext .jsx src/",

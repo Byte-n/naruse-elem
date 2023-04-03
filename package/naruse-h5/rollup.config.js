@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const version = JSON.parse(fs.readFileSync(path.join(__dirname, './package.json'), 'utf-8')).version;
 
-const customResolver = nodeResolve({ extensions: ['.mjs', 'cjs', '.js', '.jsx', '.json', '.sass', '.scss', '.css'] });
+const customResolver = nodeResolve({ extensions: ['.mjs', 'cjs', '.js', '.jsx', '.json', '.sass', '.scss', '.css', '.ts', 'tsx'] });
 
 const isDev = process.env.BUILD === 'development';
 

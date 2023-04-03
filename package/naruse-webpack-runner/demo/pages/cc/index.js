@@ -1,5 +1,4 @@
 import Naruse from 'Naruse';
-import { cc } from '../../common'
 
 export default class Demo extends Naruse.Component {
     componentDidMount() {

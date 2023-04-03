@@ -38,28 +38,50 @@ export const getNaruseComponentFromProps = async (props: any) => {
 export const getNaruseComponentFromCode = async (code: string, ctx: AdRunningContext | {}) => {
     if (!code) return;
     const naruseConfig = getNaruseConfig();
-    const {  baseCtx: _baseCtx, onRunError } = naruseConfig;
+    const {  baseCtx: _baseCtx, onRunError, hotImport } = naruseConfig;
     const baseCtx = <AdRunningContext>(typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx);
+
+    // 用于隔离多个 webpack 打包的代码
+    const $webpack = {};
+
+    // 热加载导入
+    const $$import = async (...args) => {
+        // @ts-ignore
+        const code = await hotImport(...args);
+        return executeCode(code);
+    };
+
+    // 运行时上下文
     const context: AdRunningContext = {
-        h: createElement,
+        h: Naruse.createElement,
         Naruse,
         // @ts-ignore
         my: typeof my === 'object' ? my : {},
         ...baseCtx,
         ...ctx,
+        // 热加载导入
+        $$import,
+        $webpack,
     };
+
+    // 运行时错误处理
     const onError = (source: RunningCodeErrorSource, error: Error) => {
         const params: PluginOnErrorParams = { config: naruseConfig, context, error, source };
         pluginEvent.emit(PluginMethod.onError, params);
         onRunError(error, source);
     }
+
+    // 执行代码
+    const executeCode = (code: string) => run(code, context, onError.bind(null, RunningCodeErrorSource.errorCenter));
+
     // 触发插件的生命周期 apply
     const params: PluginApplyParams = { config: naruseConfig, context };
     pluginEvent.emit(PluginMethod.apply, params);
+
     // 导出变量
     let exports: Record<string, any> = {};
     try {
-        exports = run(code, context, onError.bind(null, RunningCodeErrorSource.errorCenter));
+        exports = executeCode(code);
     } catch (err) {
         logger.error('运行时出错，自动继续', err);
         onError(RunningCodeErrorSource.tryCatch, err);

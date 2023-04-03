@@ -1,7 +1,8 @@
+import { NaruseInitParams } from "../../naruse-share";
 import { logger } from "../utils/log";
 import { withPageInit } from "./withPage";
 
-const _config = {
+const _config: NaruseInitParams = {
     hotPuller: () => {
         logger.error('未初始化热更新拉取，无法更新组件默认为空');
         return Promise.resolve({ code: '', ctx: {} });
@@ -13,7 +14,10 @@ const _config = {
         console.error(err);
     },
     // 自定义 rpx 的单位转换
-    convertRpx : (rpx) => (rpx / 2 * 1.4).toFixed(1),
+    convertRpx: (rpx) => (rpx / 2 * 1.4).toFixed(1),
+    hotImport: (path) => {
+        throw new Error('尚未初始化 hotImport 函数');
+    }
 };
 
 /**
@@ -36,11 +40,9 @@ const getNaruseConfig = () => {
  * @param convertRpx 自定义 rpx 到 px 的转换
  * @param pageContainer 能获取到页面滚动条偏移量的容器元素
  */
-const naruseInit = ({ hotPuller, baseCtx, onRunError, convertRpx, pageContainer } = {}) => {
-    if (hotPuller) _config.hotPuller = hotPuller;
-    if (baseCtx) _config.baseCtx = baseCtx;
-    if (onRunError) _config.onRunError = onRunError;
-    if (convertRpx) _config.convertRpx = convertRpx;
+const naruseInit = (newConfig: NaruseInitParams) => {
+    Object.assign(_config, newConfig);
+    const { pageContainer } = _config as any;
     withPageInit({ pageContainer });
 }
 

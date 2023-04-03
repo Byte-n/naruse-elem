@@ -1,8 +1,4 @@
 const speicalConfig = {
-    events: {
-        // 'onTap': 'onClick',
-        // 'onLongTap': 'onLongClick',
-    },
     attributes: {
         'class': 'className',
     },
@@ -253,8 +249,12 @@ const templateList = [
     pureText,
 ]
 
+
+const eventCenterEventName = 'ec';
+
 export {
     templateList,
     speicalConfig,
+    eventCenterEventName
 }
 
