@@ -180,9 +180,13 @@ importers:
 
   package/naruse-alipay:
     specifiers:
+      naruse-plugin: workspace:*
+      naruse-share: workspace:*
       naruse-webpack-runner: workspace:*
       react-like-hooks: workspace:*
     devDependencies:
+      naruse-plugin: link:../naruse-plugin
+      naruse-share: link:../naruse-share
       naruse-webpack-runner: link:../naruse-webpack-runner
       react-like-hooks: link:../react-like-hooks
 
@@ -197,6 +201,12 @@ importers:
       react: 15.6.1
       react-dom: 15.6.1_react@15.6.1
       react-like-hooks: link:../react-like-hooks
+
+  package/naruse-plugin:
+    specifiers:
+      naruse-share: workspace:*
+    devDependencies:
+      naruse-share: link:../naruse-share
 
   package/naruse-share:
     specifiers: {}
@@ -318,14 +328,12 @@ importers:
 
   package/naruse-weex:
     specifiers:
-      '@swc/core': ^1.3.42
       rax: ^1.1.0
       rax-document: ^0.1.0
       rax-image: ^2.0.0
       rax-link: ^1.0.1
       rax-text: ^2.0.0
       rax-view: ^2.0.0
-      swc-loader: ^0.2.3
     dependencies:
       rax: 1.2.2
       rax-document: 0.1.6_rax@1.2.2
@@ -333,9 +341,6 @@ importers:
       rax-link: 1.5.2_rax@1.2.2
       rax-text: 2.2.0_rax@1.2.2
       rax-view: 2.3.0_rax@1.2.2
-    devDependencies:
-      '@swc/core': 1.3.42
-      swc-loader: 0.2.3_@swc+core@1.3.42
 
   package/react-like-hooks:
     specifiers: {}
@@ -11998,15 +12003,6 @@ packages:
       picocolors: 1.0.0
       stable: 0.1.8
     dev: false
-
-  /swc-loader/0.2.3_@swc+core@1.3.42:
-    resolution: {integrity: sha512-D1p6XXURfSPleZZA/Lipb3A8pZ17fP4NObZvFCDjK/OKljroqDpPmsBdTraWhVBqUNpcWBQY1imWdoPScRlQ7A==}
-    peerDependencies:
-      '@swc/core': ^1.2.147
-      webpack: '>=2'
-    dependencies:
-      '@swc/core': 1.3.42
-    dev: true
 
   /swc-loader/0.2.3_arlhkjksfct3e2enfwqtyp463a:
     resolution: {integrity: sha512-D1p6XXURfSPleZZA/Lipb3A8pZ17fP4NObZvFCDjK/OKljroqDpPmsBdTraWhVBqUNpcWBQY1imWdoPScRlQ7A==}

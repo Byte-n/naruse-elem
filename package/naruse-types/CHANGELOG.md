@@ -1,12 +1,19 @@
 # naruse-types
 
+## 0.4.7
+
+### Patch Changes
+
+- #FEAT: 新增 naruse-plugin(just alipay) 支持组件系统
+- #FIX: 【alipay】修复 ES3 类写法下 middware 初始化的问题
+
 ## 0.4.6
 
 ### Patch Changes
 
 - #FEAT: 【share】切换为 TS
-- #FIX:  【weex】修复 weex 端运行时因为缺失 api 导致的页面渲染错误
-- #FEAT: 【PC】PC的MouseEvent 新增target，currentTarget，新增 onMouseDown,onMouseUp,，优化hoverClass导致的更新错误，PC\MB保留dataset，MB Touch 添加 detail
+- #FIX: 【weex】修复 weex 端运行时因为缺失 api 导致的页面渲染错误
+- #FEAT: 【PC】PC 的 MouseEvent 新增 target，currentTarget，新增 onMouseDown,onMouseUp,，优化 hoverClass 导致的更新错误，PC\MB 保留 dataset，MB Touch 添加 detail
 
 ## 0.4.5
 
