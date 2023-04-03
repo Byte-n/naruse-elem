@@ -81,6 +81,7 @@ export class VirtualPage {
         this.oldEvents = {};
         // this.eventCenter.on('onUnload', () => setTimeout(() => this.clear()));
         this.hasBind = {};
+        this.once('onUnLoad', this.clear.bind(this));
     }
 
     /**

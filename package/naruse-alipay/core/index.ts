@@ -3,7 +3,7 @@ import { createMiniFactory } from "./hybrid/createMiniFactory";
 import { getNaruseConfig, naruseInit } from "./init";
 import { createMainBehavior } from "./mainComponent";
 import { Naruse, naruseExtend } from "./naurse";
-import { Plugin, registerPlugin as _registerPlugin, LoggerLevel, LoggerLanding, LoggerPlus, LoggerPlugin } from 'naruse-plugin';
+import { Plugin, registerPlugin as _registerPlugin, LoggerLevel, LoggerLanding, LoggerPlus, LoggerPlugin } from '../../naruse-plugin';
 
 naruseExtend({
     renderComponentOnPage,

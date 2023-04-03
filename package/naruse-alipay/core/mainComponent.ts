@@ -4,7 +4,7 @@ import { Middware } from './middware.js';
 import { globalEvent, isEmpty } from '../../naruse-share/index';
 import { getNaruseComponentFromProps } from './create.js';
 import { bindRenderEventOnComponent, uninstallMainComponentOnSomePage } from '../expand';
-import { VirtualPage } from "./page";
+import { getPageInstance } from "./page";
 
 /**
  * @description 初始化naruse主组件
@@ -71,7 +71,6 @@ const createMainBehavior = (option = {}) => {
     // 小程序组件默认minxs对象
     const naruseBehavior = {
         ...getMiniappEventBehavior(),
-        virtualPage: null,
         __NaruseUniqueComponentPageShowEvent: null,
         /**
          * @description 装载完毕后
@@ -90,8 +89,7 @@ const createMainBehavior = (option = {}) => {
                         const path = Object.getPrototypeOf(this.$page).route;
                         globalEvent.emit('__NaruseUniqueComponentPageShow', { path, event: event || 'onShow' });
                     }
-                    this.virtualPage = new VirtualPage(this.$page)
-                    this.virtualPage.on('onShow', this.__NaruseUniqueComponentPageShowEvent)
+                    getPageInstance(this).on('onShow', this.__NaruseUniqueComponentPageShowEvent);
                     this.__NaruseUniqueComponentPageShowEvent('didMount');
                 }
             }
@@ -138,11 +136,6 @@ const createMainBehavior = (option = {}) => {
             if (!this.$middware) return;
             this.isNaruseMainComponent && uninstallMainComponentOnSomePage(this);
             this.$middware.onUnMount(true);
-            const { unique = false } = this.props || {};
-            if (unique && this.virtualPage) {
-                const page = new VirtualPage(this.$page)
-                this.virtualPage.off('__NaruseUniqueComponentPageShow', this.__NaruseUniqueComponentPageShowEvent)
-            }
         },
     };
     return naruseBehavior;
