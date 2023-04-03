@@ -261,6 +261,31 @@ var isEmptyObj = function (o) {
     }
     return true;
 };
+/** 转JSON,对Error特殊处理，且忽略 function、bigint、symbol */
+var safeToJSON = function (obj) {
+    // ERROR
+    if (obj instanceof Error) {
+        return JSON.stringify({ name: obj.name, message: obj.message, stack: obj.stack });
+    }
+    // 存储所有对象，判断是有循环引用
+    var cache = [];
+    return JSON.stringify(obj, function (key, value) {
+        if (typeof value === 'function' || typeof value === 'bigint' || typeof value === 'symbol') {
+            return;
+        }
+        // object
+        if (typeof value === 'object') {
+            // 循环引用了
+            if (cache.indexOf(value) !== -1) {
+                return "$circular:".concat(key);
+            }
+            cache.push(value);
+            // 空数组
+        }
+        // number || boolean || object || null || undefined
+        return value;
+    });
+};
 
 /**
  * @description 处理api
@@ -389,396 +414,6 @@ var RunningCodeErrorSource;
     RunningCodeErrorSource["errorCenter"] = "errorCenter";
     RunningCodeErrorSource["tryCatch"] = "tryCatch";
 })(RunningCodeErrorSource || (RunningCodeErrorSource = {}));
-/** 插件 的 生命周期 */
-var PluginMethod;
-(function (PluginMethod) {
-    PluginMethod["apply"] = "Plugin.apply";
-    PluginMethod["onError"] = "Plugin.onError";
-})(PluginMethod || (PluginMethod = {}));
-/** 日志等级 */
-var LoggerLevel;
-(function (LoggerLevel) {
-    LoggerLevel["debug"] = "debug";
-    LoggerLevel["info"] = "info";
-    LoggerLevel["warn"] = "warn";
-    LoggerLevel["error"] = "error";
-    LoggerLevel["none"] = "none";
-})(LoggerLevel || (LoggerLevel = {}));
-/** 日志的触发起源地 */
-var LoggerLanding;
-(function (LoggerLanding) {
-    /** naruse error center */
-    LoggerLanding["errorCenter"] = "error-center";
-    /** try-catch run */
-    LoggerLanding["tryCatch"] = "error-center";
-    /** 线上 */
-    LoggerLanding["production"] = "production";
-    /** 开发时 */
-    LoggerLanding["development"] = "development";
-})(LoggerLanding || (LoggerLanding = {}));
-/** LoggerInfo 中 key 到 梦想埋点参数 key 的映射 */
-var LoggerInfoKeyMap = {
-    action: 'p',
-    event: 'e',
-    userNick: 'n',
-    level: 'm1',
-    appName: 'm2',
-    landing: 'm3',
-    vipEndTime: 'm4',
-    adVer: 'm5',
-    creative_name: 'm6',
-    systemInfo: 'm7',
-    info: 'm9',
-    pid: 'd1',
-    cid: 'd2',
-    vipFlag: 'd3',
-};
-// type ValueOf<T> = T[keyof T];
-// type RequestParamsKey = ValueOf<typeof LoggerInfoKeyMap>;
-
-/**
-* 插件,很明显，它是一个插件，它可以做点什么。你必须继承此类，来实现插件
-*/
-var Plugin = /** @class */ (function () {
-    function Plugin() {
-        var _newTarget = this.constructor;
-        /** 插件名称标识 */
-        this.name = '';
-        if (_newTarget === Plugin) {
-            throw new Error('Plugin 是一个抽象类，不能被实例化');
-        }
-    }
-    /** 在广告代码运行前，获取到有效的广告数据后 */
-    Plugin.prototype.apply = function (params) {
-    };
-    /** 解析广告代码错误时、运行广告代码错误时 */
-    Plugin.prototype.onError = function (params) {
-    };
-    return Plugin;
-}());
-
-// 所有日志等级，顺序 按优先级升序（none 这个...最高，啥也不显示）
-var levels = [LoggerLevel.debug, LoggerLevel.info, LoggerLevel.warn, LoggerLevel.error, LoggerLevel.none];
-/** 获取空广告 */
-var nullAdData = function () { return ({
-    creative_id: undefined,
-    creative_name: "null data",
-    dest_url: "",
-    group_id: 0,
-    img_path: "",
-    img_size: "",
-    pid: undefined,
-    pid_name: "",
-    plan_id: 0,
-    primary_class: "",
-    secondary_class: "",
-    template_type: "",
-    user_define: { body: undefined },
-    version: ""
-}); };
-var log$2 = createLogger('LoggerPlus');
-/** 日志发送类 */
-var LoggerPlus = /** @class */ (function () {
-    /**
-     * 构造日志对象
-     * @param adData     广告数据
-     * @param landing    日志触发源头
-     * @param publicInfo 初始化日志公共属性的参数
-     */
-    function LoggerPlus(_a, publicInfo) {
-        var adData = _a.adData;
-        /** 日志的公共信息 */
-        this._publicInfo = {
-            action: 'advert-template-logger',
-            appName: "",
-            landing: undefined,
-            systemInfo: "",
-            userNick: "",
-            vipEndTime: "",
-            vipFlag: 0
-        };
-        /** 日志的网络请求接口 */
-        this._logNetworkInterface = function () {
-            throw new Error('未初始化 LoggerPlugin logInterface');
-        };
-        // 当前日志等级
-        this._curLoggerLevel = LoggerLevel.debug;
-        if (isEmpty(adData)) {
-            throw new Error('构造日志对象错误，缺少必要参数：adData');
-        }
-        // 初始化 公共属性
-        this.updatePublicInfo(publicInfo, false);
-        // 初始化 私有属性
-        var creative_name = adData.creative_name, creative_id = adData.creative_id, version = adData.version, pid = adData.pid;
-        this._info = {
-            landing: undefined,
-            creative_name: creative_name,
-            /** 二级分类 发送 时指定， 默认创意名称 */
-            event: creative_name,
-            /** 日志等级 发送 时指定 */
-            level: LoggerLevel.debug,
-            /** 广告系统版本 */
-            adVer: version,
-            /** m9 日志信息 */
-            info: {},
-            /** 广告位 */
-            pid: Number(pid),
-            /** 创意id */
-            cid: Number(creative_id)
-        };
-        // 移除空值
-        removeObjectNullValue(this._info);
-    }
-    /** 解析公共属性 */
-    LoggerPlus.prototype.updatePublicInfo = function (_a, ignoredNull) {
-        var level = _a.level, landing = _a.landing, appName = _a.appName, userInfo = _a.userInfo, systemInfo = _a.systemInfo, logInterface = _a.logInterface;
-        if (ignoredNull === void 0) { ignoredNull = true; }
-        var userNick = userInfo.userNick, vipEndTime = userInfo.vipEndTime, vipFlag = userInfo.vipFlag;
-        var obj = {
-            userNick: userNick,
-            appName: appName,
-            landing: landing,
-            vipEndTime: vipEndTime,
-            systemInfo: systemInfo,
-            vipFlag: vipFlag,
-        };
-        ignoredNull && removeObjectNullValue(obj);
-        // 日志等级
-        if (levels.includes(level)) {
-            this._curLoggerLevel = level;
-        }
-        // 日志 网络接口
-        if (typeof logInterface === 'function') {
-            this._logNetworkInterface = logInterface;
-        }
-        Object.assign(this._publicInfo, obj);
-    };
-    /** 再此日志对象基础上，创建一个新的日志对象 */
-    LoggerPlus.prototype.clone = function (info, ignoredNull) {
-        if (ignoredNull === void 0) { ignoredNull = true; }
-        // 不允许修改 action
-        delete info.action;
-        if (ignoredNull) {
-            removeObjectNullValue(info);
-        }
-        // 构造一份原本的
-        var obj = __assign(__assign({}, this._publicInfo), { logInterface: this._logNetworkInterface, level: this._curLoggerLevel });
-        // 覆盖上去
-        Object.assign(obj, info);
-        // 构造日志类
-        var loggerPlus = new LoggerPlus(
-        // 先使用空公共信息
-        { adData: nullAdData(), landing: LoggerLanding.production }, {
-            appName: obj.appName,
-            landing: obj.landing,
-            level: obj.level,
-            logInterface: obj.logInterface,
-            systemInfo: obj.systemInfo,
-            userInfo: { userNick: obj.userNick, vipEndTime: obj.vipEndTime, vipFlag: obj.vipFlag },
-        });
-        // 公共 私有 信息 部分。
-        loggerPlus._info = __assign({}, this._info);
-        return loggerPlus;
-    };
-    /**
-     * 发送日志
-     * @param level 日志等级
-     * @param event 事件名称
-     * @param args 参数
-     */
-    LoggerPlus.prototype._request = function (level, event) {
-        var args = [];
-        for (var _i = 2; _i < arguments.length; _i++) {
-            args[_i - 2] = arguments[_i];
-        }
-        if (!this.isCanLog(level)) {
-            log$2.debug.apply(log$2, __spreadArray$1(['忽略日志：', level, event], args, false));
-            return;
-        }
-        if (typeof this._logNetworkInterface !== 'function') {
-            // 按理来说，在初始化时 initAdLoggerPublicInfo 没报错，这里不可能为空
-            throw new Error('logNetworkInterface 不是一个函数');
-        }
-        var info = __assign(__assign(__assign({}, this._publicInfo), (this._info)), { event: event, level: level, info: args });
-        // 转换
-        var requestParams = coverLoggerInfoToRequestParam(info);
-        // 调用接口发送
-        this._logNetworkInterface(this.encode(requestParams), this.encodeValue(requestParams), info);
-        log$2.debug('发生日志：', level, event, info);
-    };
-    /** 将obj转 get 请求的字符串，并进行 url 编码 */
-    LoggerPlus.prototype.encode = function (obj) {
-        var res = this.encodeValue(obj);
-        return Object.keys(res)
-            .map(function (key) { return "".concat(key, "=").concat(obj[key]); })
-            .join('&');
-    };
-    /**
-     * 将 obj 的 value 编码成字符串
-     * @param obj
-     */
-    LoggerPlus.prototype.encodeValue = function (obj) {
-        var res = {};
-        Object.keys(obj)
-            .forEach(function (key) {
-            var value = obj[key];
-            if (typeof value === 'object') {
-                res[key] = encodeURIComponent(JSON.stringify(value));
-                return;
-            }
-            if (typeof value === 'function') {
-                // 不会有人传递一个函数吧
-                res[key] = encodeURIComponent("[function-".concat(value.name, "]:").concat(value.toString()));
-                return;
-            }
-            res[key] = encodeURIComponent(value);
-        });
-        return res;
-    };
-    /** debug 日志 */
-    LoggerPlus.prototype.debug = function (event) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        this._request.apply(this, __spreadArray$1([LoggerLevel.debug, event], args, false));
-    };
-    /** info 日志 */
-    LoggerPlus.prototype.info = function (event) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        this._request.apply(this, __spreadArray$1([LoggerLevel.info, event], args, false));
-    };
-    /** warn 日志 */
-    LoggerPlus.prototype.warn = function (event) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        this._request.apply(this, __spreadArray$1([LoggerLevel.warn, event], args, false));
-    };
-    /** error 日志 */
-    LoggerPlus.prototype.error = function (event) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        this._request.apply(this, __spreadArray$1([LoggerLevel.error, event], args, false));
-    };
-    /** 是否可打印 level 级别的日志 */
-    LoggerPlus.prototype.isCanLog = function (level) {
-        var _this = this;
-        var index = levels.findIndex(function (v) { return v === level; });
-        var curIndex = levels.findIndex(function (v) { return v === _this._curLoggerLevel; });
-        // level 级别 >= _curLoggerLevel 才能发送
-        return index >= curIndex;
-    };
-    return LoggerPlus;
-}());
-/** 将 LoggerInfo 转为 LoggerRequestParams */
-function coverLoggerInfoToRequestParam(info) {
-    return Object.keys(info).reduce(function (res, k) {
-        res[LoggerInfoKeyMap[k]] = info[k];
-        return res;
-    }, {});
-}
-
-var log$1 = createLogger('LoggerPlugin');
-/**
- * 日志插件，将 管理 日志 的公共属性参数，负责将日志对象注入到公共系统中
- */
-var LoggerPlugin = /** @class */ (function (_super) {
-    __extends$1(LoggerPlugin, _super);
-    function LoggerPlugin(_a) {
-        var level = _a.level, landing = _a.landing, appName = _a.appName, userInfo = _a.userInfo, logInterface = _a.logInterface, systemInfo = _a.systemInfo;
-        var _this = _super.call(this) || this;
-        /** 日志的公共信息 参数 */
-        _this._initParams = {
-            appName: "",
-            level: LoggerLevel.debug,
-            logInterface: function (_paramsStr, _params, _loggerInfo) {
-                throw new Error('未初始化 LoggerPlugin logInterface');
-            },
-            systemInfo: {},
-            userInfo: { userNick: "", vipEndTime: "", vipFlag: 0 }
-        };
-        // 一小波，错误提示
-        if (isEmpty(appName)) {
-            throw new Error('initAdLoggerPublicInfo: appName 必须的');
-        }
-        if (isEmpty(userInfo)) {
-            throw new Error('initAdLoggerPublicInfo: userInfo 必须的');
-        }
-        if (typeof logInterface !== 'function') {
-            throw new Error('initAdLoggerPublicInfo: logInterface 必须是一个函数');
-        }
-        if (isEmpty(systemInfo)) {
-            throw new Error('initAdLoggerPublicInfo: systemInfo 必须的');
-        }
-        if (isEmpty(landing)) {
-            throw new Error('initAdLoggerPublicInfo: landing 必须的');
-        }
-        _this.updatePublicInfo({ level: level, landing: landing, appName: appName, userInfo: userInfo, logInterface: logInterface, systemInfo: systemInfo }, false);
-        return _this;
-    }
-    /** 修改参数 */
-    LoggerPlugin.prototype.updatePublicInfo = function (params, ignoredNull) {
-        if (ignoredNull === void 0) { ignoredNull = true; }
-        log$1.info('updatePublicInfo: params = ', params, 'ignoredNull = ', ignoredNull);
-        (ignoredNull) && removeObjectNullValue(params);
-        Object.assign(this._initParams, params);
-        this.$logger && this.$logger.updatePublicInfo(params, ignoredNull);
-    };
-    LoggerPlugin.prototype.apply = function (_a) {
-        var context = _a.context; _a.config;
-        var $adImport = context.$adImport;
-        var adData = $adImport.adData;
-        /** 注入 日志对象 */
-        this.$logger = new LoggerPlus({ adData: adData.results[0] }, this._initParams);
-        context.$logger = this.$logger;
-        log$1.info('apply: context = ', context);
-    };
-    LoggerPlugin.prototype.onError = function (_a) {
-        var context = _a.context, error = _a.error, source = _a.source;
-        var $logger = context.$logger;
-        // 打印错误日志
-        $logger.clone({ landing: LoggerLanding[source] })
-            .error("".concat(error.name, "-").concat(error.message), JSON.stringify(error));
-    };
-    return LoggerPlugin;
-}(Plugin));
-
-/** 插件的所有方法 */
-var PluginMethodList = ['apply', 'onError'];
-/** 所有的插件 */
-var plugins = {};
-var log = createLogger('PluginMethod');
-// @ts-ignore
-var pluginEvent = new EventBus();
-/** 使用全局事件中心 注册插件的生命周期 */
-PluginMethodList.forEach(function (method) {
-    pluginEvent.on(PluginMethod[method], function (params) {
-        var keys = Object.keys(plugins);
-        log.info("PluginMethod[".concat(method, "]"), keys.length, params);
-        keys
-            .forEach(function (key) {
-            plugins[key][method](params);
-        });
-    });
-});
-/** 注册一个插件 */
-function registerPlugin(name, plugin) {
-    if (!(plugin instanceof Plugin)) {
-        throw new Error('registerPlugin: plugin 必须是 Plugin类的实例 ');
-    }
-    if (plugin[name]) {
-        throw new Error("".concat(name, " \u6B64\u63D2\u4EF6\uFF0C\u5DF2\u7ECF\u6CE8\u518C\u8FC7\u4E86"));
-    }
-    plugins[name] = plugin;
-    plugin.name = name;
-}
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -5826,7 +5461,7 @@ var ALLOW_EVENT = [
  * @description 获取naruse内部的页面对象
  * @author CHC
  * @date 2022-05-04 18:05:46
- * @param {Page} miniComponent
+ * @param {VirtualPage} miniComponent
  */
 var getPageInstance = function (miniComponent) {
     if (!miniComponent) {
@@ -5848,7 +5483,7 @@ var getPageInstance = function (miniComponent) {
     }
     var pageInstance = miniComponent.$$narusePage ? miniComponent : miniComponent.$page;
     if (!pageCenter[id]) {
-        pageCenter[id] = new Page$1(pageInstance);
+        pageCenter[id] = new VirtualPage(pageInstance);
         return pageCenter[id];
     }
     return pageCenter[id];
@@ -5857,10 +5492,10 @@ var getPageInstance = function (miniComponent) {
  * @description Naruse内部的Page实例
  * @author CHC
  * @date 2022-05-04 18:05:45
- * @class Page
+ * @class VirtualPage
  */
-var Page$1 = /** @class */ (function () {
-    function Page(miniPage) {
+var VirtualPage = /** @class */ (function () {
+    function VirtualPage(miniPage) {
         // 小程序实例
         this.miniPage = miniPage;
         // 事件中心
@@ -5870,6 +5505,7 @@ var Page$1 = /** @class */ (function () {
         this.oldEvents = {};
         // this.eventCenter.on('onUnload', () => setTimeout(() => this.clear()));
         this.hasBind = {};
+        this.once('onUnLoad', this.clear.bind(this));
     }
     /**
      * @description 拦截小程序页面事件，将事件改造为事件中心机制
@@ -5878,7 +5514,7 @@ var Page$1 = /** @class */ (function () {
      * @param {*} key
      * @param {*} value
      */
-    Page.prototype.interceptEvent = function (key) {
+    VirtualPage.prototype.interceptEvent = function (key) {
         var _this = this;
         var selfPage = this;
         // 保存原有事件并进入事件中心
@@ -5904,13 +5540,13 @@ var Page$1 = /** @class */ (function () {
                 };
             },
             set: function () {
-                logger.error('正在修改页面事件，请勿修改，请使用Naruse.Page.on()');
+                logger.error('正在修改页面事件，请勿修改，请使用Naruse.VirtualPage.on()');
             },
             enumerable: true,
             configurable: true,
         });
     };
-    Page.prototype.on = function (eventName, func) {
+    VirtualPage.prototype.on = function (eventName, func) {
         if (!ALLOW_EVENT.includes(eventName)) {
             logger.error("\u65E0\u6548\u7ED1\u5B9A\u4E8B\u4EF6\u540D-".concat(eventName));
             return;
@@ -5922,20 +5558,20 @@ var Page$1 = /** @class */ (function () {
         }
         this.eventCenter.on(eventName, func);
     };
-    Page.prototype.off = function (eventName, func) {
+    VirtualPage.prototype.off = function (eventName, func) {
         this.eventCenter.off(eventName, func);
     };
-    Page.prototype.once = function (eventName, func) {
+    VirtualPage.prototype.once = function (eventName, func) {
         this.eventCenter.once(eventName, func);
     };
-    Object.defineProperty(Page.prototype, "route", {
+    Object.defineProperty(VirtualPage.prototype, "route", {
         get: function () {
             return this.miniPage.route;
         },
         enumerable: false,
         configurable: true
     });
-    Page.prototype.clear = function () {
+    VirtualPage.prototype.clear = function () {
         var _this = this;
         this.eventCenter.clear();
         // 替换回对应的事件
@@ -5946,7 +5582,7 @@ var Page$1 = /** @class */ (function () {
         this.miniPage = null;
         this.oldEvents = {};
     };
-    return Page;
+    return VirtualPage;
 }());
 
 var withPage = function (component) {
@@ -6445,7 +6081,7 @@ var createPageComponent = function (instance, config) {
         middware.update();
         this.$middware = middware;
     };
-    // @ts-ignore
+    // @ts-ignore 小程序中的Page?
     Page(pageConfig);
 };
 
@@ -6464,7 +6100,7 @@ var createMiniFactory = function (type, instance, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.4.7";
+var version = "0.4.8";
 initVersionLogger('naruse-alipay', version);
 // naruse模块内容
 var Naruse = __assign(__assign(__assign(__assign(__assign(__assign(__assign({}, Hooks), { Component: NaruseComponent, createElement: createElement, h: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
@@ -6480,6 +6116,426 @@ var naruseExtend = function (opt) {
 };
 // @ts-ignore
 my.Naruse = Naruse;
+
+/** 插件 的 生命周期 */
+var PluginMethod;
+(function (PluginMethod) {
+    PluginMethod["apply"] = "Plugin.apply";
+    PluginMethod["onError"] = "Plugin.onError";
+})(PluginMethod || (PluginMethod = {}));
+/** 日志等级 */
+var LoggerLevel;
+(function (LoggerLevel) {
+    LoggerLevel["debug"] = "debug";
+    LoggerLevel["info"] = "info";
+    LoggerLevel["warn"] = "warn";
+    LoggerLevel["error"] = "error";
+    LoggerLevel["none"] = "none";
+})(LoggerLevel || (LoggerLevel = {}));
+/** 日志的触发起源地 */
+var LoggerLanding;
+(function (LoggerLanding) {
+    /** naruse error center */
+    LoggerLanding["errorCenter"] = "error-center";
+    /** try-catch run */
+    LoggerLanding["tryCatch"] = "error-center";
+    /** 线上 */
+    LoggerLanding["production"] = "production";
+    /** 开发时 */
+    LoggerLanding["development"] = "development";
+})(LoggerLanding || (LoggerLanding = {}));
+/** LoggerInfo 中 key 到 梦想埋点参数 key 的映射 */
+var LoggerInfoKeyMap = {
+    action: 'p',
+    event: 'e',
+    userNick: 'n',
+    level: 'm1',
+    appName: 'm2',
+    landing: 'm3',
+    vipEndTime: 'm4',
+    adVer: 'm5',
+    creative_name: 'm6',
+    systemInfo: 'm7',
+    info: 'm9',
+    pid: 'd1',
+    cid: 'd2',
+    vipFlag: 'd3',
+};
+// type ValueOf<T> = T[keyof T];
+// type RequestParamsKey = ValueOf<typeof LoggerInfoKeyMap>;
+
+/**
+ * 插件,很明显，它是一个插件，它可以做点什么。你必须继承此类，来实现插件
+ */
+var Plugin = /** @class */ (function () {
+    function Plugin(_config) {
+        var _newTarget = this.constructor;
+        /** 插件名称标识 */
+        this.name = '';
+        if (_newTarget === Plugin) {
+            throw new Error('Plugin 是一个抽象类，不能被实例化');
+        }
+    }
+    /** 在广告代码运行前，获取到有效的广告数据后 */
+    Plugin.prototype.apply = function (params) {
+    };
+    /** 解析广告代码错误时、运行广告代码错误时 */
+    Plugin.prototype.onError = function (params) {
+    };
+    return Plugin;
+}());
+/** 插件的所有方法 */
+var PluginMethodList = ['apply', 'onError'];
+/** 所有的插件 */
+var plugins = {};
+var log$2 = createLogger('PluginMethod');
+// @ts-ignore
+var pluginEvent = new EventBus();
+/** 使用全局事件中心 注册插件的生命周期 */
+PluginMethodList.forEach(function (method) {
+    pluginEvent.on(PluginMethod[method], function (params) {
+        var keys = Object.keys(plugins);
+        log$2.info("PluginMethod[".concat(method, "]"), keys.length, params);
+        keys
+            .forEach(function (key) {
+            plugins[key][method](params);
+        });
+    });
+});
+/** 注册一个插件 */
+function registerPlugin$1(name, pluginConstructor, firstParam) {
+    var params = [];
+    for (var _i = 3; _i < arguments.length; _i++) {
+        params[_i - 3] = arguments[_i];
+    }
+    // 构造对象
+    var plugin = new (pluginConstructor.bind.apply(pluginConstructor, __spreadArray$1([void 0, firstParam], params, false)))();
+    if (!(plugin instanceof Plugin)) {
+        throw new Error('registerPlugin: pluginConstructor 必须返回一个 Plugin类的实例');
+    }
+    if (plugin[name]) {
+        throw new Error("".concat(name, " \u6B64\u63D2\u4EF6\uFF0C\u5DF2\u7ECF\u6CE8\u518C\u8FC7\u4E86"));
+    }
+    plugins[name] = plugin;
+    plugin.name = name;
+    return plugin;
+}
+
+// 所有日志等级，顺序 按优先级升序（none 这个...最高，啥也不显示）
+var levels = [LoggerLevel.debug, LoggerLevel.info, LoggerLevel.warn, LoggerLevel.error, LoggerLevel.none];
+/** 获取空广告 */
+var nullAdData = function () { return ({
+    creative_id: undefined,
+    creative_name: "null data",
+    dest_url: "",
+    group_id: 0,
+    img_path: "",
+    img_size: "",
+    pid: undefined,
+    pid_name: "",
+    plan_id: 0,
+    primary_class: "",
+    secondary_class: "",
+    template_type: "",
+    user_define: { body: undefined },
+    version: ""
+}); };
+var log$1 = createLogger('LoggerPlus');
+/** 日志发送类 */
+var LoggerPlus = /** @class */ (function () {
+    /**
+     * 构造日志对象
+     * @param adData     广告数据
+     * @param landing    日志触发源头
+     * @param publicInfo 初始化日志公共属性的参数
+     */
+    function LoggerPlus(_a, publicInfo) {
+        var adData = _a.adData, landing = _a.landing;
+        /** 日志的公共信息 */
+        this._publicInfo = {
+            action: 'advert-template-logger',
+            appName: "",
+            landing: undefined,
+            systemInfo: "",
+            userNick: "",
+            vipEndTime: "",
+            vipFlag: 0
+        };
+        /** 日志的网络请求接口 */
+        this._logNetworkInterface = function () {
+            throw new Error('未初始化 LoggerPlugin logInterface');
+        };
+        // 当前日志等级
+        this._curLoggerLevel = LoggerLevel.debug;
+        if (!(adData !== null && typeof adData === 'object')) {
+            throw new Error('构造日志对象错误: adData 必须是一个对象');
+        }
+        // 初始化 公共属性
+        this.updatePublicInfo(publicInfo, false);
+        // 初始化 私有属性
+        var creative_name = adData.creative_name, creative_id = adData.creative_id, version = adData.version, pid = adData.pid;
+        this._info = {
+            landing: landing,
+            creative_name: creative_name,
+            /** 二级分类 发送 时指定， 默认创意名称 */
+            event: creative_name,
+            /** 日志等级 发送 时指定 */
+            level: LoggerLevel.debug,
+            /** 广告系统版本 */
+            adVer: version,
+            /** m9 日志信息 */
+            info: {},
+            /** 广告位 */
+            pid: Number(pid),
+            /** 创意id */
+            cid: Number(creative_id)
+        };
+        // 移除空值
+        removeObjectNullValue(this._info);
+    }
+    /** 解析公共属性 */
+    LoggerPlus.prototype.updatePublicInfo = function (_a, ignoredNull) {
+        var level = _a.level, landing = _a.landing, appName = _a.appName, userInfo = _a.userInfo, systemInfo = _a.systemInfo, logInterface = _a.logInterface;
+        if (ignoredNull === void 0) { ignoredNull = true; }
+        var userNick = userInfo.userNick, vipEndTime = userInfo.vipEndTime, vipFlag = userInfo.vipFlag;
+        var obj = {
+            userNick: userNick,
+            appName: appName,
+            landing: landing,
+            vipEndTime: vipEndTime,
+            systemInfo: systemInfo,
+            vipFlag: vipFlag,
+        };
+        ignoredNull && removeObjectNullValue(obj);
+        // 日志等级
+        if (levels.includes(level)) {
+            this._curLoggerLevel = level;
+        }
+        // 日志 网络接口
+        if (typeof logInterface === 'function') {
+            this._logNetworkInterface = logInterface;
+        }
+        Object.assign(this._publicInfo, obj);
+    };
+    /** 再此日志对象基础上，创建一个新的日志对象 */
+    LoggerPlus.prototype.clone = function (info, ignoredNull) {
+        if (ignoredNull === void 0) { ignoredNull = true; }
+        // 不允许修改 action
+        delete info.action;
+        if (ignoredNull) {
+            removeObjectNullValue(info);
+        }
+        // 构造一份原本的
+        var obj = __assign(__assign({}, this._publicInfo), { logInterface: this._logNetworkInterface, level: this._curLoggerLevel });
+        // 覆盖上去
+        Object.assign(obj, info);
+        // 构造日志类
+        var loggerPlus = new LoggerPlus(
+        // 先使用空公共信息
+        { adData: nullAdData(), landing: LoggerLanding.production }, {
+            appName: obj.appName,
+            landing: obj.landing,
+            level: obj.level,
+            logInterface: obj.logInterface,
+            systemInfo: obj.systemInfo,
+            userInfo: { userNick: obj.userNick, vipEndTime: obj.vipEndTime, vipFlag: obj.vipFlag },
+        });
+        // 公共 私有 信息 部分。
+        loggerPlus._info = __assign({}, this._info);
+        return loggerPlus;
+    };
+    /**
+     * 发送日志
+     * @param level 日志等级
+     * @param event 事件名称
+     * @param args 参数
+     */
+    LoggerPlus.prototype._request = function (level, event) {
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
+        if (!this.isCanLog(level)) {
+            log$1.debug.apply(log$1, __spreadArray$1(['忽略日志：', level, event], args, false));
+            return;
+        }
+        if (typeof this._logNetworkInterface !== 'function') {
+            // 按理来说，在初始化时 initAdLoggerPublicInfo 没报错，这里不可能为空
+            throw new Error('logNetworkInterface 不是一个函数');
+        }
+        var info = __assign(__assign(__assign({}, this._publicInfo), (this._info)), { event: event, level: level, info: args });
+        // 转换
+        var requestParams = coverLoggerInfoToRequestParam(info);
+        // 调用接口发送
+        this._logNetworkInterface(this.encode(requestParams), this.encodeValue(requestParams), info);
+        log$1.debug('发生日志：', level, event, info);
+    };
+    /** 将obj转 get 请求的字符串，并进行 url 编码 */
+    LoggerPlus.prototype.encode = function (obj) {
+        var res = this.encodeValue(obj);
+        return Object.keys(res)
+            .map(function (key) { return "".concat(key, "=").concat(obj[key]); })
+            .join('&');
+    };
+    /**
+     * 将 obj 的 value 编码成字符串
+     * @param obj
+     */
+    LoggerPlus.prototype.encodeValue = function (obj) {
+        var res = {};
+        Object.keys(obj)
+            .forEach(function (key) {
+            var value = obj[key];
+            if (typeof value === 'object') {
+                res[key] = encodeURIComponent(safeToJSON(value));
+                return;
+            }
+            if (typeof value === 'function') {
+                // 不会有人传递一个函数吧
+                res[key] = encodeURIComponent("[function-".concat(value.name, "]:").concat(value.toString()));
+                return;
+            }
+            res[key] = encodeURIComponent(value);
+        });
+        return res;
+    };
+    /** debug 日志 */
+    LoggerPlus.prototype.debug = function (event) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        this._request.apply(this, __spreadArray$1([LoggerLevel.debug, event], args, false));
+    };
+    /** info 日志 */
+    LoggerPlus.prototype.info = function (event) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        this._request.apply(this, __spreadArray$1([LoggerLevel.info, event], args, false));
+    };
+    /** warn 日志 */
+    LoggerPlus.prototype.warn = function (event) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        this._request.apply(this, __spreadArray$1([LoggerLevel.warn, event], args, false));
+    };
+    /** error 日志 */
+    LoggerPlus.prototype.error = function (event) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        this._request.apply(this, __spreadArray$1([LoggerLevel.error, event], args, false));
+    };
+    /** 是否可打印 level 级别的日志 */
+    LoggerPlus.prototype.isCanLog = function (level) {
+        var _this = this;
+        var index = levels.findIndex(function (v) { return v === level; });
+        var curIndex = levels.findIndex(function (v) { return v === _this._curLoggerLevel; });
+        // level 级别 >= _curLoggerLevel 才能发送
+        return index >= curIndex;
+    };
+    return LoggerPlus;
+}());
+/** 将 LoggerInfo 转为 LoggerRequestParams */
+function coverLoggerInfoToRequestParam(info) {
+    return Object.keys(info).reduce(function (res, k) {
+        res[LoggerInfoKeyMap[k]] = info[k];
+        return res;
+    }, {});
+}
+
+var log = createLogger('LoggerPlugin');
+var getNullAdData = function () {
+    return {
+        creative_id: 0,
+        creative_name: "",
+        dest_url: "",
+        group_id: 0,
+        img_path: "",
+        img_size: "",
+        pid: 0,
+        pid_name: "",
+        plan_id: 0,
+        primary_class: "",
+        secondary_class: "",
+        template_type: "",
+        user_define: { body: {} },
+        version: ""
+    };
+};
+/**
+ * 日志插件，将 管理 日志 的公共属性参数，负责将日志对象注入到公共系统中
+ */
+var LoggerPlugin = /** @class */ (function (_super) {
+    __extends$1(LoggerPlugin, _super);
+    function LoggerPlugin(first, _a) {
+        var level = _a.level, landing = _a.landing, appName = _a.appName, userInfo = _a.userInfo, logInterface = _a.logInterface, systemInfo = _a.systemInfo;
+        var _this = _super.call(this, first) || this;
+        /** 日志的公共信息 参数 */
+        _this._initParams = {
+            appName: "",
+            level: LoggerLevel.debug,
+            logInterface: function (_paramsStr, _params, _loggerInfo) {
+                throw new Error('未初始化 LoggerPlugin logInterface');
+            },
+            systemInfo: {},
+            userInfo: { userNick: "", vipEndTime: "", vipFlag: 0 }
+        };
+        // 一小波，错误提示
+        if (isEmpty(appName)) {
+            throw new Error('initAdLoggerPublicInfo: appName 必须的');
+        }
+        if (isEmpty(userInfo)) {
+            throw new Error('initAdLoggerPublicInfo: userInfo 必须的');
+        }
+        if (typeof logInterface !== 'function') {
+            throw new Error('initAdLoggerPublicInfo: logInterface 必须是一个函数');
+        }
+        if (isEmpty(systemInfo)) {
+            throw new Error('initAdLoggerPublicInfo: systemInfo 必须的');
+        }
+        if (isEmpty(landing)) {
+            throw new Error('initAdLoggerPublicInfo: landing 必须的');
+        }
+        _this.updatePublicInfo({ level: level, landing: landing, appName: appName, userInfo: userInfo, logInterface: logInterface, systemInfo: systemInfo }, false);
+        // 注入默认的 日志对象.(预加载代码，不会触发插件的生命周期)
+        var default$logger = new LoggerPlus({ adData: getNullAdData(), landing: LoggerLanding.production }, _this._initParams);
+        var config = first.config;
+        var baseCtx = config.baseCtx();
+        baseCtx.$logger = default$logger;
+        return _this;
+    }
+    /** 修改参数 */
+    LoggerPlugin.prototype.updatePublicInfo = function (params, ignoredNull) {
+        if (ignoredNull === void 0) { ignoredNull = true; }
+        log.info('updatePublicInfo: params = ', params, 'ignoredNull = ', ignoredNull);
+        (ignoredNull) && removeObjectNullValue(params);
+        Object.assign(this._initParams, params);
+        this.$logger && this.$logger.updatePublicInfo(params, ignoredNull);
+    };
+    LoggerPlugin.prototype.apply = function (_a) {
+        var context = _a.context; _a.config;
+        var $adImport = context.$adImport;
+        var adData = $adImport.adData;
+        /** 注入 日志对象 */
+        this.$logger = new LoggerPlus({ adData: adData.results[0] }, this._initParams);
+        context.$logger = this.$logger;
+        log.info('apply: context = ', context);
+    };
+    LoggerPlugin.prototype.onError = function (_a) {
+        var context = _a.context, error = _a.error, source = _a.source;
+        var $logger = context.$logger;
+        // 打印错误日志
+        $logger.clone({ landing: LoggerLanding[source] })
+            .error("".concat(error.name, "-").concat(error.message), error);
+    };
+    return LoggerPlugin;
+}(Plugin));
 
 /**
  * @description 根据props获取naruse组件
@@ -6737,19 +6793,28 @@ var createVmContext = function () {
 var createMainBehavior = function (option) {
     if (option === void 0) { option = {}; }
     // 小程序组件默认minxs对象
-    var naruseBehavior = __assign(__assign({}, getMiniappEventBehavior()), { 
+    var naruseBehavior = __assign(__assign({}, getMiniappEventBehavior()), { __NaruseUniqueComponentPageShowEvent: null, 
         /**
          * @description 装载完毕后
          * @author CHC
          * @date 2022-03-16 10:03:05
          */
         didMount: function () {
+            var _this = this;
             this.isNaruseMainComponent = isEmpty(this.props.component);
             if (this.isNaruseMainComponent) {
-                var _a = (this.props || {}).unique, unique = _a === void 0 ? false : _a;
-                // 绑定重新渲染事件
-                if (unique)
+                var _a = this.props || {}, _b = _a.unique, unique = _b === void 0 ? false : _b; _a.pagePath;
+                if (unique) {
+                    // 绑定重新渲染事件
                     bindRenderEventOnComponent(this);
+                    this.__NaruseUniqueComponentPageShowEvent = function (event) {
+                        // 小程序对象Page.__proto__.route
+                        var path = Object.getPrototypeOf(_this.$page).route;
+                        globalEvent.emit('__NaruseUniqueComponentPageShow', { path: path, event: event || 'onShow' });
+                    };
+                    getPageInstance(this).on('onShow', this.__NaruseUniqueComponentPageShowEvent);
+                    this.__NaruseUniqueComponentPageShowEvent('didMount');
+                }
             }
             this.option = option;
             createVmContext.call(this);
@@ -6809,5 +6874,13 @@ naruseExtend({
     createMiniFactory: createMiniFactory,
     Naruse: Naruse,
 });
+var registerPlugin = function (name, plugin) {
+    var params = [];
+    for (var _i = 2; _i < arguments.length; _i++) {
+        params[_i - 2] = arguments[_i];
+    }
+    var config = getNaruseConfig();
+    return registerPlugin$1.apply(void 0, __spreadArray$1([name, plugin, { config: config }], params, false));
+};
 
 export { LoggerLanding, LoggerLevel, LoggerPlugin, LoggerPlus, Naruse, Plugin, createMainBehavior, Naruse as default, naruseExtend, naruseInit, registerPlugin, renderComponentOnPageWithCode };

@@ -1,5 +1,12 @@
 # naruse-share
 
+## 0.4.8
+
+### Patch Changes
+
+- #FEAT: 新增 naruse-plugin(just alipay) 支持组件系统
+- #FIX: 【alipay】修复 ES3 类写法下 middware 初始化的问题
+
 ## 0.4.7
 
 ### Patch Changes
