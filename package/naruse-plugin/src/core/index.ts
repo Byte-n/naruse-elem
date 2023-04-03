@@ -1,5 +1,5 @@
 import { PluginApplyParams, PluginConstructorFirstParma, PluginMethod, PluginMethodKey, PluginOnErrorParams } from "../type";
-import { createLogger, EventBus, isArrowFunction } from "naruse-share";
+import { createLogger, EventBus } from "naruse-share";
 
 /**
  * 插件,很明显，它是一个插件，它可以做点什么。你必须继承此类，来实现插件
