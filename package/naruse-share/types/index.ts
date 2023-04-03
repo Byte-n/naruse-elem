@@ -5,7 +5,9 @@ export type NaruseInitParams = Partial<NaruseConfig>
 export type NaruseConfig = {
     hotPuller: (props: any) => HotPullerReturn,
     baseCtx: () => AdRunningContext | {},
-    onRunError: (err: Error, source: RunningCodeErrorSource) => void,
+    onRunError: (err: Error, source?: RunningCodeErrorSource) => void,
+    hotImport: (path: string) => string | Promise<string>,
+    [k: string]: any,
 }
 
 /** 热更新方法返回值 */
@@ -26,6 +28,8 @@ export type AdRunningContext = {
     $logger?: any,
     // 广告版本
     $adVersion?: string,
+    $webpack?: any,
+    $$import?: any,
     // todo: 待补充
 } & Record<string, any>;
 

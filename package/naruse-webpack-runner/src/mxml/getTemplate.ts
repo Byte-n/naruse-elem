@@ -1,8 +1,7 @@
 // 根据数据队列生成axml模版
 import { js2xml } from 'xml-js';
 import humps from 'humps';
-
-
+import { eventCenterEventName } from './data';
 
 const camelCase = humps.camelize;
 
@@ -43,10 +42,8 @@ function generateTemplate(template, speicalConfig) {
     });
     events.forEach(event => {
         let name = event;
-        let value = event;
-        if (speicalEvent[event]) {
-            value = speicalEvent[event];
-        }
+        // 统一使用同一个事件中心
+        const value = eventCenterEventName;
         // 事件冒泡 值名前需要把on替换成catch
         if (bubblingEvents.includes(event)) {
             name = name.replace('on', 'catch');

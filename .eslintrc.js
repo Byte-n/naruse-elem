@@ -21,6 +21,9 @@ module.exports = {
         "react"
     ],
     "rules": {
+        "node/no-extraneous-require": [0],
+        "node/no-unsupported-features/es-syntax": [0],
+        "node/no-extraneous-import":[0]
     },
     "globals": {
         "require": "readonly"

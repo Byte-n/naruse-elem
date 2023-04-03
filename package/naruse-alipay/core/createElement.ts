@@ -1,4 +1,4 @@
-import { isNaruseComponent } from './component';
+import { isNaruseComponent, functionalizae } from './component';
 import { isBaseTypeComponent, VNode } from './diff';
 
 
@@ -126,7 +126,7 @@ const createBaseElement = (type: any, props: any, childNodes: any []): VNode => 
  * @date 2022-03-15 12:03:45
  */
 const createFuncElement = (type, props, childNodes) => {
-    return type({ ...props, children: childNodes });
+    return createClassElement(functionalizae(type), props, childNodes);
 };
 
 

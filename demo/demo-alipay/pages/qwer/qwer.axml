@@ -1,5 +1,4 @@
 <view>
   new page
   <button size="default" type="primary">Button</button>
-  <cc></cc>
 </view>

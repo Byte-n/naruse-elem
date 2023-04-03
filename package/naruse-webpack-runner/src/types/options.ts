@@ -1,4 +1,5 @@
-import { NaruseTemplate } from "src/core/template";
+import type { NaruseTemplate } from "../core/template";
+import type Chain from 'webpack-chain';
 
 interface BaseWebpackRunnerOptions {
     /** 编译模式 */
@@ -7,19 +8,19 @@ interface BaseWebpackRunnerOptions {
     isWatch?: boolean;
     /** 基础环境 */
     sourceDir: string;
-    /** naruse 外部依赖路径 */
+    /** naruse 外部依赖路径, 为空 或 为 false 则默认不转化 Naruse 引入 */
     naruseExternal?: string | {
         path: string;
         // 外部依赖的库名
         libName?: string;
         // 外部组件名
         componentName?: string;
-    };
+    } | false;
     template?: NaruseTemplate;
     /** 输出总路径 */
     outputPath: string;
-    /** commonChunks */
-    commonChunks?: string[];
+    /** 对外暴露 webpack chain */
+    webpackChain?: (chain: Chain, config: BaseWebpackRunnerOptions) => void;
 }
 
 /** 编译模式 */
@@ -31,7 +32,9 @@ export type CompilerType = 'app' | 'pages' | 'components';
 export interface NaruseWebpackPageRunnerOptions extends BaseWebpackRunnerOptions {
     compilerType: 'pages';
     /** 页面入口文件 */
-    pages : string | string[];
+    pages: string | string[];
+    /** commonChunks */
+    commonChunks?: string[];
 }
 
 /**
@@ -43,6 +46,8 @@ export interface NaruseWebpackComponentRunnerOptions extends BaseWebpackRunnerOp
         // 组件入口文件
         entry: string | string[] | ComponentEntryConfig[] | ComponentEntryConfig;
     };
+    /** commonChunks */
+    commonChunks?: string[];
 }
 
 export interface ComponentEntryConfig {
@@ -53,4 +58,13 @@ export interface ComponentEntryConfig {
 }
 
 
-export type NaruseWebpackRunnerOptions = NaruseWebpackPageRunnerOptions | NaruseWebpackComponentRunnerOptions;
+export interface NaruseWebpackSingleHotComponentRunnerOptions extends BaseWebpackRunnerOptions {
+    compilerType: 'singleHotComponent'
+    // 默认为 false
+    naruseExternal: false;
+    /** 是否输出为 export default + 字符串 */
+    isExportDefaultString?: boolean;
+}
+
+
+export type NaruseWebpackRunnerOptions = NaruseWebpackPageRunnerOptions | NaruseWebpackComponentRunnerOptions | NaruseWebpackSingleHotComponentRunnerOptions;
