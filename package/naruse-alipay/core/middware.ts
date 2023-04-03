@@ -58,8 +58,10 @@ export class Middware {
         this.component = miniappComponent;
         if (NaruseComponentActuator instanceof NaruseComponent) {
             this.naruseComponent = NaruseComponentActuator;
-        // 通过静态属性判断是否是尚未实例化的 naruse 组件
-        } else if (NaruseComponentActuator.$isNaruseComponent === true) {
+        // 通过静态属性判断是否是尚未实例化的 naruse 组件 || 通过原型链判断是否是继承自 NaruseComponent 的组件
+        // @ts-ignore
+        } else if (NaruseComponentActuator.$isNaruseClass || Object.getPrototypeOf(NaruseComponentActuator.prototype).constructor?.$isNaruseClass) {
+            // @ts-ignore
             this.naruseComponent = new NaruseComponentActuator(props);
             this.naruseComponent.props = props;
         } else if (typeof NaruseComponentActuator === 'function') {
