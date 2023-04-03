@@ -12,7 +12,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, u
  * @class NaruseComponent
  */
 export class NaruseComponent {
-    static $isNaruseComponent = true;
+    static $isNaruseClass = true;
     state: Record<string, any>;
     props: Record<string, any>;
     $mounted: boolean;
