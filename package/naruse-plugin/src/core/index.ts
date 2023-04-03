@@ -42,9 +42,6 @@ PluginMethodList.forEach((method: PluginMethodKey) => {
 
 /** 注册一个插件 */
 export function registerPlugin (name: string, pluginConstructor: typeof Plugin, firstParam: PluginConstructorFirstParma, ...params: any[]): Plugin {
-    if (isArrowFunction(pluginConstructor)) {
-        throw new Error('registerPlugin: pluginConstructor 不能是箭头函数，无法通过 箭头函数创建对象');
-    }
     // 构造对象
     const plugin = new pluginConstructor(firstParam, ...params);
     if (!(plugin instanceof Plugin)) {
