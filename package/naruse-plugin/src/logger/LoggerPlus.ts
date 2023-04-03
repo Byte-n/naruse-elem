@@ -11,7 +11,7 @@ import {
     LoggerRequestParams,
     LoggerCloneParams, UpdateAdLoggerPublicInfoParams,
 } from '../type';
-import { AdData, removeObjectNullValue, createLogger, } from "naruse-share";
+import { AdData, removeObjectNullValue, createLogger, safeToJSON } from "naruse-share";
 
 // 所有日志等级，顺序 按优先级升序（none 这个...最高，啥也不显示）
 const levels = [LoggerLevel.debug, LoggerLevel.info, LoggerLevel.warn, LoggerLevel.error, LoggerLevel.none];
@@ -202,7 +202,7 @@ export default class LoggerPlus {
             .forEach(key => {
                 const value = obj[key];
                 if (typeof value === 'object') {
-                    res[key] = encodeURIComponent(JSON.stringify(value));
+                    res[key] = encodeURIComponent(safeToJSON(value));
                     return;
                 }
                 if (typeof value === 'function') {
