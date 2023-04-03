@@ -34,6 +34,6 @@ import { MiniComponentConfig } from "./createMiniFactory";
         this.$middware = middware;
     }
 
-    // @ts-ignore
+    // @ts-ignore 小程序中的Page?
     Page(pageConfig);
 }

@@ -1,5 +1,5 @@
 import { logger } from "./uitl";
-import { NaruseConfig, NaruseInitParams } from '../../naruse-share/index';
+import { NaruseConfig, NaruseInitParams } from 'naruse-share';
 
 const _config: NaruseConfig = {
     hotPuller: () => {

@@ -59,7 +59,7 @@ export const isObj = (obj) => obj !== null &&  typeof obj === 'object';
  * @author CHC
  * @date 2022-07-14 17:07:45
  * @param {*} str
- * @returns {*} 
+ * @returns {*}
  */
 export const safeJsonParse = (str) => {
     try {
@@ -80,3 +80,29 @@ export const isEmptyObj = (o) => {
     }
     return true;
 }
+
+/** 转JSON,对Error特殊处理，且忽略 function、bigint、symbol */
+export const safeToJSON = (obj) => {
+    // ERROR
+    if (obj instanceof Error) {
+        return JSON.stringify({ name: obj.name, message: obj.message, stack: obj.stack });
+    }
+    // 存储所有对象，判断是有循环引用
+    const cache = [];
+    return JSON.stringify(obj, (key, value) => {
+        if (typeof value === 'function' || typeof value === 'bigint' || typeof value === 'symbol') {
+            return;
+        }
+        // object
+        if (typeof value === 'object') {
+            // 循环引用了
+            if (cache.indexOf(value) !== -1) {
+                return `$circular:${key}`;
+            }
+            cache.push(value);
+            // 空数组
+        }
+        // number || boolean || object || null || undefined
+        return value;
+    });
+};

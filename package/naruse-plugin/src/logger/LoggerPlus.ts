@@ -9,10 +9,10 @@ import {
     LoggerRawInfo,
     LogNetworkInterface,
     LoggerRequestParams,
-    AdData, LoggerCloneParams, UpdateAdLoggerPublicInfoParams,
-} from "../../types";
-import { isEmpty, removeObjectNullValue } from "../../utils";
-import { createLogger } from "../../index";
+    LoggerCloneParams, UpdateAdLoggerPublicInfoParams,
+} from '../type';
+import { AdData, removeObjectNullValue, createLogger, safeToJSON } from "naruse-share";
+
 // 所有日志等级，顺序 按优先级升序（none 这个...最高，啥也不显示）
 const levels = [LoggerLevel.debug, LoggerLevel.info, LoggerLevel.warn, LoggerLevel.error, LoggerLevel.none];
 /** 获取空广告 */
@@ -62,9 +62,9 @@ export default class LoggerPlus {
      * @param landing    日志触发源头
      * @param publicInfo 初始化日志公共属性的参数
      */
-    constructor({ adData }: LoggerPlusConstructorParams, publicInfo: InitAdLoggerPublicInfoParams) {
-        if (isEmpty(adData)) {
-            throw new Error('构造日志对象错误，缺少必要参数：adData')
+    constructor({ adData, landing }: LoggerPlusConstructorParams, publicInfo: InitAdLoggerPublicInfoParams) {
+        if (!(adData !== null && typeof adData === 'object')) {
+            throw new Error('构造日志对象错误: adData 必须是一个对象')
         }
         // 初始化 公共属性
         this.updatePublicInfo(publicInfo, false);
@@ -72,7 +72,7 @@ export default class LoggerPlus {
         // 初始化 私有属性
         const { creative_name, creative_id, version, pid } = adData;
         this._info = {
-            landing: undefined,
+            landing,
             creative_name,
             /** 二级分类 发送 时指定， 默认创意名称 */
             event: creative_name,
@@ -202,7 +202,7 @@ export default class LoggerPlus {
             .forEach(key => {
                 const value = obj[key];
                 if (typeof value === 'object') {
-                    res[key] = encodeURIComponent(JSON.stringify(value));
+                    res[key] = encodeURIComponent(safeToJSON(value));
                     return;
                 }
                 if (typeof value === 'function') {

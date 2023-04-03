@@ -1,9 +1,10 @@
 import { getMiniappEventBehavior } from './domEvents.js';
 import { logger, propsEquals } from './uitl.js';
 import { Middware } from './middware.js';
-import { isEmpty } from '../../naruse-share/index';
+import { globalEvent, isEmpty } from '../../naruse-share/index';
 import { getNaruseComponentFromProps } from './create.js';
-import { bindRenderEventOnComponent, uninstallMainComponentOnSomePage } from '../expand/index.js';
+import { bindRenderEventOnComponent, uninstallMainComponentOnSomePage } from '../expand';
+import { getPageInstance } from "./page";
 
 /**
  * @description 初始化naruse主组件
@@ -70,6 +71,7 @@ const createMainBehavior = (option = {}) => {
     // 小程序组件默认minxs对象
     const naruseBehavior = {
         ...getMiniappEventBehavior(),
+        __NaruseUniqueComponentPageShowEvent: null,
         /**
          * @description 装载完毕后
          * @author CHC
@@ -78,9 +80,18 @@ const createMainBehavior = (option = {}) => {
         didMount() {
             this.isNaruseMainComponent = isEmpty(this.props.component);
             if (this.isNaruseMainComponent) {
-                const { unique = false } = this.props || {};
-                // 绑定重新渲染事件
-                if (unique) bindRenderEventOnComponent(this);
+                const { unique = false, pagePath } = this.props || {};
+                if (unique) {
+                    // 绑定重新渲染事件
+                    bindRenderEventOnComponent(this)
+                    this.__NaruseUniqueComponentPageShowEvent = (event) => {
+                        // 小程序对象Page.__proto__.route
+                        const path = Object.getPrototypeOf(this.$page).route;
+                        globalEvent.emit('__NaruseUniqueComponentPageShow', { path, event: event || 'onShow' });
+                    }
+                    getPageInstance(this).on('onShow', this.__NaruseUniqueComponentPageShowEvent);
+                    this.__NaruseUniqueComponentPageShowEvent('didMount');
+                }
             }
             this.option = option;
             createVmContext.call(this);

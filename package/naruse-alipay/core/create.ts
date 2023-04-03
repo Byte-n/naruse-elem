@@ -3,13 +3,8 @@ import { getNaruseConfig } from './init';
 import { logger } from './uitl';
 import { createElement } from './createElement';
 import { Naruse } from './naurse';
-import {
-    AdRunningContext, PluginApplyParams,
-    pluginEvent,
-    PluginMethod,
-    PluginOnErrorParams,
-    RunningCodeErrorSource
-} from '../../naruse-share/index';
+import { AdRunningContext, RunningCodeErrorSource } from 'naruse-share';
+import { PluginApplyParams, pluginEvent, PluginMethod, PluginOnErrorParams } from '../../naruse-plugin';
 
 /**
  * @description 根据props获取naruse组件
