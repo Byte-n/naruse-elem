@@ -102,36 +102,43 @@ function __spreadArray$1(to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 }
 
-const createLogger = (name) => {
-    const Logger = {
-        debug () {
-            console.debug(`[${name}][debugger]`, ...arguments);
+var createLogger = function (name) {
+    return {
+        debug: function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            console.debug.apply(console, __spreadArray$1(["[".concat(name, "][debugger]")], args, false));
         },
-        warn () {
-            console.warn(`[${name}][warn]`, ...arguments);
+        warn: function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            console.warn.apply(console, __spreadArray$1(["[".concat(name, "][warn]")], args, false));
         },
-        info () {
-            console.info(`[${name}][info]`, ...arguments);
+        info: function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            console.info.apply(console, __spreadArray$1(["[".concat(name, "][info]")], args, false));
         },
-        error () {
-            console.error(`[${name}][error]`, ...arguments);
+        error: function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            console.error.apply(console, __spreadArray$1(["[".concat(name, "][error]")], args, false));
         },
     };
-
-    return Logger;
+};
+var initVersionLogger = function (name, version) {
+    console.log("%c naruse %c ".concat(name, " v").concat(version, " %c"), 'background:#17c0eb ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff', 'background:#7158e2 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff', 'background:transparent');
 };
 
-const initVersionLogger = (name, version) => {
-    console.log(
-        `%c naruse %c ${name} v${version} %c`,
-        'background:#17c0eb ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
-        'background:#7158e2 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
-        'background:transparent'
-      );
-};
-
-const logger$1 = createLogger('naurse-error');
-
+var logger$1 = createLogger('naurse-error');
 /**
  * @description 期望为某个类型，异步版
  * @author CHC
@@ -139,14 +146,13 @@ const logger$1 = createLogger('naurse-error');
  * @param {*} { obj, type, name }
  * @returns {*}
  */
-const exceptType = (obj, type, name) => {
+var exceptType = function (obj, type, name) {
     if (typeof obj !== type) {
-        const res = { errMsg: `${name}:fail must has a ${type}` };
+        var res = { errMsg: "".concat(name, ":fail must has a ").concat(type) };
         logger$1.error(res.errMsg);
         return Promise.reject(res);
     }
 };
-
 /**
  * @description 期望为某个类型同步版
  * @author CHC
@@ -156,15 +162,13 @@ const exceptType = (obj, type, name) => {
  * @param {*} name
  * @returns {*}
  */
-const exceptTypeSync = (obj, type, name) => {
+var exceptTypeSync = function (obj, type, name) {
     if (typeof obj !== type) {
-        logger$1.error(`${name}:fail must has a ${type}`);
+        logger$1.error("".concat(name, ":fail must has a ").concat(type));
         return true;
     }
     return false;
 };
-
-
 /**
  * @description 暂时不支持的api
  * @author CHC
@@ -172,15 +176,15 @@ const exceptTypeSync = (obj, type, name) => {
  * @param {*} apiName
  * @returns {*}
  */
-const temporarilyNotSupport = function temporarilyNotSupport (apiName) {
-    return () => {
-        const errMsg = `暂时不支持 API ${apiName}`;
+var temporarilyNotSupport = function temporarilyNotSupport(apiName) {
+    return function () {
+        var errMsg = "\u6682\u65F6\u4E0D\u652F\u6301 API ".concat(apiName);
         logger$1.error(errMsg);
-        return Promise.reject({ errMsg });
+        return Promise.reject({ errMsg: errMsg });
     };
 };
 
-const mitt = function (n) {
+var mitt = function (n) {
     return {
         all: n = n || new Map,
         on: function (e, t) {
@@ -191,18 +195,26 @@ const mitt = function (n) {
             var i = n.get(e);
             i && (t ? i.splice(i.indexOf(t) >>> 0, 1) : n.set(e, []));
         },
-        emit: function (e, ...t) {
+        emit: function (e) {
+            var t = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                t[_i - 1] = arguments[_i];
+            }
             var i = n.get(e);
             i && i.slice().map(function (n) {
-                n(...t);
+                n.apply(void 0, t);
             }), (i = n.get("*")) && i.slice().map(function (n) {
-                typeof n === 'function' && n(e, ...t);
+                typeof n === 'function' && n.apply(void 0, __spreadArray$1([e], t, false));
             });
         },
         once: function (event, fun) {
             var i = n.get(event);
-            const funcs = (...args) => {
-                fun(...args);
+            var funcs = function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                fun.apply(void 0, args);
                 var i = n.get(event);
                 i && i.splice(i.indexOf(funcs) >>> 0, 1);
             };
@@ -211,13 +223,10 @@ const mitt = function (n) {
         clear: function () {
             n.clear();
         }
-    }
+    };
 };
-
-
 /** 全局事件中心 */
-const globalEvent = mitt();
-
+var globalEvent = mitt();
 /**
  * 这里不要改成箭头函数
  * 需要利用 new 来执行(兼容)
@@ -230,43 +239,95 @@ function EventBus(map) {
     return mitt(map);
 }
 
-class MethodHandler {
-    constructor ({ name, success, fail, complete }) {
+var MethodHandler = /** @class */ (function () {
+    function MethodHandler(_a) {
+        var name = _a.name, success = _a.success, fail = _a.fail, complete = _a.complete;
         this.methodName = name;
         this.__success = success;
         this.__fail = fail;
         this.__complete = complete;
     }
-
     /** 成功 */
-    success (res = {}, resolve = Promise.resolve.bind(Promise)) {
+    MethodHandler.prototype.success = function (res, resolve) {
+        if (res === void 0) { res = {}; }
+        if (resolve === void 0) { resolve = Promise.resolve.bind(Promise); }
         if (!res.errMsg) {
-            res.errMsg = `${this.methodName}:ok`;
+            res.errMsg = "".concat(this.methodName, ":ok");
         }
         typeof this.__success === 'function' && this.__success(res);
         typeof this.__complete === 'function' && this.__complete(res);
         return resolve(res);
-    }
-
+    };
     /** 失败 */
-    fail (res = {}, reject = Promise.reject.bind(Promise)) {
+    MethodHandler.prototype.fail = function (res, reject) {
+        if (res === void 0) { res = {}; }
+        if (reject === void 0) { reject = Promise.reject.bind(Promise); }
         if (!res.errMsg) {
-            res.errMsg = `${this.methodName}:fail`;
-        } else {
-            res.errMsg = `${this.methodName}:fail ${res.errMsg}`;
+            res.errMsg = "".concat(this.methodName, ":fail");
+        }
+        else {
+            res.errMsg = "".concat(this.methodName, ":fail ").concat(res.errMsg);
         }
         console.error(res.errMsg);
         typeof this.__fail === 'function' && this.__fail(res);
         typeof this.__complete === 'function' && this.__complete(res);
         return reject(res);
+    };
+    return MethodHandler;
+}());
+
+/**
+ * 去掉前后 空格/空行/tab 的正则 预先定义 避免在函数中重复构造
+ * @type {RegExp}
+ */
+var trimReg = /(^\s*)|(\s*$)/g;
+/**
+  * 判断一个东西是不是空 空格 空字符串 undefined 长度为0的数组及对象会被认为是空的
+  * @param key
+  * @returns {boolean}
+  */
+var isEmpty = function (key) {
+    if (key === undefined || key === '' || key === null) {
+        return true;
     }
+    if (typeof (key) === 'string') {
+        key = key.replace(trimReg, '');
+        if (key === '' || key === null || key === 'null' || key === undefined || key === 'undefined') {
+            return true;
+        }
+        return false;
+    }
+    else if (typeof (key) === 'undefined') {
+        return true;
+    }
+    else if (typeof (key) === 'object') {
+        for (var i in key) {
+            return false;
+        }
+        return true;
+    }
+    else if (typeof (key) === 'boolean') {
+        return false;
+    }
+};
+/** 移除对象的中空值 */
+function removeObjectNullValue(obj) {
+    if (typeof obj !== 'object' || obj === null) {
+        return obj;
+    }
+    Object.keys(obj)
+        .forEach(function (k) {
+        if (isEmpty(obj[k])) {
+            delete obj[k];
+        }
+    });
+    return obj;
 }
 
-const deferMap = {};
-
-const getDeferPromise = () => {
-    let resolve, reject;
-    const promise = new Promise((res, rej) => {
+var deferMap = {};
+var getDeferPromise = function () {
+    var resolve, reject;
+    var promise = new Promise(function (res, rej) {
         resolve = res;
         reject = rej;
     });
@@ -274,13 +335,12 @@ const getDeferPromise = () => {
     promise.reject = reject;
     return promise;
 };
-
-const proxyObject = (obj) => {
+var proxyObject = function (obj) {
     if (typeof Proxy !== 'function') {
         return obj;
     }
     return new Proxy(obj, {
-        get(target, key) {
+        get: function (target, key) {
             if (!target[key]) {
                 return obj[key] = getDeferPromise();
             }
@@ -288,17 +348,403 @@ const proxyObject = (obj) => {
         }
     });
 };
-
-const getDeferred = (key) => {
+var getDeferred = function (key) {
     if (!key) {
         return proxyObject(deferMap);
     }
     if (deferMap[key]) {
         return deferMap[key];
-    } else {
+    }
+    else {
         return deferMap[key] = getDeferPromise();
     }
 };
+
+/** 错误来源，该枚举的值为 LoggerLanding 的 key */
+var RunningCodeErrorSource;
+(function (RunningCodeErrorSource) {
+    RunningCodeErrorSource["errorCenter"] = "errorCenter";
+    RunningCodeErrorSource["tryCatch"] = "tryCatch";
+})(RunningCodeErrorSource || (RunningCodeErrorSource = {}));
+/** 插件 的 生命周期 */
+var PluginMethod;
+(function (PluginMethod) {
+    PluginMethod["apply"] = "Plugin.apply";
+    PluginMethod["onError"] = "Plugin.onError";
+})(PluginMethod || (PluginMethod = {}));
+/** 日志等级 */
+var LoggerLevel;
+(function (LoggerLevel) {
+    LoggerLevel["debug"] = "debug";
+    LoggerLevel["info"] = "info";
+    LoggerLevel["warn"] = "warn";
+    LoggerLevel["error"] = "error";
+    LoggerLevel["none"] = "none";
+})(LoggerLevel || (LoggerLevel = {}));
+/** 日志的触发起源地 */
+var LoggerLanding;
+(function (LoggerLanding) {
+    /** naruse error center */
+    LoggerLanding["errorCenter"] = "error-center";
+    /** try-catch run */
+    LoggerLanding["tryCatch"] = "error-center";
+    /** 线上 */
+    LoggerLanding["production"] = "production";
+    /** 开发时 */
+    LoggerLanding["development"] = "development";
+})(LoggerLanding || (LoggerLanding = {}));
+/** LoggerInfo 中 key 到 梦想埋点参数 key 的映射 */
+var LoggerInfoKeyMap = {
+    action: 'p',
+    event: 'e',
+    userNick: 'n',
+    level: 'm1',
+    appName: 'm2',
+    landing: 'm3',
+    vipEndTime: 'm4',
+    adVer: 'm5',
+    creative_name: 'm6',
+    systemInfo: 'm7',
+    info: 'm9',
+    pid: 'd1',
+    cid: 'd2',
+    vipFlag: 'd3',
+};
+// type ValueOf<T> = T[keyof T];
+// type RequestParamsKey = ValueOf<typeof LoggerInfoKeyMap>;
+
+/**
+* 插件,很明显，它是一个插件，它可以做点什么。你必须继承此类，来实现插件
+*/
+var Plugin = /** @class */ (function () {
+    function Plugin() {
+        var _newTarget = this.constructor;
+        /** 插件名称标识 */
+        this.name = '';
+        if (_newTarget === Plugin) {
+            throw new Error('Plugin 是一个抽象类，不能被实例化');
+        }
+    }
+    /** 在广告代码运行前，获取到有效的广告数据后 */
+    Plugin.prototype.apply = function (params) {
+    };
+    /** 解析广告代码错误时、运行广告代码错误时 */
+    Plugin.prototype.onError = function (params) {
+    };
+    return Plugin;
+}());
+
+// 所有日志等级，顺序 按优先级升序（none 这个...最高，啥也不显示）
+var levels = [LoggerLevel.debug, LoggerLevel.info, LoggerLevel.warn, LoggerLevel.error, LoggerLevel.none];
+/** 获取空广告 */
+var nullAdData = function () { return ({
+    creative_id: undefined,
+    creative_name: "null data",
+    dest_url: "",
+    group_id: 0,
+    img_path: "",
+    img_size: "",
+    pid: undefined,
+    pid_name: "",
+    plan_id: 0,
+    primary_class: "",
+    secondary_class: "",
+    template_type: "",
+    user_define: { body: undefined },
+    version: ""
+}); };
+var log$2 = createLogger('LoggerPlus');
+/** 日志发送类 */
+var LoggerPlus = /** @class */ (function () {
+    /**
+     * 构造日志对象
+     * @param adData     广告数据
+     * @param landing    日志触发源头
+     * @param publicInfo 初始化日志公共属性的参数
+     */
+    function LoggerPlus(_a, publicInfo) {
+        var adData = _a.adData;
+        /** 日志的公共信息 */
+        this._publicInfo = {
+            action: 'advert-template-logger',
+            appName: "",
+            landing: undefined,
+            systemInfo: "",
+            userNick: "",
+            vipEndTime: "",
+            vipFlag: 0
+        };
+        /** 日志的网络请求接口 */
+        this._logNetworkInterface = function () {
+            throw new Error('未初始化 LoggerPlugin logInterface');
+        };
+        // 当前日志等级
+        this._curLoggerLevel = LoggerLevel.debug;
+        if (isEmpty(adData)) {
+            throw new Error('构造日志对象错误，缺少必要参数：adData');
+        }
+        // 初始化 公共属性
+        this.updatePublicInfo(publicInfo, false);
+        // 初始化 私有属性
+        var creative_name = adData.creative_name, creative_id = adData.creative_id, version = adData.version, pid = adData.pid;
+        this._info = {
+            landing: undefined,
+            creative_name: creative_name,
+            /** 二级分类 发送 时指定， 默认创意名称 */
+            event: creative_name,
+            /** 日志等级 发送 时指定 */
+            level: LoggerLevel.debug,
+            /** 广告系统版本 */
+            adVer: version,
+            /** m9 日志信息 */
+            info: {},
+            /** 广告位 */
+            pid: Number(pid),
+            /** 创意id */
+            cid: Number(creative_id)
+        };
+        // 移除空值
+        removeObjectNullValue(this._info);
+    }
+    /** 解析公共属性 */
+    LoggerPlus.prototype.updatePublicInfo = function (_a, ignoredNull) {
+        var level = _a.level, landing = _a.landing, appName = _a.appName, userInfo = _a.userInfo, systemInfo = _a.systemInfo, logInterface = _a.logInterface;
+        if (ignoredNull === void 0) { ignoredNull = true; }
+        var userNick = userInfo.userNick, vipEndTime = userInfo.vipEndTime, vipFlag = userInfo.vipFlag;
+        var obj = {
+            userNick: userNick,
+            appName: appName,
+            landing: landing,
+            vipEndTime: vipEndTime,
+            systemInfo: systemInfo,
+            vipFlag: vipFlag,
+        };
+        ignoredNull && removeObjectNullValue(obj);
+        // 日志等级
+        if (levels.includes(level)) {
+            this._curLoggerLevel = level;
+        }
+        // 日志 网络接口
+        if (typeof logInterface === 'function') {
+            this._logNetworkInterface = logInterface;
+        }
+        Object.assign(this._publicInfo, obj);
+    };
+    /** 再此日志对象基础上，创建一个新的日志对象 */
+    LoggerPlus.prototype.clone = function (info, ignoredNull) {
+        if (ignoredNull === void 0) { ignoredNull = true; }
+        // 不允许修改 action
+        delete info.action;
+        if (ignoredNull) {
+            removeObjectNullValue(info);
+        }
+        // 构造一份原本的
+        var obj = __assign(__assign({}, this._publicInfo), { logInterface: this._logNetworkInterface, level: this._curLoggerLevel });
+        // 覆盖上去
+        Object.assign(obj, info);
+        // 构造日志类
+        var loggerPlus = new LoggerPlus(
+        // 先使用空公共信息
+        { adData: nullAdData(), landing: LoggerLanding.production }, {
+            appName: obj.appName,
+            landing: obj.landing,
+            level: obj.level,
+            logInterface: obj.logInterface,
+            systemInfo: obj.systemInfo,
+            userInfo: { userNick: obj.userNick, vipEndTime: obj.vipEndTime, vipFlag: obj.vipFlag },
+        });
+        // 公共 私有 信息 部分。
+        loggerPlus._info = __assign({}, this._info);
+        return loggerPlus;
+    };
+    /**
+     * 发送日志
+     * @param level 日志等级
+     * @param event 事件名称
+     * @param args 参数
+     */
+    LoggerPlus.prototype._request = function (level, event) {
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
+        if (!this.isCanLog(level)) {
+            log$2.debug.apply(log$2, __spreadArray$1(['忽略日志：', level, event], args, false));
+            return;
+        }
+        if (typeof this._logNetworkInterface !== 'function') {
+            // 按理来说，在初始化时 initAdLoggerPublicInfo 没报错，这里不可能为空
+            throw new Error('logNetworkInterface 不是一个函数');
+        }
+        var info = __assign(__assign(__assign({}, this._publicInfo), (this._info)), { event: event, level: level, info: args });
+        // 转换
+        var requestParams = coverLoggerInfoToRequestParam(info);
+        // 调用接口发送
+        this._logNetworkInterface(this.encode(requestParams), this.encodeValue(requestParams), info);
+        log$2.debug('发生日志：', level, event, info);
+    };
+    /** 将obj转 get 请求的字符串，并进行 url 编码 */
+    LoggerPlus.prototype.encode = function (obj) {
+        var res = this.encodeValue(obj);
+        return Object.keys(res)
+            .map(function (key) { return "".concat(key, "=").concat(obj[key]); })
+            .join('&');
+    };
+    /**
+     * 将 obj 的 value 编码成字符串
+     * @param obj
+     */
+    LoggerPlus.prototype.encodeValue = function (obj) {
+        var res = {};
+        Object.keys(obj)
+            .forEach(function (key) {
+            var value = obj[key];
+            if (typeof value === 'object') {
+                res[key] = encodeURIComponent(JSON.stringify(value));
+                return;
+            }
+            if (typeof value === 'function') {
+                // 不会有人传递一个函数吧
+                res[key] = encodeURIComponent("[function-".concat(value.name, "]:").concat(value.toString()));
+                return;
+            }
+            res[key] = encodeURIComponent(value);
+        });
+        return res;
+    };
+    /** debug 日志 */
+    LoggerPlus.prototype.debug = function (event) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        this._request.apply(this, __spreadArray$1([LoggerLevel.debug, event], args, false));
+    };
+    /** info 日志 */
+    LoggerPlus.prototype.info = function (event) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        this._request.apply(this, __spreadArray$1([LoggerLevel.info, event], args, false));
+    };
+    /** warn 日志 */
+    LoggerPlus.prototype.warn = function (event) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        this._request.apply(this, __spreadArray$1([LoggerLevel.warn, event], args, false));
+    };
+    /** error 日志 */
+    LoggerPlus.prototype.error = function (event) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        this._request.apply(this, __spreadArray$1([LoggerLevel.error, event], args, false));
+    };
+    /** 是否可打印 level 级别的日志 */
+    LoggerPlus.prototype.isCanLog = function (level) {
+        var _this = this;
+        var index = levels.findIndex(function (v) { return v === level; });
+        var curIndex = levels.findIndex(function (v) { return v === _this._curLoggerLevel; });
+        // level 级别 >= _curLoggerLevel 才能发送
+        return index >= curIndex;
+    };
+    return LoggerPlus;
+}());
+/** 将 LoggerInfo 转为 LoggerRequestParams */
+function coverLoggerInfoToRequestParam(info) {
+    return Object.keys(info).reduce(function (res, k) {
+        res[LoggerInfoKeyMap[k]] = info[k];
+        return res;
+    }, {});
+}
+
+var log$1 = createLogger('LoggerPlugin');
+/**
+ * 日志插件，将 管理 日志 的公共属性参数，负责将日志对象注入到公共系统中
+ */
+/** @class */ ((function (_super) {
+    __extends$1(LoggerPlugin, _super);
+    function LoggerPlugin(_a) {
+        var level = _a.level, landing = _a.landing, appName = _a.appName, userInfo = _a.userInfo, logInterface = _a.logInterface, systemInfo = _a.systemInfo;
+        var _this = _super.call(this) || this;
+        /** 日志的公共信息 参数 */
+        _this._initParams = {
+            appName: "",
+            level: LoggerLevel.debug,
+            logInterface: function (_paramsStr, _params, _loggerInfo) {
+                throw new Error('未初始化 LoggerPlugin logInterface');
+            },
+            systemInfo: {},
+            userInfo: { userNick: "", vipEndTime: "", vipFlag: 0 }
+        };
+        // 一小波，错误提示
+        if (isEmpty(appName)) {
+            throw new Error('initAdLoggerPublicInfo: appName 必须的');
+        }
+        if (isEmpty(userInfo)) {
+            throw new Error('initAdLoggerPublicInfo: userInfo 必须的');
+        }
+        if (typeof logInterface !== 'function') {
+            throw new Error('initAdLoggerPublicInfo: logInterface 必须是一个函数');
+        }
+        if (isEmpty(systemInfo)) {
+            throw new Error('initAdLoggerPublicInfo: systemInfo 必须的');
+        }
+        if (isEmpty(landing)) {
+            throw new Error('initAdLoggerPublicInfo: landing 必须的');
+        }
+        _this.updatePublicInfo({ level: level, landing: landing, appName: appName, userInfo: userInfo, logInterface: logInterface, systemInfo: systemInfo }, false);
+        return _this;
+    }
+    /** 修改参数 */
+    LoggerPlugin.prototype.updatePublicInfo = function (params, ignoredNull) {
+        if (ignoredNull === void 0) { ignoredNull = true; }
+        log$1.info('updatePublicInfo: params = ', params, 'ignoredNull = ', ignoredNull);
+        (ignoredNull) && removeObjectNullValue(params);
+        Object.assign(this._initParams, params);
+        this.$logger && this.$logger.updatePublicInfo(params, ignoredNull);
+    };
+    LoggerPlugin.prototype.apply = function (_a) {
+        var context = _a.context; _a.config;
+        var $adImport = context.$adImport;
+        var adData = $adImport.adData;
+        /** 注入 日志对象 */
+        this.$logger = new LoggerPlus({ adData: adData.results[0] }, this._initParams);
+        context.$logger = this.$logger;
+        log$1.info('apply: context = ', context);
+    };
+    LoggerPlugin.prototype.onError = function (_a) {
+        var context = _a.context, error = _a.error, source = _a.source;
+        var $logger = context.$logger;
+        // 打印错误日志
+        $logger.clone({ landing: LoggerLanding[source] })
+            .error("".concat(error.name, "-").concat(error.message), JSON.stringify(error));
+    };
+    return LoggerPlugin;
+})(Plugin));
+
+/** 插件的所有方法 */
+var PluginMethodList = ['apply', 'onError'];
+/** 所有的插件 */
+var plugins = {};
+var log = createLogger('PluginMethod');
+// @ts-ignore
+var pluginEvent = new EventBus();
+/** 使用全局事件中心 注册插件的生命周期 */
+PluginMethodList.forEach(function (method) {
+    pluginEvent.on(PluginMethod[method], function (params) {
+        var keys = Object.keys(plugins);
+        log.info("PluginMethod[".concat(method, "]"), keys.length, params);
+        keys
+            .forEach(function (key) {
+            plugins[key][method](params);
+        });
+    });
+});
 
 var logger = createLogger('naruse-h5');
 
@@ -778,6 +1224,25 @@ var getPropsDataSet = function (props) { return Object.keys(props || {}).reduce(
     }
     return per;
 }, {}); };
+/**
+ * 解析 字符串参数，类型： k=v&k=v&k=v&...
+ * 前面没有 ‘？’
+ * @param url
+ */
+function parseURLParam(url) {
+    if (url === void 0) { url = ''; }
+    if (!url) {
+        return {};
+    }
+    var split = url.split('&');
+    var res = {};
+    for (var _i = 0, split_1 = split; _i < split_1.length; _i++) {
+        var item = split_1[_i];
+        var kv = item.split('=');
+        res[kv[0]] = kv[1];
+    }
+    return res;
+}
 
 var h$2 = React.createElement;
 var View = /** @class */ (function (_super) {
@@ -1243,6 +1708,597 @@ Textarea.defaultProps = {
     controlled: false,
 };
 
+function withPage(Comp) {
+    return /** @class */ (function (_super) {
+        __extends$1(WithPageComponent, _super);
+        function WithPageComponent() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        WithPageComponent.prototype.render = function () {
+            var page = getCurrentPageInstance();
+            var hashs = location.hash.split('?');
+            var currentPage = {
+                route: hashs[0],
+                param: parseURLParam(hashs[1]),
+                events: {
+                    on: page.on.bind(page),
+                    off: page.off.bind(page),
+                    once: page.once.bind(page),
+                },
+            };
+            return naruseCreateElement(Comp, __assign(__assign({}, this.props), { currentPage: currentPage }));
+        };
+        return WithPageComponent;
+    }(React.Component));
+}
+var pages = [];
+// 获取当前页面的对象
+function getCurrentPageInstance() {
+    var hash = location.hash.substring(1);
+    if (pages[hash]) {
+        return pages[hash];
+    }
+    pages[hash] = new Page();
+    return pages[hash];
+}
+// 页面可用生命周期函数
+var PageEventKey = { onShow: 'onShow', onHide: 'onHide', onPageScroll: 'onPageScroll' };
+var PageEventKeys = Object.keys(PageEventKey);
+var Page = /** @class */ (function () {
+    function Page() {
+        // @ts-ignore 事件中心
+        this.eventCenter = new EventBus();
+    }
+    /**
+     * 检查 event 、 callback 是否合理
+     * @param event
+     * @param callback
+     */
+    Page.prototype.eventCheck = function (event, callback) {
+        if (PageEventKeys.indexOf(event) === -1) {
+            return false;
+        }
+        return typeof callback === 'function';
+    };
+    Page.prototype.on = function (event, callback) {
+        if (!this.eventCheck(event, callback)) {
+            return;
+        }
+        this.eventCenter.on(event, callback);
+    };
+    Page.prototype.off = function (event, callback) {
+        if (PageEventKeys.indexOf(event) === -1) {
+            return;
+        }
+        this.eventCenter.off(event, callback);
+    };
+    Page.prototype.once = function (event, callback) {
+        if (!this.eventCheck(event, callback)) {
+            return;
+        }
+        this.eventCenter.once(event, callback);
+    };
+    // 触发指定 事件
+    Page.prototype.call = function (eventName, e) {
+        this.eventCenter.emit(eventName, e);
+    };
+    return Page;
+}());
+/**
+ * 兼容获取浏览器滚动条位置 ，
+ */
+var getScroll = function () {
+    if (currentPageContainer === window || currentPageContainer === document.body || currentPageContainer === document.documentElement) {
+        return {
+            scrollTop: document.body.scrollTop || document.documentElement.scrollTop || 0,
+            scrollLeft: document.body.scrollLeft || document.documentElement.scrollLeft || 0
+        };
+    }
+    return {
+        scrollTop: currentPageContainer.scrollTop,
+        scrollLeft: currentPageContainer.scrollLeft,
+    };
+};
+/**
+ * 监听地址栏的hash变化
+ */
+window.addEventListener('hashchange', function (event) {
+    var keys = Object.keys(pages);
+    if (keys.length === 0) {
+        return;
+    }
+    var _a = event.oldURL, oldURL = _a === void 0 ? '' : _a, _b = event.newURL, newURL = _b === void 0 ? '' : _b;
+    // 隐藏
+    var prePage = pages[oldURL.split('#')[1]];
+    prePage && prePage.call(PageEventKey.onHide);
+    // 显示
+    var cur = pages[newURL.split('#')[1]];
+    cur && cur.call(PageEventKey.onShow);
+});
+function onPageScrollEvent() {
+    var keys = Object.keys(pages);
+    if (keys.length === 0) {
+        return;
+    }
+    var hash = location.hash.substring(1);
+    pages[hash] && pages[hash].call(PageEventKey.onPageScroll, getScroll());
+}
+// 默认window
+var currentPageContainer = null;
+function withPageInit(_a) {
+    var _b = _a.pageContainer, pageContainer = _b === void 0 ? window : _b;
+    if (pageContainer && pageContainer !== currentPageContainer) {
+        // 切换事件 对象
+        currentPageContainer && currentPageContainer.removeEventListener('scroll', onPageScrollEvent);
+        pageContainer.addEventListener('scroll', onPageScrollEvent);
+        currentPageContainer = pageContainer;
+    }
+}
+
+var _config = {
+    hotPuller: function () {
+        logger.error('未初始化热更新拉取，无法更新组件默认为空');
+        return Promise.resolve({ code: '', ctx: {} });
+    },
+    baseCtx: function () {
+        return {};
+    },
+    onRunError: function (err) {
+        console.error(err);
+    },
+    // 自定义 rpx 的单位转换
+    convertRpx: function (rpx) { return (rpx / 2 * 1.4).toFixed(1); },
+    hotImport: function (path) {
+        throw new Error('尚未初始化 hotImport 函数');
+    }
+};
+/**
+ * @description 获取初始化
+ * @author CHC
+ * @date 2022-06-14 10:06:50
+ * @returns {{ _config: () => Promise<{ code, ctx }>  }}
+ */
+var getNaruseConfig = function () {
+    return _config;
+};
+/**
+ * @description naruse内部初始化过程
+ * @author CHC
+ * @date 2022-06-14 10:06:36
+ * @param hotPuller 热更新处理、广告加载
+ * @param baseCtx 广告运行时的上下文环境
+ * @param onRunError 广告运行错误时触发
+ * @param convertRpx 自定义 rpx 到 px 的转换
+ * @param pageContainer 能获取到页面滚动条偏移量的容器元素
+ */
+var naruseInit = function (newConfig) {
+    Object.assign(_config, newConfig);
+    var pageContainer = _config.pageContainer;
+    withPageInit({ pageContainer: pageContainer });
+};
+
+var dist = {};
+
+Object.defineProperty(dist, '__esModule', { value: true });
+
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  }, _typeof(obj);
+}
+
+var isProduction = process.env.NODE_ENV === 'production';
+var prefix = 'Invariant failed';
+function invariant(condition, message) {
+  if (condition) {
+    return;
+  }
+  if (isProduction) {
+    throw new Error(prefix);
+  }
+  throw new Error(prefix + ": " + (message || ''));
+}
+
+invariant(typeof Symbol === 'function' && Symbol["for"], 'react-class-hooks needs Symbols!');
+
+// Separate objects for better debugging.
+var MAGIC_STATES = Symbol["for"]('States');
+var MAGIC_EFFECTS = Symbol["for"]('Effects');
+var MAGIC_MEMOS = Symbol["for"]('Memos');
+var MAGIC_REFS = Symbol["for"]('Refs');
+var MAGIC_STACKS = Symbol["for"]('Stacks');
+var mustFristInit = function mustFristInit() {
+  throw new Error('You must call reactLikeHooksInit first!');
+};
+var defaultConfig = {
+  isOrginReact: false,
+  getDispatcher: mustFristInit,
+  getSelfComponent: mustFristInit
+};
+function getMagicSelf() {
+  invariant(defaultConfig.getSelfComponent(), 'You are using Hooks outside of "render" Component Method!');
+  return defaultConfig.getSelfComponent();
+}
+function checkSymbol(name, keySymbol) {
+  invariant(_typeof(keySymbol) === 'symbol', "".concat(name, " - Expected a Symbol for key!"));
+}
+
+/**
+ * @description 初始化 react like hooks
+ * @author CHC
+ * @date 2023-03-22 20:03:49
+ * @param {*} FacotoryObject
+ * @param {*} specialCurrentObjectPath
+ * @param {boolean} [isOrginReact=false]
+ */
+var reactLikeHooksInit = function reactLikeHooksInit(_ref) {
+  var getDispatcher = _ref.getDispatcher,
+    getSelfComponent = _ref.getSelfComponent,
+    _ref$isOrginReact = _ref.isOrginReact,
+    isOrginReact = _ref$isOrginReact === void 0 ? false : _ref$isOrginReact;
+  defaultConfig.getDispatcher = getDispatcher;
+  defaultConfig.getSelfComponent = getSelfComponent;
+  defaultConfig.isOrginReact = isOrginReact;
+};
+
+function MagicStack(StackName) {
+  var _this = this;
+  this.name = StackName;
+  this.symbol = Symbol("".concat(this.name, ".Stack"));
+  // this.cleanSymbol = Symbol(`${this.name}.Stack.Cleaner`);
+  this.keys = [];
+  this.getKey = function (stackIndex) {
+    var len = _this.keys.length;
+    // create if not exist
+    if (stackIndex > len) {
+      for (var i = len; i < stackIndex; i += 1) _this.keys.push(Symbol("".concat(_this.name, "-").concat(i)));
+    }
+    return _this.keys[stackIndex - 1];
+  };
+}
+function useMagicStack(magicStack, hook) {
+  // inject next renders stack counter cleaner
+  var self = getMagicSelf();
+  if (!self[MAGIC_STACKS]) {
+    self[MAGIC_STACKS] = {};
+    var renderFunc = self.render.bind(self);
+    self.render = function () {
+      Object.getOwnPropertySymbols(self[MAGIC_STACKS]).forEach(function (k) {
+        self[MAGIC_STACKS][k] = 0;
+      });
+      return renderFunc.apply(void 0, arguments);
+    };
+  }
+
+  // stack counter init
+  if (!self[MAGIC_STACKS][magicStack.symbol]) {
+    self[MAGIC_STACKS][magicStack.symbol] = 0;
+  }
+
+  // stack counter update
+  self[MAGIC_STACKS][magicStack.symbol] += 1;
+  for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+    args[_key - 2] = arguments[_key];
+  }
+  return hook.apply(void 0, [magicStack.getKey(self[MAGIC_STACKS][magicStack.symbol])].concat(args));
+}
+
+function createHook(stackName, hook) {
+  var stack = new MagicStack(stackName);
+  return function () {
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+    if (args && args.length && _typeof(args[0]) === 'symbol') return hook.apply(void 0, args);
+    return useMagicStack.apply(void 0, [stack, hook].concat(args));
+  };
+}
+function createNamedHook(name, hook) {
+  var keySymbol = Symbol(name);
+  return hook.bind(null, keySymbol);
+}
+
+function setDevToolsHookState(name, state) {
+}
+
+function useClassStateKey(keySymbol, initialValue) {
+  checkSymbol('useClassStateKey', keySymbol);
+  var self = getMagicSelf();
+
+  // first time Render && first Hook
+  if (!self[MAGIC_STATES]) self[MAGIC_STATES] = {};
+
+  // first time Render -> assign initial Value and create Setter
+  if (!self[MAGIC_STATES].hasOwnProperty(keySymbol)) {
+    self[MAGIC_STATES][keySymbol] = {
+      value: typeof initialValue === 'function' ? initialValue() : initialValue,
+      setValue: function setValue(value, callback) {
+        var newState = typeof value === 'function' ? value(self[MAGIC_STATES][keySymbol].value) : value;
+        if (self[MAGIC_STATES][keySymbol].value !== newState) {
+          self[MAGIC_STATES][keySymbol].value = newState;
+          if (self.updater.isMounted(self)) {
+            self.updater.enqueueForceUpdate(self, callback);
+          }
+        }
+      }
+    };
+  }
+  var _self$MAGIC_STATES$ke = self[MAGIC_STATES][keySymbol],
+    value = _self$MAGIC_STATES$ke.value,
+    setValue = _self$MAGIC_STATES$ke.setValue;
+  setDevToolsHookState(keySymbol.description);
+  return [value, setValue];
+}
+
+var useClassState = createHook('States', useClassStateKey);
+useClassState.create = function (name) {
+  return createNamedHook(name, useClassStateKey);
+};
+useClassState.createStack = function (stackName) {
+  return createHook(stackName, useClassStateKey);
+};
+
+function inputsArrayEqual(inputs, prevInputs) {
+  invariant(inputs.length === prevInputs.length, 'Hooks inputs array length should be constant between renders!');
+
+  // Object.is polyfill
+  for (var i = 0; i < inputs.length; i += 1) {
+    var val1 = inputs[i];
+    var val2 = prevInputs[i];
+    if (!(val1 === val2 && (val1 !== 0 || 1 / val1 === 1 / val2) || val1 !== val1 && val2 !== val2)) {
+      // eslint-disable-line
+      return false;
+    }
+  }
+  return true;
+}
+
+var useClassEffectKey = function useClassEffectKey(keySymbol, creator, inputs) {
+  var onlyDidUpdate = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  checkSymbol('useClassEffect', keySymbol);
+  invariant(typeof creator === 'function', 'Creator should be a function!');
+  invariant(!inputs || Array.isArray(inputs), 'inputs should be an array!');
+  var self = getMagicSelf();
+
+  // create MAGIC_EFFECTS if not exists
+  if (!self[MAGIC_EFFECTS]) self[MAGIC_EFFECTS] = {};
+
+  // First Render -> Assign creator, inputs and inject methods
+  // TODO didCatch
+  if (!self[MAGIC_EFFECTS].hasOwnProperty(keySymbol)) {
+    self[MAGIC_EFFECTS][keySymbol] = {
+      creator: creator,
+      inputs: inputs
+    };
+    if (!onlyDidUpdate) {
+      // inject componentDidMount
+      var didMount = typeof self.componentDidMount === 'function' ? self.componentDidMount.bind(self) : undefined;
+      self.componentDidMount = function () {
+        if (didMount) didMount();
+        self[MAGIC_EFFECTS][keySymbol].cleaner = self[MAGIC_EFFECTS][keySymbol].creator();
+        // save last executed inputs
+        self[MAGIC_EFFECTS][keySymbol].prevInputs = self[MAGIC_EFFECTS][keySymbol].inputs;
+        invariant(!self[MAGIC_EFFECTS][keySymbol].cleaner || typeof self[MAGIC_EFFECTS][keySymbol].cleaner === 'function', 'useClassEffect return (Effect Cleaner) should be Function or Void !');
+      };
+    }
+
+    // inject componentDidUpdate
+    var didUpdate = typeof self.componentDidUpdate === 'function' ? self.componentDidUpdate.bind(self) : undefined;
+    self.componentDidUpdate = function () {
+      if (didUpdate) didUpdate.apply(void 0, arguments);
+
+      // execute if no inputs || inputs array has values and values changed
+      var execute = !self[MAGIC_EFFECTS][keySymbol].inputs || !inputsArrayEqual(self[MAGIC_EFFECTS][keySymbol].inputs, self[MAGIC_EFFECTS][keySymbol].prevInputs);
+      if (execute) {
+        if (typeof self[MAGIC_EFFECTS][keySymbol].cleaner === 'function') self[MAGIC_EFFECTS][keySymbol].cleaner();
+        self[MAGIC_EFFECTS][keySymbol].cleaner = self[MAGIC_EFFECTS][keySymbol].creator();
+        // save last executed inputs!
+        self[MAGIC_EFFECTS][keySymbol].prevInputs = self[MAGIC_EFFECTS][keySymbol].inputs;
+        invariant(!self[MAGIC_EFFECTS][keySymbol].cleaner || typeof self[MAGIC_EFFECTS][keySymbol].cleaner === 'function', 'useClassEffect return (Effect Cleaner) should be Function or Void !');
+      }
+    };
+
+    // inject componentWillUnmount
+    var unmount = typeof self.componentWillUnmount === 'function' ? self.componentWillUnmount.bind(self) : undefined;
+    self.componentWillUnmount = function () {
+      if (unmount) unmount();
+      if (typeof self[MAGIC_EFFECTS][keySymbol].cleaner === 'function') self[MAGIC_EFFECTS][keySymbol].cleaner();
+    };
+  } else {
+    // next renders
+    self[MAGIC_EFFECTS][keySymbol].creator = creator;
+    self[MAGIC_EFFECTS][keySymbol].inputs = inputs;
+  }
+};
+
+var useClassEffect = createHook('Effects', useClassEffectKey);
+useClassEffect.create = function (name) {
+  return createNamedHook(name, useClassEffectKey);
+};
+useClassEffect.createStack = function (stackName) {
+  return createHook(stackName, useClassEffectKey);
+};
+
+var useClassMemoKey = function useClassMemoKey(keySymbol, creator, inputs) {
+  checkSymbol('useClassMemo', keySymbol);
+  invariant(typeof creator === 'function', 'Creator should be a function!');
+  invariant(!inputs || Array.isArray(inputs), 'inputs should be an array!');
+  var self = getMagicSelf();
+
+  // create magic Memos if not exists
+  if (!self[MAGIC_MEMOS]) self[MAGIC_MEMOS] = {};
+
+  // First Render -> assign creator, inputs, value
+  if (!self[MAGIC_MEMOS].hasOwnProperty(keySymbol)) {
+    self[MAGIC_MEMOS][keySymbol] = {
+      creator: creator,
+      inputs: inputs,
+      value: creator()
+    };
+  } else {
+    // next renders
+    var execute = false;
+    if (!inputs) {
+      if (creator !== self[MAGIC_MEMOS][keySymbol].creator) {
+        execute = true;
+      }
+    } else {
+      execute = !inputsArrayEqual(inputs, self[MAGIC_MEMOS][keySymbol].inputs);
+    }
+    if (execute) {
+      self[MAGIC_MEMOS][keySymbol] = {
+        creator: creator,
+        inputs: inputs,
+        value: creator()
+      };
+    }
+  }
+  var returnValue = self[MAGIC_MEMOS][keySymbol].value;
+  setDevToolsHookState(keySymbol.description);
+  return returnValue;
+};
+var useClassMemo = createHook('Memos', useClassMemoKey);
+useClassMemo.create = function (name) {
+  return createNamedHook(name, useClassMemoKey);
+};
+useClassMemo.createStack = function (stackName) {
+  return createHook(stackName, useClassMemoKey);
+};
+
+function useClassCallbackKey(keySymbol, callback, inputs) {
+  return useClassMemoKey(keySymbol, function () {
+    return callback;
+  }, inputs);
+}
+var useClassCallback = createHook('Callbacks', useClassCallbackKey);
+useClassCallback.create = function (name) {
+  return createNamedHook(name, useClassCallbackKey);
+};
+useClassCallback.createStack = function (stackName) {
+  return createHook(stackName, useClassCallbackKey);
+};
+
+var useClassReducerKey = function useClassReducerKey(keySymbol, reducer, initialState) {
+  var stateSetState = useClassStateKey(keySymbol, initialState);
+  var state = stateSetState[0];
+  var setState = stateSetState[1];
+  function dispatch(action) {
+    var nextState = reducer(state, action);
+    setState(nextState);
+  }
+  return [state, dispatch];
+};
+var useClassReducer = createHook('Reducers', useClassReducerKey);
+useClassReducer.create = function (name) {
+  return createNamedHook(name, useClassReducerKey);
+};
+
+function useClassRefKey(keySymbol, initialValue) {
+  checkSymbol('useClassRefKey', keySymbol);
+  var self = getMagicSelf();
+
+  // first time Render && first Hook
+  if (!self[MAGIC_REFS]) self[MAGIC_REFS] = {};
+
+  // first time Render -> assign initial Value
+  if (!self[MAGIC_REFS].hasOwnProperty(keySymbol)) {
+    var ref = {
+      current: initialValue
+    };
+    Object.seal(ref);
+    self[MAGIC_REFS][keySymbol] = ref;
+  }
+  var returnValue = self[MAGIC_REFS][keySymbol];
+  setDevToolsHookState(keySymbol.description);
+  return returnValue;
+}
+
+var useClassRef = createHook('Refs', useClassRefKey);
+useClassRef.create = function (name) {
+  return createNamedHook(name, useClassRefKey);
+};
+useClassRef.createStack = function (stackName) {
+  return createHook(stackName, useClassRefKey);
+};
+
+// poly 15 ref
+var refCallback = function refCallback(refObject) {
+  return function (ref) {
+    refObject.current = ref;
+  };
+};
+
+var useClassLayoutEffect = useClassEffect;
+
+var reactLikeHooksInit_1 = dist.reactLikeHooksInit = reactLikeHooksInit;
+dist.refCallback = refCallback;
+var useCallback = dist.useCallback = useClassCallback;
+var useEffect = dist.useEffect = useClassEffect;
+var useLayoutEffect = dist.useLayoutEffect = useClassLayoutEffect;
+var useMemo = dist.useMemo = useClassMemo;
+var useReducer = dist.useReducer = useClassReducer;
+var useRef = dist.useRef = useClassRef;
+var useState = dist.useState = useClassState;
+
+var Hooks = {
+    useCallback: useCallback,
+    useEffect: useEffect,
+    useLayoutEffect: useLayoutEffect,
+    useMemo: useMemo,
+    useReducer: useReducer,
+    useState: useState,
+    useRef: useRef,
+};
+// 判断 react 是否支持 hooks，如果不支持则使用 react-like-hooks
+if (React.useState) {
+    Hooks = {
+        useCallback: React.useCallback,
+        useEffect: React.useEffect,
+        useLayoutEffect: React.useLayoutEffect,
+        useMemo: React.useMemo,
+        useReducer: React.useReducer,
+        useState: React.useState,
+        useRef: React.useRef,
+    };
+}
+else {
+    // inject None effects
+    React.PureComponent.prototype.componentDidMount = function () { };
+    React.Component.prototype.componentDidMount = function () { };
+    // 初始化
+    reactLikeHooksInit_1({
+        // @ts-ignore
+        getSelfComponent: function () {
+            var _a, _b, _c;
+            // @ts-ignore
+            return (_c = (_b = (_a = React === null || React === void 0 ? void 0 : React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED) === null || _a === void 0 ? void 0 : _a.ReactCurrentOwner) === null || _b === void 0 ? void 0 : _b.current) === null || _c === void 0 ? void 0 : _c._instance;
+        },
+        getDispatcher: function () { return null; },
+    });
+}
+var getHooks = function () {
+    return Hooks;
+};
+/**
+ * 将函数组件转换为类组件
+ */
+var functionalizae = function (fn) {
+    return /** @class */ (function (_super) {
+        __extends$1(class_1, _super);
+        function class_1() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        class_1.prototype.render = function () {
+            return fn(this.props);
+        };
+        return class_1;
+    }(React.Component));
+};
+
 /** 组件映射表 */
 var componentReflectMap = {
     button: Button,
@@ -1272,7 +2328,7 @@ var naruseCreateElement = function (type, props) {
         var Component_1 = componentReflectMap[type];
         if (!Component_1) {
             logger.warn('不支持的组件类型', type);
-            return naruseCreateElement('view', null, "\u4E0D\u652F\u6301\u7684\u7EC4\u4EF6\u7C7B\u578B-".concat(type));
+            return naruseCreateElement('view', undefined, "\u4E0D\u652F\u6301\u7684\u7EC4\u4EF6\u7C7B\u578B-".concat(type));
         }
         return React.createElement.apply(void 0, __spreadArray$1([Component_1, props], children, false));
     }
@@ -1281,7 +2337,7 @@ var naruseCreateElement = function (type, props) {
     }
     if (typeof type === 'function') {
         props && (props.children = children);
-        return type(props);
+        return React.createElement(functionalizae(type), props);
     }
     logger.warn('不支持的组件类型', type);
 };
@@ -1290,12 +2346,13 @@ var parsePx = function (val) {
     if (typeof val !== 'string')
         return val;
     var matchRes = val.match(rpxReg);
+    var convertRpx = getNaruseConfig().convertRpx;
     if (!matchRes)
         return val;
     matchRes.forEach(function (item) {
         var num = parseFloat(item);
         // 按照手机和电脑的比例进行换算
-        val = val.replace(item, "".concat((num / 2 * 1.4).toFixed(1), "px"));
+        val = val.replace(item, "".concat(convertRpx(num), "px"));
     });
     return val;
 };
@@ -1494,6 +2551,7 @@ var BREAK_SIGNAL = {};
 var CONTINUE_SIGNAL = {};
 var RETURN_SIGNAL = { result: undefined };
 var YIELD_SIGNAL = { result: undefined };
+var THIS = 'this';
 
 var ScopeVar = /** @class */ (function () {
     function ScopeVar(kind, value) {
@@ -1576,9 +2634,7 @@ var Scope = /** @class */ (function () {
         this.type = type;
         this.parent = parent || null;
         this.generator = generator;
-        // if (generator) {
         this.generatorStack = new GeneratorStack();
-        // }
     }
     Scope.prototype.$find = function (raw_name) {
         var name = this.prefix + raw_name;
@@ -1610,10 +2666,7 @@ var Scope = /** @class */ (function () {
     };
     Scope.prototype.$var = function (raw_name, value) {
         var name = this.prefix + raw_name;
-        var scope = this;
-        while (scope.parent !== null && scope.type !== 'function') {
-            scope = scope.parent;
-        }
+        var scope = this.getLastUnFunctionScope();
         var $var = scope.content[name];
         if (!$var) {
             this.content[name] = new ScopeVar('var', value);
@@ -1634,29 +2687,71 @@ var Scope = /** @class */ (function () {
             const: function () { return _this.$const(raw_name, value); },
         })[kind]();
     };
+    /**
+     * 获取最近的函数作用域
+     */
+    Scope.prototype.getLastUnFunctionScope = function () {
+        var scope = this;
+        while (scope.parent !== null && scope.type !== "function" /* ScopeType.Function */) {
+            scope = scope.parent;
+        }
+        return scope;
+    };
     return Scope;
 }());
 
-var _a;
+var _a, _b;
 var anonymousId = 0;
 var thisRunner;
+var ObjectDefineProperty = Object.defineProperty;
 var illegalFun = [setTimeout, setInterval, clearInterval, clearTimeout];
 var isUndefinedOrNull = function (val) { return val === void 0 || val === null; };
-var evaluate_map = (_a = {},
-    _a[Program] = function (program, scope) {
-        var nonFunctionList = [];
-        var list = program.body;
-        for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
-            var node = list_1[_i];
-            // function 声明语句 会提升到作用域顶部
-            isPromoteStatement(node) ? evaluate(node, scope) : nonFunctionList.push(node);
+/**
+ * 提炼 for语句中的变量提升
+ * k: 语句
+ * v: 对应的属性名
+ */
+var RefineForPromoteNameMap = (_a = {},
+    _a[ForStatement] = 'init',
+    _a[ForInStatement] = 'left',
+    _a[ForOfStatement] = 'left',
+    _a);
+/**
+ * 提炼非函数声明语句，并执行函数声明语句 与 初始化 var 变量
+ */
+var refinePromteStatements = function (nodes, scope) {
+    var nonPromoteList = [];
+    for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
+        var node = nodes_1[_i];
+        // function 声明语句 提升到作用域顶部直接执行
+        if (isPromoteStatement(node)) {
+            evaluate(node, scope);
         }
-        for (var _a = 0, nonFunctionList_1 = nonFunctionList; _a < nonFunctionList_1.length; _a++) {
-            var node = nonFunctionList_1[_a];
+        else {
+            // 如果是 var 则需要先声明变量为 undefined
+            if (isVarPromoteStatement(node))
+                evaluate_map[VariableDeclaration](node, scope, true);
+            // for,forin,forof 循环中的 var 声明语句也需要提升
+            if (RefineForPromoteNameMap[node.type]) {
+                var initNode = node[RefineForPromoteNameMap[node.type]];
+                if (isVarPromoteStatement(initNode))
+                    evaluate_map[VariableDeclaration](initNode, scope, true);
+            }
+            nonPromoteList.push(node);
+        }
+    }
+    return nonPromoteList;
+};
+var evaluate_map = (_b = {},
+    _b[Program] = function (program, scope) {
+        var list = program.body;
+        var nonFunctionList = refinePromteStatements(list, scope);
+        for (var _i = 0, nonFunctionList_1 = nonFunctionList; _i < nonFunctionList_1.length; _i++) {
+            var node = nonFunctionList_1[_i];
             evaluate(node, scope);
         }
     },
-    _a[Identifier] = function (node, scope) {
+    _b[Identifier] = function (node, scope) {
         if (node.name === 'undefined') {
             return undefined;
         }
@@ -1666,20 +2761,15 @@ var evaluate_map = (_a = {},
         }
         throw createError(errorMessageList.notYetDefined, node.name, node, thisRunner.source);
     },
-    _a[Literal] = function (node) {
+    _b[Literal] = function (node) {
         return node.value;
     },
-    _a[BlockStatement] = function (block, scope) {
+    _b[BlockStatement] = function (block, scope) {
         return indexGeneratorStackDecorate(function (stackData) {
-            var new_scope = scope.invasive ? scope : new Scope('block', scope);
+            var new_scope = scope.invasive ? scope : new Scope("block" /* ScopeType.Block */, scope);
             var list = block.body;
-            // 非 function 声明语句
-            var nonFunctionList = [];
-            for (var _i = 0, list_2 = list; _i < list_2.length; _i++) {
-                var node = list_2[_i];
-                // 变量提升语句需要提升到作用域顶部执行
-                isPromoteStatement(node) ? evaluate(node, new_scope) : nonFunctionList.push(node);
-            }
+            // 提炼语句需要提升到父级作用域
+            var nonFunctionList = refinePromteStatements(list, new_scope);
             for (; stackData.index < nonFunctionList.length; stackData.index++) {
                 var node = nonFunctionList[stackData.index];
                 var result = evaluate(node, new_scope);
@@ -1691,28 +2781,30 @@ var evaluate_map = (_a = {},
             }
         }, scope);
     },
-    _a[EmptyStatement] = function () { },
-    _a[ExpressionStatement] = function (node, scope) {
+    _b[EmptyStatement] = function () { },
+    _b[ExpressionStatement] = function (node, scope) {
         return evaluate(node.expression, scope);
     },
-    _a[ReturnStatement] = function (node, scope) {
+    _b[ReturnStatement] = function (node, scope) {
         RETURN_SIGNAL.result = node.argument ? evaluate(node.argument, scope) : undefined;
         return RETURN_SIGNAL;
     },
-    _a[BreakStatement] = function () {
+    _b[BreakStatement] = function () {
         return BREAK_SIGNAL;
     },
-    _a[ContinueStatement] = function () {
+    _b[ContinueStatement] = function () {
         return CONTINUE_SIGNAL;
     },
-    _a[IfStatement] = function (node, scope) {
+    _b[IfStatement] = function (node, scope) {
         if (evaluate(node.test, scope))
             return evaluate(node.consequent, scope);
         else if (node.alternate)
             return evaluate(node.alternate, scope);
     },
-    _a[ForStatement] = function (node, scope) {
-        for (var new_scope = new Scope('loop', scope), init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
+    _b[ForStatement] = function (node, scope) {
+        for (var new_scope = new Scope("loop" /* ScopeType.Loop */, scope), 
+        // 只有 var 变量才会被提高到上一作用域
+        init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
             var result = evaluate(node.body, new_scope);
             if (isReturnResult(result))
                 return result;
@@ -1722,28 +2814,32 @@ var evaluate_map = (_a = {},
                 break;
         }
     },
-    _a[FunctionDeclaration] = function (node, scope) {
+    _b[FunctionDeclaration] = function (node, scope) {
         var func = evaluate_map[FunctionExpression](node, scope);
-        var func_name = (node.id || { name: "anonymous".concat(anonymousId++) }).name;
-        if (!scope.$var(func_name, func)) {
-            throw createError(errorMessageList.duplicateDefinition, func_name, node, thisRunner.source);
+        if (!scope.$var(func.name, func)) {
+            throw createError(errorMessageList.duplicateDefinition, func.name, node, thisRunner.source);
         }
         return func;
     },
-    _a[VariableDeclaration] = function (node, scope) {
+    _b[VariableDeclaration] = function (node, scope, isVarPromote) {
+        if (isVarPromote === void 0) { isVarPromote = false; }
         var kind = node.kind;
         return indexGeneratorStackDecorate(function (stackData) {
             var list = node.declarations;
             for (; stackData.index < list.length; stackData.index++) {
                 var declaration = list[stackData.index];
                 var id = declaration.id, init = declaration.init;
-                var value = init ? evaluate(init, scope) : undefined;
+                // 如果是变量提升语句，需要先声明一个 undefined 变量，等待后续的重新赋值语句
+                var value = !isVarPromote && init ? evaluate(init, scope) : undefined;
                 // 迭代器变量中断
                 if (isYieldResult(scope, value))
                     return value;
                 // 正常流程
                 if (id.type === Identifier) {
                     var name_1 = id.name;
+                    // 如果作用域提升时变量已经存在，则不需要再次声明
+                    if (isVarPromote && scope.$find(name_1) !== null)
+                        continue;
                     if (!scope.$declar(kind, name_1, value)) {
                         throw createError(errorMessageList.duplicateDefinition, name_1, node, thisRunner.source);
                     }
@@ -1756,7 +2852,7 @@ var evaluate_map = (_a = {},
             }
         }, scope);
     },
-    _a[ArrayPattern] = function (node, scope, kind, value) {
+    _b[ArrayPattern] = function (node, scope, kind, value) {
         var elements = node.elements;
         if (!Array.isArray(value)) {
             throw createError(errorMessageList.deconstructNotArray, value, node, thisRunner.source);
@@ -1766,6 +2862,8 @@ var evaluate_map = (_a = {},
                 return;
             if (element.type === Identifier) {
                 var name_2 = element.name;
+                if (!kind)
+                    kind = 'var';
                 if (!scope.$declar(kind, name_2, value[index])) {
                     throw createError(errorMessageList.duplicateDefinition, name_2, node, thisRunner.source);
                 }
@@ -1775,7 +2873,7 @@ var evaluate_map = (_a = {},
             }
         });
     },
-    _a[ObjectPattern] = function (node, scope, kind, object) {
+    _b[ObjectPattern] = function (node, scope, kind, object) {
         var properties = node.properties;
         properties.forEach(function (property) {
             if (property.type === Property) {
@@ -1793,7 +2891,7 @@ var evaluate_map = (_a = {},
             }
         });
     },
-    _a[AssignmentPattern] = function (node, scope, kind, init) {
+    _b[AssignmentPattern] = function (node, scope, kind, init) {
         var left = node.left, right = node.right;
         var value = init === void 0 ? evaluate(right, scope) : init;
         if (left.type === Identifier) {
@@ -1806,14 +2904,14 @@ var evaluate_map = (_a = {},
             evaluate_map[left.type](left, scope, kind, value);
         }
     },
-    _a[ThisExpression] = function (node, scope) {
-        var this_val = scope.$find('this');
+    _b[ThisExpression] = function (node, scope) {
+        var this_val = scope.$find(THIS);
         return this_val ? this_val.$get() : null;
     },
-    _a[ArrayExpression] = function (node, scope) {
+    _b[ArrayExpression] = function (node, scope) {
         return node.elements.map(function (item) { return item ? evaluate(item, scope) : null; });
     },
-    _a[ObjectExpression] = function (node, scope) {
+    _b[ObjectExpression] = function (node, scope) {
         var object = {};
         for (var _i = 0, _a = node.properties; _i < _a.length; _i++) {
             var property = _a[_i];
@@ -1832,10 +2930,10 @@ var evaluate_map = (_a = {},
                     object[key] = value;
                 }
                 else if (kind === 'set') {
-                    Object.defineProperty(object, key, { set: value });
+                    ObjectDefineProperty(object, key, { set: value });
                 }
                 else if (kind === 'get') {
-                    Object.defineProperty(object, key, { get: value });
+                    ObjectDefineProperty(object, key, { get: value });
                 }
             }
             else {
@@ -1844,17 +2942,21 @@ var evaluate_map = (_a = {},
         }
         return object;
     },
-    _a[FunctionExpression] = function (node, scope, isArrowFunction) {
+    _b[FunctionExpression] = function (node, scope, isArrowFunction) {
         if (isArrowFunction === void 0) { isArrowFunction = false; }
         var func;
+        var func_name = (node.id || { name: "anonymous".concat(anonymousId++) }).name;
         if (node.generator) {
             func = function () {
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i] = arguments[_i];
                 }
-                var new_scope = new Scope('function', scope, true);
+                var new_scope = new Scope("function" /* ScopeType.Function */, scope, true);
                 new_scope.invasive = true;
+                new_scope.$const(THIS, this);
+                new_scope.$const('arguments', arguments);
+                new_scope.$var(func_name, func);
                 node.params.forEach(function (param, index) {
                     if (param.type === Identifier) {
                         var name_5 = param.name;
@@ -1864,8 +2966,6 @@ var evaluate_map = (_a = {},
                         evaluate_map[param.type](param, new_scope, 'var', args[index]);
                     }
                 });
-                new_scope.$const('this', this);
-                new_scope.$const('arguments', arguments);
                 var completed = false;
                 var next = function (arg) {
                     var _a;
@@ -1890,8 +2990,11 @@ var evaluate_map = (_a = {},
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i] = arguments[_i];
                 }
-                var new_scope = new Scope('function', scope);
+                var new_scope = new Scope("function" /* ScopeType.Function */, scope);
                 new_scope.invasive = true;
+                // fix: 修复在非 block 作用域中使用函数名调用函数时，函数名指向错误的问题
+                // fix: 修复了当函数中出现与函数名相同的的形参时会导致形参会取到当前函数
+                new_scope.$var(func_name, func);
                 node.params.forEach(function (param, index) {
                     if (param.type === Identifier) {
                         var name_6 = param.name;
@@ -1903,15 +3006,15 @@ var evaluate_map = (_a = {},
                 });
                 var result;
                 if (isArrowFunction) {
-                    var parent_scope = scope.$find('this').$get();
-                    new_scope.$const('this', parent_scope ? parent_scope : null);
+                    var parent_scope = scope.$find(THIS).$get();
+                    new_scope.$const(THIS, parent_scope ? parent_scope : null);
                     result = evaluate(node.body, new_scope);
                     if (node.body.type !== BlockStatement) {
                         return result;
                     }
                 }
                 else {
-                    new_scope.$const('this', this);
+                    new_scope.$const(THIS, this);
                     new_scope.$const('arguments', arguments);
                     result = evaluate(node.body, new_scope);
                 }
@@ -1922,15 +3025,17 @@ var evaluate_map = (_a = {},
         }
         // 箭头函数的prototype属性指向的是父函数的prototype属性
         if (isArrowFunction) {
-            Object.defineProperty(func, "prototype", { value: undefined });
+            ObjectDefineProperty(func, "prototype", { value: undefined });
         }
         // 矫正属性
-        Object.defineProperty(func, "length", { value: node.params.length });
+        ObjectDefineProperty(func, "length", { value: node.params.length });
         // @ts-ignore
-        Object.defineProperty(func, "toString", { value: function () { return thisRunner.source.slice(node.start, node.end); }, configurable: true });
+        ObjectDefineProperty(func, "toString", { value: function () { return thisRunner.source.slice(node.start, node.end); }, configurable: true });
+        // 矫正name属性
+        ObjectDefineProperty(func, "name", { value: func_name, configurable: true });
         return func;
     },
-    _a[UnaryExpression] = function (node, scope) {
+    _b[UnaryExpression] = function (node, scope) {
         var _a;
         var sk = 'typeof';
         return (_a = {
@@ -1951,7 +3056,7 @@ var evaluate_map = (_a = {},
                         }
                     }
                     else if (node.argument.type === Identifier) {
-                        var $this = scope.$find('this');
+                        var $this = scope.$find(THIS);
                         // @ts-ignore
                         if ($this)
                             return $this.$get()[node.argument.name];
@@ -1971,7 +3076,7 @@ var evaluate_map = (_a = {},
             },
             _a)[node.operator]();
     },
-    _a[UpdateExpression] = function (node, scope) {
+    _b[UpdateExpression] = function (node, scope) {
         var prefix = node.prefix;
         var $var;
         if (node.argument.type === Identifier) {
@@ -2001,7 +3106,7 @@ var evaluate_map = (_a = {},
             '++': function (v) { return ($var.$set(v + 1), (prefix ? ++v : v++)); },
         })[node.operator](evaluate(node.argument, scope));
     },
-    _a[BinaryExpression] = function (node, scope) {
+    _b[BinaryExpression] = function (node, scope) {
         return ({
             '==': function (a, b) { return a == b; },
             '!=': function (a, b) { return a != b; },
@@ -2027,7 +3132,7 @@ var evaluate_map = (_a = {},
             instanceof: function (a, b) { return a instanceof b; },
         })[node.operator](evaluate(node.left, scope), evaluate(node.right, scope));
     },
-    _a[AssignmentExpression] = function (node, scope) {
+    _b[AssignmentExpression] = function (node, scope) {
         var $var;
         var left = node.left;
         if (left.type === Identifier) {
@@ -2072,26 +3177,26 @@ var evaluate_map = (_a = {},
             '&=': function (v) { return ($var.$set($var.$get() & v), $var.$get()); },
         })[node.operator](evaluate(node.right, scope));
     },
-    _a[LogicalExpression] = function (node, scope) {
+    _b[LogicalExpression] = function (node, scope) {
         return ({
             '||': function () { return evaluate(node.left, scope) || evaluate(node.right, scope); },
             '&&': function () { return evaluate(node.left, scope) && evaluate(node.right, scope); },
             '??': function () { var _a; return (_a = evaluate(node.left, scope)) !== null && _a !== void 0 ? _a : evaluate(node.right, scope); },
         })[node.operator]();
     },
-    _a[MemberExpression] = function (node, scope) {
+    _b[MemberExpression] = function (node, scope) {
         var object = node.object, property = node.property, computed = node.computed;
         if (computed) {
             return evaluate(object, scope)[evaluate(property, scope)];
         }
         return evaluate(object, scope)[property.name];
     },
-    _a[ConditionalExpression] = function (node, scope) {
+    _b[ConditionalExpression] = function (node, scope) {
         return (evaluate(node.test, scope)
             ? evaluate(node.consequent, scope)
             : evaluate(node.alternate, scope));
     },
-    _a[CallExpression] = function (node, scope) {
+    _b[CallExpression] = function (node, scope) {
         var this_val = null;
         var func = null;
         // fix: ww().ww().ww()
@@ -2105,7 +3210,7 @@ var evaluate_map = (_a = {},
             func = this_val[funcName];
         }
         else {
-            this_val = scope.$find('this').$get();
+            this_val = scope.$find(THIS).$get();
             func = evaluate(node.callee, scope);
         }
         if (typeof func !== 'function')
@@ -2115,12 +3220,12 @@ var evaluate_map = (_a = {},
             this_val = null;
         return func.apply(this_val, node.arguments.map(function (arg) { return evaluate(arg, scope); }));
     },
-    _a[NewExpression] = function (node, scope) {
+    _b[NewExpression] = function (node, scope) {
         var Func = evaluate(node.callee, scope);
         var args = node.arguments.map(function (arg) { return evaluate(arg, scope); });
         return new (Func.bind.apply(Func, __spreadArray([void 0], args, false)))();
     },
-    _a[SequenceExpression] = function (node, scope) {
+    _b[SequenceExpression] = function (node, scope) {
         var last;
         for (var _i = 0, _a = node.expressions; _i < _a.length; _i++) {
             var expr = _a[_i];
@@ -2128,17 +3233,17 @@ var evaluate_map = (_a = {},
         }
         return last;
     },
-    _a[ThrowStatement] = function (node, scope) {
+    _b[ThrowStatement] = function (node, scope) {
         throw evaluate(node.argument, scope);
     },
-    _a[TryStatement] = function (node, scope) {
+    _b[TryStatement] = function (node, scope) {
         try {
             return evaluate(node.block, scope);
         }
         catch (err) {
             if (node.handler) {
                 var param = node.handler.param;
-                var new_scope = new Scope('block', scope);
+                var new_scope = new Scope("block" /* ScopeType.Block */, scope);
                 new_scope.invasive = true;
                 new_scope.$const(param === null || param === void 0 ? void 0 : param.name, err);
                 return evaluate(node.handler, new_scope);
@@ -2148,16 +3253,20 @@ var evaluate_map = (_a = {},
             }
         }
         finally {
-            if (node.finalizer)
-                return evaluate(node.finalizer, scope);
+            // fix: 当 finally 中存在 return 时 会覆盖 try 里的返回值，导致返回值错误
+            if (node.finalizer) {
+                var res = evaluate(node.finalizer, scope);
+                if (isReturnResult(res))
+                    return res;
+            }
         }
     },
-    _a[CatchClause] = function (node, scope) {
+    _b[CatchClause] = function (node, scope) {
         return evaluate(node.body, scope);
     },
-    _a[SwitchStatement] = function (node, scope) {
+    _b[SwitchStatement] = function (node, scope) {
         var discriminant = evaluate(node.discriminant, scope);
-        var new_scope = new Scope('switch', scope);
+        var new_scope = new Scope("switch" /* ScopeType.Switch */, scope);
         var matched = false;
         for (var _i = 0, _a = node.cases; _i < _a.length; _i++) {
             var $case = _a[_i];
@@ -2177,7 +3286,7 @@ var evaluate_map = (_a = {},
             }
         }
     },
-    _a[SwitchCase] = function (node, scope) {
+    _b[SwitchCase] = function (node, scope) {
         for (var _i = 0, _a = node.consequent; _i < _a.length; _i++) {
             var stmt = _a[_i];
             var result = evaluate(stmt, scope);
@@ -2186,9 +3295,9 @@ var evaluate_map = (_a = {},
             }
         }
     },
-    _a[WhileStatement] = function (node, scope) {
+    _b[WhileStatement] = function (node, scope) {
         while (evaluate(node.test, scope)) {
-            var new_scope = new Scope('loop', scope);
+            var new_scope = new Scope("loop" /* ScopeType.Loop */, scope);
             new_scope.invasive = true;
             var result = evaluate(node.body, new_scope);
             if (isBreakResult(result)) {
@@ -2202,9 +3311,9 @@ var evaluate_map = (_a = {},
             }
         }
     },
-    _a[DoWhileStatement] = function (node, scope) {
+    _b[DoWhileStatement] = function (node, scope) {
         do {
-            var new_scope = new Scope('loop', scope);
+            var new_scope = new Scope("loop" /* ScopeType.Loop */, scope);
             new_scope.invasive = true;
             var result = evaluate(node.body, new_scope);
             if (result === BREAK_SIGNAL) {
@@ -2218,19 +3327,22 @@ var evaluate_map = (_a = {},
             }
         } while (evaluate(node.test, scope));
     },
-    _a[ArrowFunctionExpression] = function (node, scope) {
+    _b[ArrowFunctionExpression] = function (node, scope) {
         return evaluate_map[FunctionExpression](node, scope, true);
     },
-    _a[ForInStatement] = function (node, scope, isForOf) {
+    _b[ForInStatement] = function (node, scope, isForOf) {
         if (isForOf === void 0) { isForOf = false; }
         var kind = node.left.kind;
-        var id = node.left.declarations[0].id;
+        var id = kind ? node.left.declarations[0].id : node.left;
         var forInit = function (value) {
-            var new_scope = new Scope('loop', scope);
+            var new_scope = new Scope("loop" /* ScopeType.Loop */, scope);
             new_scope.invasive = true;
             if (id.type === Identifier) {
                 var name_9 = id.name;
-                new_scope.$declar(kind, name_9, value);
+                // fix: 修复了 in 或者 of 可能提前声明变量的问题
+                // let i; for (i in [1, 2, 3]) {  };
+                var newKind = kind || 'var';
+                new_scope.$declar(newKind, name_9, value);
             }
             else {
                 evaluate_map[id.type](id, new_scope, kind, value);
@@ -2241,13 +3353,13 @@ var evaluate_map = (_a = {},
         if (isForOf) {
             for (var index = 0; index < init.length; index++) {
                 var result = forInit(init[index]);
-                if (result === BREAK_SIGNAL) {
+                if (isBreakResult(result)) {
                     break;
                 }
-                else if (result === CONTINUE_SIGNAL) {
+                else if (isContinueResult(result)) {
                     continue;
                 }
-                else if (result === RETURN_SIGNAL) {
+                else if (isReturnResult(result)) {
                     return result;
                 }
             }
@@ -2255,19 +3367,19 @@ var evaluate_map = (_a = {},
         else {
             for (var value in init) {
                 var result = forInit(value);
-                if (result === BREAK_SIGNAL) {
+                if (isBreakResult(result)) {
                     break;
                 }
-                else if (result === CONTINUE_SIGNAL) {
+                else if (isContinueResult(result)) {
                     continue;
                 }
-                else if (result === RETURN_SIGNAL) {
+                else if (isReturnResult(result)) {
                     return result;
                 }
             }
         }
     },
-    _a[TemplateLiteral] = function (node, scope) {
+    _b[TemplateLiteral] = function (node, scope) {
         var result = node.quasis.map(function (quasi, index) {
             if (!quasi.tail)
                 return quasi.value.raw + evaluate(node.expressions[index], scope);
@@ -2275,17 +3387,17 @@ var evaluate_map = (_a = {},
         });
         return result.join('');
     },
-    _a[ImportExpression] = function (node, scope) {
+    _b[ImportExpression] = function (node, scope) {
         var source = evaluate(node.source, scope);
         var importer = scope.$find('$$import');
         if (!importer)
             throw createError(errorMessageList.notHasImport, '$$import', node, thisRunner.source);
         return importer.$get()(source);
     },
-    _a[ForOfStatement] = function (node, scope) {
+    _b[ForOfStatement] = function (node, scope) {
         return evaluate_map[ForInStatement](node, scope, true);
     },
-    _a[YieldExpression] = function (node, scope) {
+    _b[YieldExpression] = function (node, scope) {
         var _a;
         if (!isGeneratorFunction(scope))
             throw createError(errorMessageList.notGeneratorFunction, '', node, thisRunner.source);
@@ -2295,7 +3407,7 @@ var evaluate_map = (_a = {},
         YIELD_SIGNAL.result = evaluate(node.argument, scope);
         return YIELD_SIGNAL;
     },
-    _a);
+    _b);
 var _evaluate = function (node, scope) {
     var func = evaluate_map[node.type];
     if (!func)
@@ -2310,25 +3422,21 @@ var evaluate = function (node, scope, runner) {
     var thisId = thisRunner.traceId++;
     thisRunner.traceStack.push(thisId);
     try {
-        var res = _evaluate(node, scope);
-        thisRunner.traceStack.pop();
-        return res;
+        return _evaluate(node, scope);
     }
     catch (err) {
         // 错误已经冒泡到栈定了，触发错误收集处理
         if (thisRunner.traceStack[0] === thisId) {
             thisRunner.onError(err);
-            thisRunner.traceStack.pop();
         }
         // 错误已经处理过了，直接抛出
         if (err.isEvaluateError) {
             throw err;
         }
-        // 第一级错误，需要包裹处理
-        if (thisRunner.traceStack[thisRunner.traceStack.length - 1] === thisId) {
-            throw createError(errorMessageList.runTimeError, err === null || err === void 0 ? void 0 : err.message, node, thisRunner.source);
-        }
-        throw err;
+        throw createError(errorMessageList.runTimeError, err === null || err === void 0 ? void 0 : err.message, node, thisRunner.source);
+    }
+    finally {
+        thisRunner.traceStack.pop();
     }
 };
 
@@ -5314,7 +6422,7 @@ var Runner = /** @class */ (function () {
         this.traceStack = [];
         this.currentNode = null;
         this.ast = null;
-        this.mainScope = new Scope('block');
+        this.mainScope = new Scope("program" /* ScopeType.Program */);
     }
     /** 错误收集中心 */
     Runner.prototype.onError = function (err) {
@@ -5337,14 +6445,14 @@ var Runner = /** @class */ (function () {
     Runner.prototype.initScope = function (injectObject) {
         var _this = this;
         var exports = {};
-        this.mainScope = new Scope('block');
-        this.mainScope.$const('exports', exports);
-        this.mainScope.$const('this', this);
+        this.mainScope = new Scope("program" /* ScopeType.Program */);
+        this.mainScope.$var('exports', exports);
+        this.mainScope.$const(THIS, this);
         Object.keys(default_api).forEach(function (name) {
-            _this.mainScope.$const(name, default_api[name]);
+            _this.mainScope.$var(name, default_api[name]);
         });
         Object.keys(injectObject).forEach(function (name) {
-            _this.mainScope.$const(name, injectObject[name]);
+            _this.mainScope.$var(name, injectObject[name]);
         });
     };
     Runner.prototype.parserAst = function (code) {
@@ -5359,6 +6467,35 @@ var run = function (code, injectObject, onError) {
     return runner.run(code, injectObject, onError);
 };
 
+/**
+ * getOsInfo().name 映射未 platform
+ */
+var OSNameToPlatformMap = {
+    Windows: 'Windows',
+    iPhone: 'iOS',
+    Mac: 'Mac',
+    Android: 'Android',
+    Unix: '',
+    Linux: '',
+    Unknown: '',
+};
+/**
+ * 根据 getOsInfo 获取当前系统平台
+ * @return {'Android'|'iOS'|'Windows'|'Mac'|''}
+ */
+var getOSPlatform = function () {
+    var name = getOsInfo().name;
+    return OSNameToPlatformMap[name];
+};
+var getOSModel = function () {
+    switch (getOSPlatform()) {
+        case 'iOS':
+        case 'Android':
+            return 'MB';
+        default: // Unix, Linux, Unknown,Windows,Mac
+            return 'PC';
+    }
+};
 var getOsInfo = function () {
     var userAgent = navigator.userAgent.toLowerCase();
     var name = 'Unknown';
@@ -5425,9 +6562,9 @@ var getSystemInfoSync = function () {
         currentBattery: '100%',
         fontSizeSetting: 16,
         language: 'Chinese',
-        model: 'PC',
+        model: getOSModel(),
         pixelRatio: 1.5,
-        platform: 'H5',
+        platform: getOSPlatform(),
         screenHeight: window.screen.height,
         screenWidth: window.screen.width,
         statusBarHeight: 0,
@@ -5437,7 +6574,7 @@ var getSystemInfoSync = function () {
         titleBarHeight: 0,
         version: '0.0.1',
         windowHeight: window.innerHeight,
-        windowWidth: window.innerWidth,
+        windowWidth: window.innerWidth
     };
 };
 /**
@@ -5755,6 +6892,16 @@ function upperCaseFirstLetter(string) {
 }
 function findDOM(inst) {
     return document;
+}
+function inlineStyle(style) {
+    var res = '';
+    for (var attr in style)
+        res += "".concat(attr, ": ").concat(style[attr], ";");
+    if (res.indexOf('display: flex;') >= 0)
+        res += 'display: -webkit-box;display: -webkit-flex;';
+    res = res.replace(/transform:(.+?);/g, function (s, $1) { return "".concat(s, "-webkit-transform:").concat($1, ";"); });
+    res = res.replace(/flex-direction:(.+?);/g, function (s, $1) { return "".concat(s, "-webkit-flex-direction:").concat($1, ";"); });
+    return res;
 }
 
 /**
@@ -6418,58 +7565,269 @@ var animation = /*#__PURE__*/Object.freeze({
     createAnimation: createAnimation
 });
 
-var api = __assign(__assign(__assign(__assign(__assign(__assign(__assign({}, system), storage), route), device), media), wxml), animation);
+var Toast = /** @class */ (function () {
+    function Toast() {
+        this.options = {
+            title: '',
+            icon: 'none',
+            image: '',
+            duration: 1500,
+            mask: false
+        };
+        this.style = {
+            maskStyle: {
+                position: 'fixed',
+                'z-index': '1000',
+                top: '0',
+                right: '0',
+                left: '0',
+                bottom: '0'
+            },
+            toastStyle: {
+                'z-index': '5000',
+                'box-sizing': 'border-box',
+                display: 'flex',
+                'flex-direction': 'column',
+                'justify-content': 'center',
+                '-webkit-justify-content': 'center',
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                'min-width': '120px',
+                'max-width': '200px',
+                'min-height': '120px',
+                padding: '15px',
+                transform: 'translate(-50%, -50%)',
+                'border-radius': '5px',
+                'text-align': 'center',
+                'line-height': '1.6',
+                color: '#FFFFFF',
+                background: 'rgba(17, 17, 17, 0.7)'
+            },
+            successStyle: {
+                margin: '6px auto',
+                width: '38px',
+                height: '38px',
+                background: 'transparent url(data:image/svg+xml;base64,PHN2ZyB0PSIxNjM5NTQ4OTYzMjA0IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjQzNDgiIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cGF0aCBkPSJNMjE5Ljk1MiA1MTIuNTc2bDIxMC40MzIgMjEwLjQzMi00NS4yNDggNDUuMjU2LTIxMC40MzItMjEwLjQzMnoiIHAtaWQ9IjQzNDkiIGZpbGw9IiNmZmZmZmYiPjwvcGF0aD48cGF0aCBkPSJNNzk5LjY3MiAyNjIuMjY0bDQ1LjI1NiA0NS4yNTYtNDYwLjQ2NCA0NjAuNDY0LTQ1LjI1Ni00NS4yNTZ6IiBwLWlkPSI0MzUwIiBmaWxsPSIjZmZmZmZmIj48L3BhdGg+PC9zdmc+) no-repeat',
+                'background-size': '100%'
+            },
+            errrorStyle: {
+                margin: '6px auto',
+                width: '38px',
+                height: '38px',
+                background: 'transparent url(data:image/svg+xml;base64,PHN2ZyB0PSIxNjM5NTUxMDU1MTgzIiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjE0MDc2IiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTUxMiA2NEMyNjQuNTggNjQgNjQgMjY0LjU4IDY0IDUxMnMyMDAuNTggNDQ4IDQ0OCA0NDggNDQ4LTIwMC41OCA0NDgtNDQ4Uzc1OS40MiA2NCA1MTIgNjR6IG0wIDc1MmEzNiAzNiAwIDEgMSAzNi0zNiAzNiAzNiAwIDAgMS0zNiAzNnogbTUxLjgzLTU1MS45NUw1NDggNjM2YTM2IDM2IDAgMCAxLTcyIDBsLTE1LjgzLTM3MS45NWMtMC4xLTEuMzMtMC4xNy0yLjY4LTAuMTctNC4wNWE1MiA1MiAwIDAgMSAxMDQgMGMwIDEuMzctMC4wNyAyLjcyLTAuMTcgNC4wNXoiIHAtaWQ9IjE0MDc3IiBmaWxsPSIjZmZmZmZmIj48L3BhdGg+PC9zdmc+) no-repeat',
+                'background-size': '100%'
+            },
+            loadingStyle: {
+                margin: '6px auto',
+                width: '38px',
+                height: '38px',
+                '-webkit-animation': 'taroLoading 1s steps(12, end) infinite',
+                animation: 'taroLoading 1s steps(12, end) infinite',
+                background: 'transparent url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgxMDB2MTAwSDB6Ii8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iMjAiIHg9IjQ2LjUiIHk9IjQwIiBmaWxsPSIjRTlFOUU5IiByeD0iNSIgcnk9IjUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgLTMwKSIvPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiB4PSI0Ni41IiB5PSI0MCIgZmlsbD0iIzk4OTY5NyIgcng9IjUiIHJ5PSI1IiB0cmFuc2Zvcm09InJvdGF0ZSgzMCAxMDUuOTggNjUpIi8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iMjAiIHg9IjQ2LjUiIHk9IjQwIiBmaWxsPSIjOUI5OTlBIiByeD0iNSIgcnk9IjUiIHRyYW5zZm9ybT0icm90YXRlKDYwIDc1Ljk4IDY1KSIvPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiB4PSI0Ni41IiB5PSI0MCIgZmlsbD0iI0EzQTFBMiIgcng9IjUiIHJ5PSI1IiB0cmFuc2Zvcm09InJvdGF0ZSg5MCA2NSA2NSkiLz48cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSIyMCIgeD0iNDYuNSIgeT0iNDAiIGZpbGw9IiNBQkE5QUEiIHJ4PSI1IiByeT0iNSIgdHJhbnNmb3JtPSJyb3RhdGUoMTIwIDU4LjY2IDY1KSIvPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiB4PSI0Ni41IiB5PSI0MCIgZmlsbD0iI0IyQjJCMiIgcng9IjUiIHJ5PSI1IiB0cmFuc2Zvcm09InJvdGF0ZSgxNTAgNTQuMDIgNjUpIi8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iMjAiIHg9IjQ2LjUiIHk9IjQwIiBmaWxsPSIjQkFCOEI5IiByeD0iNSIgcnk9IjUiIHRyYW5zZm9ybT0icm90YXRlKDE4MCA1MCA2NSkiLz48cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSIyMCIgeD0iNDYuNSIgeT0iNDAiIGZpbGw9IiNDMkMwQzEiIHJ4PSI1IiByeT0iNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTE1MCA0NS45OCA2NSkiLz48cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSIyMCIgeD0iNDYuNSIgeT0iNDAiIGZpbGw9IiNDQkNCQ0IiIHJ4PSI1IiByeT0iNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTEyMCA0MS4zNCA2NSkiLz48cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSIyMCIgeD0iNDYuNSIgeT0iNDAiIGZpbGw9IiNEMkQyRDIiIHJ4PSI1IiByeT0iNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTkwIDM1IDY1KSIvPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiB4PSI0Ni41IiB5PSI0MCIgZmlsbD0iI0RBREFEQSIgcng9IjUiIHJ5PSI1IiB0cmFuc2Zvcm09InJvdGF0ZSgtNjAgMjQuMDIgNjUpIi8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iMjAiIHg9IjQ2LjUiIHk9IjQwIiBmaWxsPSIjRTJFMkUyIiByeD0iNSIgcnk9IjUiIHRyYW5zZm9ybT0icm90YXRlKC0zMCAtNS45OCA2NSkiLz48L3N2Zz4=) no-repeat',
+                'background-size': '100%'
+            },
+            imageStyle: {
+                margin: '6px auto',
+                width: '40px',
+                height: '40px',
+                background: 'transparent no-repeat',
+                'background-size': '100%'
+            },
+            textStyle: {
+                margin: '0',
+                'font-size': '16px'
+            }
+        };
+    }
+    Toast.prototype.create = function (options, _type) {
+        var _this = this;
+        if (options === void 0) { options = {}; }
+        if (_type === void 0) { _type = 'toast'; }
+        // style
+        var _a = this.style, maskStyle = _a.maskStyle, toastStyle = _a.toastStyle, successStyle = _a.successStyle, errrorStyle = _a.errrorStyle, loadingStyle = _a.loadingStyle, imageStyle = _a.imageStyle, textStyle = _a.textStyle;
+        // configuration
+        var config = __assign(__assign(__assign({}, this.options), options), { _type: _type });
+        // wrapper
+        this.el = document.createElement('div');
+        this.el.className = 'taro__toast';
+        this.el.style.opacity = '0';
+        this.el.style.transition = 'opacity 0.1s linear';
+        // mask
+        this.mask = document.createElement('div');
+        this.mask.setAttribute('style', inlineStyle(maskStyle));
+        this.mask.style.display = config.mask ? 'block' : 'none';
+        // icon
+        this.icon = document.createElement('p');
+        if (config.image) {
+            this.icon.setAttribute('style', inlineStyle(__assign(__assign({}, imageStyle), { 'background-image': "url(".concat(config.image, ")") })));
+        }
+        else {
+            var iconStyle = config.icon === 'loading' ? loadingStyle : config.icon === 'error' ? errrorStyle : successStyle;
+            this.icon.setAttribute('style', inlineStyle(__assign(__assign({}, iconStyle), (config.icon === 'none' ? { display: 'none' } : {}))));
+        }
+        // toast
+        this.toast = document.createElement('div');
+        this.toast.setAttribute('style', inlineStyle(__assign(__assign({}, toastStyle), (config.icon === 'none' ? {
+            'min-height': '0',
+            padding: '10px 15px'
+        } : {}))));
+        // title
+        this.title = document.createElement('p');
+        this.title.setAttribute('style', inlineStyle(textStyle));
+        this.title.textContent = config.title;
+        // result
+        this.toast.appendChild(this.icon);
+        this.toast.appendChild(this.title);
+        this.el.appendChild(this.mask);
+        this.el.appendChild(this.toast);
+        // show immediately
+        document.body.appendChild(this.el);
+        setTimeout(function () { _this.el.style.opacity = '1'; }, 0);
+        this.type = config._type;
+        // disappear after duration
+        config.duration >= 0 && this.hide(config.duration, this.type);
+        return '';
+    };
+    Toast.prototype.show = function (options, _type) {
+        var _this = this;
+        if (options === void 0) { options = {}; }
+        if (_type === void 0) { _type = 'toast'; }
+        var config = __assign(__assign(__assign({}, this.options), options), { _type: _type });
+        if (this.hideOpacityTimer)
+            clearTimeout(this.hideOpacityTimer);
+        if (this.hideDisplayTimer)
+            clearTimeout(this.hideDisplayTimer);
+        // title
+        this.title.textContent = config.title || '';
+        // mask
+        this.mask.style.display = config.mask ? 'block' : 'none';
+        // image
+        var _a = this.style, toastStyle = _a.toastStyle, successStyle = _a.successStyle, errrorStyle = _a.errrorStyle, loadingStyle = _a.loadingStyle, imageStyle = _a.imageStyle;
+        if (config.image) {
+            this.icon.setAttribute('style', inlineStyle(__assign(__assign({}, imageStyle), { 'background-image': "url(".concat(config.image, ")") })));
+        }
+        else {
+            if (!config.image && config.icon) {
+                var iconStyle = config.icon === 'loading' ? loadingStyle : config.icon === 'error' ? errrorStyle : successStyle;
+                this.icon.setAttribute('style', inlineStyle(__assign(__assign({}, iconStyle), (config.icon === 'none' ? { display: 'none' } : {}))));
+            }
+        }
+        // toast
+        this.toast.setAttribute('style', inlineStyle(__assign(__assign({}, toastStyle), (config.icon === 'none' ? {
+            'min-height': '0',
+            padding: '10px 15px'
+        } : {}))));
+        // show
+        this.el.style.display = 'block';
+        setTimeout(function () { _this.el.style.opacity = '1'; }, 0);
+        this.type = config._type;
+        // disappear after duration
+        config.duration >= 0 && this.hide(config.duration, this.type);
+        return '';
+    };
+    Toast.prototype.hide = function (duration, type) {
+        var _this = this;
+        if (duration === void 0) { duration = 0; }
+        if (this.type !== type)
+            return;
+        if (this.hideOpacityTimer)
+            clearTimeout(this.hideOpacityTimer);
+        if (this.hideDisplayTimer)
+            clearTimeout(this.hideDisplayTimer);
+        this.hideOpacityTimer = setTimeout(function () {
+            _this.el.style.opacity = '0';
+            _this.hideDisplayTimer = setTimeout(function () { _this.el.style.display = 'none'; }, 100);
+        }, duration);
+    };
+    return Toast;
+}());
+
+// 交互
+var status = 'default';
+// inject necessary style
+function init(doc) {
+    if (status === 'ready')
+        return;
+    var taroStyle = doc.createElement('style');
+    taroStyle.textContent = '@font-face{font-weight:normal;font-style:normal;font-family:"taro";src:url("data:application/x-font-ttf;charset=utf-8;base64, AAEAAAALAIAAAwAwR1NVQrD+s+0AAAE4AAAAQk9TLzJWs0t/AAABfAAAAFZjbWFwqVgGvgAAAeAAAAGGZ2x5Zph7qG0AAANwAAAAdGhlYWQRFoGhAAAA4AAAADZoaGVhCCsD7AAAALwAAAAkaG10eAg0AAAAAAHUAAAADGxvY2EADAA6AAADaAAAAAhtYXhwAQ4AJAAAARgAAAAgbmFtZYrphEEAAAPkAAACVXBvc3S3shtSAAAGPAAAADUAAQAAA+gAAABaA+gAAAAAA+gAAQAAAAAAAAAAAAAAAAAAAAMAAQAAAAEAAADih+FfDzz1AAsD6AAAAADXB57LAAAAANcHnssAAP/sA+gDOgAAAAgAAgAAAAAAAAABAAAAAwAYAAEAAAAAAAIAAAAKAAoAAAD/AAAAAAAAAAEAAAAKAB4ALAABREZMVAAIAAQAAAAAAAAAAQAAAAFsaWdhAAgAAAABAAAAAQAEAAQAAAABAAgAAQAGAAAAAQAAAAAAAQK8AZAABQAIAnoCvAAAAIwCegK8AAAB4AAxAQIAAAIABQMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUGZFZABAAHjqCAPoAAAAWgPoABQAAAABAAAAAAAAA+gAAABkAAAD6AAAAAAABQAAAAMAAAAsAAAABAAAAV4AAQAAAAAAWAADAAEAAAAsAAMACgAAAV4ABAAsAAAABgAEAAEAAgB46gj//wAAAHjqCP//AAAAAAABAAYABgAAAAEAAgAAAQYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAKAAAAAAAAAACAAAAeAAAAHgAAAABAADqCAAA6ggAAAACAAAAAAAAAAwAOgABAAD/7AAyABQAAgAANzMVFB4UKAAAAAABAAAAAAO7AzoAFwAAEy4BPwE+AR8BFjY3ATYWFycWFAcBBiInPQoGBwUHGgzLDCELAh0LHwsNCgr9uQoeCgGzCyEOCw0HCZMJAQoBvgkCCg0LHQv9sQsKAAAAAAAAEgDeAAEAAAAAAAAAHQAAAAEAAAAAAAEABAAdAAEAAAAAAAIABwAhAAEAAAAAAAMABAAoAAEAAAAAAAQABAAsAAEAAAAAAAUACwAwAAEAAAAAAAYABAA7AAEAAAAAAAoAKwA/AAEAAAAAAAsAEwBqAAMAAQQJAAAAOgB9AAMAAQQJAAEACAC3AAMAAQQJAAIADgC/AAMAAQQJAAMACADNAAMAAQQJAAQACADVAAMAAQQJAAUAFgDdAAMAAQQJAAYACADzAAMAAQQJAAoAVgD7AAMAAQQJAAsAJgFRCiAgQ3JlYXRlZCBieSBmb250LWNhcnJpZXIKICB3ZXVpUmVndWxhcndldWl3ZXVpVmVyc2lvbiAxLjB3ZXVpR2VuZXJhdGVkIGJ5IHN2ZzJ0dGYgZnJvbSBGb250ZWxsbyBwcm9qZWN0Lmh0dHA6Ly9mb250ZWxsby5jb20ACgAgACAAQwByAGUAYQB0AGUAZAAgAGIAeQAgAGYAbwBuAHQALQBjAGEAcgByAGkAZQByAAoAIAAgAHcAZQB1AGkAUgBlAGcAdQBsAGEAcgB3AGUAdQBpAHcAZQB1AGkAVgBlAHIAcwBpAG8AbgAgADEALgAwAHcAZQB1AGkARwBlAG4AZQByAGEAdABlAGQAIABiAHkAIABzAHYAZwAyAHQAdABmACAAZgByAG8AbQAgAEYAbwBuAHQAZQBsAGwAbwAgAHAAcgBvAGoAZQBjAHQALgBoAHQAdABwADoALwAvAGYAbwBuAHQAZQBsAGwAbwAuAGMAbwBtAAAAAAIAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwECAQMBBAABeAd1bmlFQTA4AAAAAAA=") format("truetype");}@-webkit-keyframes taroLoading{0%{-webkit-transform:rotate3d(0, 0, 1, 0deg);}100%{-webkit-transform:rotate3d(0, 0, 1, 360deg);transform:rotate3d(0, 0, 1, 360deg);}}@keyframes taroLoading{0%{-webkit-transform:rotate3d(0, 0, 1, 0deg);}100%{-webkit-transform:rotate3d(0, 0, 1, 360deg);transform:rotate3d(0, 0, 1, 360deg);}}.taro-modal__foot:after {content: "";position: absolute;left: 0;top: 0;right: 0;height: 1px;border-top: 1px solid #D5D5D6;color: #D5D5D6;-webkit-transform-origin: 0 0;transform-origin: 0 0;-webkit-transform: scaleY(0.5);transform: scaleY(0.5);} .taro-model__btn:active {background-color: #EEEEEE}.taro-model__btn:not(:first-child):after {content: "";position: absolute;left: 0;top: 0;width: 1px;bottom: 0;border-left: 1px solid #D5D5D6;color: #D5D5D6;-webkit-transform-origin: 0 0;transform-origin: 0 0;-webkit-transform: scaleX(0.5);transform: scaleX(0.5);}.taro-actionsheet__cell:not(:first-child):after {content: "";position: absolute;left: 0;top: 0;right: 0;height: 1px;border-top: 1px solid #e5e5e5;color: #e5e5e5;-webkit-transform-origin: 0 0;transform-origin: 0 0;-webkit-transform: scaleY(0.5);transform: scaleY(0.5);}';
+    doc.querySelector('head').appendChild(taroStyle);
+    status = 'ready';
+}
+var toast = new Toast();
+var showToast = function (options) {
+    if (options === void 0) { options = { title: '' }; }
+    init(document);
+    options = Object.assign({
+        title: '',
+        icon: 'success',
+        image: '',
+        duration: 1500,
+        mask: false
+    }, options);
+    var success = options.success, fail = options.fail, complete = options.complete;
+    var handle = new MethodHandler({ name: 'showToast', success: success, fail: fail, complete: complete });
+    if (typeof options.title !== 'string') {
+        return handle.fail({
+            errMsg: getParameterError({
+                para: 'title',
+                correct: 'String',
+                wrong: options.title
+            })
+        });
+    }
+    if (typeof options.duration !== 'number') {
+        return handle.fail({
+            errMsg: getParameterError({
+                para: 'duration',
+                correct: 'Number',
+                wrong: options.duration
+            })
+        });
+    }
+    if (options.image && typeof options.image !== 'string')
+        options.image = '';
+    options.mask = !!options.mask;
+    var errMsg = '';
+    if (!toast.el) {
+        errMsg = toast.create(options, 'toast');
+    }
+    else {
+        errMsg = toast.show(options, 'toast');
+    }
+    return handle.success({ errMsg: errMsg });
+};
+var hideToast = function (_a) {
+    var _b = _a === void 0 ? {} : _a, success = _b.success, fail = _b.fail, complete = _b.complete;
+    var handle = new MethodHandler({ name: 'hideToast', success: success, fail: fail, complete: complete });
+    if (!toast.el)
+        return handle.success();
+    toast.hide(0, 'toast');
+    return handle.success();
+};
+
+var uiInteraction = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    hideToast: hideToast,
+    showToast: showToast
+});
+
+var api = __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({}, system), storage), route), device), media), wxml), animation), uiInteraction);
 
 // @ts-ignore
-var version = "0.4.6";
+var version = "0.4.7";
 initVersionLogger('naruse-h5', version);
-var Naruse = __assign(__assign({}, api), { Component: React.Component, createElement: naruseCreateElement, env: {
+var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {
         USER_DATA_PATH: '',
         clientName: 'H5',
         clientVersion: version,
         language: 'zh-Hans',
         platform: 'H5',
-    }, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, version: version, unsafe_run: run, withPage: function (Component) { return Component; }, cloneElement: React.cloneElement, isValidElement: React.isValidElement, Children: React.Children });
+    }, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, version: version, unsafe_run: run, withPage: withPage, cloneElement: React.cloneElement, isValidElement: React.isValidElement, Children: React.Children });
 if (typeof window !== 'undefined') {
     // @ts-ignore
     window.Naruse = Naruse;
 }
-
-var _config = {
-    hotPuller: function () {
-        logger.error('未初始化热更新拉取，无法更新组件默认为空');
-        return Promise.resolve({ code: '', ctx: {} });
-    },
-    baseCtx: function () {
-        return {};
-    },
-    onRunError: function (err) {
-        console.error(err);
-    },
-};
-/**
- * @description 获取初始化
- * @author CHC
- * @date 2022-06-14 10:06:50
- * @returns {{ _config: () => Promise<{ code, ctx }>  }}
- */
-var getNaruseConfig = function () {
-    return _config;
-};
-/**
- * @description naruse内部初始化过程
- * @author CHC
- * @date 2022-06-14 10:06:36
- */
-var naruseInit = function (_a) {
-    var _b = _a === void 0 ? {} : _a, hotPuller = _b.hotPuller, baseCtx = _b.baseCtx, onRunError = _b.onRunError;
-    if (hotPuller)
-        _config.hotPuller = hotPuller;
-    if (baseCtx)
-        _config.baseCtx = baseCtx;
-    if (onRunError)
-        _config.onRunError = onRunError;
-};
 
 /**
  * @description 根据props获取naruse组件
@@ -6507,15 +7865,36 @@ var getNaruseComponentFromProps = function (props) { return __awaiter(void 0, vo
  * @date 2022-06-14 16:06:40
  */
 var getNaruseComponentFromCode = function (code, ctx) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, _baseCtx, onRunError, baseCtx, exports, component, NaruseComponent_1, compatibleClass;
+    var _a, _baseCtx, onRunError, hotImport, baseCtx, $webpack, $$import, executeCode, exports, component, NaruseComponent_1, compatibleClass;
     return __generator(this, function (_b) {
         if (!code)
             return [2 /*return*/, null];
-        _a = getNaruseConfig(), _baseCtx = _a.baseCtx, onRunError = _a.onRunError;
+        _a = getNaruseConfig(), _baseCtx = _a.baseCtx, onRunError = _a.onRunError, hotImport = _a.hotImport;
         baseCtx = typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx;
+        $webpack = {};
+        $$import = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            return __awaiter(void 0, void 0, void 0, function () {
+                var code;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, hotImport.apply(void 0, args)];
+                        case 1:
+                            code = _a.sent();
+                            return [2 /*return*/, executeCode(code)];
+                    }
+                });
+            });
+        };
+        executeCode = function (code) { return run(code, __assign(__assign(__assign({ h: Naruse.createElement, Naruse: Naruse }, baseCtx), ctx), { 
+            // 热加载导入
+            $$import: $$import, $webpack: $webpack })); };
         exports = {};
         try {
-            exports = run(code, __assign(__assign({ h: Naruse.createElement, Naruse: Naruse }, baseCtx), ctx));
+            exports = executeCode(code);
         }
         catch (err) {
             logger.error('运行时出错，自动继续', err);
@@ -6585,6 +7964,7 @@ var Container = /** @class */ (function (_super) {
         });
     };
     Container.prototype.render = function () {
+        // @ts-ignore
         return this.state.loaded ? Naruse.createElement(this.Component) : null;
     };
     return Container;

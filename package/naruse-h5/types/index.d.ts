@@ -34,7 +34,7 @@ declare module 'Naruse' {
         'step-end'
       }
     }
-  
+
     /** 动画对象
      * @supported weapp, h5, tt
      * @see https://developers.weixin.qq.com/miniprogram/dev/api/ui/animation/Animation.html
@@ -291,7 +291,7 @@ declare module 'Naruse' {
         value: number | string,
       ): Animation
     }
-  
+
     namespace Animation {
       interface StepOption {
         /** 动画延迟时间，单位 ms */
@@ -319,7 +319,7 @@ declare module 'Naruse' {
         'step-end'
       }
     }
-  
+
     /** @ignore */
     interface KeyFrame {
       /** 关键帧的偏移，范围[0-1] */
@@ -388,10 +388,10 @@ declare module 'Naruse' {
       easing?: string
       [property: string]: any
     }
-  
+
     /** @ignore */
     type ClearAnimationOptions = Record<keyof KeyFrame, boolean>
-  
+
     /** @ignore */
     interface ScrollTimelineOption {
       /** 指定滚动元素的选择器（只支持 scroll-view），该元素滚动时会驱动动画的进度 */
@@ -405,8 +405,8 @@ declare module 'Naruse' {
       /** 起始和结束的滚动范围映射的时间长度，该时间可用于与关键帧动画里的时间 (duration) 相匹配，单位 ms */
       timeRange: number
     }
-  
-  
+
+
     /** 创建一个动画实例 [animation](../Animation)。调用实例的方法来描述动画。最后通过动画实例的 export 方法导出动画数据传递给组件的 animation 属性。
     * @supported weapp, h5, tt
     * @example
@@ -422,4 +422,23 @@ declare module 'Naruse' {
     */
     function createAnimation (option: createAnimation.Option): Animation
   }
-  
+
+
+declare module 'react' {
+    export const useState: any = (initialState: any) => [any, any];
+    export const useEffect: any = (callback: any, deps: any) => {};
+    export const useRef: any = (initialValue: any) => { current: any };
+    export const useLayoutEffect: any = (callback: any, deps: any) => {};
+    export const useMemo: any = (callback: any, deps: any) => {};
+    export const useCallback: any = (callback: any, deps: any) => {};
+    export const useContext: any = (context: any) => {};
+    export const useReducer: any = (reducer: any, initialState: any, init: any) => [any, any];
+    export const useImperativeHandle: any = (ref: any, callback: any, deps: any) => {};
+    export const useDebugValue: any = (value: any, formatter: any) => {};
+    export const createContext: any = (defaultValue: any) => {};
+    export const forwardRef: any = (callback: any) => {};
+    export const memo: any = (callback: any, compare: any) => {};
+    export const Fragment: any = {};
+    export const Component: any = Function;
+    export const PureComponent: any = Function;
+}

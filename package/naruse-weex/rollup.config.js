@@ -14,10 +14,13 @@ const customResolver = nodeResolve({ extensions: ['.mjs', '.js', '.jsx', '.json'
  */
 module.exports = {
   input: './src/index.ts',
-  output: {
+  output: [{
     file: './build/lib.js',
     format: 'es',
-  },
+  }, {
+    file: '../../demo/demo-rap/lib.js',
+    format: 'es',
+  }],
   plugins: [
     replace({ __VERSION__: JSON.stringify(version) }),
     customResolver,

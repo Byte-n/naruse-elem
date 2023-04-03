@@ -1,6 +1,6 @@
 {
     "name": "naruse-alipay",
-    "version": "0.4.6",
+    "version": "0.4.7",
     "description": "naruse 针对支付宝小程序的基础包",
     "main": "./build/lib.js",
     "scripts": {
@@ -11,7 +11,8 @@
     "devDependencies": {
         "naruse-webpack-runner": "workspace:*",
         "naruse-plugin": "workspace:*",
-        "naruse-share": "workspace:*"
+        "naruse-share": "workspace:*",
+        "react-like-hooks": "workspace:*"
     },
     "author": "CHC",
     "license": "ISC"
