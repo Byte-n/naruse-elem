@@ -10,6 +10,8 @@
     },
     "devDependencies": {
         "naruse-webpack-runner": "workspace:*",
+        "naruse-plugin": "workspace:*",
+        "naruse-share": "workspace:*",
         "react-like-hooks": "workspace:*"
     },
     "author": "CHC",

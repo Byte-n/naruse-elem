@@ -3,15 +3,34 @@ import {
     LoggerLanding,
     LoggerLevel,
     PluginApplyParams,
+    PluginConstructorFirstParma,
     PluginOnErrorParams,
-    UpdateAdLoggerPublicInfoParams
-} from "../../types";
-import { isEmpty, removeObjectNullValue } from "../../utils";
-import Plugin from '../Plugin'
+    UpdateAdLoggerPublicInfoParams,
+} from '../type'
+import { AdData, AdRunningContext, isEmpty, removeObjectNullValue, createLogger, } from "naruse-share";
+
+import Plugin from '../core/index'
 import LoggerPlus from "./LoggerPlus";
-import { createLogger } from "../../index";
 
 const log = createLogger('LoggerPlugin');
+const getNullAdData: () => AdData = () => {
+    return {
+        creative_id: 0,
+        creative_name: "",
+        dest_url: "",
+        group_id: 0,
+        img_path: "",
+        img_size: "",
+        pid: 0,
+        pid_name: "",
+        plan_id: 0,
+        primary_class: "",
+        secondary_class: "",
+        template_type: "",
+        user_define: { body: {} },
+        version: ""
+    } ;
+}
 /**
  * 日志插件，将 管理 日志 的公共属性参数，负责将日志对象注入到公共系统中
  */
@@ -27,7 +46,7 @@ class LoggerPlugin extends Plugin {
         userInfo: { userNick: "", vipEndTime: "", vipFlag: 0 }
     }
     $logger: LoggerPlus | null
-    constructor({
+    constructor(first: PluginConstructorFirstParma, {
         level,
         landing,
         appName,
@@ -35,7 +54,7 @@ class LoggerPlugin extends Plugin {
         logInterface,
         systemInfo,
     }: InitAdLoggerPublicInfoParams) {
-        super();
+        super(first);
         // 一小波，错误提示
         if (isEmpty(appName)) {
             throw new Error('initAdLoggerPublicInfo: appName 必须的');
@@ -53,6 +72,14 @@ class LoggerPlugin extends Plugin {
             throw new Error('initAdLoggerPublicInfo: landing 必须的');
         }
         this.updatePublicInfo({ level, landing, appName, userInfo, logInterface, systemInfo }, false);
+        // 注入默认的 日志对象.(预加载代码，不会触发插件的生命周期)
+        const default$logger = new LoggerPlus(
+            { adData: getNullAdData(), landing: LoggerLanding.production },
+            this._initParams
+        );
+        const { config } = first;
+        const baseCtx = config.baseCtx() as AdRunningContext;
+        baseCtx.$logger = default$logger;
     }
 
     /** 修改参数 */
@@ -76,7 +103,7 @@ class LoggerPlugin extends Plugin {
         const { $logger } = context;
         // 打印错误日志
         $logger.clone({ landing: LoggerLanding[source] })
-            .error(`${error.name}-${error.message}`, JSON.stringify(error));
+            .error(`${error.name}-${error.message}`, error);
     }
 }
 
