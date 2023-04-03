@@ -58,7 +58,7 @@ const singleHotComponentBuildExample: NaruseWebpackRunnerOptions = {
     isWatch: true,
 }
 
-// webpack 打印内部错误
-build(singleHotComponentBuildExample).catch(err => {
-    console.log(err)
-})
+// // webpack 打印内部错误
+// build(singleHotComponentBuildExample).catch(err => {
+//     console.log(err)
+// })
