@@ -10,10 +10,49 @@ if (React.version.indexOf('15') === 0) {
     };
 }
 
+const _defineProperty = (obj, key, value) => {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+};
 
 naruseInit({
     hotPuller() {
-        return { code: code, ctx: {}}
+        return {
+            code: code, ctx: {
+                $adImport: {
+                    adData: {
+                        results: [
+                            {
+                                user_define: {
+                                    body: {
+
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                _defineProperty,
+                $userInfoChanger: {
+                    getUserInfo () {
+                        return {}
+                    }
+                },
+                $sensorsBeacon: {
+                    sensorsBeacon () {
+
+                    }
+                }
+            }
+        }
     },
     async hotImport(path) {
         const res = await import('../dev/' + path + '?raw');
