@@ -71,6 +71,8 @@ const createMainBehavior = (option = {}) => {
     // 小程序组件默认minxs对象
     const naruseBehavior = {
         ...getMiniappEventBehavior(),
+        virtualPage: null,
+        __NaruseUniqueComponentPageShowEvent: null,
         /**
          * @description 装载完毕后
          * @author CHC
@@ -83,14 +85,14 @@ const createMainBehavior = (option = {}) => {
                 if (unique) {
                     // 绑定重新渲染事件
                     bindRenderEventOnComponent(this)
-                    // 触发自定义事件
-                    const page = new VirtualPage(this.$page)
-                    // 小程序对象Page.__proto__.route
-                    const path = Object.getPrototypeOf(this.$page).route;
-                    page.on('onShow', () => {
-                        globalEvent.emit('__NaruseUniqueComponentPageShow', { path, event: 'onShow' });
-                    })
-                    globalEvent.emit('__NaruseUniqueComponentPageShow', { path, event: 'didMount' });
+                    this.__NaruseUniqueComponentPageShowEvent = (event) => {
+                        // 小程序对象Page.__proto__.route
+                        const path = Object.getPrototypeOf(this.$page).route;
+                        globalEvent.emit('__NaruseUniqueComponentPageShow', { path, event: event || 'onShow' });
+                    }
+                    this.virtualPage = new VirtualPage(this.$page)
+                    this.virtualPage.on('onShow', this.__NaruseUniqueComponentPageShowEvent)
+                    this.__NaruseUniqueComponentPageShowEvent('didMount');
                 }
             }
             this.option = option;
@@ -136,6 +138,11 @@ const createMainBehavior = (option = {}) => {
             if (!this.$middware) return;
             this.isNaruseMainComponent && uninstallMainComponentOnSomePage(this);
             this.$middware.onUnMount(true);
+            const { unique = false } = this.props || {};
+            if (unique && this.virtualPage) {
+                const page = new VirtualPage(this.$page)
+                this.virtualPage.off('__NaruseUniqueComponentPageShow', this.__NaruseUniqueComponentPageShowEvent)
+            }
         },
     };
     return naruseBehavior;
