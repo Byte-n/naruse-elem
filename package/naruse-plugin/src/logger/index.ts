@@ -103,7 +103,7 @@ class LoggerPlugin extends Plugin {
         const { $logger } = context;
         // 打印错误日志
         $logger.clone({ landing: LoggerLanding[source] })
-            .error(`${error.name}-${error.message}`, JSON.stringify(error));
+            .error(`${error.name}-${error.message}`, error);
     }
 }
 
