@@ -7,7 +7,7 @@ import {
     logger
 } from './uitl';
 
-const pageCenter: Record<string, Page> = {};
+const pageCenter: Record<string, VirtualPage> = {};
 
 export const getPageCenter = () => {
     return { ...pageCenter };
@@ -32,7 +32,7 @@ export const ALLOW_EVENT = [
  * @description 获取naruse内部的页面对象
  * @author CHC
  * @date 2022-05-04 18:05:46
- * @param {Page} miniComponent
+ * @param {VirtualPage} miniComponent
  */
 export const getPageInstance = (miniComponent) => {
     if (!miniComponent) {
@@ -53,7 +53,7 @@ export const getPageInstance = (miniComponent) => {
     }
     const pageInstance = miniComponent.$$narusePage ? miniComponent : miniComponent.$page;
     if (!pageCenter[id]) {
-        pageCenter[id] = new Page(pageInstance);
+        pageCenter[id] = new VirtualPage(pageInstance);
         return pageCenter[id];
     }
     return pageCenter[id];
@@ -64,9 +64,9 @@ export const getPageInstance = (miniComponent) => {
  * @description Naruse内部的Page实例
  * @author CHC
  * @date 2022-05-04 18:05:45
- * @class Page
+ * @class VirtualPage
  */
-export class Page {
+export class VirtualPage {
     miniPage: any;
     eventCenter: ReturnType<typeof EventBus>;
     oldEvents: {};
@@ -102,7 +102,7 @@ export class Page {
                 return (...arg) => selfPage.eventCenter.emit(key, ...arg);
             },
             set() {
-                logger.error('正在修改页面事件，请勿修改，请使用Naruse.Page.on()');
+                logger.error('正在修改页面事件，请勿修改，请使用Naruse.VirtualPage.on()');
             },
             enumerable: true,
             configurable: true,

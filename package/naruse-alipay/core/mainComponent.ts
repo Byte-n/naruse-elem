@@ -4,7 +4,7 @@ import { Middware } from './middware.js';
 import { globalEvent, isEmpty } from '../../naruse-share/index';
 import { getNaruseComponentFromProps } from './create.js';
 import { bindRenderEventOnComponent, uninstallMainComponentOnSomePage } from '../expand';
-import { Page } from "./page";
+import { VirtualPage } from "./page";
 
 /**
  * @description 初始化naruse主组件
@@ -84,13 +84,13 @@ const createMainBehavior = (option = {}) => {
                     // 绑定重新渲染事件
                     bindRenderEventOnComponent(this)
                     // 触发自定义事件
-                    const page = new Page(this.$page)
-                    // 开发环境下没有这玩意（）
+                    const page = new VirtualPage(this.$page)
+                    // 小程序对象Page.__proto__.route
                     const path = Object.getPrototypeOf(this.$page).route;
                     page.on('onShow', () => {
-                        globalEvent.emit('uniqueComponentPageShow', { path, event: 'onShow' });
+                        globalEvent.emit('__NaruseUniqueComponentPageShow', { path, event: 'onShow' });
                     })
-                    globalEvent.emit('uniqueComponentPageShow', { path, event: 'didMount' });
+                    globalEvent.emit('__NaruseUniqueComponentPageShow', { path, event: 'didMount' });
                 }
             }
             this.option = option;

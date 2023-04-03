@@ -83,5 +83,14 @@ export const isEmptyObj = (o) => {
 /** 判断是不是箭头函数 */
 export const isArrowFunction = (fn) => {
     const fnStr = fn.toString();
-    return /^(\([^)]*\)|[a-zA-Z0-9$_]+\s*[=:]\s*)?=>/.test(fnStr)
+    if (!(fn instanceof Function)) {
+        return false;
+    }
+    // 判断函数体是否有花括号
+    if (fnStr.match(/{[\s\S]*}/)) {
+        // 将花括号内的函数体去掉
+        return fnStr.replace(/{[\s\S]*}/, "").includes("=>")
+    } else {
+        return true
+    }
 };
