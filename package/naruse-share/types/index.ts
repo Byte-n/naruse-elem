@@ -53,7 +53,7 @@ export type AdData = {
     template_type: string,
     pid_name: string,
     plan_id: number,
-    version: string
+    version: string,
     // todo；待补充
 } & Record<string, any>;
 

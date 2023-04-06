@@ -10,6 +10,7 @@ export const withPage = (component) => {
                 events: {
                     on: page.on.bind(page),
                     off: page.off.bind(page),
+                    once: page.once.bind(page),
                 },
             };
             return createElement(component, { ...this.props, currentPage });
