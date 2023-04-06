@@ -1,5 +1,11 @@
 # naruse-types
 
+## 0.4.10
+
+### Patch Changes
+
+- #FIX: 升级 naruse-parser 修复部分语法错误
+
 ## 0.4.9
 
 ### Patch Changes
