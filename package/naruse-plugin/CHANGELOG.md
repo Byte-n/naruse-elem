@@ -1,5 +1,11 @@
 # naruse-plugin
 
+## 1.0.3
+
+### Patch Changes
+
+- #FEAT: naruse-parser 升级 0.1.10
+
 ## 1.0.2
 
 ### Patch Changes

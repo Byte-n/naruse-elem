@@ -7389,7 +7389,7 @@ var uiInteraction = /*#__PURE__*/Object.freeze({
 var api = __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({}, system), storage), route), device), media), wxml), animation), uiInteraction);
 
 // @ts-ignore
-var version = "0.4.9";
+var version = "0.4.10";
 initVersionLogger('naruse-h5', version);
 var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {
         USER_DATA_PATH: '',

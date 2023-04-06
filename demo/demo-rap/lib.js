@@ -5432,7 +5432,7 @@ var Hooks = {
 };
 
 // @ts-ignore
-var version = "0.4.9";
+var version = "0.4.10";
 initVersionLogger('naruse-weex', version);
 var Naruse = __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({}, Hooks), { Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, globalEvent: globalEvent, withPage: function (Component) { return Component; } }), Storage), Route), Device), System), UI), { getImageInfo: temporarilyNotSupport('getImageInfo'), createAnimation: temporarilyNotSupport('createAnimation') }), elementApi);
 var naruseExtend = function (obj) {
