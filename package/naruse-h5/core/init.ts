@@ -15,8 +15,9 @@ const _config: NaruseInitParams = {
     },
     // 自定义 rpx 的单位转换
     convertRpx: (rpx) => (rpx / 2 * 1.4).toFixed(1),
-    hotImport: (path) => {
-        throw new Error('尚未初始化 hotImport 函数');
+    hotImport: (path, ctx) => {
+        logger.error('hotImport 函数尚未初始化！');
+        return Promise.resolve('');
     }
 };
 

@@ -12,8 +12,8 @@ const _config: NaruseConfig = {
     onRunError: (err) => {
         console.error(err);
     },
-    hotImport: (...args: any []) => {
-        logger.error('未初始化热更新导入，无法更新组件默认为空');
+    hotImport: (path, ctx) => {
+        logger.error('hotImport 函数尚未初始化！');
         return Promise.resolve('');
     }
 };

@@ -1,12 +1,19 @@
 # rollup-plugin-naruse
 
+## 0.4.9
+
+### Patch Changes
+
+- #FIX: 日志无广告版本，新增自定义转换日志请求参数接口 coverLoggerInfoToRequestParamInterface， page.evnets 新增 once
+- #FEAT: 热装载函数非必要初始化项 & 新增 ctx 传入
+
 ## 0.4.6
 
 ### Patch Changes
 
 - #FEAT: 【share】切换为 TS
-- #FIX:  【weex】修复 weex 端运行时因为缺失 api 导致的页面渲染错误
-- #FEAT: 【PC】PC的MouseEvent 新增target，currentTarget，新增 onMouseDown,onMouseUp,，优化hoverClass导致的更新错误，PC\MB保留dataset，MB Touch 添加 detail
+- #FIX: 【weex】修复 weex 端运行时因为缺失 api 导致的页面渲染错误
+- #FEAT: 【PC】PC 的 MouseEvent 新增 target，currentTarget，新增 onMouseDown,onMouseUp,，优化 hoverClass 导致的更新错误，PC\MB 保留 dataset，MB Touch 添加 detail
 
 ## 0.4.5
 

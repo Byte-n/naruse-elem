@@ -4546,8 +4546,9 @@ var _config = {
     onRunError: function (err) {
         console.error(err);
     },
-    hotImport: function (path) {
-        throw new Error('尚未初始化 hotImport 函数');
+    hotImport: function (path, ctx) {
+        logger.error('hotImport 函数尚未初始化！');
+        return Promise.resolve('');
     }
 };
 /**
@@ -5598,6 +5599,7 @@ var withPage = function (component) {
                 events: {
                     on: page.on.bind(page),
                     off: page.off.bind(page),
+                    once: page.once.bind(page),
                 },
             };
             return createElement(component, __assign(__assign({}, this.props), { currentPage: currentPage }));
@@ -6100,7 +6102,7 @@ var createMiniFactory = function (type, instance, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.4.8";
+var version = "0.4.9";
 initVersionLogger('naruse-alipay', version);
 // naruse模块内容
 var Naruse = __assign(__assign(__assign(__assign(__assign(__assign(__assign({}, Hooks), { Component: NaruseComponent, createElement: createElement, h: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
@@ -6154,7 +6156,7 @@ var LoggerInfoKeyMap = {
     landing: 'm3',
     vipEndTime: 'm4',
     adVer: 'm5',
-    creative_name: 'm6',
+    template_type: 'm6',
     systemInfo: 'm7',
     info: 'm9',
     pid: 'd1',
@@ -6247,10 +6249,12 @@ var LoggerPlus = /** @class */ (function () {
      * 构造日志对象
      * @param adData     广告数据
      * @param landing    日志触发源头
+     * @param adVer      广告版本
+     * @param coverLoggerInfoToRequestParamInterface LoggerInfo 转为 请求参数的函数
      * @param publicInfo 初始化日志公共属性的参数
      */
     function LoggerPlus(_a, publicInfo) {
-        var adData = _a.adData, landing = _a.landing;
+        var adData = _a.adData, landing = _a.landing, adVer = _a.adVer;
         /** 日志的公共信息 */
         this._publicInfo = {
             action: 'advert-template-logger',
@@ -6267,22 +6271,24 @@ var LoggerPlus = /** @class */ (function () {
         };
         // 当前日志等级
         this._curLoggerLevel = LoggerLevel.debug;
+        /** 将LoggerInfo 转为 请求参数的接口 */
+        this.coverLoggerInfoToRequestParamInterface = null;
         if (!(adData !== null && typeof adData === 'object')) {
             throw new Error('构造日志对象错误: adData 必须是一个对象');
         }
         // 初始化 公共属性
         this.updatePublicInfo(publicInfo, false);
         // 初始化 私有属性
-        var creative_name = adData.creative_name, creative_id = adData.creative_id, version = adData.version, pid = adData.pid;
+        var creative_name = adData.creative_name, template_type = adData.template_type, creative_id = adData.creative_id, pid = adData.pid;
         this._info = {
             landing: landing,
-            creative_name: creative_name,
+            template_type: template_type,
             /** 二级分类 发送 时指定， 默认创意名称 */
             event: creative_name,
             /** 日志等级 发送 时指定 */
             level: LoggerLevel.debug,
             /** 广告系统版本 */
-            adVer: version,
+            adVer: adVer,
             /** m9 日志信息 */
             info: {},
             /** 广告位 */
@@ -6295,7 +6301,7 @@ var LoggerPlus = /** @class */ (function () {
     }
     /** 解析公共属性 */
     LoggerPlus.prototype.updatePublicInfo = function (_a, ignoredNull) {
-        var level = _a.level, landing = _a.landing, appName = _a.appName, userInfo = _a.userInfo, systemInfo = _a.systemInfo, logInterface = _a.logInterface;
+        var level = _a.level, landing = _a.landing, appName = _a.appName, userInfo = _a.userInfo, systemInfo = _a.systemInfo, logInterface = _a.logInterface, coverLoggerInfoToRequestParamInterface = _a.coverLoggerInfoToRequestParamInterface;
         if (ignoredNull === void 0) { ignoredNull = true; }
         var userNick = userInfo.userNick, vipEndTime = userInfo.vipEndTime, vipFlag = userInfo.vipFlag;
         var obj = {
@@ -6315,6 +6321,7 @@ var LoggerPlus = /** @class */ (function () {
         if (typeof logInterface === 'function') {
             this._logNetworkInterface = logInterface;
         }
+        this.coverLoggerInfoToRequestParamInterface = coverLoggerInfoToRequestParamInterface;
         Object.assign(this._publicInfo, obj);
     };
     /** 再此日志对象基础上，创建一个新的日志对象 */
@@ -6329,16 +6336,22 @@ var LoggerPlus = /** @class */ (function () {
         var obj = __assign(__assign({}, this._publicInfo), { logInterface: this._logNetworkInterface, level: this._curLoggerLevel });
         // 覆盖上去
         Object.assign(obj, info);
+        var adVer = this._info.adVer;
         // 构造日志类
         var loggerPlus = new LoggerPlus(
         // 先使用空公共信息
-        { adData: nullAdData(), landing: LoggerLanding.production }, {
+        {
+            adData: nullAdData(),
+            landing: LoggerLanding.production,
+            adVer: adVer
+        }, {
             appName: obj.appName,
             landing: obj.landing,
             level: obj.level,
             logInterface: obj.logInterface,
             systemInfo: obj.systemInfo,
             userInfo: { userNick: obj.userNick, vipEndTime: obj.vipEndTime, vipFlag: obj.vipFlag },
+            coverLoggerInfoToRequestParamInterface: this.coverLoggerInfoToRequestParamInterface,
         });
         // 公共 私有 信息 部分。
         loggerPlus._info = __assign({}, this._info);
@@ -6365,7 +6378,9 @@ var LoggerPlus = /** @class */ (function () {
         }
         var info = __assign(__assign(__assign({}, this._publicInfo), (this._info)), { event: event, level: level, info: args });
         // 转换
-        var requestParams = coverLoggerInfoToRequestParam(info);
+        var requestParams = typeof this.coverLoggerInfoToRequestParamInterface === 'function' ?
+            this.coverLoggerInfoToRequestParamInterface(info) :
+            coverLoggerInfoToRequestParam(info);
         // 调用接口发送
         this._logNetworkInterface(this.encode(requestParams), this.encodeValue(requestParams), info);
         log$1.debug('发生日志：', level, event, info);
@@ -6453,7 +6468,7 @@ var log = createLogger('LoggerPlugin');
 var getNullAdData = function () {
     return {
         creative_id: 0,
-        creative_name: "",
+        creative_name: "creative_name",
         dest_url: "",
         group_id: 0,
         img_path: "",
@@ -6463,7 +6478,7 @@ var getNullAdData = function () {
         plan_id: 0,
         primary_class: "",
         secondary_class: "",
-        template_type: "",
+        template_type: "template_type",
         user_define: { body: {} },
         version: ""
     };
@@ -6474,7 +6489,7 @@ var getNullAdData = function () {
 var LoggerPlugin = /** @class */ (function (_super) {
     __extends$1(LoggerPlugin, _super);
     function LoggerPlugin(first, _a) {
-        var level = _a.level, landing = _a.landing, appName = _a.appName, userInfo = _a.userInfo, logInterface = _a.logInterface, systemInfo = _a.systemInfo;
+        var level = _a.level, landing = _a.landing, appName = _a.appName, userInfo = _a.userInfo, logInterface = _a.logInterface, systemInfo = _a.systemInfo, coverLoggerInfoToRequestParamInterface = _a.coverLoggerInfoToRequestParamInterface;
         var _this = _super.call(this, first) || this;
         /** 日志的公共信息 参数 */
         _this._initParams = {
@@ -6487,27 +6502,26 @@ var LoggerPlugin = /** @class */ (function (_super) {
             userInfo: { userNick: "", vipEndTime: "", vipFlag: 0 }
         };
         // 一小波，错误提示
-        if (isEmpty(appName)) {
-            throw new Error('initAdLoggerPublicInfo: appName 必须的');
+        if (typeof appName !== 'string') {
+            throw new Error('initAdLoggerPublicInfo: appName 必须是一个字符串');
         }
-        if (isEmpty(userInfo)) {
-            throw new Error('initAdLoggerPublicInfo: userInfo 必须的');
+        if (typeof userInfo !== "object") {
+            throw new Error('initAdLoggerPublicInfo: userInfo 必须是一个对象');
         }
         if (typeof logInterface !== 'function') {
             throw new Error('initAdLoggerPublicInfo: logInterface 必须是一个函数');
         }
-        if (isEmpty(systemInfo)) {
-            throw new Error('initAdLoggerPublicInfo: systemInfo 必须的');
+        if (typeof systemInfo !== "object") {
+            throw new Error('initAdLoggerPublicInfo: systemInfo 必须是一个对象');
         }
-        if (isEmpty(landing)) {
-            throw new Error('initAdLoggerPublicInfo: landing 必须的');
+        if (typeof landing !== "string") {
+            throw new Error('initAdLoggerPublicInfo: landing 必须是一个字符串');
         }
-        _this.updatePublicInfo({ level: level, landing: landing, appName: appName, userInfo: userInfo, logInterface: logInterface, systemInfo: systemInfo }, false);
-        // 注入默认的 日志对象.(预加载代码，不会触发插件的生命周期)
-        var default$logger = new LoggerPlus({ adData: getNullAdData(), landing: LoggerLanding.production }, _this._initParams);
-        var config = first.config;
-        var baseCtx = config.baseCtx();
-        baseCtx.$logger = default$logger;
+        if (coverLoggerInfoToRequestParamInterface && typeof coverLoggerInfoToRequestParamInterface !== "function") {
+            throw new Error('initAdLoggerPublicInfo: coverLoggerInfoToRequestParamInterface 必须是一个函数');
+        }
+        _this.constructorFirstParams = first;
+        _this.updatePublicInfo({ level: level, landing: landing, appName: appName, userInfo: userInfo, logInterface: logInterface, systemInfo: systemInfo, coverLoggerInfoToRequestParamInterface: coverLoggerInfoToRequestParamInterface }, false);
         return _this;
     }
     /** 修改参数 */
@@ -6516,14 +6530,28 @@ var LoggerPlugin = /** @class */ (function (_super) {
         log.info('updatePublicInfo: params = ', params, 'ignoredNull = ', ignoredNull);
         (ignoredNull) && removeObjectNullValue(params);
         Object.assign(this._initParams, params);
-        this.$logger && this.$logger.updatePublicInfo(params, ignoredNull);
+        var config = this.constructorFirstParams.config;
+        var baseCtx = config.baseCtx();
+        // 修改公共信息之后，也要重新初始化 默认的 logger
+        // 注入默认的 日志对象.(预加载代码，不会触发插件的生命周期)
+        baseCtx.$logger = new LoggerPlus({
+            adData: getNullAdData(),
+            landing: LoggerLanding.production,
+            adVer: baseCtx.$adVersion || '0.0.0',
+        }, this._initParams);
+        // 优先才有 准确的 logger
+        var logger = this.$logger || baseCtx.$logger;
+        logger.updatePublicInfo(params, ignoredNull);
     };
     LoggerPlugin.prototype.apply = function (_a) {
         var context = _a.context; _a.config;
-        var $adImport = context.$adImport;
+        var $adImport = context.$adImport, $adVersion = context.$adVersion;
         var adData = $adImport.adData;
         /** 注入 日志对象 */
-        this.$logger = new LoggerPlus({ adData: adData.results[0] }, this._initParams);
+        this.$logger = new LoggerPlus({
+            adData: adData.results[0],
+            adVer: $adVersion,
+        }, this._initParams);
         context.$logger = this.$logger;
         log.info('apply: context = ', context);
     };
@@ -6584,23 +6612,17 @@ var getNaruseComponentFromCode = function (code, ctx) { return __awaiter(void 0,
         _baseCtx = naruseConfig.baseCtx, onRunError = naruseConfig.onRunError, hotImport = naruseConfig.hotImport;
         baseCtx = (typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx);
         $webpack = {};
-        $$import = function () {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i] = arguments[_i];
-            }
-            return __awaiter(void 0, void 0, void 0, function () {
-                var code;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, hotImport.apply(void 0, args)];
-                        case 1:
-                            code = _a.sent();
-                            return [2 /*return*/, executeCode(code)];
-                    }
-                });
+        $$import = function (path) { return __awaiter(void 0, void 0, void 0, function () {
+            var code;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, hotImport(path, context)];
+                    case 1:
+                        code = _a.sent();
+                        return [2 /*return*/, executeCode(code)];
+                }
             });
-        };
+        }); };
         context = __assign(__assign(__assign({ h: Naruse.createElement, Naruse: Naruse, 
             // @ts-ignore
             my: typeof my === 'object' ? my : {} }, baseCtx), ctx), { 

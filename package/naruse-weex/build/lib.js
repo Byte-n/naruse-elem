@@ -5432,7 +5432,7 @@ var Hooks = {
 };
 
 // @ts-ignore
-var version = "0.4.8";
+var version = "0.4.9";
 initVersionLogger('naruse-weex', version);
 var Naruse = __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({}, Hooks), { Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, globalEvent: globalEvent, withPage: function (Component) { return Component; } }), Storage), Route), Device), System), UI), { getImageInfo: temporarilyNotSupport('getImageInfo'), createAnimation: temporarilyNotSupport('createAnimation') }), elementApi);
 var naruseExtend = function (obj) {
@@ -5450,8 +5450,8 @@ var _config = {
     onRunError: function (err) {
         console.error(err);
     },
-    hotImport: function () {
-        logger$1.error('未初始化热更新导入，无法更新组件默认为空');
+    hotImport: function (path, ctx) {
+        logger$1.error('hotImport 函数尚未初始化！');
         return Promise.resolve('');
     }
 };
@@ -5516,23 +5516,17 @@ var getNaruseComponentFromCode = function (code, ctx) { return __awaiter(void 0,
         _a = getNaruseConfig(), _baseCtx = _a.baseCtx, onRunError = _a.onRunError, hotImport = _a.hotImport;
         baseCtx = typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx;
         $webpack = {};
-        $$import = function () {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i] = arguments[_i];
-            }
-            return __awaiter(void 0, void 0, void 0, function () {
-                var code;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, hotImport.apply(void 0, args)];
-                        case 1:
-                            code = _a.sent();
-                            return [2 /*return*/, executeCode(code)];
-                    }
-                });
+        $$import = function (path) { return __awaiter(void 0, void 0, void 0, function () {
+            var code;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, hotImport(path, context)];
+                    case 1:
+                        code = _a.sent();
+                        return [2 /*return*/, executeCode(code)];
+                }
             });
-        };
+        }); };
         context = __assign(__assign(__assign({ h: Naruse.createElement, Naruse: Naruse }, baseCtx), ctx), { 
             // 热加载导入
             $$import: $$import, $webpack: $webpack, RAP: rap, window: window });
