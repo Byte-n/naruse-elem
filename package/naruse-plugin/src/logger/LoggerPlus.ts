@@ -9,7 +9,7 @@ import {
     LoggerRawInfo,
     LogNetworkInterface,
     LoggerRequestParams,
-    LoggerCloneParams, UpdateAdLoggerPublicInfoParams,
+    LoggerCloneParams, UpdateAdLoggerPublicInfoParams, CoverLoggerInfoToRequestParamInterface,
 } from '../type';
 import { AdData, removeObjectNullValue, createLogger, safeToJSON } from "naruse-share";
 
@@ -56,31 +56,35 @@ export default class LoggerPlus {
     // 当前日志等级
     _curLoggerLevel = LoggerLevel.debug;
 
+    /** 将LoggerInfo 转为 请求参数的接口 */
+    coverLoggerInfoToRequestParamInterface?: CoverLoggerInfoToRequestParamInterface = null;
+
     /**
      * 构造日志对象
      * @param adData     广告数据
      * @param landing    日志触发源头
+     * @param adVer      广告版本
+     * @param coverLoggerInfoToRequestParamInterface LoggerInfo 转为 请求参数的函数
      * @param publicInfo 初始化日志公共属性的参数
      */
-    constructor({ adData, landing }: LoggerPlusConstructorParams, publicInfo: InitAdLoggerPublicInfoParams) {
+    constructor({ adData, landing, adVer }: LoggerPlusConstructorParams, publicInfo: InitAdLoggerPublicInfoParams) {
         if (!(adData !== null && typeof adData === 'object')) {
             throw new Error('构造日志对象错误: adData 必须是一个对象')
         }
         // 初始化 公共属性
         this.updatePublicInfo(publicInfo, false);
-
         // 初始化 私有属性
-        const { creative_name, creative_id, version, pid } = adData;
+        const { creative_name, template_type, creative_id, pid } = adData;
         this._info = {
             landing,
-            creative_name,
+            template_type,
             /** 二级分类 发送 时指定， 默认创意名称 */
             event: creative_name,
 
             /** 日志等级 发送 时指定 */
             level: LoggerLevel.debug,
             /** 广告系统版本 */
-            adVer: version,
+            adVer,
             /** m9 日志信息 */
             info: {},
 
@@ -101,7 +105,8 @@ export default class LoggerPlus {
             appName,
             userInfo,
             systemInfo,
-            logInterface
+            logInterface,
+            coverLoggerInfoToRequestParamInterface,
         }: UpdateAdLoggerPublicInfoParams,
         ignoredNull = true) {
         const { userNick, vipEndTime, vipFlag } = userInfo;
@@ -117,6 +122,7 @@ export default class LoggerPlus {
         if (typeof logInterface === 'function') {
             this._logNetworkInterface = logInterface;
         }
+        this.coverLoggerInfoToRequestParamInterface = coverLoggerInfoToRequestParamInterface;
         Object.assign(this._publicInfo, obj);
     }
 
@@ -131,10 +137,15 @@ export default class LoggerPlus {
         const obj: LoggerCloneParams = { ...(<Partial<LoggerPublicInfo & { action: never }>>this._publicInfo), logInterface: this._logNetworkInterface, level: this._curLoggerLevel };
         // 覆盖上去
         Object.assign(obj, info);
+        const { adVer } = this._info;
         // 构造日志类
         let loggerPlus = new LoggerPlus(
             // 先使用空公共信息
-            { adData: nullAdData(), landing: LoggerLanding.production },
+            {
+                adData: nullAdData(),
+                landing: LoggerLanding.production,
+                adVer
+            },
             {
                 appName: obj.appName,
                 landing: obj.landing,
@@ -142,6 +153,7 @@ export default class LoggerPlus {
                 logInterface: obj.logInterface,
                 systemInfo: obj.systemInfo,
                 userInfo: { userNick: obj.userNick, vipEndTime: obj.vipEndTime, vipFlag: obj.vipFlag },
+                coverLoggerInfoToRequestParamInterface: this.coverLoggerInfoToRequestParamInterface,
             }
         );
         // 公共 私有 信息 部分。
@@ -174,7 +186,10 @@ export default class LoggerPlus {
             info: args
         };
         // 转换
-        let requestParams = coverLoggerInfoToRequestParam(info);
+        let requestParams =
+            typeof this.coverLoggerInfoToRequestParamInterface === 'function' ?
+                this.coverLoggerInfoToRequestParamInterface(info) :
+                coverLoggerInfoToRequestParam(info);
         // 调用接口发送
         this._logNetworkInterface(
             this.encode(requestParams),
