@@ -1,5 +1,11 @@
 # naruse-plugin
 
+## 1.0.4
+
+### Patch Changes
+
+- #FIX: 升级 naruse-parser 修复部分语法错误
+
 ## 1.0.3
 
 ### Patch Changes

@@ -2530,7 +2530,7 @@ var evaluate_map = (_b = {},
                 new_scope.invasive = true;
                 new_scope.$const(THIS, this);
                 new_scope.$const('arguments', arguments);
-                new_scope.$var(func_name, func);
+                scope.$var(func_name, func);
                 node.params.forEach(function (param, index) {
                     if (param.type === Identifier) {
                         var name_5 = param.name;
@@ -2568,7 +2568,7 @@ var evaluate_map = (_b = {},
                 new_scope.invasive = true;
                 // fix: 修复在非 block 作用域中使用函数名调用函数时，函数名指向错误的问题
                 // fix: 修复了当函数中出现与函数名相同的的形参时会导致形参会取到当前函数
-                new_scope.$var(func_name, func);
+                scope.$var(func_name, func);
                 node.params.forEach(function (param, index) {
                     if (param.type === Identifier) {
                         var name_6 = param.name;
@@ -7389,7 +7389,7 @@ var uiInteraction = /*#__PURE__*/Object.freeze({
 var api = __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({}, system), storage), route), device), media), wxml), animation), uiInteraction);
 
 // @ts-ignore
-var version = "0.4.10";
+var version = "0.4.11";
 initVersionLogger('naruse-h5', version);
 var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {
         USER_DATA_PATH: '',
