@@ -28,9 +28,11 @@ export type PluginMethodKey = keyof (typeof PluginMethod);
 /** 构造 LoggerPlus 的构造方法 参数 */
 export interface LoggerPlusConstructorParams {
     adData: AdData,
-    landing?: LoggerLanding
-};
-
+    landing?: LoggerLanding,
+    adVer: string,
+}
+/** 将LoggerInfo 转为 请求参数的接口 */
+export type CoverLoggerInfoToRequestParamInterface = (info: LoggerInfo) => Record<string, any>;
 /** initPublicInfo 的参数 */
 export type InitAdLoggerPublicInfoParams = {
     level: LoggerLevel,
@@ -38,7 +40,8 @@ export type InitAdLoggerPublicInfoParams = {
     logInterface: LogNetworkInterface,
     appName: string,
     userInfo: { userNick: string, vipEndTime: string, vipFlag: number },
-    systemInfo: any
+    systemInfo: any,
+    coverLoggerInfoToRequestParamInterface?: CoverLoggerInfoToRequestParamInterface
 };
 
 /** changePublicInfo 的参数 */
@@ -83,7 +86,8 @@ export type LoggerRawInfo = {
     pid: number,
     /** d2 创意id */
     cid: number,
-    creative_name: string,
+    /** 物料模板名称 */
+    template_type: string,
 };
 
 /** 日志的完整信息 */
@@ -170,7 +174,7 @@ export const LoggerInfoKeyMap = {
     landing: 'm3',
     vipEndTime: 'm4',
     adVer: 'm5',
-    creative_name: 'm6',
+    template_type: 'm6',
     systemInfo: 'm7',
     info: 'm9',
     pid: 'd1',
