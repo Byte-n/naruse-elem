@@ -7,7 +7,7 @@ import {
     PluginOnErrorParams,
     UpdateAdLoggerPublicInfoParams,
 } from '../type'
-import { AdData, AdRunningContext, isEmpty, removeObjectNullValue, createLogger, } from "naruse-share";
+import { AdData, AdRunningContext, createLogger, removeObjectNullValue } from "naruse-share";
 
 import Plugin from '../core/index'
 import LoggerPlus from "./LoggerPlus";
@@ -16,7 +16,7 @@ const log = createLogger('LoggerPlugin');
 const getNullAdData: () => AdData = () => {
     return {
         creative_id: 0,
-        creative_name: "",
+        creative_name: "creative_name",
         dest_url: "",
         group_id: 0,
         img_path: "",
@@ -26,7 +26,7 @@ const getNullAdData: () => AdData = () => {
         plan_id: 0,
         primary_class: "",
         secondary_class: "",
-        template_type: "",
+        template_type: "template_type",
         user_define: { body: {} },
         version: ""
     } ;
@@ -46,6 +46,8 @@ class LoggerPlugin extends Plugin {
         userInfo: { userNick: "", vipEndTime: "", vipFlag: 0 }
     }
     $logger: LoggerPlus | null
+    /** 插件构造函数的第一个参数 */
+    constructorFirstParams: PluginConstructorFirstParma
     constructor(first: PluginConstructorFirstParma, {
         level,
         landing,
@@ -53,33 +55,30 @@ class LoggerPlugin extends Plugin {
         userInfo,
         logInterface,
         systemInfo,
+        coverLoggerInfoToRequestParamInterface,
     }: InitAdLoggerPublicInfoParams) {
         super(first);
         // 一小波，错误提示
-        if (isEmpty(appName)) {
-            throw new Error('initAdLoggerPublicInfo: appName 必须的');
+        if (typeof appName !== 'string') {
+            throw new Error('initAdLoggerPublicInfo: appName 必须是一个字符串');
         }
-        if (isEmpty(userInfo)) {
-            throw new Error('initAdLoggerPublicInfo: userInfo 必须的');
+        if (typeof userInfo !== "object") {
+            throw new Error('initAdLoggerPublicInfo: userInfo 必须是一个对象');
         }
         if (typeof logInterface !== 'function') {
             throw new Error('initAdLoggerPublicInfo: logInterface 必须是一个函数');
         }
-        if (isEmpty(systemInfo)) {
-            throw new Error('initAdLoggerPublicInfo: systemInfo 必须的');
+        if (typeof systemInfo !== "object") {
+            throw new Error('initAdLoggerPublicInfo: systemInfo 必须是一个对象');
         }
-        if (isEmpty(landing)) {
-            throw new Error('initAdLoggerPublicInfo: landing 必须的');
+        if (typeof landing !=="string") {
+            throw new Error('initAdLoggerPublicInfo: landing 必须是一个字符串');
         }
-        this.updatePublicInfo({ level, landing, appName, userInfo, logInterface, systemInfo }, false);
-        // 注入默认的 日志对象.(预加载代码，不会触发插件的生命周期)
-        const default$logger = new LoggerPlus(
-            { adData: getNullAdData(), landing: LoggerLanding.production },
-            this._initParams
-        );
-        const { config } = first;
-        const baseCtx = config.baseCtx() as AdRunningContext;
-        baseCtx.$logger = default$logger;
+        if (coverLoggerInfoToRequestParamInterface && typeof coverLoggerInfoToRequestParamInterface !=="function") {
+            throw new Error('initAdLoggerPublicInfo: coverLoggerInfoToRequestParamInterface 必须是一个函数');
+        }
+        this.constructorFirstParams = first;
+        this.updatePublicInfo({ level, landing, appName, userInfo, logInterface, systemInfo, coverLoggerInfoToRequestParamInterface }, false);
     }
 
     /** 修改参数 */
@@ -87,14 +86,31 @@ class LoggerPlugin extends Plugin {
         log.info('updatePublicInfo: params = ',params, 'ignoredNull = ',ignoredNull);
         (ignoredNull) && removeObjectNullValue(params);
         Object.assign(this._initParams, params);
-        this.$logger && this.$logger.updatePublicInfo(params, ignoredNull);
+        const { config } = this.constructorFirstParams;
+        const baseCtx = config.baseCtx() as AdRunningContext;
+        // 修改公共信息之后，也要重新初始化 默认的 logger
+        // 注入默认的 日志对象.(预加载代码，不会触发插件的生命周期)
+        baseCtx.$logger = new LoggerPlus(
+            {
+                adData: getNullAdData(),
+                landing: LoggerLanding.production,
+                adVer: baseCtx.$adVersion || '0.0.0',
+            },
+            this._initParams
+        );
+        // 优先才有 准确的 logger
+        const logger = this.$logger || baseCtx.$logger;
+        logger.updatePublicInfo(params, ignoredNull);
     }
 
     apply({ context, config }: PluginApplyParams) {
-        const { $adImport } = context
+        const { $adImport, $adVersion } = context
         const { adData } = $adImport;
         /** 注入 日志对象 */
-        this.$logger = new LoggerPlus({ adData: adData.results[0] }, this._initParams);
+        this.$logger = new LoggerPlus({
+            adData: adData.results[0],
+            adVer: $adVersion,
+        }, this._initParams);
         context.$logger = this.$logger;
         log.info('apply: context = ', context);
     }
