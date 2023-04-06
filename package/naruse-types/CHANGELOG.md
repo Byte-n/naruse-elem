@@ -1,5 +1,11 @@
 # naruse-types
 
+## 0.4.9
+
+### Patch Changes
+
+- #FEAT: naruse-parser 升级 0.1.10
+
 ## 0.4.8
 
 ### Patch Changes
