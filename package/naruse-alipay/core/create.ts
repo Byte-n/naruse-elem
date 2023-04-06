@@ -45,9 +45,9 @@ export const getNaruseComponentFromCode = async (code: string, ctx: AdRunningCon
     const $webpack = {};
 
     // 热加载导入
-    const $$import = async (...args) => {
+    const $$import = async (path) => {
         // @ts-ignore
-        const code = await hotImport(...args);
+        const code = await hotImport(path, context);
         return executeCode(code);
     };
 

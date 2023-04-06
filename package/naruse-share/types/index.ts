@@ -6,7 +6,7 @@ export type NaruseConfig = {
     hotPuller: (props: any) => HotPullerReturn,
     baseCtx: () => AdRunningContext | {},
     onRunError: (err: Error, source?: RunningCodeErrorSource) => void,
-    hotImport: (path: string) => string | Promise<string>,
+    hotImport: (path: string, ctx: any) => string | Promise<string>,
     [k: string]: any,
 }
 

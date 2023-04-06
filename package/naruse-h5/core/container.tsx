@@ -37,12 +37,12 @@ export const getNaruseComponentFromCode = async (code, ctx) => {
     // 每次加载新的组件都需要创建一个用于隔离环境
     // 详细可以见 naruse-webpack-runner
     const $webpack = {};
-    const $$import = async (...args) => {
+    const $$import = async (path) => {
         // @ts-ignore
-        const code = await hotImport(...args);
+        const code = await hotImport(path, context);
         return executeCode(code);
     };
-    const executeCode = (code) => run(code, {
+    const context = {
         h: Naruse.createElement,
         Naruse,
         ...baseCtx,
@@ -50,7 +50,8 @@ export const getNaruseComponentFromCode = async (code, ctx) => {
         // 热加载导入
         $$import,
         $webpack,
-    })
+    };
+    const executeCode = (code) => run(code, context);
     // 导出变量
     let exports: any = {};
     try {

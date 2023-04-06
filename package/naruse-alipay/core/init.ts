@@ -12,8 +12,9 @@ const _config: NaruseConfig = {
     onRunError: (err: Error) => {
         console.error(err);
     },
-    hotImport: (path) => {
-        throw new Error('尚未初始化 hotImport 函数');
+    hotImport: (path, ctx) => {
+        logger.error('hotImport 函数尚未初始化！');
+        return Promise.resolve('');
     }
 };
 
