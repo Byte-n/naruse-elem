@@ -59,7 +59,7 @@ importers:
       lodash: ^4.17.21
       mocha: ^10.0.0
       moment: ^2.29.1
-      naruse-parser: ^0.1.9
+      naruse-parser: ^0.1.12
       naruse-webpack-runner: workspace:*
       naruse-weex: workspace:*
       power-assert: ^1.6.1
@@ -146,7 +146,7 @@ importers:
       lodash: 4.17.21
       mocha: 10.2.0
       moment: 2.29.4
-      naruse-parser: 0.1.9
+      naruse-parser: 0.1.12
       naruse-webpack-runner: link:package/naruse-webpack-runner
       naruse-weex: link:package/naruse-weex
       power-assert: 1.6.1
@@ -346,7 +346,12 @@ importers:
     specifiers: {}
 
   package/rollup-plugin-naruse:
-    specifiers: {}
+    specifiers:
+      '@babel/plugin-transform-block-scoping': ^7.21.0
+      terser: ^5.16.8
+    devDependencies:
+      '@babel/plugin-transform-block-scoping': 7.21.0
+      terser: 5.16.8
 
 packages:
 
@@ -1110,6 +1115,15 @@ packages:
     dependencies:
       '@babel/core': 7.20.12
       '@babel/helper-plugin-utils': 7.20.2
+
+  /@babel/plugin-transform-block-scoping/7.21.0:
+    resolution: {integrity: sha512-Mdrbunoh9SxwFZapeHVrwFmri16+oYotcZysSzhNIVDwIAb1UV+kvnxULSYq9J3/q5MDG+4X6w8QVgD1zhBXNQ==}
+    engines: {node: '>=6.9.0'}
+    peerDependencies:
+      '@babel/core': ^7.0.0-0
+    dependencies:
+      '@babel/helper-plugin-utils': 7.20.2
+    dev: true
 
   /@babel/plugin-transform-classes/7.20.7_@babel+core@7.20.12:
     resolution: {integrity: sha512-LWYbsiXTPKl+oBlXUGlwNlJZetXD5Am+CyBdqhPsDVjM9Jc8jwBJFrKhHf900Kfk2eZG1y9MAG3UNajol7A4VQ==}
@@ -8970,8 +8984,8 @@ packages:
       - supports-color
     dev: true
 
-  /naruse-parser/0.1.9:
-    resolution: {integrity: sha512-Id2QRqGTE+Q+xAymSlP2j1Gwu3mayXmakytyzn0NQyt2VNVHwjmNQPeTMHcXiGf2n9BEqFQoUHlGFwMHmBuqhw==}
+  /naruse-parser/0.1.12:
+    resolution: {integrity: sha512-OICwyx6PudfPuqfR+D9cqRKSjVzHd72g9ltfmjEUfAyfXTgSXXV9KdZj3MI7RLfJhb7LvtGFhA/MQ+3jXiy7NA==}
     dev: true
 
   /native-request/1.1.0:
@@ -12163,6 +12177,17 @@ packages:
       acorn: 8.8.1
       commander: 2.20.3
       source-map-support: 0.5.21
+
+  /terser/5.16.8:
+    resolution: {integrity: sha512-QI5g1E/ef7d+PsDifb+a6nnVgC4F22Bg6T0xrBrz6iloVB4PUkkunp6V8nzoOOZJIzjWVdAGqCdlKlhLq/TbIA==}
+    engines: {node: '>=10'}
+    hasBin: true
+    dependencies:
+      '@jridgewell/source-map': 0.3.2
+      acorn: 8.8.1
+      commander: 2.20.3
+      source-map-support: 0.5.21
+    dev: true
 
   /test-exclude/6.0.0:
     resolution: {integrity: sha512-cAGWPIyOHU6zlmg88jwm7VRyXnMN7iV68OGAbYDk/Mh/xC/pzVPlQtY6ngoIH/5/tciuhGfvESU8GrHrcxD56w==}
