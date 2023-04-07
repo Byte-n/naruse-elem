@@ -59,7 +59,7 @@
     "lodash": "^4.17.21",
     "mocha": "^10.0.0",
     "moment": "^2.29.1",
-    "naruse-parser": "^0.1.11",
+    "naruse-parser": "^0.1.12",
     "naruse-webpack-runner": "workspace:*",
     "naruse-weex": "workspace:*",
     "power-assert": "^1.6.1",
