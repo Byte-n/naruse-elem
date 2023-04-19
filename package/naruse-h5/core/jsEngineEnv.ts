@@ -39,6 +39,13 @@ if (typeof window !== 'undefined') {
     window.Naruse = Naruse;
 }
 
+export function naruseExtend (object) {
+    if (typeof object !== 'object') {
+        return false;
+    }
+    Object.assign(Naruse, object);
+    return true;
+}
 
 export const jsEngineEnv = {
     h: naruseCreateElement,
