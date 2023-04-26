@@ -6118,7 +6118,7 @@ var createMiniFactory = function (type, instance, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.4.12";
+var version = "0.5.0";
 initVersionLogger('naruse-alipay', version);
 // naruse模块内容
 var Naruse = __assign(__assign(__assign(__assign(__assign(__assign(__assign({}, Hooks), { Component: NaruseComponent, createElement: createElement, h: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {

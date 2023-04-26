@@ -1,5 +1,15 @@
 # naruse-webpack-runner
 
+## 0.5.0
+
+### Minor Changes
+
+- #FEAT: alipay,h5,weex 接入插件日志系统
+
+### Patch Changes
+
+- #FEAT: naruse-webpack-runner 正式发布，支持页面、单热更新组件模式编译
+
 ## 0.4.12
 
 ### Patch Changes
