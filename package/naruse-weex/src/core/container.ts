@@ -12,7 +12,9 @@ import { logger } from '../utils/log';
 import { run } from 'naruse-parser';
 import { Naruse } from './naruse';
 import { emptyElement, naruseCreateElement } from './createElement';
-import { AdRunningContext } from '../../../naruse-share';
+import { AdRunningContext, RunningCodeErrorSource } from '../../../naruse-share';
+import { PluginApplyParams, pluginEvent, PluginMethod, PluginOnErrorParams } from "../../../naruse-plugin";
+// @ts-ignore
 import RAP from 'rap-sdk';
 
 /**
@@ -28,7 +30,7 @@ export const getNaruseComponentFromProps = async (props: any) => {
     const { hotPuller } = getNaruseConfig();
     try {
         const { code, ctx } = (await hotPuller(props)) || {};
-        return getNaruseComponentFromCode(code, ctx);
+        return getNaruseComponentFromCode(code, ctx as AdRunningContext);
     } catch (e) {
         logger.error('加载远程代码资源失败', e);
     }
@@ -41,7 +43,8 @@ export const getNaruseComponentFromProps = async (props: any) => {
  */
 export const getNaruseComponentFromCode = async (code: string, ctx: AdRunningContext) => {
     if (!code) return emptyElement;
-    const { baseCtx: _baseCtx, onRunError, hotImport } = getNaruseConfig();
+    const naruseConfig = getNaruseConfig();
+    const { baseCtx: _baseCtx, onRunError, hotImport } = naruseConfig;
     const baseCtx = typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx;
 
     // 用于隔离多个 webpack 打包的代码
@@ -66,8 +69,19 @@ export const getNaruseComponentFromCode = async (code: string, ctx: AdRunningCon
         RAP,
         window,
     };
+
+    // 运行时错误处理
+    const onErrorHandler = (source: RunningCodeErrorSource, error: Error) => {
+        const params: PluginOnErrorParams = { config: naruseConfig, context, error, source };
+        pluginEvent.emit(PluginMethod.onError, params);
+        onRunError(error, source);
+    }
+
+    // 触发插件的生命周期 apply
+    const params: PluginApplyParams = { config: naruseConfig, context };
+    pluginEvent.emit(PluginMethod.apply, params);
     // 执行代码
-    const executeCode = (code: string) => run(code, context, onRunError);
+    const executeCode = (code: string) => run(code, context, onErrorHandler.bind(null, RunningCodeErrorSource.errorCenter));
 
     // 导出变量
     let exports: Record<string, any> = {};
@@ -75,7 +89,7 @@ export const getNaruseComponentFromCode = async (code: string, ctx: AdRunningCon
         exports = executeCode(code);
     } catch (err) {
         logger.error('运行时出错，自动继续', err);
-        onRunError(err);
+        onErrorHandler(RunningCodeErrorSource.tryCatch, err);
         return;
     }
     let component = null;
