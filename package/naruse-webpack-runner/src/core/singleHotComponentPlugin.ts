@@ -9,6 +9,7 @@ interface IOptions {
     entry: string;
     outputPath: string;
     isExportDefaultString?: boolean;
+    fileName: string;
 }
 
 
@@ -36,12 +37,14 @@ export default class SingleHotComponentPlugin {
     entryFile: string;
     /** 是否导出默认字符串 */
     isExportDefaultString: boolean;
+    fileName: string;
 
     constructor(options: IOptions) {
         this.options = options;
         this.entry = options.entry;
         this.outputPath = options.outputPath;
         this.isExportDefaultString = options.isExportDefaultString || false;
+        this.fileName = options.fileName || 'index.js';
     }
 
     apply(compiler: Compiler) {
@@ -74,7 +77,7 @@ export default class SingleHotComponentPlugin {
                 stage: Compilation.PROCESS_ASSETS_STAGE_ADDITIONS
             }, () => {
                 // 获取出口文件内容
-                let entryContent = compilation.assets['index.js'].source().toString();
+                let entryContent = compilation.assets[this.fileName].source().toString();
                 // 将 webpack 导出的东西重新导出到 exports
                 entryContent += 'for(var i in $outer)exports[i] = $outer[i];';
                 // 在头部默认添加上 $webpack 防止不存在
@@ -84,7 +87,7 @@ export default class SingleHotComponentPlugin {
                     entryContent = entryContent.toString().replace(/`/g, '\\`');
                     entryContent = `export default ${JSON.stringify(entryContent)}`;
                 }
-                compilation.assets['index.js'] = new sources.RawSource(entryContent);
+                compilation.assets[this.fileName] = new sources.RawSource(entryContent);
             })
         })
     }
@@ -115,7 +118,7 @@ export default class SingleHotComponentPlugin {
         printLog(processTypeEnum.COMPILE, '发现入口文件', entryPath);
         this.entryFile = entryPath;
         compiler.options.entry = {
-            index: {
+            [path.parse(this.fileName).name]: {
                 import: [entryPath],
             },
         };

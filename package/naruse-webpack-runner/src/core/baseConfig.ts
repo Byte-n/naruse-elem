@@ -6,7 +6,7 @@ import { NaruseWebpackRunnerOptions } from '../types/options';
 import SingleHotComponentPlugin from './singleHotComponentPlugin';
 import webpackBar from 'webpackbar';
 import formatMessages from 'webpack-format-messages'
-import { baseExts } from '../utils';
+import { baseExts, deepMergeObject } from '../utils';
 import { Stats } from 'webpack';
 import { chalk } from '@tarojs/helper';
 
@@ -116,6 +116,7 @@ export class BaseConfig {
             entry: config.sourceDir,
             outputPath: config.outputPath,
             isExportDefaultString: config.isExportDefaultString,
+            fileName: config.fileName,
         }])
 
         // 使用自定义的 loader
@@ -227,6 +228,33 @@ export class BaseConfig {
      * @date 2023-03-29 14:03:27
      */
     setSwcLoader() {
+        const baseConfig = {
+            "jsc": {
+                "externalHelpers": true,
+                "parser": {
+                    "syntax": "typescript",
+                    "tsx": true
+                },
+                "target": "es5",
+                "loose": false,
+                "minify": {
+                    "compress": false,
+                    "mangle": false
+                },
+                "transform": {
+                    "react": {
+                        "pragma": "Naruse.createElement",
+                        "pragmaFrag": "Naruse.Fragment",
+                        "development": false,
+                    }
+                }
+            },
+            "module": {
+                "type": "es6"
+            },
+            "minify": false,
+            "isModule": true
+        };
         this.chain.module.rule('compile')
             .exclude
             .add(/node_modules/)
@@ -235,33 +263,8 @@ export class BaseConfig {
             .end()
             .test(/\.(js|jsx|ts|tsx)$/)
             .use('swc-loader')
-            .loader('swc-loader')
-            .options({
-                "jsc": {
-                    "parser": {
-                        "syntax": "typescript",
-                        "tsx": true
-                    },
-                    "target": "es5",
-                    "loose": false,
-                    "minify": {
-                        "compress": false,
-                        "mangle": false
-                    },
-                    "transform": {
-                        "react": {
-                            "pragma": "Naruse.createElement",
-                            "pragmaFrag": "Naruse.Fragment",
-                            "development": false,
-                        }
-                    }
-                },
-                "module": {
-                    "type": "es6"
-                },
-                "minify": false,
-                "isModule": true
-            });
+            .loader(path.resolve(__dirname, '../loaders/swcLoader.js'))
+            .options(deepMergeObject(baseConfig, this.config.swcOptions || {}));
     }
 
     /**

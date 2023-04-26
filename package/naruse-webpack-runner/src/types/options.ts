@@ -1,3 +1,4 @@
+import { Swcrc } from "@swc/core";
 import type { NaruseTemplate } from "../core/template";
 import type Chain from 'webpack-chain';
 
@@ -21,6 +22,8 @@ interface BaseWebpackRunnerOptions {
     outputPath: string;
     /** 对外暴露 webpack chain */
     webpackChain?: (chain: Chain, config: BaseWebpackRunnerOptions) => void;
+    /** swc 合并配置项 */
+    swcOptions?: Swcrc;
 }
 
 /** 编译模式 */
@@ -64,6 +67,8 @@ export interface NaruseWebpackSingleHotComponentRunnerOptions extends BaseWebpac
     naruseExternal: false;
     /** 是否输出为 export default + 字符串 */
     isExportDefaultString?: boolean;
+    /** 输出文件名 */
+    fileName?: string;
 }
 
 
