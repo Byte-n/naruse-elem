@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "naruse": "../../naruse-alipay/index"
+  }
+}

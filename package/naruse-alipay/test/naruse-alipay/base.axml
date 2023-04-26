@@ -1,0 +1,15 @@
+<template name="text">
+    <text style="{{style}}" id="{{id}}" class="{{className}}" selectable="{{selectable}}" space="{{space}}" decode="{{decode}}" number-of-lines="{{numberOfLines}}" animation="{{animation}}" catchTap="ec" catchLongTap="ec" catchTouchStart="ec" catchTouchMove="ec" catchTouchEnd="ec" catchTouchCancel="ec" catchTransitionEnd="ec">{{content}}</text>
+</template>
+<template name="image">
+    <image style="{{style}}" id="{{id}}" class="{{className}}" src="{{src}}" mode="{{mode}}" lazy-load="{{lazyLoad}}" animation="{{animation}}" onLoad="ec" onError="ec" catchTap="ec" catchLongTap="ec" catchTouchStart="ec" catchTouchMove="ec" catchTouchEnd="ec" catchTouchCancel="ec" catchTransitionEnd="ec"/>
+</template>
+<template name="video">
+    <video style="{{style}}" id="{{id}}" class="{{className}}" src="{{src}}" poster="{{poster}}" object-fit="{{objectFit}}" initial-time="{{initialTime}}" controls="{{controls}}" autoplay="{{autoplay}}" direction="{{direction}}" loop="{{loop}}" muted="{{muted}}" show-fullscreen-btn="{{showFullscreenBtn}}" show-mute-btn="{{showMuteBtn}}" mobilenetHintType="{{mobilenetHintType}}" onPlay="ec" onPause="ec" onEnded="ec" onTimeUpdate="ec" onFullScreenChange="ec" onLoading="ec" onError="ec"/>
+</template>
+<template name="input">
+    <input style="{{style}}" id="{{id}}" class="{{className}}" value="{{value}}" type="{{type}}" password="{{password}}" placeholder="{{placeholder}}" placeholder-style="{{placeholderStyle}}" placeholder-class="{{placeholderClass}}" disabled="{{disabled}}" maxlength="{{maxlength}}" cursor-spacing="{{cursorSpacing}}" auto-focus="{{autoFocus}}" focus="{{focus}}" confirm-type="{{confirmType}}" confirm-hold="{{confirmHold}}" controlled="{{controlled}}" cursor="{{cursor}}" randomNumber="{{randomNumber}}" animation="{{animation}}" onInput="ec" onFocus="ec" onBlur="ec" onConfirm="ec"/>
+</template>
+<template name="textarea">
+    <textarea style="{{style}}" id="{{id}}" class="{{className}}" value="{{value}}" placeholder="{{placeholder}}" placeholder-style="{{placeholderStyle}}" placeholder-class="{{placeholderClass}}" disabled="{{disabled}}" maxlength="{{maxlength}}" auto-focus="{{autoFocus}}" focus="{{focus}}" auto-height="{{autoHeight}}" fixed="{{fixed}}" show-count="{{showCount}}" controlled="{{controlled}}" animation="{{animation}}" onInput="ec" onFocus="ec" onBlur="ec" onConfirm="ec"/>
+</template>

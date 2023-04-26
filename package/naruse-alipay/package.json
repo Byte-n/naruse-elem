@@ -9,9 +9,10 @@
         "build": "rollup -c --environment PROJECT_NAME:alipay"
     },
     "devDependencies": {
-        "naruse-webpack-runner": "workspace:*",
+        "@types/chai": "^4.3.4",
         "naruse-plugin": "workspace:*",
         "naruse-share": "workspace:*",
+        "naruse-webpack-runner": "workspace:*",
         "react-like-hooks": "workspace:*"
     },
     "author": "CHC",
