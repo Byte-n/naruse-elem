@@ -1,0 +1,44 @@
+<import src="./base.axml" />
+<template name="view">
+    <view style="{{style}}" id="{{id}}" class="{{className}}" disable-scroll="{{disableScroll}}" hover-class="{{hoverClass}}" hover-start-time="{{hoverStartTime}}" hover-stay-time="{{hoverStayTime}}" animation="{{animation}}" hover-stop-propagation="{{hoverStopPropagation}}" hidden="{{hidden}}" catchTap="ec" catchLongTap="ec" catchTouchStart="ec" catchTouchMove="ec" catchTouchEnd="ec" catchTouchCancel="ec" catchTransitionEnd="ec">
+        <block a:if="{{childNodes}}">
+            <template a:for="{{childNodes}}" is="{{item.naruseType}}" data="{{...item}}"/>
+        </block>
+    </view>
+</template>
+<template name="scroll-view">
+    <scroll-view style="{{style}}" id="{{id}}" class="{{className}}" scroll-x="{{scrollX}}" scroll-y="{{scrollY}}" upper-threshold="{{upperThreshold}}" lower-threshold="{{lowerThreshold}}" scroll-top="{{scrollTop}}" scroll-left="{{scrollLeft}}" scroll-into-view="{{scrollIntoView}}" scroll-with-animation="{{scrollWithAnimation}}" scroll-animation-duration="{{scrollAnimationDuration}}" enable-back-to-top="{{enableBackToTop}}" trap-scroll="{{trapScroll}}" animation="{{animation}}" onScrollToUpper="ec" onScrollToLower="ec" onScroll="ec" catchTap="ec" catchLongTap="ec" catchTouchStart="ec" catchTouchMove="ec" catchTouchEnd="ec" catchTouchCancel="ec" catchTransitionEnd="ec">
+        <block a:if="{{childNodes}}">
+            <template a:for="{{childNodes}}" is="{{item.naruseType}}" data="{{...item}}"/>
+        </block>
+    </scroll-view>
+</template>
+<template name="button">
+    <button style="{{style}}" id="{{id}}" class="{{className}}" size="{{size}}" type="{{type}}" plain="{{plain}}" disabled="{{disabled}}" loading="{{loading}}" form-type="{{formType}}" animation="{{animation}}" catchTap="ec" catchLongTap="ec" catchTouchStart="ec" catchTouchMove="ec" catchTouchEnd="ec" catchTouchCancel="ec" catchTransitionEnd="ec">
+        <block a:if="{{childNodes}}">
+            <template a:for="{{childNodes}}" is="{{item.naruseType}}" data="{{...item}}"/>
+        </block>
+    </button>
+</template>
+<template name="pv">
+    <view style="{{style}}" id="{{id}}" class="{{className}}">
+        <block a:if="{{childNodes}}">
+            <template a:for="{{childNodes}}" is="{{item.naruseType}}" data="{{...item}}"/>
+        </block>
+    </view>
+</template>
+<template name="pt">
+    <text style="{{style}}" id="{{id}}" class="{{className}}">{{content}}</text>
+</template>
+<template name="fragment">
+    <block a:if="{{childNodes}}">
+        <template a:for="{{childNodes}}" is="{{item.naruseType}}" data="{{...item}}"/>
+    </block>
+</template>
+<template name="naruse-element">
+    <naruse-element component="{{component}}"/>
+</template>
+<template name="base_template">
+    <template is="{{i.naruseType}}" data="{{...i}}"/>
+</template>
+<template is="base_template" data="{{i:node}}"/>

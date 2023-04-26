@@ -15,6 +15,8 @@ const { main: genTemplate } = require('./axml/index');
 genTemplate(path.join(__dirname, './build/'));
 // demo 也生成一份
 genTemplate(path.join(__dirname, '../../demo/demo-alipay/naruse-alipay'));
+// 测试环境
+genTemplate(path.join(__dirname, './test/naruse-alipay'));
 /**
  * @type {import('rollup').RollupOptions}
  */
@@ -29,10 +31,10 @@ module.exports = {
             file: '../../demo/demo-alipay/naruse-alipay/lib.js',
             format: 'es',
         },
-        // {
-        //     file: "./build/lib.d.ts",
-        //     format: "es"
-        // }
+        {
+            file: "./test/naruse-alipay/lib.js",
+            format: "es"
+        }
     ],
     plugins: [
         customResolver,
