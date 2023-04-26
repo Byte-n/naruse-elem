@@ -3,6 +3,8 @@ import { run } from 'naruse-parser';
 import { Naruse } from './jsEngineEnv';
 import { getNaruseConfig } from './init';
 import { logger } from '../utils/log';
+import { RunningCodeErrorSource } from "../../naruse-share";
+import { PluginApplyParams, pluginEvent, PluginMethod, PluginOnErrorParams } from "../../naruse-plugin";
 
 /**
  * @description 根据props获取naruse组件
@@ -30,7 +32,8 @@ export const getNaruseComponentFromProps = async (props) => {
  */
 export const getNaruseComponentFromCode = async (code, ctx) => {
     if (!code) return null;
-    const { baseCtx: _baseCtx, onRunError, hotImport } = getNaruseConfig();
+    const naruseConfig = getNaruseConfig();
+    const { baseCtx: _baseCtx, onRunError, hotImport } = naruseConfig;
     const baseCtx = typeof _baseCtx === 'function' ? _baseCtx() : _baseCtx;
 
     // 主动注入一个全局变量供 webpack 挂载，防止多个不同环境的代码混合
@@ -51,14 +54,26 @@ export const getNaruseComponentFromCode = async (code, ctx) => {
         $$import,
         $webpack,
     };
-    const executeCode = (code) => run(code, context);
+
+    // 运行时错误处理
+    const onErrorHandler = (source: RunningCodeErrorSource, error: Error) => {
+        const params: PluginOnErrorParams = { config: naruseConfig, context, error, source };
+        pluginEvent.emit(PluginMethod.onError, params);
+        onRunError(error, source);
+    }
+
+    // 触发插件的生命周期 apply
+    const params: PluginApplyParams = { config: naruseConfig, context };
+    pluginEvent.emit(PluginMethod.apply, params);
+
+    const executeCode = (code) => run(code, context, onErrorHandler.bind(null, RunningCodeErrorSource.errorCenter));
     // 导出变量
     let exports: any = {};
     try {
         exports = executeCode(code);
     } catch (err) {
         logger.error('运行时出错，自动继续', err);
-        onRunError!(err);
+        onErrorHandler(RunningCodeErrorSource.tryCatch, err);
         return;
     }
     let component: any = null;
