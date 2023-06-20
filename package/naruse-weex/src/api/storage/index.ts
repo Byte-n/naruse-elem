@@ -1,9 +1,9 @@
 
 import { logger } from '../../utils/log';
 import { exceptType, MethodHandler, safeJsonParse, temporarilyNotSupport } from '../../../../naruse-share/index';
-import rap from 'rap-sdk';
+import RAP from 'rap-sdk';
 
-const localStorage = rap.localStorage;
+const localStorage = RAP.localStorage;
 
 /** 同步设置缓存 */
 export const setStorageSync = () => {
