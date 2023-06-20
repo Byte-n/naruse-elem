@@ -1,4 +1,4 @@
-import rap from 'rap-sdk';
+import RAP from 'rap-sdk';
 import { exceptType, MethodHandler } from '../../../../../naruse-share/index';
 
 // 展示 toast
@@ -14,7 +14,7 @@ export const showToast = (options) => {
     }
 
     try {
-        rap.toast.show(title, duration)
+        RAP.toast.show(title, duration)
         handle.success();
     } catch (e) {
         handle.fail(e);
@@ -31,7 +31,7 @@ export const hideToast = (options) => {
     const handle = new MethodHandler({ name: 'hideToast', success, fail, complete });
 
     try {
-        rap.toast.hide();
+        RAP.toast.hide();
         handle.success();
     } catch (e) {
         handle.fail(e);
