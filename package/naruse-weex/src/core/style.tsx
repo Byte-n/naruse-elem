@@ -1,6 +1,6 @@
 import Rax, { createElement } from 'rax';
 import Text from '../components/text/index';
-import { getCurrentRenderingComponent, isNaruseComponent, isRaxComponent } from './component';
+import { isNaruseComponent, isRaxComponent } from './component';
 
 /** 可继承属性 */
 const inheritableStyleMap: Record<string, boolean> = {
@@ -63,7 +63,7 @@ const generateBaseTypeComponent = (child: string | number | boolean, style: Reco
  */
 const infectionStyleChildren = (children: Rax.RaxNode, parentStyle: Record<string, any>): Rax.RaxNode => {
     if (!children) return children;
-    
+
     const filteredStyle = inheritStyle(parentStyle);
     const _infectedProps = Object.freeze && Object.freeze({ style: filteredStyle }) || { style: filteredStyle };
 
@@ -89,9 +89,6 @@ const infectionStyleChildren = (children: Rax.RaxNode, parentStyle: Record<strin
         // 透过组件传递参数
         if (typeof child.type === 'function') {
             child.props = { ...child.props, _infectedProps };
-            if (isFixedComponent(child)) {
-                return getCurrentRenderingComponent()?._fixedComponents.push(child);
-            }
             return newChildren.push(child);
         }
         return newChildren.push(child);
