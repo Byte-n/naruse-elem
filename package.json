@@ -102,7 +102,10 @@
     "version": "changeset version",
     "demo:alipay": "cd ./demo/demo-alipay && npm run dev",
     "demo:h5": "cd ./demo/demo-h5 && npm run dev",
-    "demo:rap": "cd ./demo/demo-rap && npm run dev"
+    "demo:rap": "cd ./demo/demo-rap && npm run dev",
+    "dev:weex": "pnpm -r --filter naruse-weex run dev",
+    "dev:h5": "pnpm -r --filter naruse-h5 run dev",
+    "dev:alipay": "pnpm -r --filter naruse-alipay run dev"
   },
   "repository": {
     "type": "git",
