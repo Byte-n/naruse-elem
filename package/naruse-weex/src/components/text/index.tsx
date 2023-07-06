@@ -2,7 +2,6 @@ import { Component, createElement } from 'rax';
 import { Text } from 'rax-components';
 import type { TouchEvent } from 'rax';
 import { createCommonEvent } from '../../utils';
-import { infectionStyleChildren } from 'src/core/style';
 
 
 class _Text extends Component<any, any> {

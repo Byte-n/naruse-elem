@@ -3,12 +3,13 @@ import * as Route from '../api/route/index';
 import * as Device from '../api/device/clipborad'
 import * as System from '../api/system/index';
 import * as UI from '../api/ui/interaction/index'
-import { getDeferred, EventBus, globalEvent, initVersionLogger, temporarilyNotSupport } from '../../../naruse-share'
+import { getDeferred, EventBus, initVersionLogger, temporarilyNotSupport } from '../../../naruse-share'
 import NaruseComponent from './component';
 import { naruseCreateElement } from './createElement';
 import { run } from 'naruse-parser';
 import * as elementApi from './element';
 import { Hooks } from './hooks';
+import { globalEvent } from "./globalEvent";
 
 // @ts-ignore
 const version = __VERSION__;
