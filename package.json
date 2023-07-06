@@ -1,7 +1,7 @@
 {
   "name": "naruse",
   "sideEffects": false,
-  "version": "0.4.8",
+  "version": "0.5.0",
   "description": "",
   "devDependencies": {
     "@babel/core": "^7.20.12",
@@ -98,7 +98,6 @@
     "preinstall": "npx only-allow pnpm",
     "start": "rollup -c ./rollup.config.js -w",
     "build": "pnpm -r --filter=./package/* run build",
-    "publish": "changeset publish --registry=http://1.15.115.152:4873",
     "version": "changeset version",
     "demo:alipay": "cd ./demo/demo-alipay && npm run dev",
     "demo:h5": "cd ./demo/demo-h5 && npm run dev",
