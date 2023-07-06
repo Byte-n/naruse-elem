@@ -4,6 +4,9 @@ const mitt = function (n) {
         on: function (e, t) {
             var i = n.get(e);
             i ? i.push(t) : n.set(e, [t])
+            return () => {
+                this.off(e, t);
+            };
         },
         off: function (e, t) {
             var i = n.get(e);
