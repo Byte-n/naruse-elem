@@ -1,4 +1,4 @@
-import rap from 'rap-sdk';
+import RAP from 'rap-sdk';
 interface Option {
     /** 提示的内容 */
     title: string
@@ -29,7 +29,7 @@ const showToast = (options: Option) => {
         message: title,
         duration,
     };
-    rap.toast.show(title, duration);
+    RAP.toast.show(title, duration);
 }
 
 

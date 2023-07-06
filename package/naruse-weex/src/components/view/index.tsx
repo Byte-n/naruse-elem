@@ -1,9 +1,9 @@
 import { createElement } from 'rax';
 import type { TouchEvent } from 'rax';
 import { View } from 'rax-components';
-import { createCommonEvent, createCommonTouchEvent } from '../../utils/index';
+import { createCommonEvent, createCommonTouchEvent } from '../../utils';
 import { infectionStyleChildren } from '../../core/style';
-import { allFixedComponents, BaseComponent, bindRender, nowRenderingComponentStack } from 'src/core/component';
+import { BaseComponent } from 'src/core/component';
 
 class _View extends BaseComponent {
     constructor (props: any) {
@@ -49,29 +49,14 @@ class _View extends BaseComponent {
     }
 
     componentWillUnmount () {
-        // 清除
-        this._fixedComponents && (this._fixedComponents.length = 0);
-        allFixedComponents[this._naruseId] && delete allFixedComponents[this._naruseId];
     }
 
     render() {
-        this._fixedComponents.length = 0;
-        nowRenderingComponentStack.push(this);
 
         const { children, style, className, onClick, onLongClick, onTouchStart, onTouchMove, onTouchEnd, _infectedProps = {}, ...other } = this.props;
         const { style: parentStyle } = _infectedProps;
         const styleObj = { ...parentStyle, ...style };
         const infectedChildren = infectionStyleChildren(children, styleObj);
-
-        nowRenderingComponentStack.pop();
-
-        // 如果当前组件含有fixed组件，那么把当前组件加入到fixed组件列表中
-        if (this._fixedComponents.length) {
-            bindRender(this);
-            allFixedComponents[this._naruseId] = this;
-        } else {
-            allFixedComponents[this._naruseId] && delete allFixedComponents[this._naruseId];
-        }
 
         const jsx = <View
             {...other}
