@@ -12,9 +12,7 @@ const version = __VERSION__;
 
 initVersionLogger('naruse-h5', version);
 
-const runCodeWithNaruse = (code: string, ctx: AdRunningContext) => {
-    return getNaruseComponentFromCode(code, ctx);
-};
+const runCodeWithNaruse = (code: string, ctx: AdRunningContext) => getNaruseComponentFromCode(code, ctx);
 
 export const Naruse = {
     ...api,

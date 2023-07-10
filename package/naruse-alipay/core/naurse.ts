@@ -13,9 +13,7 @@ const apis = initNaruseAlipayApi();
 const version = __VERSION__;
 initVersionLogger('naruse-alipay', version);
 
-function runCodeWithNaruse(code: string, ctx: AdRunningContext | {})  {
-    return getNaruseComponentFromCode(code, ctx)
-}
+const runCodeWithNaruse = (code: string, ctx: AdRunningContext | {}) => getNaruseComponentFromCode(code, ctx);
 
 // naruse模块内容
 export const Naruse = {
