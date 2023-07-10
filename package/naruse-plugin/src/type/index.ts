@@ -112,7 +112,7 @@ export enum LoggerLanding {
     /** naruse error center */
     errorCenter = 'error-center',
     /** try-catch run */
-    tryCatch = 'error-center',
+    tryCatch = 'try-catch',
     /** 线上 */
     production = 'production',
     /** 开发时 */
