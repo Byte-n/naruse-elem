@@ -1,16 +1,21 @@
 import { Hooks, NaruseComponent, __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } from './component';
-import { globalEvent, EventBus, getDeferred, initVersionLogger } from 'naruse-share';
+import { globalEvent, EventBus, getDeferred, initVersionLogger, AdRunningContext } from 'naruse-share';
 import { initNaruseAlipayApi } from '../api/index';
 import { withPage } from '../api/HOC/index';
 import { run } from 'naruse-parser';
 import { createElement, Fragment } from './createElement';
 import * as elementApi from './element';
 import { createMiniFactory } from './hybrid/createMiniFactory';
+import { getNaruseComponentFromCode } from "./create";
 
 const apis = initNaruseAlipayApi();
 // @ts-ignore
 const version = __VERSION__;
 initVersionLogger('naruse-alipay', version);
+
+function runCodeWithNaruse(code: string, ctx: AdRunningContext | {})  {
+    return getNaruseComponentFromCode(code, ctx)
+}
 
 // naruse模块内容
 export const Naruse = {
@@ -33,6 +38,7 @@ export const Naruse = {
     ...apis,
     withPage,
     unsafe_run: run,
+    runCodeWithNaruse,
     $$debug: false,
     ...elementApi,
     createMiniFactory,
