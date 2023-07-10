@@ -1,4 +1,4 @@
-import rap from 'rap-sdk';
+import RAP from 'rap-sdk';
 import { createElement, Component, useCallback, useContext, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState, createContext } from 'rax';
 import { Text, View, Image, ScrollView, TextInput } from 'rax-components';
 
@@ -178,8 +178,12 @@ var mitt = function (n) {
     return {
         all: n = n || new Map,
         on: function (e, t) {
+            var _this = this;
             var i = n.get(e);
             i ? i.push(t) : n.set(e, [t]);
+            return function () {
+                _this.off(e, t);
+            };
         },
         off: function (e, t) {
             var i = n.get(e);
@@ -216,7 +220,7 @@ var mitt = function (n) {
     };
 };
 /** 全局事件中心 */
-var globalEvent = mitt();
+mitt();
 /**
  * 这里不要改成箭头函数
  * 需要利用 new 来执行(兼容)
@@ -397,7 +401,7 @@ var RunningCodeErrorSource;
     RunningCodeErrorSource["tryCatch"] = "tryCatch";
 })(RunningCodeErrorSource || (RunningCodeErrorSource = {}));
 
-var localStorage = rap.localStorage;
+var localStorage = RAP.localStorage;
 /** 同步设置缓存 */
 var setStorageSync = function () {
 };
@@ -513,7 +517,7 @@ var Storage = /*#__PURE__*/Object.freeze({
     clearStorage: clearStorage
 });
 
-var navigator$1 = rap.navigator;
+var navigator$1 = RAP.navigator;
 /**
  * @description 跳转到其他页面
  * @author CHC
@@ -592,7 +596,7 @@ var Route = /*#__PURE__*/Object.freeze({
     navigateBack: navigateBack
 });
 
-var clipboard = rap.clipboard;
+var clipboard = RAP.clipboard;
 /**
   * 设置系统剪贴板的内容
   */
@@ -689,7 +693,7 @@ var showToast = function (options) {
         return handle.fail({ errMsg: 'title' });
     }
     try {
-        rap.toast.show(title, duration);
+        RAP.toast.show(title, duration);
         handle.success();
     }
     catch (e) {
@@ -704,7 +708,7 @@ var hideToast = function (options) {
     var success = options.success, fail = options.fail, complete = options.complete;
     var handle = new MethodHandler({ name: 'hideToast', success: success, fail: fail, complete: complete });
     try {
-        rap.toast.hide();
+        RAP.toast.hide();
         handle.success();
     }
     catch (e) {
@@ -749,14 +753,6 @@ var createCommonTouchEvent = function (event) {
         stopPropagation: stopPropagation,
         timestamp: new Date().getTime(),
     };
-};
-var nexTick = function (fn) {
-    if (typeof Promise !== 'undefined') {
-        Promise.resolve().then(fn);
-    }
-    else {
-        setTimeout(fn);
-    }
 };
 
 var _Text = /** @class */ (function (_super) {
@@ -839,11 +835,6 @@ var inheritStyle = function (style) {
     }
     return newStyle;
 };
-/** 是否是一个fixed基础组件 */
-var isFixedComponent = function (component) {
-    var _a, _b;
-    return isRaxComponent(component === null || component === void 0 ? void 0 : component.type) && ((_b = (_a = component === null || component === void 0 ? void 0 : component.props) === null || _a === void 0 ? void 0 : _a.style) === null || _b === void 0 ? void 0 : _b.position) === 'fixed';
-};
 /** 是否为基础类型元素 */
 var isBaseTypeComponent = function (child) {
     return typeof child === 'string' || typeof child === 'number' || typeof child === 'boolean';
@@ -873,7 +864,6 @@ var infectionStyleChildren = function (children, parentStyle) {
         children = [children];
     var newChildren = [];
     children.forEach(function (child) {
-        var _a;
         if (!child)
             return;
         // 基本元素自动转化为text
@@ -883,9 +873,6 @@ var infectionStyleChildren = function (children, parentStyle) {
         // 透过组件传递参数
         if (typeof child.type === 'function') {
             child.props = __assign(__assign({}, child.props), { _infectedProps: _infectedProps });
-            if (isFixedComponent(child)) {
-                return (_a = getCurrentRenderingComponent()) === null || _a === void 0 ? void 0 : _a._fixedComponents.push(child);
-            }
             return newChildren.push(child);
         }
         return newChildren.push(child);
@@ -893,97 +880,14 @@ var infectionStyleChildren = function (children, parentStyle) {
     return newChildren;
 };
 
-var rootId = 0;
-var isRootComponent = function (component) {
-    if (!rootId) {
-        rootId = component._naruseId;
-        return true;
-    }
-    return rootId === component._naruseId;
-};
-
-var baseNaruseId = 0;
-var getNewId = function () { return baseNaruseId++; };
-/** 现在正在渲染的Naruse组件队列栈 */
-var nowRenderingComponentStack = [];
-/** 现在正在渲染的naruse组件 */
-var getCurrentRenderingComponent = function () { return nowRenderingComponentStack[nowRenderingComponentStack.length - 1]; };
-/** 所有的fixed组件 */
-var allFixedComponents = {};
-/** 排序并获取当前所有fixed组件 */
-var getAllFixedComponents = function () {
-    return Object.values(allFixedComponents)
-        .map(function (component) { return component._fixedComponents; })
-        .flat(1)
-        // @ts-ignore
-        .sort(function (a, b) { var _a, _b; return Number(((_a = a.props.style) === null || _a === void 0 ? void 0 : _a.zIndex) || 0) - Number(((_b = b.props.style) === null || _b === void 0 ? void 0 : _b.zIndex) || 0); });
-};
 /** 基础组件 */
 var BaseComponent = /** @class */ (function (_super) {
     __extends$1(BaseComponent, _super);
     function BaseComponent(props) {
-        var _this = _super.call(this, props) || this;
-        /** 组件id */
-        _this._naruseId = getNewId();
-        /** 当前组件的fixed组件列表 */
-        _this._fixedComponents = [];
-        return _this;
+        return _super.call(this, props) || this;
     }
     return BaseComponent;
 }(Component));
-var fixedComponentUpdater = function () { };
-var hasNextTick = false;
-/**
- * @description 更新fixed组件
- * @author CHC
- * @date 2022-07-14 12:07:43
- */
-var updateFixedComponents = function () {
-    if (!hasNextTick) {
-        hasNextTick = true;
-        nexTick(function () {
-            hasNextTick = false;
-            fixedComponentUpdater();
-        });
-    }
-};
-/**
- * @description 拦截原有render函数，每当重新渲染时也重新渲染fixed组件
- * @author CHC
- * @date 2022-07-14 14:07:57
- * @param {BaseComponent} component
- */
-var bindRender = function (component) {
-    if (component._hasBinding)
-        return;
-    component._bindRender = component.render;
-    component._hasBinding = true;
-    updateFixedComponents();
-    component.render = function () {
-        updateFixedComponents();
-        return component._bindRender && component._bindRender();
-    };
-};
-/**
- * @description fixed容器组件，在主组件完全创建完毕后渲染
- * @author CHC
- * @date 2022-07-13 21:07:47
- * @class FixedComponent
- * @extends {BaseComponent}
- */
-var FixedComponent = /** @class */ (function (_super) {
-    __extends$1(FixedComponent, _super);
-    function FixedComponent(props) {
-        var _this = _super.call(this, props) || this;
-        fixedComponentUpdater = function () { return _this.setState({}); };
-        return _this;
-    }
-    FixedComponent.prototype.render = function () {
-        return getAllFixedComponents();
-    };
-    return FixedComponent;
-}(BaseComponent));
-var FixedContainer = createElement(FixedComponent);
 /**
  * @description 拦截下来的rax.Component
  * @author CHC
@@ -994,47 +898,20 @@ var FixedContainer = createElement(FixedComponent);
 var NaruseComponent = /** @class */ (function (_super) {
     __extends$1(NaruseComponent, _super);
     function NaruseComponent(props) {
-        var _this = this;
-        var _a;
-        _this = _super.call(this, props) || this;
+        var _this = _super.call(this, props) || this;
         _this.__render = _this.render.bind(_this);
         _this.render = _this.__naruseRender.bind(_this);
-        _this.__componentWillUnmount = (_a = _this.componentWillMount) === null || _a === void 0 ? void 0 : _a.bind(_this);
         return _this;
     }
-    NaruseComponent.prototype.componentWillUnmount = function () {
-        this._fixedComponents && (this._fixedComponents.length = 0);
-        typeof this.__componentWillUnmount === 'function' && this.__componentWillUnmount.call(this);
-    };
     NaruseComponent.prototype.__naruseRender = function () {
-        this._fixedComponents.length = 0;
-        nowRenderingComponentStack.push(this);
         var _a = this.props._infectedProps, _infectedProps = _a === void 0 ? {} : _a;
         var style = _infectedProps.style;
         var renderedRes = this.__render();
-        var infectedRes = infectionStyleChildren(renderedRes, style);
-        nowRenderingComponentStack.pop();
-        // 如果当前组件含有fixed组件，那么把当前组件加入到fixed组件列表中
-        if (this._fixedComponents.length) {
-            allFixedComponents[this._naruseId] = this;
-            bindRender(this);
-        }
-        else {
-            allFixedComponents[this._naruseId] && delete allFixedComponents[this._naruseId];
-        }
-        // 顶层组件
-        if (isRootComponent(this)) {
-            return [
-                infectedRes,
-                FixedContainer,
-            ];
-        }
-        return infectedRes;
+        return infectionStyleChildren(renderedRes, style);
     };
     return NaruseComponent;
 }(BaseComponent));
 var isNaruseComponent = function (component) { return (component === null || component === void 0 ? void 0 : component.prototype) instanceof NaruseComponent; };
-var isRaxComponent = function (component) { return (component === null || component === void 0 ? void 0 : component.prototype) instanceof Component; };
 
 var _View = /** @class */ (function (_super) {
     __extends$1(_View, _super);
@@ -1078,26 +955,12 @@ var _View = /** @class */ (function (_super) {
         return _this;
     }
     _View.prototype.componentWillUnmount = function () {
-        // 清除
-        this._fixedComponents && (this._fixedComponents.length = 0);
-        allFixedComponents[this._naruseId] && delete allFixedComponents[this._naruseId];
     };
     _View.prototype.render = function () {
-        this._fixedComponents.length = 0;
-        nowRenderingComponentStack.push(this);
         var _a = this.props, children = _a.children, style = _a.style; _a.className; var onClick = _a.onClick, onLongClick = _a.onLongClick; _a.onTouchStart; var onTouchMove = _a.onTouchMove, onTouchEnd = _a.onTouchEnd, _b = _a._infectedProps, _infectedProps = _b === void 0 ? {} : _b, other = __rest(_a, ["children", "style", "className", "onClick", "onLongClick", "onTouchStart", "onTouchMove", "onTouchEnd", "_infectedProps"]);
         var parentStyle = _infectedProps.style;
         var styleObj = __assign(__assign({}, parentStyle), style);
         var infectedChildren = infectionStyleChildren(children, styleObj);
-        nowRenderingComponentStack.pop();
-        // 如果当前组件含有fixed组件，那么把当前组件加入到fixed组件列表中
-        if (this._fixedComponents.length) {
-            bindRender(this);
-            allFixedComponents[this._naruseId] = this;
-        }
-        else {
-            allFixedComponents[this._naruseId] && delete allFixedComponents[this._naruseId];
-        }
         var jsx = createElement(View, __assign({}, other, { style: styleObj, className: parentStyle, onClick: onClick ? this.onClick : undefined, onLongpress: onLongClick ? this.onLongClick : undefined, onTouchStart: onTouchMove ? this.onTouchStart : undefined, onTouchMove: onTouchMove ? this.onTouchMove : undefined, onTouchEnd: onTouchEnd ? this.onTouchEnd : undefined }), infectedChildren);
         return jsx;
     };
@@ -5515,12 +5378,43 @@ var Hooks = {
     createContext: createContext
 };
 
-// @ts-ignore
-var version = "0.5.0";
-initVersionLogger('naruse-weex', version);
-var Naruse = __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({}, Hooks), { Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, globalEvent: globalEvent, withPage: function (Component) { return Component; } }), Storage), Route), Device), System), UI), { getImageInfo: temporarilyNotSupport('getImageInfo'), createAnimation: temporarilyNotSupport('createAnimation') }), elementApi);
-var naruseExtend = function (obj) {
-    Object.assign(Naruse, obj);
+var globalEvent = {
+    _eventName: function (eventName) {
+        return "APP.naruse_global_event_".concat(eventName);
+    },
+    on: function (eventName, event) {
+        var _this = this;
+        if (typeof event !== 'function') {
+            throw new Error('event must be a function');
+        }
+        RAP.on(this._eventName(eventName), event);
+        return function () {
+            _this.off(eventName, event);
+        };
+    },
+    off: function (eventName, event) {
+        RAP.off(this._eventName(eventName), event);
+    },
+    emit: function (eventName, data) {
+        RAP.emit(this._eventName(eventName), data);
+    },
+    once: function (eventName, event) {
+        var _this = this;
+        var func = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            event.apply(void 0, args);
+            // 取消监听
+            _this.off(eventName, func);
+        };
+        // 监听
+        this.on(eventName, func);
+    },
+    clear: function () {
+        // 暂未有实现方案
+    },
 };
 
 var _config = {
@@ -5577,7 +5471,7 @@ var LoggerLanding;
     /** naruse error center */
     LoggerLanding["errorCenter"] = "error-center";
     /** try-catch run */
-    LoggerLanding["tryCatch"] = "error-center";
+    LoggerLanding["tryCatch"] = "try-catch";
     /** 线上 */
     LoggerLanding["production"] = "production";
     /** 开发时 */
@@ -6060,7 +5954,7 @@ var getNaruseComponentFromCode = function (code, ctx) { return __awaiter(void 0,
         }); };
         context = __assign(__assign(__assign({ h: Naruse.createElement, Naruse: Naruse }, baseCtx), ctx), { 
             // 热加载导入
-            $$import: $$import, $webpack: $webpack, RAP: rap, window: window });
+            $$import: $$import, $webpack: $webpack, RAP: RAP, window: window });
         onErrorHandler = function (source, error) {
             var params = { config: naruseConfig, context: context, error: error, source: source };
             pluginEvent.emit(PluginMethod.onError, params);
@@ -6145,6 +6039,15 @@ var Container = /** @class */ (function (_super) {
     };
     return Container;
 }(Component));
+
+// @ts-ignore
+var version = "0.5.1";
+initVersionLogger('naruse-weex', version);
+var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
+var Naruse = __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({}, Hooks), { Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, runCodeWithNaruse: runCodeWithNaruse, globalEvent: globalEvent, withPage: function (Component) { return Component; } }), Storage), Route), Device), System), UI), { getImageInfo: temporarilyNotSupport('getImageInfo'), createAnimation: temporarilyNotSupport('createAnimation') }), elementApi);
+var naruseExtend = function (obj) {
+    Object.assign(Naruse, obj);
+};
 
 var registerPlugin = function (name, plugin) {
     var params = [];
