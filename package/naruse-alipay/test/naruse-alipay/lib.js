@@ -144,8 +144,12 @@ var mitt = function (n) {
     return {
         all: n = n || new Map,
         on: function (e, t) {
+            var _this = this;
             var i = n.get(e);
             i ? i.push(t) : n.set(e, [t]);
+            return function () {
+                _this.off(e, t);
+            };
         },
         off: function (e, t) {
             var i = n.get(e);
@@ -6118,15 +6122,16 @@ var createMiniFactory = function (type, instance, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.5.0";
+var version = "0.5.1";
 initVersionLogger('naruse-alipay', version);
+var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 // naruse模块内容
 var Naruse = __assign(__assign(__assign(__assign(__assign(__assign(__assign({}, Hooks), { Component: NaruseComponent, createElement: createElement, h: createElement, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, env: {
         clientName: 'alipay',
         clientVersion: version,
         language: 'zh-Hans',
         platform: 'alipay',
-    }, version: version }), my), apis), { withPage: withPage, unsafe_run: run, $$debug: false }), elementApi), { createMiniFactory: createMiniFactory, Fragment: Fragment, __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED });
+    }, version: version }), my), apis), { withPage: withPage, unsafe_run: run, runCodeWithNaruse: runCodeWithNaruse, $$debug: false }), elementApi), { createMiniFactory: createMiniFactory, Fragment: Fragment, __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED });
 var naruseExtend = function (opt) {
     if (typeof opt === 'object') {
         Object.assign(Naruse, opt);
@@ -6156,7 +6161,7 @@ var LoggerLanding;
     /** naruse error center */
     LoggerLanding["errorCenter"] = "error-center";
     /** try-catch run */
-    LoggerLanding["tryCatch"] = "error-center";
+    LoggerLanding["tryCatch"] = "try-catch";
     /** 线上 */
     LoggerLanding["production"] = "production";
     /** 开发时 */

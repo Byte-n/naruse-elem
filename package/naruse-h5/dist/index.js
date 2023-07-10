@@ -188,8 +188,12 @@ var mitt = function (n) {
     return {
         all: n = n || new Map,
         on: function (e, t) {
+            var _this = this;
             var i = n.get(e);
             i ? i.push(t) : n.set(e, [t]);
+            return function () {
+                _this.off(e, t);
+            };
         },
         off: function (e, t) {
             var i = n.get(e);
@@ -7477,28 +7481,6 @@ var uiInteraction = /*#__PURE__*/Object.freeze({
 
 var api = __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({}, system), storage), route), device), media), wxml), animation), uiInteraction);
 
-// @ts-ignore
-var version = "0.5.0";
-initVersionLogger('naruse-h5', version);
-var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {
-        USER_DATA_PATH: '',
-        clientName: 'H5',
-        clientVersion: version,
-        language: 'zh-Hans',
-        platform: 'H5',
-    }, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, version: version, unsafe_run: run, withPage: withPage, cloneElement: React.cloneElement, isValidElement: React.isValidElement, Children: React.Children });
-if (typeof window !== 'undefined') {
-    // @ts-ignore
-    window.Naruse = Naruse;
-}
-function naruseExtend(object) {
-    if (typeof object !== 'object') {
-        return false;
-    }
-    Object.assign(Naruse, object);
-    return true;
-}
-
 /** 插件 的 生命周期 */
 var PluginMethod;
 (function (PluginMethod) {
@@ -7520,7 +7502,7 @@ var LoggerLanding;
     /** naruse error center */
     LoggerLanding["errorCenter"] = "error-center";
     /** try-catch run */
-    LoggerLanding["tryCatch"] = "error-center";
+    LoggerLanding["tryCatch"] = "try-catch";
     /** 线上 */
     LoggerLanding["production"] = "production";
     /** 开发时 */
@@ -8088,6 +8070,29 @@ var Container = /** @class */ (function (_super) {
     };
     return Container;
 }(React.Component));
+
+// @ts-ignore
+var version = "0.5.1";
+initVersionLogger('naruse-h5', version);
+var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
+var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {
+        USER_DATA_PATH: '',
+        clientName: 'H5',
+        clientVersion: version,
+        language: 'zh-Hans',
+        platform: 'H5',
+    }, getDeferred: getDeferred, globalEvent: globalEvent, EventBus: EventBus, version: version, unsafe_run: run, runCodeWithNaruse: runCodeWithNaruse, withPage: withPage, cloneElement: React.cloneElement, isValidElement: React.isValidElement, Children: React.Children });
+if (typeof window !== 'undefined') {
+    // @ts-ignore
+    window.Naruse = Naruse;
+}
+function naruseExtend(object) {
+    if (typeof object !== 'object') {
+        return false;
+    }
+    Object.assign(Naruse, object);
+    return true;
+}
 
 var registerPlugin = function (name, plugin) {
     var params = [];
