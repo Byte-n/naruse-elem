@@ -1,5 +1,13 @@
 # naruse-plugin
 
+## 1.1.1
+
+### Patch Changes
+
+- #FEAT:全端 EventBus.on 返回取消监听的函数
+- #FEAT:优化 weex 端的 globalEvent 实现
+- #FEAT:优化 unsafe_run 的实现，修正 LoggerLanding 的 tryCatch 枚举值
+
 ## 1.1.0
 
 ### Minor Changes
