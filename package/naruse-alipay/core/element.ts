@@ -1,4 +1,5 @@
 import { cleanChildNode, VNode } from "./diff";
+import { allMiddware } from './middware';
 
 /**
  * @description 以 Naruse 元素为模板克隆并返回新的 Naruse 元素，将传入的 props 与原始元素的 props 浅层合并后返回新元素的 props。新的子元素将取代现有的子元素，而来自原始元素的 key 和 ref 将被保留。
@@ -17,8 +18,7 @@ export const cloneElement = (element: VNode, props: Record<string,any>, ...child
     if (children && children.length) {
         newChildren = children;
     } else if (isNaruseElement) {
-        // 自定义组件
-        newChildren = element.component?.props.children;
+        newChildren = allMiddware[element.parentMiddwareId].parseProps({ propHubKey: element.propHubKey })?.props.children;
     } else {
         // 原生组件
         newChildren = element.childNodes;
@@ -29,9 +29,16 @@ export const cloneElement = (element: VNode, props: Record<string,any>, ...child
 
     // naruse 原生组件
     if (isNaruseElement) {
-        const oldProps = element?.component.props;
-        const newComponent = { ...element.component, props: { ...oldProps, ...newProps, children: newChildren, key: oldProps.key, ref: oldProps.ref } };
-        return { ...element, component: newComponent };
+        const oldElement = allMiddware[element.parentMiddwareId].parseProps({ propHubKey: element.propHubKey });
+        const oldProps = oldElement?.props;
+        return {
+            ...element,
+            propHubKey: allMiddware[element.parentMiddwareId].saveProps({
+                actuator: oldElement.actuator,
+                props: { ...oldProps, ...newProps, children: newChildren, key: oldProps.key, ref: oldProps.ref },
+            }),
+            parentMiddwareId: element.parentMiddwareId,
+        };
     }
     // 基础元素
     return {

@@ -123,7 +123,8 @@ function getNaruseSelfTemplate () {
             },
             'naruse-element': {
                 _attributes: {
-                    component: genDoubleBracket('component'),
+                    propHubKey: genDoubleBracket('propHubKey'),
+                    parentMiddwareId: genDoubleBracket('parentMiddwareId'),
                 }
             },
         }
