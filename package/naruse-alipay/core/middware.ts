@@ -8,6 +8,16 @@ import { logger, NOOP, propsEquals } from './uitl';
 
 let uid = 0;
 
+/** 当前在渲染的 */
+export const currentRenderMiddawre: { current?: Middware } = {
+    current: null
+}
+
+/** 所有的 */
+export const allMiddware: Record<string, Middware> = {};
+
+export type MiddwareProps  = Partial<{ actuator: typeof NaruseComponent, props: any, propHubKey: string, parentMiddwareId: string }>;
+
 /**
  * @description 承接小程序组件与NaruseComponent的桥梁，将小程序组件的生命周期映射到naruseComponent上，同时将naruseComponet的行为映射到小程序组件上
  * @author CHC
@@ -53,7 +63,32 @@ export class Middware {
     /** diff修改队列 */
     diffQueue: Record<string, any> = {};
 
-    constructor(miniappComponent: any, NaruseComponentActuator: typeof NaruseComponent | NaruseComponent | Function, props: {}) {
+    /** 存储此 组件下的所有 class 组件的 props */
+    hub = {};
+    /** hub key 的自增id */
+    incrId = 0;
+
+    /** 保存 */
+    saveProps = ({ actuator, props }:{ actuator: typeof NaruseComponent, props: any }) => {
+        const id = this.incrId++;
+
+        this.hub[id] = { actuator, props };
+
+        return id;
+    }
+
+    /** 解析 */
+    parseProps (params: MiddwareProps) {
+        const { actuator, props = {}, propHubKey, parentMiddwareId = this.$$uid } = params || {};
+        if (actuator) {
+            return { actuator, props }
+        }
+        return allMiddware[parentMiddwareId].hub[propHubKey];
+    }
+
+    constructor(miniappComponent: any, params: MiddwareProps) {
+        allMiddware[this.$$uid] = this;
+        const { actuator: NaruseComponentActuator, props } = this.parseProps(params);
         this.props = props;
         this.component = miniappComponent;
         if (NaruseComponentActuator instanceof NaruseComponent) {
@@ -113,12 +148,14 @@ export class Middware {
             return;
         }
         // 注入当前组件
+        currentRenderMiddawre.current = this;
         const extrnalCurrentOwner = Naruse.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.NaruseCurrentOwner;
         extrnalCurrentOwner.current = this.naruseComponent;
         // 开始渲染
         let vnode: VNode = this.naruseComponent.render();
         // 取消注入
         extrnalCurrentOwner.current = null;
+        currentRenderMiddawre.current = null;
         // 计时
         Naruse.$$debug && console.time(`组件 ${this.$$uid} diff 花费时间`);
         // 单文字节点需要包裹一层text节点
@@ -210,5 +247,6 @@ export class Middware {
             this.naruseComponent.updater = null;
         }
         this.naruseComponent = null;
+        delete allMiddware[this.$$uid];
     }
 }

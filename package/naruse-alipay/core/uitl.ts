@@ -35,3 +35,24 @@ const propsEquals = (a: { [x: string]: any; }, b: { [x: string]: any; }) => {
 };
 
 export { logger, NOOP, propsEquals };
+
+/** 深度克隆，例如调试时，用于打印某个时刻的对象副本 */
+export function deepClone(obj, circularReferences = new WeakMap()) {
+    // 判断是否为引用类型或函数
+    if (typeof obj !== 'object' || obj === null) {
+        return obj;
+    }
+    // 检查是否已经拷贝过该对象
+    if (circularReferences.has(obj)) {
+        return circularReferences.get(obj);
+    }
+    // 创建新的对象或数组
+    const clone = Array.isArray(obj) ? [] : {};
+    // 缓存当前对象和对应的拷贝
+    circularReferences.set(obj, clone);
+    // 遍历属性进行拷贝
+    Object.keys(obj).forEach(key => {
+        clone[key] = deepClone(obj[key], circularReferences);
+    });
+    return clone;
+}

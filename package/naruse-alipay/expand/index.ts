@@ -2,7 +2,7 @@ import type { NaruseComponent } from "core/component";
 import { globalEvent } from "../../naruse-share/index";
 import { getNaruseComponentFromCode } from "../core/create";
 import { Middware } from '../core/middware'
-import { logger } from "../core/uitl";
+import { logger} from "../core/uitl";
 
 
 const bindedPages: Record<string, any> = {};
@@ -38,12 +38,12 @@ const bindRenderEventOnComponent = (miniComponent: any) => {
     }
     bindedPages[route] = miniComponent;
     miniComponent._naruseEventCenter = globalEvent;
-    globalEvent.on('naruse.renderComponentOnPage', (pageName: string, Component: NaruseComponent) => {
+    globalEvent.on('naruse.renderComponentOnPage', (pageName: string, Component: typeof NaruseComponent) => {
         if (pageName !== route) return;
         // 卸载已有组件
         miniComponent.$middware && miniComponent.$middware.onUnMount();
         // 重新加载组件
-        miniComponent.$middware = new Middware(miniComponent, Component, {});
+        miniComponent.$middware = new Middware(miniComponent, { actuator: Component, props:{} });
         miniComponent.$middware.update();
     });
 }

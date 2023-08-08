@@ -215,7 +215,7 @@ export const getMethodsObject = () => {
  */
 export const getMiniappEventBehavior = () => {
     return {
-        props: { component: {} },
+        props: { propHubKey: null, parentMiddwareId: null },
         data: { node: {} },
         methods: getMethodsObject(),
     };
