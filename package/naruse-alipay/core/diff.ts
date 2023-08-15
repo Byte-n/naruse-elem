@@ -1,7 +1,6 @@
-import { isEmptyObj, isObj } from "../../naruse-share";
-import type { NaruseComponent } from "./component";
-
+import { isEmpty, isEmptyObj, isObj } from "../../naruse-share";
 import { createElement } from "./createElement";
+import { allMiddware } from './middware';
 
 type DiffRes = Record<string, any>;
 
@@ -13,10 +12,8 @@ interface BaseVNode {
     _uid?: string;
     id?: string;
     parentId?: string;
-    component?: {
-        actuator: NaruseComponent;
-        props: any;
-    };
+    propHubKey?: string;
+    parentMiddwareId?: string;
     [key: string]: any;
 };
 
@@ -64,14 +61,19 @@ export const vnodeDiff = (newVnode: VNode, oldVnode: VNode, newParentNode?: VNod
         res[path] = newVnode;
         return res;
     }
-
     // naruse-element 单独判断
-    if (newVnode.naruseType === 'naruse-element' && newVnode.component) {
-        if (newVnode.component.actuator === oldVnode.component?.actuator) {
-            const propsChnages = vnodePropsDiff(newVnode.component.props, oldVnode.component.props, true);
-            Object.keys(propsChnages).forEach((key) => {
-                res[`${path}.component.props.${key}`] = propsChnages[key];
-            });
+    if (newVnode.naruseType === 'naruse-element' && newVnode.propHubKey) {
+        const newComponent = allMiddware[newVnode.parentMiddwareId].parseProps({ propHubKey: newVnode.propHubKey });
+        const oldComponent = allMiddware[oldVnode.parentMiddwareId].parseProps({ propHubKey: oldVnode.propHubKey });
+        // 比较
+        if (newComponent.actuator === oldComponent?.actuator) {
+            // 仅仅 props 就行了。毕竟只有 actuator naruseType, props 了。
+            const propsChanges = vnodePropsDiff(newComponent.props, oldComponent.props, true);
+            // 如果又更新
+            if (!isEmpty(propsChanges)) {
+                res[`${path}.propHubKey`] = newVnode.propHubKey;
+                res[`${path}.parentMiddwareId`] = newVnode.parentMiddwareId;
+            }
         } else {
             res[path] = newVnode;
             return res;

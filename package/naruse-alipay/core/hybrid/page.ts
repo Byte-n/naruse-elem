@@ -7,7 +7,7 @@ import { MiniComponentConfig } from "./createMiniFactory";
 /**
  * 创建一个页面组件
  */
- export const createPageComponent = (instance: NaruseComponent, config: MiniComponentConfig) => {
+ export const createPageComponent = (instance: typeof NaruseComponent, config: MiniComponentConfig) => {
     const pageConfig: Record<string, any> = {
         // 标识是 naruse 页面
         $$narusePage: true,
@@ -29,7 +29,7 @@ import { MiniComponentConfig } from "./createMiniFactory";
     pageConfig["onLoad"] = function (query) {
         this.$query = query;
         // 初始化 naruse 组件
-        const middware = new Middware(this, instance, {});
+        const middware = new Middware(this, { actuator: instance, props: {} });
         middware.update();
         this.$middware = middware;
     }

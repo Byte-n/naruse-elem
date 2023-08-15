@@ -1,6 +1,6 @@
 import { getMiniappEventBehavior } from './domEvents.js';
 import { logger, propsEquals } from './uitl.js';
-import { Middware } from './middware.js';
+import { allMiddware, Middware } from './middware.js';
 import { globalEvent, isEmpty } from '../../naruse-share/index';
 import { getNaruseComponentFromProps } from './create.js';
 import { bindRenderEventOnComponent, uninstallMainComponentOnSomePage } from '../expand';
@@ -19,7 +19,7 @@ const initMainComponent = function () {
                 logger.warn('无远程资源，不加载组件')
                 return;
             }
-            this.$middware = new Middware(this, component, {});
+            this.$middware = new Middware(this, { actuator: component, props: {} });
             this.$middware.update();
         })
         .catch((err) => {
@@ -31,12 +31,11 @@ const initMainComponent = function () {
  * @description 初始化子虚拟组件
  * @author CHC
  * @date 2022-03-21 16:03:28
- * @param {*} component
  */
-const initSubComponent = function (args: Record<string, any> = {}) {
-    const { actuator, props } = args;
+const initSubComponent = function () {
+    const { actuator } = allMiddware[this.props.parentMiddwareId].parseProps({ propHubKey: this.props.propHubKey });
     if (actuator) {
-        this.$middware = new Middware(this, actuator, props || {});
+        this.$middware = new Middware(this, { propHubKey: this.props.propHubKey, parentMiddwareId: this.props.parentMiddwareId });
         this.$middware.update();
     }
 };
@@ -58,7 +57,7 @@ const createMainVmContext = function () {
  * @description 初始化组件
  */
 const createVmContext = function () {
-    (!this.isNaruseMainComponent ? initSubComponent : createMainVmContext).call(this, this.props.component);
+    (!this.isNaruseMainComponent ? initSubComponent : createMainVmContext).call(this);
 };
 
 /**
@@ -78,12 +77,12 @@ const createMainBehavior = (option = {}) => {
          * @date 2022-03-16 10:03:05
          */
         didMount() {
-            this.isNaruseMainComponent = isEmpty(this.props.component);
+            this.isNaruseMainComponent = isEmpty(this.props.propHubKey);
             if (this.isNaruseMainComponent) {
-                const { unique = false, pagePath } = this.props || {};
+                const { unique = false } = this.props || {};
                 if (unique) {
                     // 绑定重新渲染事件
-                    bindRenderEventOnComponent(this)
+                    bindRenderEventOnComponent(this);
                     this.__NaruseUniqueComponentPageShowEvent = (event) => {
                         // 小程序对象Page.__proto__.route
                         const path = Object.getPrototypeOf(this.$page).route;
@@ -114,16 +113,19 @@ const createMainBehavior = (option = {}) => {
                 return;
             }
             // 子组件更新逻辑
-            if (!isEmpty(this.props.component)) {
-                const { props, actuator } = prevProps.component;
+            if (this.props.propHubKey) {
+                // 从指定的 主组件下获取，
+                const { props: propsOld, actuator: actuatorOld } = allMiddware[prevProps.parentMiddwareId].parseProps({ propHubKey: prevProps.propHubKey })
+                const { props, actuator } = allMiddware[this.props.parentMiddwareId].parseProps({ propHubKey: this.props.propHubKey });
                 // FIX: 修复了当切换装载器后不会卸载组件重新渲染
                 // FIX: 修复了当key发生变化后组件不会重新渲染 0615
-                if (actuator === this.props.component.actuator && props.key === this.props.component.props.key) {
-                    this.$middware.props = this.props.component.props;
-                    this.$middware.canUpdate(props);
+                if (actuator=== actuatorOld && props.key === propsOld.key) {
+                    this.$middware.props = props;
+                    this.$middware.canUpdate(propsOld);
                 } else {
                     this.$middware.onUnMount();
-                    initSubComponent.call(this, this.props.component);
+                    // 更新 mainComponent。 $middware 会重建
+                    initSubComponent.call(this);
                 }
             }
         },
