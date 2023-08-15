@@ -1,5 +1,11 @@
 # naruse-alipay
 
+## 0.6.0
+
+### Minor Changes
+
+- #FIX: naruse-alipay class 组件 props 函数丢失
+
 ## 0.5.1
 
 ### Patch Changes

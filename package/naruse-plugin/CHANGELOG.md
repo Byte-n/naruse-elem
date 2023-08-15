@@ -1,5 +1,11 @@
 # naruse-plugin
 
+## 1.2.0
+
+### Minor Changes
+
+- #FIX: naruse-alipay class 组件 props 函数丢失
+
 ## 1.1.1
 
 ### Patch Changes

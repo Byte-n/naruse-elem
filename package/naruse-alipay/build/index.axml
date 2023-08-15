@@ -36,7 +36,7 @@
     </block>
 </template>
 <template name="naruse-element">
-    <naruse-element component="{{component}}"/>
+    <naruse-element propHubKey="{{propHubKey}}" parentMiddwareId="{{parentMiddwareId}}"/>
 </template>
 <template name="base_template">
     <template is="{{i.naruseType}}" data="{{...i}}"/>
