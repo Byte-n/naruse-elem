@@ -8072,7 +8072,7 @@ var Container = /** @class */ (function (_super) {
 }(React.Component));
 
 // @ts-ignore
-var version = "0.5.1";
+var version = "0.6.0";
 initVersionLogger('naruse-h5', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {

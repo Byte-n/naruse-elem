@@ -5167,13 +5167,437 @@ var initNaruseAlipayApi = function () {
     return NaruseApiInterface;
 };
 
+// naruse事件中心
+/** 允许继续冒泡的事件 */
+var allowPropagetionEventNames = [
+    'onClick',
+    'onLongClick',
+    'onTouchStart',
+    'onTouchMove',
+    'onTouchEnd',
+    'onTouchCancel',
+    'onTransitionEnd',
+    'onAnimationStart',
+    'onAnimationIteration',
+    'onAnimationEnd',
+];
+/**
+ * @description 获取节点的路径
+ * @author CHC
+ * @date 2022-02-23 09:02:32
+ * @param {*} id
+ * @param {*} vnode
+ * @returns {*}
+ */
+var getPathById = function (id, vnode) {
+    var path = [];
+    if (!vnode)
+        return;
+    if (vnode.id === id)
+        return path;
+    if (!vnode.childNodes || !vnode.childNodes.length)
+        return;
+    // 层次遍历
+    for (var i = 0; i < vnode.childNodes.length; i++) {
+        if (vnode.childNodes[i] && vnode.childNodes[i].id === id) {
+            path.push(i);
+            return path;
+        }
+    }
+    for (var i = 0; i < vnode.childNodes.length; i++) {
+        var childPath = getPathById(id, vnode.childNodes[i]);
+        if (childPath) {
+            path.push(i);
+            for (var j = 0; j < childPath.length; j++) {
+                path.push(childPath[j]);
+            }
+            return path;
+        }
+    }
+};
+/**
+ * 获取 eventNode 中以 data- 开头的属性，
+ * @param eventNode
+ * @return Object key：value, key 为 data-xxx 去掉 data- 后的 xxx
+ */
+var getEventNodeDataPrefixProperty = function (eventNode) {
+    return Object.keys(typeof eventNode === 'object' ? eventNode : {}).reduce(function (per, cur) {
+        if (cur.startsWith('data-')) {
+            per[cur.replace('data-', '')] = eventNode[cur];
+        }
+        return per;
+    }, {});
+};
+/**
+ * @description 获取节点
+ * @author CHC
+ * @date 2022-02-23 09:02:02
+ * @param {*} id
+ * @param {*} vnode
+ * @returns {*}
+ */
+var getVnodeById = function (id, vnode) {
+    var path = getPathById(id, vnode);
+    if (!path)
+        return undefined;
+    if (!path.length)
+        return vnode;
+    var node = vnode;
+    path.forEach(function (index) {
+        node = node.childNodes[index];
+    });
+    return node;
+};
+/**
+ * @description 初始化节点
+ * @author CHC
+ * @date 2022-02-23 09:02:49
+ * @param {*} vnode
+ * @param {*} environments
+ * @param {*} parentId
+ * @returns {*}
+ */
+var initVnodeTree = function (vnode, parentId) {
+    var newNode = vnode;
+    if (!vnode || typeof vnode !== 'object')
+        return {};
+    newNode.parentId = parentId;
+    // 递归遍历
+    if (Array.isArray(newNode.childNodes)) {
+        newNode.childNodes.forEach(function (node) { return initVnodeTree(node, newNode.id); });
+    }
+    return newNode;
+};
+/**
+ * 小程序事件映射表
+ */
+var eventNameMap = {};
+var methodsTags = [
+    'tap',
+    'longTap',
+    'input',
+    'blur',
+    'focus',
+    'load',
+    'change',
+    'confirm',
+    'keyBoardHeightChange',
+    'scroll',
+    'scrollToUpper',
+    'scrollToLower',
+    'touchStart',
+    'touchMove',
+    'touchEnd',
+    'touchCancel',
+    'transitionEnd'
+];
+var methodTagTransformMap = {
+    'tap': 'click',
+    'longTap': 'longClick'
+};
+var transformFirstApha = function (item) { return 'on' + item.slice(0, 1).toLocaleUpperCase() + item.slice(1); };
+// 处理事件映射表
+methodsTags.forEach(function (tag) {
+    eventNameMap[tag] = transformFirstApha(methodTagTransformMap[tag] || tag);
+});
+/**
+ * @description 事件处理中心
+ * @author CHC
+ * @date 2022-02-23 09:02:22
+ * @param {*} event
+ * @param {*} nodeTree
+ * @returns {*}
+ */
+var eventCenter = function (event, nodeTree) {
+    // 是否继续冒泡的标志
+    var stopFlag = false;
+    // 空事件不响应
+    if (!(event && event.target && event.target.id))
+        return;
+    // 空节点不响应
+    var eventNode = getVnodeById(event.target.id, nodeTree);
+    // 浅拷贝下事件对象
+    event.naruseTarget = __assign({}, eventNode);
+    if (!eventNode)
+        return;
+    // 获取事件类型
+    var type = event.type;
+    var reflectedEventName = eventNameMap[type];
+    // 不支持的事件
+    if (!reflectedEventName) {
+        logger.warn("".concat(type, "\u4E8B\u4EF6\u4E0D\u652F\u6301"));
+    }
+    // 冒泡事件便允许阻止冒泡
+    if (allowPropagetionEventNames.includes(reflectedEventName)) {
+        stopFlag = true;
+        event.stopPropagation = function () {
+            stopFlag = false;
+        };
+    }
+    // 为当前事件对象 填充 dataset 属性
+    if (event.currentTarget && event.currentTarget.id === eventNode.id) {
+        event.currentTarget.dataset = getEventNodeDataPrefixProperty(eventNode);
+    }
+    if (event.target && event.target.id === eventNode.id) {
+        event.target.dataset = getEventNodeDataPrefixProperty(eventNode);
+    }
+    // 反射事件名称
+    var responseFuc = eventNode[reflectedEventName];
+    if (!(responseFuc && typeof responseFuc === 'function')) ;
+    else {
+        // logger.debug(`元素${eventNode.naruseType}:触发${reflectedEventName}事件`);
+        responseFuc.call(eventNode, event);
+    }
+    // 没有截断就继续冒泡
+    if (stopFlag) {
+        // logger.debug(`元素${eventNode.naruseType}: 冒泡${reflectedEventName}事件`);
+        eventCenter(__assign(__assign({}, event), { target: { id: eventNode.parentId }, narusePropagetion: true }), nodeTree);
+    }
+};
+/**
+ * 获取事件所需对象
+ */
+var getMethodsObject = function () {
+    return {
+        ec: function (event) {
+            eventCenter.call(null, event, this.data.node);
+        },
+    };
+};
+/**
+ * 获取小程序通用行为
+ */
+var getMiniappEventBehavior = function () {
+    return {
+        props: { propHubKey: null, parentMiddwareId: null },
+        data: { node: {} },
+        methods: getMethodsObject(),
+    };
+};
+
+var uid$1 = 0;
+/** 当前在渲染的 */
+var currentRenderMiddawre = {
+    current: null
+};
+/** 所有的 */
+var allMiddware = {};
+/**
+ * @description 承接小程序组件与NaruseComponent的桥梁，将小程序组件的生命周期映射到naruseComponent上，同时将naruseComponet的行为映射到小程序组件上
+ * @author CHC
+ * @date 2022-03-21 12:03:54
+ * @class ReactMiddware
+ * @note 因为是先创建的naruseComponent组件实例，后创建的中间件，所以采用后绑定
+ */
+var Middware = /** @class */ (function () {
+    function Middware(miniappComponent, params) {
+        var _this = this;
+        var _a;
+        /** 唯一id */
+        this.$$uid = uid$1++;
+        /** 是否是首次渲染 */
+        this.fristRender = true;
+        /** 是否正在更新的标志 */
+        this.updating = false;
+        /** 更新完毕的回调队列 */
+        this.callbackList = [];
+        /** 最近重新刷新的次数 */
+        this.$updateCount = 0;
+        /** diff修改队列 */
+        this.diffQueue = {};
+        /** 存储此 组件下的所有 class 组件的 props */
+        this.hub = {};
+        /** hub key 的自增id */
+        this.incrId = 0;
+        /** 保存 */
+        this.saveProps = function (_a) {
+            var actuator = _a.actuator, props = _a.props;
+            var id = _this.incrId++;
+            _this.hub[id] = { actuator: actuator, props: props };
+            return id;
+        };
+        /**
+         * 判断是否已经挂载，React for 函数
+         */
+        this.isMounted = function () {
+            return _this.naruseComponent.$mounted;
+        };
+        /** React For 函数，帮助使用统一的 Hooks */
+        this.enqueueForceUpdate = this.enqueueUpdate;
+        /** 更新后 */
+        this.onUpdated = function () {
+            if (!_this.naruseComponent)
+                return;
+            if (_this.fristRender)
+                _this.naruseComponent.$mounted = true;
+            var funcName = _this.fristRender ? 'componentDidMount' : 'componentDidUpdate';
+            _this.naruseComponent[funcName] && _this.naruseComponent[funcName]();
+            _this.fristRender = false;
+        };
+        allMiddware[this.$$uid] = this;
+        var _b = this.parseProps(params), NaruseComponentActuator = _b.actuator, props = _b.props;
+        this.props = props;
+        this.component = miniappComponent;
+        if (NaruseComponentActuator instanceof NaruseComponent) {
+            this.naruseComponent = NaruseComponentActuator;
+            // 通过静态属性判断是否是尚未实例化的 naruse 组件 || 通过原型链判断是否是继承自 NaruseComponent 的组件
+            // @ts-ignore
+        }
+        else if (NaruseComponentActuator.$isNaruseClass || ((_a = Object.getPrototypeOf(NaruseComponentActuator.prototype).constructor) === null || _a === void 0 ? void 0 : _a.$isNaruseClass)) {
+            // @ts-ignore
+            this.naruseComponent = new NaruseComponentActuator(props);
+            this.naruseComponent.props = props;
+        }
+        else if (typeof NaruseComponentActuator === 'function') {
+            var newClass = functionalizae(NaruseComponentActuator);
+            this.naruseComponent = new newClass(props);
+        }
+        this.naruseComponent.updater = this;
+    }
+    /** 解析 */
+    Middware.prototype.parseProps = function (params) {
+        var _a = params || {}, actuator = _a.actuator, _b = _a.props, props = _b === void 0 ? {} : _b, propHubKey = _a.propHubKey, _c = _a.parentMiddwareId, parentMiddwareId = _c === void 0 ? this.$$uid : _c;
+        if (actuator) {
+            return { actuator: actuator, props: props };
+        }
+        return allMiddware[parentMiddwareId].hub[propHubKey];
+    };
+    /** 进入更新队列在下一个时刻准备更新 */
+    Middware.prototype.enqueueUpdate = function (callback, callbackMaybe) {
+        var _this = this;
+        if (callback === void 0) { callback = NOOP; }
+        if (callbackMaybe === void 0) { callbackMaybe = NOOP; }
+        // @ts-ignore
+        // polyfill react-like-hooks
+        if (callback === this) {
+            callback = callbackMaybe;
+        }
+        this.callbackList.push(callback);
+        !this.updating && Promise.resolve().then(function () {
+            _this.updating = false;
+            _this.update();
+        });
+        this.updating = true;
+    };
+    /**
+     * 直接更新，不进入队列
+     */
+    Middware.prototype.update = function () {
+        var _this = this;
+        this.checkExecessiveUpdate();
+        // fix: maybe has unmounted
+        if (!this.naruseComponent) {
+            // @ts-ignore
+            logger.error('you are updating a has unmounted component, please check you code');
+            return;
+        }
+        if (!this.naruseComponent.render) {
+            // @ts-ignore
+            logger.error('the NaruseComponent must have a render function');
+            return;
+        }
+        // 注入当前组件
+        currentRenderMiddawre.current = this;
+        var extrnalCurrentOwner = Naruse.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.NaruseCurrentOwner;
+        extrnalCurrentOwner.current = this.naruseComponent;
+        // 开始渲染
+        var vnode = this.naruseComponent.render();
+        // 取消注入
+        extrnalCurrentOwner.current = null;
+        currentRenderMiddawre.current = null;
+        // 计时
+        Naruse.$$debug && console.time("\u7EC4\u4EF6 ".concat(this.$$uid, " diff \u82B1\u8D39\u65F6\u95F4"));
+        // 单文字节点需要包裹一层text节点
+        if (isBaseTypeComponent(vnode))
+            vnode = createTextElement(vnode);
+        // 初始化vnode
+        initVnodeTree(vnode);
+        var diff = vnodeDiff(vnode, this.fristRender ? null : this.component.data.node);
+        Naruse.$$debug && console.log("\u7EC4\u4EF6 ".concat(this.$$uid, ", diff\u7ED3\u679C"), diff);
+        var updatedCallBack = function () {
+            Naruse.$$debug && console.timeEnd("\u7EC4\u4EF6 ".concat(_this.$$uid, " setData \u82B1\u8D39\u65F6\u95F4"));
+            _this.lastUpdateNode = vnode;
+            _this.onUpdated.call(self);
+            _this.executeUpdateList();
+        };
+        Naruse.$$debug && console.timeEnd("\u7EC4\u4EF6 ".concat(this.$$uid, " diff \u82B1\u8D39\u65F6\u95F4"));
+        Naruse.$$debug && console.time("\u7EC4\u4EF6 ".concat(this.$$uid, " setData \u82B1\u8D39\u65F6\u95F4"));
+        // diff 存在结果才会重新渲染
+        if (!isEmptyObj(diff)) {
+            this.component.setData(diff, updatedCallBack);
+        }
+        else {
+            updatedCallBack();
+        }
+    };
+    /**
+     * 检查短时间内 (50ms内) 是否更新超过20次 有过多的更新，如果存在则报错
+     */
+    Middware.prototype.checkExecessiveUpdate = function () {
+        var now = Date.now();
+        if (now - this.lastUpdatedTime < 50) {
+            this.$updateCount++;
+        }
+        else {
+            this.$updateCount = 0;
+        }
+        this.lastUpdatedTime = now;
+        if (this.$updateCount > 20) {
+            throw new Error('too many re-renders. Naruse limits the number of renders to prevent an infinite loop.');
+        }
+    };
+    /** 按序执行callbackList中的函数，非函数不执行 */
+    Middware.prototype.executeUpdateList = function () {
+        this.callbackList.forEach(function (item) {
+            if (isFunc(item)) {
+                item();
+            }
+        });
+        this.callbackList.length = 0;
+    };
+    /** 父组件更新后是否需要更新子组件 */
+    Middware.prototype.canUpdate = function (prevProps) {
+        var c = this.naruseComponent;
+        var flag = this.shouldUpdate(this.props, c.state);
+        if (flag && !propsEquals(prevProps, this.props)) {
+            this.prevProps = prevProps;
+            c.props = this.props;
+            this.update();
+        }
+    };
+    /** 是否应该刷新 */
+    Middware.prototype.shouldUpdate = function (nextProps, nextState) {
+        var c = this.naruseComponent;
+        if (!c || typeof c.shouldComponentUpdate !== 'function')
+            return true;
+        var res = c.shouldComponentUpdate.call(c, nextProps, nextState);
+        return res === undefined ? true : res;
+    };
+    /** 卸载时 */
+    Middware.prototype.onUnMount = function (isMiniComponentUnmount) {
+        if (isMiniComponentUnmount === void 0) { isMiniComponentUnmount = false; }
+        this.naruseComponent && this.naruseComponent.componentWillUnmount();
+        // 解绑对象
+        // fix: 修复当naruse组件卸载时把小程序组件一起卸载导致后续渲染失败
+        if (isMiniComponentUnmount) {
+            this.component = null;
+        }
+        // fix: 修复naruseComponent为空的情况
+        if (this.naruseComponent) {
+            this.naruseComponent.updater = null;
+        }
+        this.naruseComponent = null;
+        delete allMiddware[this.$$uid];
+    };
+    return Middware;
+}());
+
 /**
  * @description 简单的o(n^2)diff操作，记录需要更新的node
  * @author CHC
  * @date 2022-10-11 14:10:32
  */
 var vnodeDiff = function (newVnode, oldVnode, newParentNode, oldParentNode, path, diffRes) {
-    var _a;
     if (path === void 0) { path = 'node'; }
     if (diffRes === void 0) { diffRes = {}; }
     var res = diffRes;
@@ -5206,12 +5630,18 @@ var vnodeDiff = function (newVnode, oldVnode, newParentNode, oldParentNode, path
         return res;
     }
     // naruse-element 单独判断
-    if (newVnode.naruseType === 'naruse-element' && newVnode.component) {
-        if (newVnode.component.actuator === ((_a = oldVnode.component) === null || _a === void 0 ? void 0 : _a.actuator)) {
-            var propsChnages_1 = vnodePropsDiff(newVnode.component.props, oldVnode.component.props, true);
-            Object.keys(propsChnages_1).forEach(function (key) {
-                res["".concat(path, ".component.props.").concat(key)] = propsChnages_1[key];
-            });
+    if (newVnode.naruseType === 'naruse-element' && newVnode.propHubKey) {
+        var newComponent = allMiddware[newVnode.parentMiddwareId].parseProps({ propHubKey: newVnode.propHubKey });
+        var oldComponent = allMiddware[oldVnode.parentMiddwareId].parseProps({ propHubKey: oldVnode.propHubKey });
+        // 比较
+        if (newComponent.actuator === (oldComponent === null || oldComponent === void 0 ? void 0 : oldComponent.actuator)) {
+            // 仅仅 props 就行了。毕竟只有 actuator naruseType, props 了。
+            var propsChanges = vnodePropsDiff(newComponent.props, oldComponent.props, true);
+            // 如果又更新
+            if (!isEmpty(propsChanges)) {
+                res["".concat(path, ".propHubKey")] = newVnode.propHubKey;
+                res["".concat(path, ".parentMiddwareId")] = newVnode.parentMiddwareId;
+            }
         }
         else {
             res[path] = newVnode;
@@ -5220,9 +5650,9 @@ var vnodeDiff = function (newVnode, oldVnode, newParentNode, oldParentNode, path
     }
     else {
         // 普通元素的props判断
-        var propsChnages_2 = vnodePropsDiff(newVnode, oldVnode);
-        Object.keys(propsChnages_2).forEach(function (key) {
-            res["".concat(path, ".").concat(key)] = propsChnages_2[key];
+        var propsChnages_1 = vnodePropsDiff(newVnode, oldVnode);
+        Object.keys(propsChnages_1).forEach(function (key) {
+            res["".concat(path, ".").concat(key)] = propsChnages_1[key];
         });
         diffVnodeChildren(newVnode, oldVnode, "".concat(path, ".childNodes"), res);
     }
@@ -5341,7 +5771,7 @@ var cleanChildNode = function (childVNode) {
     return childVNode;
 };
 
-var uid$1 = 0;
+var uid = 0;
 /**
  * @description 虚拟dom创建特殊处理map
  * @type {*}
@@ -5349,7 +5779,7 @@ var uid$1 = 0;
 var vnodeSpecialMap = {
     text: function (props, childNodes) {
         var tag = isPureProps(props) ? "pt" /* VnodeType.PureText */ : "text" /* VnodeType.Text */;
-        var id = "_n_".concat(uid$1++);
+        var id = "_n_".concat(uid++);
         return { naruseType: tag, content: childNodes.join(''), id: id, _uid: id };
     },
     view: function (props) {
@@ -5408,7 +5838,10 @@ var createClassElement = function (type, props, childNodes) {
     props = __assign(__assign({}, props), { children: childNodes });
     // 先不实例化对象，等待组件装载完成后再实例化
     var component = { actuator: type, props: props };
-    return { naruseType: "naruse-element" /* VnodeType.NaruseComponent */, component: component };
+    return {
+        naruseType: "naruse-element" /* VnodeType.NaruseComponent */, propHubKey: currentRenderMiddawre.current.saveProps(component),
+        parentMiddwareId: currentRenderMiddawre.current.$$uid,
+    };
 };
 /**
  * @description 创建基础节点
@@ -5436,7 +5869,7 @@ var createBaseElement = function (type, props, childNodes) {
     var node = __assign(__assign({ naruseType: type }, props), newNode);
     // 如果处理完毕没有 id 则自动补充上 id
     if (!node.id) {
-        node.id = node._uid = "_n_".concat(uid$1++);
+        node.id = node._uid = "_n_".concat(uid++);
     }
     return node;
 };
@@ -5651,8 +6084,7 @@ var cloneElement = function (element, props) {
         newChildren = children;
     }
     else if (isNaruseElement) {
-        // 自定义组件
-        newChildren = (_a = element.component) === null || _a === void 0 ? void 0 : _a.props.children;
+        newChildren = (_a = allMiddware[element.parentMiddwareId].parseProps({ propHubKey: element.propHubKey })) === null || _a === void 0 ? void 0 : _a.props.children;
     }
     else {
         // 原生组件
@@ -5663,9 +6095,12 @@ var cloneElement = function (element, props) {
     }
     // naruse 原生组件
     if (isNaruseElement) {
-        var oldProps = element === null || element === void 0 ? void 0 : element.component.props;
-        var newComponent = __assign(__assign({}, element.component), { props: __assign(__assign(__assign({}, oldProps), newProps), { children: newChildren, key: oldProps.key, ref: oldProps.ref }) });
-        return __assign(__assign({}, element), { component: newComponent });
+        var oldElement = allMiddware[element.parentMiddwareId].parseProps({ propHubKey: element.propHubKey });
+        var oldProps = oldElement === null || oldElement === void 0 ? void 0 : oldElement.props;
+        return __assign(__assign({}, element), { propHubKey: allMiddware[element.parentMiddwareId].saveProps({
+                actuator: oldElement.actuator,
+                props: __assign(__assign(__assign({}, oldProps), newProps), { children: newChildren, key: oldProps.key, ref: oldProps.ref }),
+            }), parentMiddwareId: element.parentMiddwareId });
     }
     // 基础元素
     return __assign(__assign(__assign({}, element), newProps), { childNodes: newChildren, naruseType: element.naruseType, key: element.key, ref: element.ref });
@@ -5684,401 +6119,6 @@ var elementApi = /*#__PURE__*/Object.freeze({
     cloneElement: cloneElement,
     isValidElement: isValidElement
 });
-
-// naruse事件中心
-/** 允许继续冒泡的事件 */
-var allowPropagetionEventNames = [
-    'onClick',
-    'onLongClick',
-    'onTouchStart',
-    'onTouchMove',
-    'onTouchEnd',
-    'onTouchCancel',
-    'onTransitionEnd',
-    'onAnimationStart',
-    'onAnimationIteration',
-    'onAnimationEnd',
-];
-/**
- * @description 获取节点的路径
- * @author CHC
- * @date 2022-02-23 09:02:32
- * @param {*} id
- * @param {*} vnode
- * @returns {*}
- */
-var getPathById = function (id, vnode) {
-    var path = [];
-    if (!vnode)
-        return;
-    if (vnode.id === id)
-        return path;
-    if (!vnode.childNodes || !vnode.childNodes.length)
-        return;
-    // 层次遍历
-    for (var i = 0; i < vnode.childNodes.length; i++) {
-        if (vnode.childNodes[i] && vnode.childNodes[i].id === id) {
-            path.push(i);
-            return path;
-        }
-    }
-    for (var i = 0; i < vnode.childNodes.length; i++) {
-        var childPath = getPathById(id, vnode.childNodes[i]);
-        if (childPath) {
-            path.push(i);
-            for (var j = 0; j < childPath.length; j++) {
-                path.push(childPath[j]);
-            }
-            return path;
-        }
-    }
-};
-/**
- * 获取 eventNode 中以 data- 开头的属性，
- * @param eventNode
- * @return Object key：value, key 为 data-xxx 去掉 data- 后的 xxx
- */
-var getEventNodeDataPrefixProperty = function (eventNode) {
-    return Object.keys(typeof eventNode === 'object' ? eventNode : {}).reduce(function (per, cur) {
-        if (cur.startsWith('data-')) {
-            per[cur.replace('data-', '')] = eventNode[cur];
-        }
-        return per;
-    }, {});
-};
-/**
- * @description 获取节点
- * @author CHC
- * @date 2022-02-23 09:02:02
- * @param {*} id
- * @param {*} vnode
- * @returns {*}
- */
-var getVnodeById = function (id, vnode) {
-    var path = getPathById(id, vnode);
-    if (!path)
-        return undefined;
-    if (!path.length)
-        return vnode;
-    var node = vnode;
-    path.forEach(function (index) {
-        node = node.childNodes[index];
-    });
-    return node;
-};
-/**
- * @description 初始化节点
- * @author CHC
- * @date 2022-02-23 09:02:49
- * @param {*} vnode
- * @param {*} environments
- * @param {*} parentId
- * @returns {*}
- */
-var initVnodeTree = function (vnode, parentId) {
-    var newNode = vnode;
-    if (!vnode || typeof vnode !== 'object')
-        return {};
-    newNode.parentId = parentId;
-    // 递归遍历
-    if (Array.isArray(newNode.childNodes)) {
-        newNode.childNodes.forEach(function (node) { return initVnodeTree(node, newNode.id); });
-    }
-    return newNode;
-};
-/**
- * 小程序事件映射表
- */
-var eventNameMap = {};
-var methodsTags = [
-    'tap',
-    'longTap',
-    'input',
-    'blur',
-    'focus',
-    'load',
-    'change',
-    'confirm',
-    'keyBoardHeightChange',
-    'scroll',
-    'scrollToUpper',
-    'scrollToLower',
-    'touchStart',
-    'touchMove',
-    'touchEnd',
-    'touchCancel',
-    'transitionEnd'
-];
-var methodTagTransformMap = {
-    'tap': 'click',
-    'longTap': 'longClick'
-};
-var transformFirstApha = function (item) { return 'on' + item.slice(0, 1).toLocaleUpperCase() + item.slice(1); };
-// 处理事件映射表
-methodsTags.forEach(function (tag) {
-    eventNameMap[tag] = transformFirstApha(methodTagTransformMap[tag] || tag);
-});
-/**
- * @description 事件处理中心
- * @author CHC
- * @date 2022-02-23 09:02:22
- * @param {*} event
- * @param {*} nodeTree
- * @returns {*}
- */
-var eventCenter = function (event, nodeTree) {
-    // 是否继续冒泡的标志
-    var stopFlag = false;
-    // 空事件不响应
-    if (!(event && event.target && event.target.id))
-        return;
-    // 空节点不响应
-    var eventNode = getVnodeById(event.target.id, nodeTree);
-    // 浅拷贝下事件对象
-    event.naruseTarget = __assign({}, eventNode);
-    if (!eventNode)
-        return;
-    // 获取事件类型
-    var type = event.type;
-    var reflectedEventName = eventNameMap[type];
-    // 不支持的事件
-    if (!reflectedEventName) {
-        logger.warn("".concat(type, "\u4E8B\u4EF6\u4E0D\u652F\u6301"));
-    }
-    // 冒泡事件便允许阻止冒泡
-    if (allowPropagetionEventNames.includes(reflectedEventName)) {
-        stopFlag = true;
-        event.stopPropagation = function () {
-            stopFlag = false;
-        };
-    }
-    // 为当前事件对象 填充 dataset 属性
-    if (event.currentTarget && event.currentTarget.id === eventNode.id) {
-        event.currentTarget.dataset = getEventNodeDataPrefixProperty(eventNode);
-    }
-    if (event.target && event.target.id === eventNode.id) {
-        event.target.dataset = getEventNodeDataPrefixProperty(eventNode);
-    }
-    // 反射事件名称
-    var responseFuc = eventNode[reflectedEventName];
-    if (!(responseFuc && typeof responseFuc === 'function')) ;
-    else {
-        // logger.debug(`元素${eventNode.naruseType}:触发${reflectedEventName}事件`);
-        responseFuc.call(eventNode, event);
-    }
-    // 没有截断就继续冒泡
-    if (stopFlag) {
-        // logger.debug(`元素${eventNode.naruseType}: 冒泡${reflectedEventName}事件`);
-        eventCenter(__assign(__assign({}, event), { target: { id: eventNode.parentId }, narusePropagetion: true }), nodeTree);
-    }
-};
-/**
- * 获取事件所需对象
- */
-var getMethodsObject = function () {
-    return {
-        ec: function (event) {
-            eventCenter.call(null, event, this.data.node);
-        },
-    };
-};
-/**
- * 获取小程序通用行为
- */
-var getMiniappEventBehavior = function () {
-    return {
-        props: { component: {} },
-        data: { node: {} },
-        methods: getMethodsObject(),
-    };
-};
-
-var uid = 0;
-/**
- * @description 承接小程序组件与NaruseComponent的桥梁，将小程序组件的生命周期映射到naruseComponent上，同时将naruseComponet的行为映射到小程序组件上
- * @author CHC
- * @date 2022-03-21 12:03:54
- * @class ReactMiddware
- * @note 因为是先创建的naruseComponent组件实例，后创建的中间件，所以采用后绑定
- */
-var Middware = /** @class */ (function () {
-    function Middware(miniappComponent, NaruseComponentActuator, props) {
-        var _this = this;
-        var _a;
-        /** 唯一id */
-        this.$$uid = uid++;
-        /** 是否是首次渲染 */
-        this.fristRender = true;
-        /** 是否正在更新的标志 */
-        this.updating = false;
-        /** 更新完毕的回调队列 */
-        this.callbackList = [];
-        /** 最近重新刷新的次数 */
-        this.$updateCount = 0;
-        /** diff修改队列 */
-        this.diffQueue = {};
-        /**
-         * 判断是否已经挂载，React for 函数
-         */
-        this.isMounted = function () {
-            return _this.naruseComponent.$mounted;
-        };
-        /** React For 函数，帮助使用统一的 Hooks */
-        this.enqueueForceUpdate = this.enqueueUpdate;
-        /** 更新后 */
-        this.onUpdated = function () {
-            if (!_this.naruseComponent)
-                return;
-            if (_this.fristRender)
-                _this.naruseComponent.$mounted = true;
-            var funcName = _this.fristRender ? 'componentDidMount' : 'componentDidUpdate';
-            _this.naruseComponent[funcName] && _this.naruseComponent[funcName]();
-            _this.fristRender = false;
-        };
-        this.props = props;
-        this.component = miniappComponent;
-        if (NaruseComponentActuator instanceof NaruseComponent) {
-            this.naruseComponent = NaruseComponentActuator;
-            // 通过静态属性判断是否是尚未实例化的 naruse 组件 || 通过原型链判断是否是继承自 NaruseComponent 的组件
-            // @ts-ignore
-        }
-        else if (NaruseComponentActuator.$isNaruseClass || ((_a = Object.getPrototypeOf(NaruseComponentActuator.prototype).constructor) === null || _a === void 0 ? void 0 : _a.$isNaruseClass)) {
-            // @ts-ignore
-            this.naruseComponent = new NaruseComponentActuator(props);
-            this.naruseComponent.props = props;
-        }
-        else if (typeof NaruseComponentActuator === 'function') {
-            var newClass = functionalizae(NaruseComponentActuator);
-            this.naruseComponent = new newClass(props);
-        }
-        this.naruseComponent.updater = this;
-    }
-    /** 进入更新队列在下一个时刻准备更新 */
-    Middware.prototype.enqueueUpdate = function (callback, callbackMaybe) {
-        var _this = this;
-        if (callback === void 0) { callback = NOOP; }
-        if (callbackMaybe === void 0) { callbackMaybe = NOOP; }
-        // @ts-ignore
-        // polyfill react-like-hooks
-        if (callback === this) {
-            callback = callbackMaybe;
-        }
-        this.callbackList.push(callback);
-        !this.updating && Promise.resolve().then(function () {
-            _this.updating = false;
-            _this.update();
-        });
-        this.updating = true;
-    };
-    /**
-     * 直接更新，不进入队列
-     */
-    Middware.prototype.update = function () {
-        var _this = this;
-        this.checkExecessiveUpdate();
-        // fix: maybe has unmounted
-        if (!this.naruseComponent) {
-            // @ts-ignore
-            logger.error('you are updating a has unmounted component, please check you code');
-            return;
-        }
-        if (!this.naruseComponent.render) {
-            // @ts-ignore
-            logger.error('the NaruseComponent must have a render function');
-            return;
-        }
-        // 注入当前组件
-        var extrnalCurrentOwner = Naruse.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.NaruseCurrentOwner;
-        extrnalCurrentOwner.current = this.naruseComponent;
-        // 开始渲染
-        var vnode = this.naruseComponent.render();
-        // 取消注入
-        extrnalCurrentOwner.current = null;
-        // 计时
-        Naruse.$$debug && console.time("\u7EC4\u4EF6 ".concat(this.$$uid, " diff \u82B1\u8D39\u65F6\u95F4"));
-        // 单文字节点需要包裹一层text节点
-        if (isBaseTypeComponent(vnode))
-            vnode = createTextElement(vnode);
-        // 初始化vnode
-        initVnodeTree(vnode);
-        var diff = vnodeDiff(vnode, this.fristRender ? null : this.component.data.node);
-        Naruse.$$debug && console.log("\u7EC4\u4EF6 ".concat(this.$$uid, ", diff\u7ED3\u679C"), diff);
-        var updatedCallBack = function () {
-            Naruse.$$debug && console.timeEnd("\u7EC4\u4EF6 ".concat(_this.$$uid, " setData \u82B1\u8D39\u65F6\u95F4"));
-            _this.lastUpdateNode = vnode;
-            _this.onUpdated.call(self);
-            _this.executeUpdateList();
-        };
-        Naruse.$$debug && console.timeEnd("\u7EC4\u4EF6 ".concat(this.$$uid, " diff \u82B1\u8D39\u65F6\u95F4"));
-        Naruse.$$debug && console.time("\u7EC4\u4EF6 ".concat(this.$$uid, " setData \u82B1\u8D39\u65F6\u95F4"));
-        // diff 存在结果才会重新渲染
-        if (!isEmptyObj(diff)) {
-            this.component.setData(diff, updatedCallBack);
-        }
-        else {
-            updatedCallBack();
-        }
-    };
-    /**
-     * 检查短时间内 (50ms内) 是否更新超过20次 有过多的更新，如果存在则报错
-     */
-    Middware.prototype.checkExecessiveUpdate = function () {
-        var now = Date.now();
-        if (now - this.lastUpdatedTime < 50) {
-            this.$updateCount++;
-        }
-        else {
-            this.$updateCount = 0;
-        }
-        this.lastUpdatedTime = now;
-        if (this.$updateCount > 20) {
-            throw new Error('too many re-renders. Naruse limits the number of renders to prevent an infinite loop.');
-        }
-    };
-    /** 按序执行callbackList中的函数，非函数不执行 */
-    Middware.prototype.executeUpdateList = function () {
-        this.callbackList.forEach(function (item) {
-            if (isFunc(item)) {
-                item();
-            }
-        });
-        this.callbackList.length = 0;
-    };
-    /** 父组件更新后是否需要更新子组件 */
-    Middware.prototype.canUpdate = function (prevProps) {
-        var c = this.naruseComponent;
-        var flag = this.shouldUpdate(this.props, c.state);
-        if (flag && !propsEquals(prevProps, this.props)) {
-            this.prevProps = prevProps;
-            c.props = this.props;
-            this.update();
-        }
-    };
-    /** 是否应该刷新 */
-    Middware.prototype.shouldUpdate = function (nextProps, nextState) {
-        var c = this.naruseComponent;
-        if (!c || typeof c.shouldComponentUpdate !== 'function')
-            return true;
-        var res = c.shouldComponentUpdate.call(c, nextProps, nextState);
-        return res === undefined ? true : res;
-    };
-    /** 卸载时 */
-    Middware.prototype.onUnMount = function (isMiniComponentUnmount) {
-        if (isMiniComponentUnmount === void 0) { isMiniComponentUnmount = false; }
-        this.naruseComponent && this.naruseComponent.componentWillUnmount();
-        // 解绑对象
-        // fix: 修复当naruse组件卸载时把小程序组件一起卸载导致后续渲染失败
-        if (isMiniComponentUnmount) {
-            this.component = null;
-        }
-        // fix: 修复naruseComponent为空的情况
-        if (this.naruseComponent) {
-            this.naruseComponent.updater = null;
-        }
-        this.naruseComponent = null;
-    };
-    return Middware;
-}());
 
 /**
  * 创建一个页面组件
@@ -6099,7 +6139,7 @@ var createPageComponent = function (instance, config) {
     pageConfig["onLoad"] = function (query) {
         this.$query = query;
         // 初始化 naruse 组件
-        var middware = new Middware(this, instance, {});
+        var middware = new Middware(this, { actuator: instance, props: {} });
         middware.update();
         this.$middware = middware;
     };
@@ -6122,7 +6162,7 @@ var createMiniFactory = function (type, instance, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.5.1";
+var version = "0.6.0";
 initVersionLogger('naruse-alipay', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 // naruse模块内容
@@ -6731,7 +6771,7 @@ var bindRenderEventOnComponent = function (miniComponent) {
         // 卸载已有组件
         miniComponent.$middware && miniComponent.$middware.onUnMount();
         // 重新加载组件
-        miniComponent.$middware = new Middware(miniComponent, Component, {});
+        miniComponent.$middware = new Middware(miniComponent, { actuator: Component, props: {} });
         miniComponent.$middware.update();
     });
 };
@@ -6788,7 +6828,7 @@ var initMainComponent = function () {
             logger.warn('无远程资源，不加载组件');
             return;
         }
-        _this.$middware = new Middware(_this, component, {});
+        _this.$middware = new Middware(_this, { actuator: component, props: {} });
         _this.$middware.update();
     })
         .catch(function (err) {
@@ -6799,13 +6839,11 @@ var initMainComponent = function () {
  * @description 初始化子虚拟组件
  * @author CHC
  * @date 2022-03-21 16:03:28
- * @param {*} component
  */
-var initSubComponent = function (args) {
-    if (args === void 0) { args = {}; }
-    var actuator = args.actuator, props = args.props;
+var initSubComponent = function () {
+    var actuator = allMiddware[this.props.parentMiddwareId].parseProps({ propHubKey: this.props.propHubKey }).actuator;
     if (actuator) {
-        this.$middware = new Middware(this, actuator, props || {});
+        this.$middware = new Middware(this, { propHubKey: this.props.propHubKey, parentMiddwareId: this.props.parentMiddwareId });
         this.$middware.update();
     }
 };
@@ -6825,7 +6863,7 @@ var createMainVmContext = function () {
  * @description 初始化组件
  */
 var createVmContext = function () {
-    (!this.isNaruseMainComponent ? initSubComponent : createMainVmContext).call(this, this.props.component);
+    (!this.isNaruseMainComponent ? initSubComponent : createMainVmContext).call(this);
 };
 /**
  * @description 创建naruse默认行为
@@ -6844,9 +6882,9 @@ var createMainBehavior = function (option) {
          */
         didMount: function () {
             var _this = this;
-            this.isNaruseMainComponent = isEmpty(this.props.component);
+            this.isNaruseMainComponent = isEmpty(this.props.propHubKey);
             if (this.isNaruseMainComponent) {
-                var _a = this.props || {}, _b = _a.unique, unique = _b === void 0 ? false : _b; _a.pagePath;
+                var _a = (this.props || {}).unique, unique = _a === void 0 ? false : _a;
                 if (unique) {
                     // 绑定重新渲染事件
                     bindRenderEventOnComponent(this);
@@ -6880,17 +6918,20 @@ var createMainBehavior = function (option) {
                 return;
             }
             // 子组件更新逻辑
-            if (!isEmpty(this.props.component)) {
-                var _a = prevProps.component, props = _a.props, actuator = _a.actuator;
+            if (this.props.propHubKey) {
+                // 从指定的 主组件下获取，
+                var _a = allMiddware[prevProps.parentMiddwareId].parseProps({ propHubKey: prevProps.propHubKey }), propsOld = _a.props, actuatorOld = _a.actuator;
+                var _b = allMiddware[this.props.parentMiddwareId].parseProps({ propHubKey: this.props.propHubKey }), props = _b.props, actuator = _b.actuator;
                 // FIX: 修复了当切换装载器后不会卸载组件重新渲染
                 // FIX: 修复了当key发生变化后组件不会重新渲染 0615
-                if (actuator === this.props.component.actuator && props.key === this.props.component.props.key) {
-                    this.$middware.props = this.props.component.props;
-                    this.$middware.canUpdate(props);
+                if (actuator === actuatorOld && props.key === propsOld.key) {
+                    this.$middware.props = props;
+                    this.$middware.canUpdate(propsOld);
                 }
                 else {
                     this.$middware.onUnMount();
-                    initSubComponent.call(this, this.props.component);
+                    // 更新 mainComponent。 $middware 会重建
+                    initSubComponent.call(this);
                 }
             }
         }, 
