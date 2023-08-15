@@ -1,6 +1,6 @@
 import { isNaruseComponent, functionalizae } from './component';
 import { isBaseTypeComponent, VNode } from './diff';
-
+import { currentRenderMiddawre } from './middware';
 
 /**
  * 所有 node 类型
@@ -84,7 +84,10 @@ const createClassElement = (type: any, props: any, childNodes: any) => {
     props = { ...props, children: childNodes };
     // 先不实例化对象，等待组件装载完成后再实例化
     const component = { actuator: type, props };
-    return { naruseType: VnodeType.NaruseComponent, component };
+    return {
+        naruseType: VnodeType.NaruseComponent, propHubKey: currentRenderMiddawre.current.saveProps(component),
+        parentMiddwareId: currentRenderMiddawre.current.$$uid,
+    };
 };
 
 /**
