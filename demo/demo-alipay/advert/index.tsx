@@ -9,6 +9,29 @@ export default class Qwer extends Component {
     }
 
     render() {
-        return <view>123</view>;
+        return <view
+        style={{
+            backgroundColor: 'red',
+            width: '100px',
+            height: '10000px',
+         }}>
+            {new Array(100).fill(1).map((item, index) => {
+                return <view
+                style={{
+                    backgroundColor: 'blue',
+                    width: '100px',
+                    height: '100px',
+                 }}
+                 onFirstAppear={() => {
+                    console.log('onFristAppear', index);
+                }}
+                onClick={() => {
+                    console.log('onClick', index);
+                }}
+                 >
+                    {index}
+                </view>;
+                })}
+        </view>;
     }
 }

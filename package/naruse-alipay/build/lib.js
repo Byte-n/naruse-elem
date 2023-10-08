@@ -5268,38 +5268,11 @@ var initVnodeTree = function (vnode, parentId) {
     }
     return newNode;
 };
-/**
- * 小程序事件映射表
- */
-var eventNameMap = {};
-var methodsTags = [
-    'tap',
-    'longTap',
-    'input',
-    'blur',
-    'focus',
-    'load',
-    'change',
-    'confirm',
-    'keyBoardHeightChange',
-    'scroll',
-    'scrollToUpper',
-    'scrollToLower',
-    'touchStart',
-    'touchMove',
-    'touchEnd',
-    'touchCancel',
-    'transitionEnd'
-];
 var methodTagTransformMap = {
     'tap': 'click',
     'longTap': 'longClick'
 };
 var transformFirstApha = function (item) { return 'on' + item.slice(0, 1).toLocaleUpperCase() + item.slice(1); };
-// 处理事件映射表
-methodsTags.forEach(function (tag) {
-    eventNameMap[tag] = transformFirstApha(methodTagTransformMap[tag] || tag);
-});
 /**
  * @description 事件处理中心
  * @author CHC
@@ -5322,7 +5295,7 @@ var eventCenter = function (event, nodeTree) {
         return;
     // 获取事件类型
     var type = event.type;
-    var reflectedEventName = eventNameMap[type];
+    var reflectedEventName = transformFirstApha(methodTagTransformMap[type] || type);
     // 不支持的事件
     if (!reflectedEventName) {
         logger.warn("".concat(type, "\u4E8B\u4EF6\u4E0D\u652F\u6301"));
@@ -6444,13 +6417,13 @@ var LoggerPlus = /** @class */ (function () {
             coverLoggerInfoToRequestParam(info);
         // 调用接口发送
         this._logNetworkInterface(this.encode(requestParams), this.encodeValue(requestParams), info);
-        log$1.debug('发生日志：', level, event, info);
+        log$1.debug('发送日志：', level, event, info);
     };
     /** 将obj转 get 请求的字符串，并进行 url 编码 */
     LoggerPlus.prototype.encode = function (obj) {
         var res = this.encodeValue(obj);
         return Object.keys(res)
-            .map(function (key) { return "".concat(key, "=").concat(obj[key]); })
+            .map(function (key) { return "".concat(key, "=").concat(res[key]); })
             .join('&');
     };
     /**
