@@ -13,7 +13,8 @@ export type NaruseConfig = {
 /** 热更新方法返回值 */
 export type HotPullerReturn = Promise<{
     code: string,
-    ctx: AdRunningContext | {}
+    ctx: AdRunningContext | {},
+    adProps?: Record<string, any>
 }>
 
 /** 广告代码运行时上下文环境对象 */

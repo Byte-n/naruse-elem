@@ -1,4 +1,4 @@
-import { Component, createElement } from 'react';
+import React, { Component, createElement } from 'react';
 import { logger } from '../utils/log';
 import Button from './button/index'
 import Checkbox from './checkbox/index';
@@ -46,6 +46,9 @@ const naruseCreateElement = (type: string, props: any, ...children: string[]) =>
     }
     if (typeof type === 'function') {
         props && (props.children = children);
+        if (React.useState) {
+            return createElement(type, props);
+        }
         return createElement(functionalizae(type), props);
     }
     logger.warn('不支持的组件类型', type);
