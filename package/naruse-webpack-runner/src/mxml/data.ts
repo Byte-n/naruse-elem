@@ -48,9 +48,9 @@ const view = {
     ],
     events: [
         ...baseElementEvents,
-        // 'onAppear',
-        // 'onDisappear',
-        // 'onFirstAppear',
+        'onAppear',
+        'onDisappear',
+        'onFirstAppear',
     ],
     nest: true,
 }

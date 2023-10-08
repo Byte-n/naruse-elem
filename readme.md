@@ -14,6 +14,22 @@ Naruse是一个在小程序内支持使用 **react** 开发，同时在小程序
 
 #  [详细文档](https://barrierml.github.io/naruse-doc)
 
+## 安装依赖
+
+```shell
+pnpm
+```
+
+## 快速体验
+```shell
+# 编译最新版本代码
+pnpm build
+# alipay
+pnpm demo:alipay
+# 修改 /demo/demo-alipay/advert/index.tsx 动态刷新效果
+# 使用淘宝或者支付宝开发者小程序打开 /demo/demo-alipay 即可
+```
+
 
 ## 开发相关
 
