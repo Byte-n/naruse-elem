@@ -196,14 +196,14 @@ export default class LoggerPlus {
             this.encodeValue(requestParams),
             info,
         );
-        log.debug('发生日志：', level, event, info);
+        log.debug('发送日志：', level, event, info);
     }
 
     /** 将obj转 get 请求的字符串，并进行 url 编码 */
     encode(obj) {
         const res = this.encodeValue(obj);
         return Object.keys(res)
-            .map(key => `${key}=${obj[key]}`)
+            .map(key => `${key}=${res[key]}`)
             .join('&');
     }
 
