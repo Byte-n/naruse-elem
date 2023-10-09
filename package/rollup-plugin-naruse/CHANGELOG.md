@@ -1,5 +1,15 @@
 # rollup-plugin-naruse
 
+## 0.6.1
+
+### Patch Changes
+
+- #FEAT: [alipay] 静态事件中心挂载修改为动态寻找
+- #FEAT: H5 支持业务 props 透传给广告、修复 Hooks 报错、日志发送错误
+- #FEAT: [h5] 支持 appear 相关 API
+- #FEAT: [alipay] view 支持 Appear 系列事件
+- #REFACT: [demo] 修改 @swc/helper 依赖项版本不正确导致的无法启动 demo 测试
+
 ## 0.6.0
 
 ### Minor Changes

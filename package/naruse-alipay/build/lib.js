@@ -6135,7 +6135,7 @@ var createMiniFactory = function (type, instance, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.6.0";
+var version = "0.6.1";
 initVersionLogger('naruse-alipay', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 // naruse模块内容
