@@ -106,7 +106,11 @@
         "dev:weex": "pnpm -r --filter naruse-weex run dev",
         "dev:h5": "pnpm -r --filter naruse-h5 run dev",
         "dev:alipay": "pnpm -r --filter naruse-alipay run dev",
-        "build:parser": "pnpm -r --filter naruse-parser run build"
+        "dev:parser": "pnpm -r --filter naruse-parser run start",
+        "build:parser": "pnpm -r --filter naruse-parser run build",
+        "build:weex": "pnpm -r --filter naruse-weex run build",
+        "build:h5": "pnpm -r --filter naruse-h5 run build",
+        "build:alipay": "pnpm -r --filter naruse-alipay run build"
     },
     "repository": {
         "type": "git",
