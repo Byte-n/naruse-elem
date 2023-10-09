@@ -103,44 +103,12 @@ export const initVnodeTree = function (vnode: any, parentId?: any) {
     return newNode;
 };
 
-/**
- * 小程序事件映射表
- */
-const eventNameMap: Record<string, string> = {};
-
-const methodsTags = [
-    'tap',
-    'longTap',
-    'input',
-    'blur',
-    'focus',
-    'load',
-    'change',
-    'confirm',
-    'keyBoardHeightChange',
-    'scroll',
-    'scrollToUpper',
-    'scrollToLower',
-    'touchStart',
-    'touchMove',
-    'touchEnd',
-    'touchCancel',
-    'transitionEnd'
-];
-
-
 const methodTagTransformMap: Record<string, string> = {
     'tap': 'click',
     'longTap': 'longClick'
 }
 
 const transformFirstApha = (item: string) => 'on' + item.slice(0, 1).toLocaleUpperCase() + item.slice(1)
-
-// 处理事件映射表
-methodsTags.forEach((tag) => {
-    eventNameMap[tag] = transformFirstApha(methodTagTransformMap[tag] || tag);
-});
-
 
 /**
  * @description 事件处理中心
@@ -162,7 +130,7 @@ export const eventCenter = function (event: { target?: any; currentTarget?: any,
     if (!eventNode) return;
     // 获取事件类型
     const { type } = event;
-    const reflectedEventName = eventNameMap[type];
+    const reflectedEventName = transformFirstApha(methodTagTransformMap[type] || type);
     // 不支持的事件
     if (!reflectedEventName) {
         logger.warn(`${type}事件不支持`);

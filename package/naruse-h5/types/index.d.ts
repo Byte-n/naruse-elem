@@ -441,4 +441,6 @@ declare module 'react' {
     export const Fragment: any = {};
     export const Component: any = Function;
     export const PureComponent: any = Function;
+    export const createElement: any = (type: any, props: any, ...children: any) => {};
+    export type TouchEvent<T> = any;
 }
