@@ -2,6 +2,7 @@ import View from './view/index';
 import Text from './text/index';
 import Image from './image/index';
 import { ScrollView, TextInput } from 'rax-components';
+import { Web } from 'rox-components';
 
 
 /** 组件映射表 */
@@ -11,4 +12,5 @@ export const componentReflectMap: Record<string, any> = {
     image: Image,
     'scroll-view': ScrollView,
     input: TextInput,
+    'web-view': Web,
 };

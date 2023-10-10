@@ -1,6 +1,7 @@
 import cssStyle from './index.css'
 import React from 'react'
 import { commonEventHander } from 'core/event';
+import { getPropsDataSet } from '../../utils';
 
 const h = React.createElement;
 
@@ -185,6 +186,7 @@ class ScrollView extends React.Component<IProps> {
             onTouchMove,
             animation,
             id,
+            ...other
         } = this.props;
         let { upperThreshold, lowerThreshold } = this.props;
         upperThreshold = upperThreshold ? Number(upperThreshold) : 0;
@@ -251,6 +253,7 @@ class ScrollView extends React.Component<IProps> {
                 onScroll={_onScroll}
                 onTouchMove={_onTouchMove}
                 onTransitionEnd={commonEventHander.bind(this)}
+                {...getPropsDataSet(other)}
             >
                 {this.props.children}
             </div>

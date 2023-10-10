@@ -4,7 +4,7 @@ import { getPropsDataSet, isNaruseAnimaitonName } from '../../utils';
 
 const h = React.createElement;
 
-class View extends Component<{
+class WebView extends Component<{
     disabled,
     hoverStartTime,
     hoverStayTime,
@@ -165,6 +165,7 @@ class View extends Component<{
             style,
             hoverStyle,
             id,
+            src,
             ...other
         } = this.props;
         const { hover } = this.state;
@@ -176,7 +177,7 @@ class View extends Component<{
 
 
         return (
-            <div
+            <iframe
                 id={id}
                 ref={ref => this.ref = ref}
                 onMouseEnter={this.onMouseEnter.bind(this)}
@@ -191,12 +192,18 @@ class View extends Component<{
                 className={className}
                 style={conStyle}
                 onClick={commonEventHander.bind(this)}
+                onBlur={commonEventHander.bind(this)}
+                onFocus={commonEventHander.bind(this)}
+                onLoad={commonEventHander.bind(this)}
+                onError={commonEventHander.bind(this)}
+                onMessage={commonEventHander.bind(this)}
+                src={src}
                 {...getPropsDataSet(other)}
             >
                 {this.props.children}
-            </div>
+            </iframe>
         );
     }
 }
 
-export default View;
+export default WebView;

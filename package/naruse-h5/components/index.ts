@@ -10,6 +10,7 @@ import ScrollView from './scroll-view/index'
 import Textarea from './textarea/index'
 import { getNaruseConfig } from "../core/init";
 import { functionalizae } from 'core/Component';
+import WebView from './web-view';
 
 /** 组件映射表 */
 const componentReflectMap = {
@@ -21,6 +22,7 @@ const componentReflectMap = {
     view: View,
     'scroll-view': ScrollView,
     textarea: Textarea,
+    'web-view': WebView,
 }
 
 /**
