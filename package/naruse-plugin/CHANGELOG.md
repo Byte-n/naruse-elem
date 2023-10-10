@@ -1,5 +1,12 @@
 # naruse-plugin
 
+## 1.2.2
+
+### Patch Changes
+
+- #FEAT: 引入 naruse-parser 子模块
+- #FEAT: 三端引入 web-view
+
 ## 1.2.1
 
 ### Patch Changes

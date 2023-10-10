@@ -13,3 +13,6 @@
 <template name="textarea">
     <textarea style="{{style}}" id="{{id}}" class="{{className}}" value="{{value}}" placeholder="{{placeholder}}" placeholder-style="{{placeholderStyle}}" placeholder-class="{{placeholderClass}}" disabled="{{disabled}}" maxlength="{{maxlength}}" auto-focus="{{autoFocus}}" focus="{{focus}}" auto-height="{{autoHeight}}" fixed="{{fixed}}" show-count="{{showCount}}" controlled="{{controlled}}" animation="{{animation}}" onInput="ec" onFocus="ec" onBlur="ec" onConfirm="ec"/>
 </template>
+<template name="web-view">
+    <web-view style="{{style}}" id="{{id}}" class="{{className}}" disable-scroll="{{disableScroll}}" hover-class="{{hoverClass}}" hover-start-time="{{hoverStartTime}}" hover-stay-time="{{hoverStayTime}}" animation="{{animation}}" hover-stop-propagation="{{hoverStopPropagation}}" hidden="{{hidden}}" src="{{src}}" catchTap="ec" catchLongTap="ec" catchTouchStart="ec" catchTouchMove="ec" catchTouchEnd="ec" catchTouchCancel="ec" catchTransitionEnd="ec" onAppear="ec" onDisappear="ec" onFirstAppear="ec" onMessage="ec" onLoad="ec" onError="ec"/>
+</template>
