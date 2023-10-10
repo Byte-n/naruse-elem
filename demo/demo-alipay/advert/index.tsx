@@ -15,7 +15,7 @@ export default class Qwer extends Component {
             width: '100px',
             height: '10000px',
          }}>
-            <web-view src='https://opendocs.alipay.com/mini/tool/h5?pathHash=37933357' ></web-view>
+            <web-view src='https://fuwu.taobao.com/ser/assembleParam.htm?spm=a1z13.2196529.0.0.1b1f519fmbgMhQ&tracelog=search&activityCode=&promIds=&subParams=itemCode:FW_GOODS-1827490-1,cycleNum:12,cycleUnit:2' ></web-view>
             {new Array(100).fill(1).map((item, index) => {
                 return <view
                 style={{
