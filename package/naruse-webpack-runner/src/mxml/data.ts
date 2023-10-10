@@ -55,6 +55,30 @@ const view = {
     nest: true,
 }
 
+const webView = {
+    templateName: 'web-view',
+    reflectTagName: 'web-view',
+    attributes: [
+        'disable-scroll',
+        'hover-class',
+        'hover-start-time',
+        'hover-stay-time',
+        'animation',
+        'hover-stop-propagation',
+        'hidden',
+        'src',
+    ],
+    events: [
+        ...baseElementEvents,
+        'onAppear',
+        'onDisappear',
+        'onFirstAppear',
+        'onMessage',
+        'onLoad',
+        'onError',
+    ],
+}
+
 const scrollView = {
     templateName: 'scroll-view',
     reflectTagName: 'scroll-view',
@@ -247,6 +271,7 @@ const templateList = [
     textarea,
     pureView,
     pureText,
+    webView,
 ]
 
 

@@ -1,6 +1,7 @@
 import { commonEventHander } from '../../core/event';
 import React, { Component } from 'react';
 import cssStyle from './index.css';
+import { getPropsDataSet } from '../../utils';
 
 const h = React.createElement;
 
@@ -19,7 +20,7 @@ class Button extends Component<
         hoverStyle,
         type,
         activeStyle,
-    }, 
+    },
     {
         hover: boolean,
         active: boolean,
@@ -116,7 +117,7 @@ class Button extends Component<
                 onTouchStart={this.onTouchStart.bind(this)}
                 onTouchEnd={this.onTouchEnd.bind(this)}
                 onTransitionEnd={commonEventHander.bind(this)}
-            // {...other}
+                {...getPropsDataSet(other)}
             >
                 {this.props.children}
             </button>

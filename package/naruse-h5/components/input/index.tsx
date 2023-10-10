@@ -1,5 +1,6 @@
 import { commonEventHander } from '../../core/event';
 import React, { Component } from 'react';
+import { getPropsDataSet } from '../../utils';
 
 const h = React.createElement;
 
@@ -115,7 +116,7 @@ class Input extends Component {
             className,
             value,
             controlled,
-            ...nativeProps
+            ...other
         } = this.props;
 
         const { _value } = this.state;
@@ -138,6 +139,7 @@ class Input extends Component {
                 onBlur={this.handleBlur.bind(this)}
                 onChange={this.handleChange.bind(this)}
                 onKeyDown={this.handleKeyDown.bind(this)}
+                {...getPropsDataSet(other)}
             />
         );
     }

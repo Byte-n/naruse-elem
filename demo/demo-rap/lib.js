@@ -1,6 +1,7 @@
 import RAP from 'rap-sdk';
 import { createElement, Component, useCallback, useContext, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState, createContext } from 'rax';
 import { Text, View, Image, ScrollView, TextInput } from 'rax-components';
+import { Web } from 'rox-components';
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -1066,6 +1067,7 @@ var componentReflectMap = {
     image: _Image,
     'scroll-view': ScrollView,
     input: TextInput,
+    'web-view': Web,
 };
 
 /**
@@ -5159,6 +5161,9 @@ var default_api = {
     JSON: JSON,
     Promise: Promise,
 };
+if (typeof Symbol !== 'undefined') {
+    default_api['Symbol'] = Symbol;
+}
 var Runner = /** @class */ (function () {
     function Runner() {
         this.source = '';

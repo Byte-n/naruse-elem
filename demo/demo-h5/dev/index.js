@@ -887,9 +887,24 @@ var Qwer = function(Component) {
             value: function render() {
                 return Naruse.createElement("view", {
                     style: {
+                        display: "flex",
+                        "flexDirection": "column"
+                    }
+                }, Naruse.createElement("view", {
+                    style: {
+                        height: "40vh"
+                    }
+                }, Naruse.createElement("web-view", {
+                    style: {
+                        height: "40vh",
+                        width: "50vw"
+                    },
+                    src: "https://opendocs.alipay.com/mini/tool/h5?pathHash=37933357"
+                })), Naruse.createElement("view", {
+                    style: {
                         backgroundColor: "red",
                         width: "100px",
-                        height: "10000px"
+                        height: "60vh"
                     }
                 }, new Array(100).fill(1).map(function(item, index) {
                     return Naruse.createElement("view", {
@@ -908,7 +923,7 @@ var Qwer = function(Component) {
                             console.log("onClick", index);
                         }
                     }, index);
-                }));
+                })));
             }
         }
     ]);
