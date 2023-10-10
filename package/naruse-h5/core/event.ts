@@ -101,16 +101,6 @@ const reflectEventMap = {
     touchstart (e) {
         return commonTouchEventCreater(e);
     },
-    message (e) {
-        return {
-            type: 'message',
-            detail: {
-                data: e.data,
-                origin: e.origin,
-                source: e.source,
-            }
-        };
-    }
 };
 
 /** 事件名称对应处理名称 */
@@ -127,7 +117,6 @@ const reflectEventNameMap = {
     touchstart:"onTouchStart",
     touchmove:"onTouchMove",
     touchend:"onTouchEnd",
-    message:"onMessage"
 };
 
 
