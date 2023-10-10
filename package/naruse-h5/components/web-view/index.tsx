@@ -23,6 +23,10 @@ class WebView extends Component<{
     hoverStyle,
     id,
     animation,
+    src,
+    onBlur,
+    onFocus,
+    onLoad,
 }, {
     hover: boolean,
 }> {
@@ -195,8 +199,6 @@ class WebView extends Component<{
                 onBlur={commonEventHander.bind(this)}
                 onFocus={commonEventHander.bind(this)}
                 onLoad={commonEventHander.bind(this)}
-                onError={commonEventHander.bind(this)}
-                onMessage={commonEventHander.bind(this)}
                 src={src}
                 {...getPropsDataSet(other)}
             >
