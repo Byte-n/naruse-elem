@@ -19,6 +19,12 @@ export default class Qwer extends Component {
     }
 
     render() {
-        return <view>123{this.state.name}</view>;
+        return <view>
+            123: {this.state.name}
+            <web-view
+                src='https://opendocs.alipay.com/mini/tool/h5?pathHash=37933357'
+                style={{ height: 200, width: 200 }}
+            ></web-view>
+        </view>;
     }
 }

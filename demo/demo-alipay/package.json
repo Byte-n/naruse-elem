@@ -1,12 +1,18 @@
 {
-  "name": "demo-alipay",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "pnpm concurrently --kill-others-on-fail \"node index.js\" \" node web.js \""
-  },
-  "author": "",
-  "license": "ISC"
+    "name": "demo-alipay",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "pnpm concurrently --kill-others-on-fail \"node index.js\" \" node web.js \""
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@vitejs/plugin-react": "^1.0.7",
+        "classnames": "^2.3.1",
+        "esbuild-wasm": "^0.19.4",
+        "vite": "^2.8.0"
+    }
 }

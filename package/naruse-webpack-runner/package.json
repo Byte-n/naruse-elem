@@ -1,10 +1,10 @@
 {
   "name": "naruse-webpack-runner",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "naruse-webpack-runner",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "echo ''",
     "dev": "tsc -w",
     "dev:demo": "node ./index.js"
   },

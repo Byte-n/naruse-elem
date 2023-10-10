@@ -1,4 +1,5 @@
 import React,{ Component } from 'react';
+import { getPropsDataSet } from '../../utils';
 
 const h = React.createElement;
 class Checkbox extends Component {
@@ -25,7 +26,7 @@ class Checkbox extends Component {
                 checked={checked}
                 disabled={disabled}
                 onChange={this.handleChange.bind(this)}
-                {...nativeProps}
+                {...getPropsDataSet(nativeProps)}
             />
         );
     }

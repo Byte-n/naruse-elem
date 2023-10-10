@@ -4474,6 +4474,9 @@ var default_api = {
     JSON: JSON,
     Promise: Promise,
 };
+if (typeof Symbol !== 'undefined') {
+    default_api['Symbol'] = Symbol;
+}
 var Runner = /** @class */ (function () {
     function Runner() {
         this.source = '';
@@ -6135,7 +6138,7 @@ var createMiniFactory = function (type, instance, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.6.1";
+var version = "0.6.2";
 initVersionLogger('naruse-alipay', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 // naruse模块内容

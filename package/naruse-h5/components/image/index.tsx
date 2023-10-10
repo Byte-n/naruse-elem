@@ -1,6 +1,7 @@
 import { commonEventHander } from '../../core/event';
 import React, { Component } from 'react';
 import cssStyle from './index.css'
+import { getPropsDataSet } from '../../utils';
 
 const h = React.createElement;
 
@@ -61,6 +62,7 @@ class Image extends Component<
             onError,
             imgProps,
             id,
+            ...other
         } = this.props;
         const divStyle = { ...cssStyle.naruseImg, ...(mode === 'widthFix' ? cssStyle.naruseImg__widthfix : {}) };
         const imgStyle = cssStyle[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
@@ -76,6 +78,7 @@ class Image extends Component<
                         onError={onError}
                         onTransitionEnd={commonEventHander.bind(this)}
                         {...imgProps}
+                        {...getPropsDataSet(other)}
                     />
                 }
             </div>

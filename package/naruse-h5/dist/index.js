@@ -493,6 +493,16 @@ var reflectEventMap = {
     },
     touchstart: function (e) {
         return commonTouchEventCreater(e);
+    },
+    message: function (e) {
+        return {
+            type: 'message',
+            detail: {
+                data: e.data,
+                origin: e.origin,
+                source: e.source,
+            }
+        };
     }
 };
 /** 事件名称对应处理名称 */
@@ -508,7 +518,8 @@ var reflectEventNameMap = {
     mouseup: 'onMouseUp',
     touchstart: "onTouchStart",
     touchmove: "onTouchMove",
-    touchend: "onTouchEnd"
+    touchend: "onTouchEnd",
+    message: "onMessage"
 };
 /**
  * @description 通用事件处理
@@ -580,7 +591,41 @@ var commonTouchEventCreater = function (event) {
 
 var cssStyle$4 = {"a-button":{"display":"block","outline":"0","WebkitAppearance":"none","boxSizing":"border-box","padding":"0","textAlign":"center","fontSize":"18px","height":"47px","lineHeight":"47px","borderRadius":"2px","overflow":"hidden","textOverflow":"ellipsis","wordBreak":"break-word","whiteSpace":"nowrap","color":"#000","backgroundColor":"#fff","border":"1px solid #eee"},"active":{"backgroundColor":"#ddd","color":"rgba(0,0,0,.3)"},"disabled":{"color":"rgba(0,0,0,.6)","backgroundColor":"rgba(255,255,255,.6)"}};
 
-var h$7 = React.createElement;
+/**
+ * 判断是否是 animation 名称
+ */
+var isNaruseAnimaitonName = function (name) { return name && name.substring(0, 19) === 'naruse-h5-poly-fill'; };
+/**
+ * 获取props中以 'data-' 开头的属性
+ * @param props
+ */
+var getPropsDataSet = function (props) { return Object.keys(props || {}).reduce(function (per, cur) {
+    if (cur.indexOf('data-') === 0) {
+        per[cur] = props[cur];
+    }
+    return per;
+}, {}); };
+/**
+ * 解析 字符串参数，类型： k=v&k=v&k=v&...
+ * 前面没有 ‘？’
+ * @param url
+ */
+function parseURLParam(url) {
+    if (url === void 0) { url = ''; }
+    if (!url) {
+        return {};
+    }
+    var split = url.split('&');
+    var res = {};
+    for (var _i = 0, split_1 = split; _i < split_1.length; _i++) {
+        var item = split_1[_i];
+        var kv = item.split('=');
+        res[kv[0]] = kv[1];
+    }
+    return res;
+}
+
+var h$8 = React.createElement;
 var Button = /** @class */ (function (_super) {
     __extends$1(Button, _super);
     function Button() {
@@ -641,15 +686,15 @@ var Button = /** @class */ (function (_super) {
         }, hoverStayTime);
     };
     Button.prototype.render = function () {
-        var _a = this.props, type = _a.type, disabled = _a.disabled, style = _a.style, className = _a.className, hoverStyle = _a.hoverStyle, activeStyle = _a.activeStyle; __rest(_a, ["type", "disabled", "style", "className", "hoverStyle", "activeStyle"]);
+        var _a = this.props, type = _a.type, disabled = _a.disabled, style = _a.style, className = _a.className, hoverStyle = _a.hoverStyle, activeStyle = _a.activeStyle, other = __rest(_a, ["type", "disabled", "style", "className", "hoverStyle", "activeStyle"]);
         var _b = this.state, hover = _b.hover, active = _b.active;
         var conStyle = __assign(__assign(__assign(__assign(__assign({}, cssStyle$4['a-button']), (type ? cssStyle$4[type] : {})), style), (hover ? hoverStyle : {})), (active ? __assign(__assign({}, cssStyle$4.active), activeStyle) : {}));
-        return (h$7("button", { onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), style: conStyle, disabled: disabled, className: className, onClick: commonEventHander.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this) }, this.props.children));
+        return (h$8("button", __assign({ onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), style: conStyle, disabled: disabled, className: className, onClick: commonEventHander.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
     };
     return Button;
 }(React.Component));
 
-var h$6 = React.createElement;
+var h$7 = React.createElement;
 var Checkbox = /** @class */ (function (_super) {
     __extends$1(Checkbox, _super);
     function Checkbox() {
@@ -663,20 +708,20 @@ var Checkbox = /** @class */ (function (_super) {
     Checkbox.prototype.render = function () {
         var _this = this;
         var _a = this.props, checked = _a.checked, name = _a.name, color = _a.color, value = _a.value, disabled = _a.disabled, nativeProps = __rest(_a, ["checked", "name", "color", "value", "disabled"]);
-        return (h$6("input", __assign({ ref: function (dom) {
+        return (h$7("input", __assign({ ref: function (dom) {
                 if (!dom)
                     return;
                 _this.inputEl = dom;
                 if (_this.id)
                     dom.setAttribute('id', _this.id);
-            }, type: 'checkbox', value: value, name: name, style: { color: color }, checked: checked, disabled: disabled, onChange: this.handleChange.bind(this) }, nativeProps)));
+            }, type: 'checkbox', value: value, name: name, style: { color: color }, checked: checked, disabled: disabled, onChange: this.handleChange.bind(this) }, getPropsDataSet(nativeProps))));
     };
     return Checkbox;
 }(React.Component));
 
 var cssStyle$3 = {"img-empty":{"opacity":"0"},"naruseImg":{"display":"inline-block","overflow":"hidden","position":"relative","fontSize":"0"},"naruseImg__widthfix":{"height":"100%"},"scaletofill":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfit":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfill":{"objectFit":"cover","width":"100%","height":"100%"},"widthfix":{"width":"100%"},"top":{"width":"100%"},"bottom":{"width":"100%","position":"absolute","bottom":"0"},"left":{"height":"100%"},"right":{"position":"absolute","height":"100%","right":"0"},"topright":{"position":"absolute","right":"0"},"bottomleft":{"position":"absolute","bottom":"0"},"bottomright":{"position":"absolute","right":"0","bottom":"0"}};
 
-var h$5 = React.createElement;
+var h$6 = React.createElement;
 var Image$1 = /** @class */ (function (_super) {
     __extends$1(Image, _super);
     function Image(props) {
@@ -708,15 +753,15 @@ var Image$1 = /** @class */ (function (_super) {
     };
     Image.prototype.render = function () {
         var _this = this;
-        var _a = this.props, className = _a.className, src = _a.src, _b = _a.style, style = _b === void 0 ? {} : _b, mode = _a.mode, onError = _a.onError, imgProps = _a.imgProps, id = _a.id;
+        var _a = this.props, className = _a.className, src = _a.src, _b = _a.style, style = _b === void 0 ? {} : _b, mode = _a.mode, onError = _a.onError, imgProps = _a.imgProps, id = _a.id, other = __rest(_a, ["className", "src", "style", "mode", "onError", "imgProps", "id"]);
         var divStyle = __assign(__assign({}, cssStyle$3.naruseImg), (mode === 'widthFix' ? cssStyle$3.naruseImg__widthfix : {}));
         var imgStyle = cssStyle$3[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
-        return (h$5("div", { onClick: commonEventHander.bind(this), className: className, style: __assign(__assign({}, divStyle), style) }, h$5("img", __assign({ ref: function (img) { return (_this.imgRef = img); }, id: id, style: imgStyle, src: src, onLoad: this.imageOnLoad, onError: onError, onTransitionEnd: commonEventHander.bind(this) }, imgProps))));
+        return (h$6("div", { onClick: commonEventHander.bind(this), className: className, style: __assign(__assign({}, divStyle), style) }, h$6("img", __assign({ ref: function (img) { return (_this.imgRef = img); }, id: id, style: imgStyle, src: src, onLoad: this.imageOnLoad, onError: onError, onTransitionEnd: commonEventHander.bind(this) }, imgProps, getPropsDataSet(other)))));
     };
     return Image;
 }(React.Component));
 
-var h$4 = React.createElement;
+var h$5 = React.createElement;
 /** 是否是支持的type */
 var getTrueType = function getTrueType(type, confirmType, password) {
     if (confirmType === 'search')
@@ -802,20 +847,20 @@ var Input = /** @class */ (function (_super) {
     };
     Input.prototype.render = function () {
         var _this = this;
-        var _a = this.props, type = _a.type, password = _a.password, placeholder = _a.placeholder, disabled = _a.disabled, maxlength = _a.maxlength, confirmType = _a.confirmType, name = _a.name, className = _a.className, value = _a.value, controlled = _a.controlled; __rest(_a, ["type", "password", "placeholder", "disabled", "maxlength", "confirmType", "name", "className", "value", "controlled"]);
+        var _a = this.props, type = _a.type, password = _a.password, placeholder = _a.placeholder, disabled = _a.disabled, maxlength = _a.maxlength, confirmType = _a.confirmType, name = _a.name, className = _a.className, value = _a.value, controlled = _a.controlled, other = __rest(_a, ["type", "password", "placeholder", "disabled", "maxlength", "confirmType", "name", "className", "value", "controlled"]);
         var _value = this.state._value;
-        return (h$4("input", { ref: function (input) {
+        return (h$5("input", __assign({ ref: function (input) {
                 _this.inputRef = input;
             }, className: className, 
             // 受控则只使用外部值，非受控优先使用外部值
-            value: fixControlledValue(controlled ? value : (value !== null && value !== void 0 ? value : _value)), type: getTrueType(type, confirmType, password), placeholder: placeholder, disabled: disabled, maxLength: maxlength, name: name, onInput: this.handleInput.bind(this), onFocus: this.handleFocus.bind(this), onBlur: this.handleBlur.bind(this), onChange: this.handleChange.bind(this), onKeyDown: this.handleKeyDown.bind(this) }));
+            value: fixControlledValue(controlled ? value : (value !== null && value !== void 0 ? value : _value)), type: getTrueType(type, confirmType, password), placeholder: placeholder, disabled: disabled, maxLength: maxlength, name: name, onInput: this.handleInput.bind(this), onFocus: this.handleFocus.bind(this), onBlur: this.handleBlur.bind(this), onChange: this.handleChange.bind(this), onKeyDown: this.handleKeyDown.bind(this) }, getPropsDataSet(other))));
     };
     return Input;
 }(React.Component));
 
 var cssStyle$2 = {"text":{"MozUserSelect":"none","WebkitUserSelect":"none","MsUserSelect":"none","userSelect":"none"},"textSelectable":{"MozUserSelect":"text","WebkitUserSelect":"text","MsUserSelect":"text","userSelect":"text"}};
 
-var h$3 = React.createElement;
+var h$4 = React.createElement;
 var Text = /** @class */ (function (_super) {
     __extends$1(Text, _super);
     function Text() {
@@ -852,49 +897,15 @@ var Text = /** @class */ (function (_super) {
         }, hoverStayTime);
     };
     Text.prototype.render = function () {
-        var _a = this.props, className = _a.className, id = _a.id, _b = _a.selectable, selectable = _b === void 0 ? false : _b, style = _a.style, hoverStyle = _a.hoverStyle; __rest(_a, ["className", "id", "selectable", "style", "hoverStyle"]);
+        var _a = this.props, className = _a.className, id = _a.id, _b = _a.selectable, selectable = _b === void 0 ? false : _b, style = _a.style, hoverStyle = _a.hoverStyle, other = __rest(_a, ["className", "id", "selectable", "style", "hoverStyle"]);
         var hover = this.state.hover;
         var cls = __assign(__assign(__assign(__assign({}, cssStyle$2.text), (selectable ? cssStyle$2.textSelectable : {})), style), (hover ? hoverStyle : {}));
-        return (h$3("span", { id: id, onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), style: cls, className: className, onClick: commonEventHander.bind(this) }, this.props.children));
+        return (h$4("span", __assign({ id: id, onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), style: cls, className: className, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
     };
     return Text;
 }(React.Component));
 
-/**
- * 判断是否是 animation 名称
- */
-var isNaruseAnimaitonName = function (name) { return name && name.substring(0, 19) === 'naruse-h5-poly-fill'; };
-/**
- * 获取props中以 'data-' 开头的属性
- * @param props
- */
-var getPropsDataSet = function (props) { return Object.keys(props || {}).reduce(function (per, cur) {
-    if (cur.indexOf('data-') === 0) {
-        per[cur] = props[cur];
-    }
-    return per;
-}, {}); };
-/**
- * 解析 字符串参数，类型： k=v&k=v&k=v&...
- * 前面没有 ‘？’
- * @param url
- */
-function parseURLParam(url) {
-    if (url === void 0) { url = ''; }
-    if (!url) {
-        return {};
-    }
-    var split = url.split('&');
-    var res = {};
-    for (var _i = 0, split_1 = split; _i < split_1.length; _i++) {
-        var item = split_1[_i];
-        var kv = item.split('=');
-        res[kv[0]] = kv[1];
-    }
-    return res;
-}
-
-var h$2 = React.createElement;
+var h$3 = React.createElement;
 var View = /** @class */ (function (_super) {
     __extends$1(View, _super);
     function View() {
@@ -1028,17 +1039,17 @@ var View = /** @class */ (function (_super) {
     };
     View.prototype.render = function () {
         var _this = this;
-        var _a = this.props, className = _a.className, style = _a.style, hoverStyle = _a.hoverStyle, id = _a.id; __rest(_a, ["className", "style", "hoverStyle", "id"]);
+        var _a = this.props, className = _a.className, style = _a.style, hoverStyle = _a.hoverStyle, id = _a.id, other = __rest(_a, ["className", "style", "hoverStyle", "id"]);
         var hover = this.state.hover;
         var conStyle = __assign(__assign({}, style), (hover ? hoverStyle : {}));
-        return (h$2("div", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, getPropsDataSet(this.props)), this.props.children));
+        return (h$3("div", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
     };
     return View;
 }(React.Component));
 
 var cssStyle$1 = {"scroll":{"WebkitOverflowScrolling":"auto"},"scroll::-webkit-scrollbar":{"display":"none"},"scroll-view":{"overflow":"hidden"}};
 
-var h$1 = React.createElement;
+var h$2 = React.createElement;
 function throttle(fn, threshold, scope) {
     if (threshold === void 0) { threshold = 250; }
     var lastTime = 0;
@@ -1199,7 +1210,7 @@ var ScrollView = /** @class */ (function (_super) {
     };
     ScrollView.prototype.render = function () {
         var _this = this;
-        var _a = this.props, className = _a.className, _b = _a.style, style = _b === void 0 ? {} : _b, scrollX = _a.scrollX, scrollY = _a.scrollY, onScroll = _a.onScroll, onScrollToUpper = _a.onScrollToUpper, onScrollToLower = _a.onScrollToLower, onTouchMove = _a.onTouchMove, animation = _a.animation, id = _a.id;
+        var _a = this.props, className = _a.className, _b = _a.style, style = _b === void 0 ? {} : _b, scrollX = _a.scrollX, scrollY = _a.scrollY, onScroll = _a.onScroll, onScrollToUpper = _a.onScrollToUpper, onScrollToLower = _a.onScrollToLower, onTouchMove = _a.onTouchMove, animation = _a.animation, id = _a.id, other = __rest(_a, ["className", "style", "scrollX", "scrollY", "onScroll", "onScrollToUpper", "onScrollToLower", "onTouchMove", "animation", "id"]);
         var _c = this.props, upperThreshold = _c.upperThreshold, lowerThreshold = _c.lowerThreshold;
         upperThreshold = upperThreshold ? Number(upperThreshold) : 0;
         lowerThreshold = lowerThreshold ? Number(lowerThreshold) : 0;
@@ -1249,9 +1260,9 @@ var ScrollView = /** @class */ (function (_super) {
         var _onTouchMove = function (e) {
             onTouchMove ? onTouchMove(e) : _this.onTouchMove(e);
         };
-        return (h$1("div", { id: id, "data-animation": animation, className: "".concat(className, " _scrollView"), ref: function (container) {
+        return (h$2("div", __assign({ id: id, "data-animation": animation, className: "".concat(className, " _scrollView"), ref: function (container) {
                 _this.container = container;
-            }, style: __assign(__assign(__assign({}, cssStyle$1.scroll), style), scrollWhere), onScroll: _onScroll, onTouchMove: _onTouchMove, onTransitionEnd: commonEventHander.bind(this) }, this.props.children));
+            }, style: __assign(__assign(__assign({}, cssStyle$1.scroll), style), scrollWhere), onScroll: _onScroll, onTouchMove: _onTouchMove, onTransitionEnd: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
     };
     return ScrollView;
 }(React.Component));
@@ -1265,7 +1276,7 @@ ScrollView.defaultProps = {
 
 var cssStyle = {"taroTextarea":{"display":"block","appearance":"none","cursor":"auto","lineHeight":"1.5","resize":"none","outline":"none"}};
 
-var h = React.createElement;
+var h$1 = React.createElement;
 var scrollBar = document.createElement('style');
 scrollBar.type = 'text/css';
 scrollBar.id = '_theOnlytextarea';
@@ -1345,7 +1356,7 @@ var Textarea = /** @class */ (function (_super) {
     };
     Textarea.prototype.render = function () {
         var _this = this;
-        var _a = this.props, style = _a.style, placeholder = _a.placeholder, disabled = _a.disabled, maxLength = _a.maxLength, autoFocus = _a.autoFocus, autoHeight = _a.autoHeight, name = _a.name, nativeProps = _a.nativeProps, onInput = _a.onInput, onFocus = _a.onFocus, onBlur = _a.onBlur, onConfirm = _a.onConfirm;
+        var _a = this.props, style = _a.style, placeholder = _a.placeholder, disabled = _a.disabled, maxLength = _a.maxLength, autoFocus = _a.autoFocus, autoHeight = _a.autoHeight, name = _a.name, nativeProps = _a.nativeProps, onInput = _a.onInput, onFocus = _a.onFocus, onBlur = _a.onBlur, onConfirm = _a.onConfirm, other = __rest(_a, ["style", "placeholder", "disabled", "maxLength", "autoFocus", "autoHeight", "name", "nativeProps", "onInput", "onFocus", "onBlur", "onConfirm"]);
         var otherProps = {};
         if (autoHeight) {
             otherProps.rows = this.line;
@@ -1395,11 +1406,11 @@ var Textarea = /** @class */ (function (_super) {
                 onConfirm && onConfirm(event_1);
             }
         };
-        return (h("textarea", __assign({ ref: function (input) {
+        return (h$1("textarea", __assign({ ref: function (input) {
                 if (input) {
                     _this.textareaRef = input;
                 }
-            }, style: __assign(__assign({}, style), cssStyle.taroTextarea), className: 'taroTextareaCore', placeholder: placeholder, name: name, disabled: !!disabled, maxLength: maxLength, autoFocus: autoFocus, onInput: _onInput, onFocus: _onFocus, onBlur: _onBlur, onKeyUp: _onConfirm }, nativeProps, otherProps)));
+            }, style: __assign(__assign({}, style), cssStyle.taroTextarea), className: 'taroTextareaCore', placeholder: placeholder, name: name, disabled: !!disabled, maxLength: maxLength, autoFocus: autoFocus, onInput: _onInput, onFocus: _onFocus, onBlur: _onBlur, onKeyUp: _onConfirm }, getPropsDataSet(other), nativeProps, otherProps)));
     };
     return Textarea;
 }(React.Component));
@@ -2005,6 +2016,148 @@ var functionalizae = function (fn) {
     }(React.Component));
 };
 
+var h = React.createElement;
+var WebView = /** @class */ (function (_super) {
+    __extends$1(WebView, _super);
+    function WebView() {
+        var _this = _super.call(this) || this;
+        _this.mounted = false;
+        _this.touch = false;
+        _this.hasFirstAppear = false;
+        _this.state = {
+            hover: false
+        };
+        return _this;
+    }
+    WebView.prototype.componentDidMount = function () {
+        this.mounted = true;
+        // 等待装载完毕后再启动animation
+        this.updateAnimation();
+        this.updateAppear();
+    };
+    WebView.prototype.componentDidUpdate = function () {
+        this.updateAnimation();
+        this.updateAppear();
+    };
+    WebView.prototype.updateAnimation = function () {
+        var _this = this;
+        var animation = this.props.animation;
+        if (animation !== this.lastAnimationName && isNaruseAnimaitonName(animation)) {
+            // 等待组件彻底装载完毕后再启动animation，否则会出现动画不生效的情况
+            clearTimeout(this.animationTimer);
+            this.animationTimer = setTimeout(function () { var _a; return (_a = _this.ref) === null || _a === void 0 ? void 0 : _a.setAttribute('data-animation', animation); });
+            this.lastAnimationName = animation;
+        }
+    };
+    WebView.prototype.updateAppear = function () {
+        var _a = this.props, onAppear = _a.onAppear, onDisappear = _a.onDisappear, onFirstAppear = _a.onFirstAppear;
+        var hasAppear = onAppear || onDisappear || onFirstAppear;
+        if (hasAppear && this.ref) {
+            var isOnlyFirst = onFirstAppear && !onAppear && !onDisappear;
+            if (isOnlyFirst && this.hasFirstAppear)
+                return;
+            // 开始观察
+            this.startObserver(isOnlyFirst);
+        }
+    };
+    WebView.prototype.startObserver = function (isOnlyFirst) {
+        var _this = this;
+        if (this.observer)
+            return;
+        if (window.IntersectionObserver === undefined) {
+            console.warn('IntersectionObserver is not supported in this browser, please use polyfill.');
+            return;
+        }
+        this.observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                var _a;
+                if (entry.intersectionRatio >= 0.5) {
+                    _this.props.onAppear && _this.props.onAppear();
+                    if (_this.props.onFirstAppear) {
+                        if (_this.hasFirstAppear)
+                            return;
+                        _this.props.onFirstAppear();
+                    }
+                    if (isOnlyFirst) {
+                        (_a = _this.observer) === null || _a === void 0 ? void 0 : _a.disconnect();
+                        _this.observer = undefined;
+                    }
+                    _this.hasFirstAppear = true;
+                }
+                else {
+                    // 没有展示过的不会触发消失事件
+                    if (!_this.hasFirstAppear)
+                        return;
+                    _this.props.onDisappear && _this.props.onDisappear();
+                }
+            });
+        }, {
+            threshold: [0.5]
+        });
+        this.observer.observe(this.ref);
+    };
+    WebView.prototype.componentWillUnmount = function () {
+        var _a, _b;
+        this.mounted = false;
+        // 清除动画
+        clearTimeout(this.hoverTimer);
+        clearTimeout(this.animationTimer);
+        // 清除观察
+        (_b = (_a = this.observer) === null || _a === void 0 ? void 0 : _a.disconnect) === null || _b === void 0 ? void 0 : _b.call(_a);
+        this.observer = undefined;
+    };
+    /** 当开始点击时 */
+    WebView.prototype.onTouchStart = function (event) {
+        var _this = this;
+        var _a = this.props, disabled = _a.disabled, _b = _a.hoverStartTime, hoverStartTime = _b === void 0 ? 20 : _b, onTouchStart = _a.onTouchStart;
+        if (disabled || !this.mounted)
+            return;
+        this.touch = true;
+        clearTimeout(this.hoverTimer);
+        this.hoverTimer = setTimeout(function () {
+            _this.setState({ hover: true });
+        }, hoverStartTime);
+        event && onTouchStart && onTouchStart(commonTouchEventCreater(event));
+    };
+    /** 点击结束时 */
+    WebView.prototype.onTouchEnd = function (event) {
+        var _this = this;
+        var _a = this.props, disabled = _a.disabled, _b = _a.hoverStayTime, hoverStayTime = _b === void 0 ? 70 : _b, onTouchEnd = _a.onTouchEnd;
+        if (disabled || !this.mounted)
+            return;
+        this.touch = false;
+        clearTimeout(this.hoverTimer);
+        this.hoverTimer = setTimeout(function () {
+            if (!_this.touch) {
+                _this.setState({ hover: false });
+            }
+        }, hoverStayTime);
+        event && onTouchEnd && onTouchEnd(commonTouchEventCreater(event));
+    };
+    WebView.prototype.onMouseEnter = function (event) {
+        var onMouseEnter = this.props.onMouseEnter;
+        onMouseEnter && onMouseEnter(commonMouseEventCreater(event));
+        this.onTouchStart();
+    };
+    WebView.prototype.onMouseMove = function (event) {
+        var onMouseMove = this.props.onMouseMove;
+        onMouseMove && onMouseMove(commonMouseEventCreater(event));
+    };
+    WebView.prototype.onMouseLeave = function (event) {
+        var onMouseLeave = this.props.onMouseLeave;
+        onMouseLeave && onMouseLeave(commonMouseEventCreater(event));
+        this.onTouchEnd();
+    };
+    WebView.prototype.render = function () {
+        var _this = this;
+        var _a = this.props, className = _a.className, style = _a.style, hoverStyle = _a.hoverStyle, id = _a.id, src = _a.src, other = __rest(_a, ["className", "style", "hoverStyle", "id", "src"]);
+        var hover = this.state.hover;
+        var conStyle = __assign(__assign({}, style), (hover ? hoverStyle : {}));
+        return (h("iframe", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this), onBlur: commonEventHander.bind(this), onFocus: commonEventHander.bind(this), onLoad: commonEventHander.bind(this), onError: commonEventHander.bind(this), onMessage: commonEventHander.bind(this), src: src }, getPropsDataSet(other)), this.props.children));
+    };
+    return WebView;
+}(React.Component));
+
 /** 组件映射表 */
 var componentReflectMap = {
     button: Button,
@@ -2015,6 +2168,7 @@ var componentReflectMap = {
     view: View,
     'scroll-view': ScrollView,
     textarea: Textarea,
+    'web-view': WebView,
 };
 /**
  * @description 拦截下来的react.createElement
@@ -6139,6 +6293,9 @@ var default_api = {
     JSON: JSON,
     Promise: Promise,
 };
+if (typeof Symbol !== 'undefined') {
+    default_api['Symbol'] = Symbol;
+}
 var Runner = /** @class */ (function () {
     function Runner() {
         this.source = '';
@@ -8137,7 +8294,7 @@ var Container = /** @class */ (function (_super) {
 }(React.Component));
 
 // @ts-ignore
-var version = "0.6.1";
+var version = "0.6.2";
 initVersionLogger('naruse-h5', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {

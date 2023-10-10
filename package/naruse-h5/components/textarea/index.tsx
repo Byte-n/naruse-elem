@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import cssStyle from './index.css';
 import React from 'react';
+import { getPropsDataSet } from '../../utils';
 
 const h = React.createElement;
 
@@ -88,7 +89,7 @@ export default class Textarea extends React.Component<IProps> {
             scrollHeight = parseFloat(cta.height),
             overflow = ta.style.overflow,
             originMinHeight = ta.style.minHeight || null;
-        
+
         // scrollHeight -= paddingAll;
 
         /// only bother if the ta is bigger than content
@@ -135,7 +136,8 @@ export default class Textarea extends React.Component<IProps> {
             onInput,
             onFocus,
             onBlur,
-            onConfirm
+            onConfirm,
+            ...other
         } = this.props;
 
         const otherProps: {
@@ -213,6 +215,7 @@ export default class Textarea extends React.Component<IProps> {
                 onFocus={_onFocus}
                 onBlur={_onBlur}
                 onKeyUp={_onConfirm}
+                {...getPropsDataSet(other)}
                 {...nativeProps}
                 {...otherProps}
             />

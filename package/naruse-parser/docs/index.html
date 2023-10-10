@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>naruse-parser</title>
+</head>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    border-color: #746d62;
+}
+html, body, input, textarea, select, button, dialog {
+    background-color: #191a1a;
+    color: #efebe3;
+}
+.maxWidth {
+    max-width: 95%;
+}
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    flex-direction: column;
+}
+
+.bigTextArea {
+    width: 500px;
+    height: 300px;
+    font-size: 20px;
+    padding: 10px;
+    margin: 5px;
+    color: #fff;
+}
+.blueBtn {
+    width: 100px;
+    height: 50px;
+    background-color: rgb(0, 123, 255);
+    font-size: 20px;
+    border: none;
+    border-radius: 5px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+.resultDiv {
+    width: 500px;
+    height: 200px;
+    font-size: 20px;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #efebe3;
+}
+
+.errorResultDiv {
+    width: 500px;
+    height: 200px;
+    font-size: 20px;
+    padding: 10px;
+    margin-top: 10px;
+    color: rgb(245, 55, 55);
+    border: 1px solid #efebe3;
+}
+</style>
+
+<body>
+    <div class="center" id="app">
+        <h3>代码输入框</h3>
+        <textarea class="bigTextArea maxWidth" @input="updateMessage" :value="message" placeholder="请输入要执行的代码"></textarea>
+        <button class="blueBtn" @click="execute">执行</button>
+        <textarea class="resultDiv maxWidth">{{ result }}</textarea>
+        <textarea class="errorResultDiv maxWidth">{{ errorResult }}</textarea>
+    </div>
+</body>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="./naruse-parser.js"> </script>
+<script>
+
+const baseCode =
+`// print 
+console.log("hello world"); 
+// deconstruct 
+const { q, w } = { q: 1, w: 2 }; console.log(q, w);
+// async error collect
+Promise.resolve().then(() => {
+    throw new Error('this is a error');
+})
+// variable lift
+console.log(typeof a);
+var a = 1;
+// function lift
+console.log(b);
+function b() {
+    console.log('b');
+}
+`
+
+
+    const {
+        createApp
+    } = Vue
+    createApp({
+        data() {
+            return {
+                message: baseCode,
+                result: '输出结果会显示在这里，打开控制台查看更多信息',
+                errorResult: '全局错误中心收集到的同步或异步错误信息会展示在这里',
+            }
+        },
+        created() {
+            const oldLog  = console.log;
+            console.log = (...msg) => {
+                oldLog(...msg);
+                this.result += '\n' + String(msg);
+            }
+        },
+        methods: {
+            updateMessage(e) {
+                this.message = e.target.value
+            },
+            execute() {
+                naruseParser.run(this.message, {}, this.errorCenter.bind(this));
+            },
+            errorCenter (err) {
+                this.errorResult += '\n' + err;
+            }
+        }
+    }).mount('#app')
+</script>
+</html>
