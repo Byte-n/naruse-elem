@@ -191,7 +191,7 @@ class View extends Component<{
                 className={className}
                 style={conStyle}
                 onClick={commonEventHander.bind(this)}
-                {...getPropsDataSet(this.props)}
+                {...getPropsDataSet(other)}
             >
                 {this.props.children}
             </div>

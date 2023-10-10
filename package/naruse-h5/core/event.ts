@@ -100,6 +100,16 @@ const reflectEventMap = {
     },
     touchstart (e) {
         return commonTouchEventCreater(e);
+    },
+    message (e) {
+        return {
+            type: 'message',
+            detail: {
+                data: e.data,
+                origin: e.origin,
+                source: e.source,
+            }
+        };
     }
 };
 
@@ -116,7 +126,8 @@ const reflectEventNameMap = {
     mouseup: 'onMouseUp',
     touchstart:"onTouchStart",
     touchmove:"onTouchMove",
-    touchend:"onTouchEnd"
+    touchend:"onTouchEnd",
+    message:"onMessage"
 };
 
 

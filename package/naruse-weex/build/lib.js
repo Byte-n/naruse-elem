@@ -1,6 +1,7 @@
 import RAP from 'rap-sdk';
 import { createElement, Component, useCallback, useContext, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState, createContext } from 'rax';
 import { Text, View, Image, ScrollView, TextInput } from 'rax-components';
+import { Web } from 'rox-components';
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -1066,6 +1067,7 @@ var componentReflectMap = {
     image: _Image,
     'scroll-view': ScrollView,
     input: TextInput,
+    'web-view': Web,
 };
 
 /**
@@ -5159,6 +5161,9 @@ var default_api = {
     JSON: JSON,
     Promise: Promise,
 };
+if (typeof Symbol !== 'undefined') {
+    default_api['Symbol'] = Symbol;
+}
 var Runner = /** @class */ (function () {
     function Runner() {
         this.source = '';
@@ -6041,7 +6046,7 @@ var Container = /** @class */ (function (_super) {
 }(Component));
 
 // @ts-ignore
-var version = "0.6.1";
+var version = "0.6.2";
 initVersionLogger('naruse-weex', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 var Naruse = __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({}, Hooks), { Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, runCodeWithNaruse: runCodeWithNaruse, globalEvent: globalEvent, withPage: function (Component) { return Component; } }), Storage), Route), Device), System), UI), { getImageInfo: temporarilyNotSupport('getImageInfo'), createAnimation: temporarilyNotSupport('createAnimation') }), elementApi);

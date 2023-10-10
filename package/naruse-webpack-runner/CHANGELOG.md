@@ -1,5 +1,12 @@
 # naruse-webpack-runner
 
+## 0.6.2
+
+### Patch Changes
+
+- #FEAT: 引入 naruse-parser 子模块
+- #FEAT: 三端引入 web-view
+
 ## 0.6.1
 
 ### Patch Changes
