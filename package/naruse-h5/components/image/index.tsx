@@ -24,13 +24,13 @@ class Image extends Component<
 }
 > {
     observer: any;
-    imgRef: HTMLImageElement | null;
+    ref: HTMLImageElement | null;
     constructor(props) {
         super(props);
         this.state = { isLoaded: false };
         this.imageOnLoad = this.imageOnLoad.bind(this);
         this.observer = {};
-        this.imgRef = null;
+        this.ref = null;
     }
     componentDidMount () {
         if (this.props.lazyLoad) {
@@ -38,11 +38,11 @@ class Image extends Component<
                 // 异步 api 关系
                 if (entries[entries.length - 1].isIntersecting) {
                     this.setState({ isLoaded: true }, () => {
-                        this.imgRef && (this.imgRef.src = this.props.src);
+                        this.ref && (this.ref.src = this.props.src);
                     });
                 }
             }, { rootMargin: '300px 0px' });
-            this.observer.observe(this.imgRef);
+            this.observer.observe(this.ref);
         }
     }
 
@@ -70,7 +70,7 @@ class Image extends Component<
             <div onClick={commonEventHander.bind(this)} className={className} style={{ ...divStyle, ...style }}>
                 {
                     <img
-                        ref={img => (this.imgRef = img)}
+                        ref={img => (this.ref = img)}
                         id={id}
                         style={imgStyle}
                         src={src}

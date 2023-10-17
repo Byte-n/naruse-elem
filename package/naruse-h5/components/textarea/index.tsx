@@ -47,7 +47,7 @@ if (!document.getElementById('_theOnlytextarea')) {
 }
 
 export default class Textarea extends React.Component<IProps> {
-    textareaRef: any = null;
+    ref: any = null;
     el: any = null;
     value: any = '';
     line: any = 1;
@@ -56,7 +56,7 @@ export default class Textarea extends React.Component<IProps> {
     componentDidMount() {
         const { value = '' } = this.props;
         if (value != '') {
-            this.textareaRef.value = value;
+            this.ref.value = value;
         }
     }
 
@@ -64,12 +64,12 @@ export default class Textarea extends React.Component<IProps> {
         const line = this.getNumberOfLines()
         if (line !== this.line) {
             this.line = line;
-            this.textareaRef.rows = line
+            this.ref.rows = line
         }
     }
 
     getNumberOfLines = () => {
-        const ta = this.textareaRef,
+        const ta = this.ref,
             style = window.getComputedStyle ? window.getComputedStyle(ta) : ta.style,
             // This will get the line-height only if it is set in the css,
             // otherwise it's "normal"
@@ -150,7 +150,7 @@ export default class Textarea extends React.Component<IProps> {
         }
 
         const _onInput = (e) => {
-            const { value } = this.textareaRef;
+            const { value } = this.ref;
             const event = {
                 type: 'input', detail: {
                     value,
@@ -162,7 +162,7 @@ export default class Textarea extends React.Component<IProps> {
         }
 
         const _onFocus = (e) => {
-            const { value } = this.textareaRef;
+            const { value } = this.ref;
             const event = {
                 type: 'focus', detail: {
                     value,
@@ -173,7 +173,7 @@ export default class Textarea extends React.Component<IProps> {
         }
 
         const _onBlur = (e) => {
-            const { value } = this.textareaRef;
+            const { value } = this.ref;
             const event = {
                 type: 'blur', detail: {
                     value,
@@ -185,7 +185,7 @@ export default class Textarea extends React.Component<IProps> {
 
         const _onConfirm = (e) => {
             if (e.keyCode === 13) {
-                const { value } = this.textareaRef;
+                const { value } = this.ref;
                 const event = {
                     type: 'confirm', detail: {
                         value,
@@ -201,7 +201,7 @@ export default class Textarea extends React.Component<IProps> {
             <textarea
                 ref={input => {
                     if (input) {
-                        this.textareaRef = input
+                        this.ref = input
                     }
                 }}
                 style={{ ...style, ...cssStyle.taroTextarea }}

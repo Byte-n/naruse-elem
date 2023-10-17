@@ -6,7 +6,7 @@ import { getPropsDataSet } from '../../utils';
 const h = React.createElement;
 
 class Text extends Component<{ disabled: any; hoverStartTime?: 20 | undefined; }> {
-
+    ref: HTMLSpanElement | null;
     state = {
         hover: false
     }
@@ -50,6 +50,7 @@ class Text extends Component<{ disabled: any; hoverStartTime?: 20 | undefined; }
         return (
             <span
                 id={id}
+                ref={ref => this.ref = ref}
                 onMouseEnter={this.onTouchStart.bind(this)}
                 onMouseLeave={this.onTouchEnd.bind(this)}
                 onTouchStart={this.onTouchStart.bind(this)}
