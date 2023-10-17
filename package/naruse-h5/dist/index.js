@@ -494,16 +494,6 @@ var reflectEventMap = {
     touchstart: function (e) {
         return commonTouchEventCreater(e);
     },
-    message: function (e) {
-        return {
-            type: 'message',
-            detail: {
-                data: e.data,
-                origin: e.origin,
-                source: e.source,
-            }
-        };
-    }
 };
 /** 事件名称对应处理名称 */
 var reflectEventNameMap = {
@@ -519,7 +509,6 @@ var reflectEventNameMap = {
     touchstart: "onTouchStart",
     touchmove: "onTouchMove",
     touchend: "onTouchEnd",
-    message: "onMessage"
 };
 /**
  * @description 通用事件处理
@@ -731,7 +720,7 @@ var Image$1 = /** @class */ (function (_super) {
         _this.state = { isLoaded: false };
         _this.imageOnLoad = _this.imageOnLoad.bind(_this);
         _this.observer = {};
-        _this.imgRef = null;
+        _this.ref = null;
         return _this;
     }
     Image.prototype.componentDidMount = function () {
@@ -741,11 +730,11 @@ var Image$1 = /** @class */ (function (_super) {
                 // 异步 api 关系
                 if (entries[entries.length - 1].isIntersecting) {
                     _this.setState({ isLoaded: true }, function () {
-                        _this.imgRef && (_this.imgRef.src = _this.props.src);
+                        _this.ref && (_this.ref.src = _this.props.src);
                     });
                 }
             }, { rootMargin: '300px 0px' });
-            this.observer.observe(this.imgRef);
+            this.observer.observe(this.ref);
         }
     };
     Image.prototype.componentWillUnmount = function () {
@@ -756,7 +745,7 @@ var Image$1 = /** @class */ (function (_super) {
         var _a = this.props, className = _a.className, src = _a.src, _b = _a.style, style = _b === void 0 ? {} : _b, mode = _a.mode, onError = _a.onError, imgProps = _a.imgProps, id = _a.id, other = __rest(_a, ["className", "src", "style", "mode", "onError", "imgProps", "id"]);
         var divStyle = __assign(__assign({}, cssStyle$3.naruseImg), (mode === 'widthFix' ? cssStyle$3.naruseImg__widthfix : {}));
         var imgStyle = cssStyle$3[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
-        return (h$6("div", { onClick: commonEventHander.bind(this), className: className, style: __assign(__assign({}, divStyle), style) }, h$6("img", __assign({ ref: function (img) { return (_this.imgRef = img); }, id: id, style: imgStyle, src: src, onLoad: this.imageOnLoad, onError: onError, onTransitionEnd: commonEventHander.bind(this) }, imgProps, getPropsDataSet(other)))));
+        return (h$6("div", { onClick: commonEventHander.bind(this), className: className, style: __assign(__assign({}, divStyle), style) }, h$6("img", __assign({ ref: function (img) { return (_this.ref = img); }, id: id, style: imgStyle, src: src, onLoad: this.imageOnLoad, onError: onError, onTransitionEnd: commonEventHander.bind(this) }, imgProps, getPropsDataSet(other)))));
     };
     return Image;
 }(React.Component));
@@ -799,7 +788,7 @@ var Input = /** @class */ (function (_super) {
             commonEventHander.call(_this, e);
             keyCode === 13 && _this.props.onConfirm && _this.props.onConfirm({ value: value });
         };
-        _this.inputRef = null;
+        _this.ref = null;
         _this.isOnComposition = false;
         _this.onInputExcuted = false;
         _this.el = {};
@@ -813,10 +802,10 @@ var Input = /** @class */ (function (_super) {
             this.fileListener = function (e) {
                 _this.props.onInput && _this.props.onInput(e);
             };
-            (_a = this.inputRef) === null || _a === void 0 ? void 0 : _a.addEventListener('change', this.fileListener);
+            (_a = this.ref) === null || _a === void 0 ? void 0 : _a.addEventListener('change', this.fileListener);
         }
         Object.defineProperty(this.el, 'value', {
-            get: function () { var _a; return (_a = _this.inputRef) === null || _a === void 0 ? void 0 : _a.value; },
+            get: function () { var _a; return (_a = _this.ref) === null || _a === void 0 ? void 0 : _a.value; },
             set: function (value) {
                 _this.setState({
                     _value: value,
@@ -824,7 +813,7 @@ var Input = /** @class */ (function (_super) {
             },
             configurable: true,
         });
-        setTimeout(function () { var _a; return _this.props.focus && ((_a = _this.inputRef) === null || _a === void 0 ? void 0 : _a.focus()); });
+        setTimeout(function () { var _a; return _this.props.focus && ((_a = _this.ref) === null || _a === void 0 ? void 0 : _a.focus()); });
     };
     /** 输入 */
     Input.prototype.handleInput = function (e) {
@@ -850,7 +839,7 @@ var Input = /** @class */ (function (_super) {
         var _a = this.props, type = _a.type, password = _a.password, placeholder = _a.placeholder, disabled = _a.disabled, maxlength = _a.maxlength, confirmType = _a.confirmType, name = _a.name, className = _a.className, value = _a.value, controlled = _a.controlled, other = __rest(_a, ["type", "password", "placeholder", "disabled", "maxlength", "confirmType", "name", "className", "value", "controlled"]);
         var _value = this.state._value;
         return (h$5("input", __assign({ ref: function (input) {
-                _this.inputRef = input;
+                _this.ref = input;
             }, className: className, 
             // 受控则只使用外部值，非受控优先使用外部值
             value: fixControlledValue(controlled ? value : (value !== null && value !== void 0 ? value : _value)), type: getTrueType(type, confirmType, password), placeholder: placeholder, disabled: disabled, maxLength: maxlength, name: name, onInput: this.handleInput.bind(this), onFocus: this.handleFocus.bind(this), onBlur: this.handleBlur.bind(this), onChange: this.handleChange.bind(this), onKeyDown: this.handleKeyDown.bind(this) }, getPropsDataSet(other))));
@@ -897,10 +886,11 @@ var Text = /** @class */ (function (_super) {
         }, hoverStayTime);
     };
     Text.prototype.render = function () {
+        var _this = this;
         var _a = this.props, className = _a.className, id = _a.id, _b = _a.selectable, selectable = _b === void 0 ? false : _b, style = _a.style, hoverStyle = _a.hoverStyle, other = __rest(_a, ["className", "id", "selectable", "style", "hoverStyle"]);
         var hover = this.state.hover;
         var cls = __assign(__assign(__assign(__assign({}, cssStyle$2.text), (selectable ? cssStyle$2.textSelectable : {})), style), (hover ? hoverStyle : {}));
-        return (h$4("span", __assign({ id: id, onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), style: cls, className: className, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
+        return (h$4("span", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), style: cls, className: className, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
     };
     return Text;
 }(React.Component));
@@ -1149,6 +1139,7 @@ var ScrollView = /** @class */ (function (_super) {
         _this._scrollTop = undefined;
         _this._scrollLeft = undefined;
         _this.container = null;
+        _this.ref = null;
         _this.onTouchMove = function (e) {
             e.stopPropagation();
         };
@@ -1262,6 +1253,7 @@ var ScrollView = /** @class */ (function (_super) {
         };
         return (h$2("div", __assign({ id: id, "data-animation": animation, className: "".concat(className, " _scrollView"), ref: function (container) {
                 _this.container = container;
+                _this.ref = container;
             }, style: __assign(__assign(__assign({}, cssStyle$1.scroll), style), scrollWhere), onScroll: _onScroll, onTouchMove: _onTouchMove, onTransitionEnd: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
     };
     return ScrollView;
@@ -1289,7 +1281,7 @@ var Textarea = /** @class */ (function (_super) {
     __extends$1(Textarea, _super);
     function Textarea() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.textareaRef = null;
+        _this.ref = null;
         _this.el = null;
         _this.value = '';
         _this.line = 1;
@@ -1297,11 +1289,11 @@ var Textarea = /** @class */ (function (_super) {
             var line = _this.getNumberOfLines();
             if (line !== _this.line) {
                 _this.line = line;
-                _this.textareaRef.rows = line;
+                _this.ref.rows = line;
             }
         };
         _this.getNumberOfLines = function () {
-            var ta = _this.textareaRef, style = window.getComputedStyle ? window.getComputedStyle(ta) : ta.style, 
+            var ta = _this.ref, style = window.getComputedStyle ? window.getComputedStyle(ta) : ta.style, 
             // This will get the line-height only if it is set in the css,
             // otherwise it's "normal"
             taLineHeight = parseInt(style.lineHeight, 10), 
@@ -1351,7 +1343,7 @@ var Textarea = /** @class */ (function (_super) {
     Textarea.prototype.componentDidMount = function () {
         var _a = this.props.value, value = _a === void 0 ? '' : _a;
         if (value != '') {
-            this.textareaRef.value = value;
+            this.ref.value = value;
         }
     };
     Textarea.prototype.render = function () {
@@ -1363,7 +1355,7 @@ var Textarea = /** @class */ (function (_super) {
             cssStyle.taroTextarea.height = 'auto';
         }
         var _onInput = function (e) {
-            var value = _this.textareaRef.value;
+            var value = _this.ref.value;
             var event = {
                 type: 'input', detail: {
                     value: value,
@@ -1375,7 +1367,7 @@ var Textarea = /** @class */ (function (_super) {
                 _this.handleLineChange();
         };
         var _onFocus = function (e) {
-            var value = _this.textareaRef.value;
+            var value = _this.ref.value;
             var event = {
                 type: 'focus', detail: {
                     value: value,
@@ -1385,7 +1377,7 @@ var Textarea = /** @class */ (function (_super) {
             onFocus && onFocus(event);
         };
         var _onBlur = function (e) {
-            var value = _this.textareaRef.value;
+            var value = _this.ref.value;
             var event = {
                 type: 'blur', detail: {
                     value: value,
@@ -1396,7 +1388,7 @@ var Textarea = /** @class */ (function (_super) {
         };
         var _onConfirm = function (e) {
             if (e.keyCode === 13) {
-                var value = _this.textareaRef.value;
+                var value = _this.ref.value;
                 var event_1 = {
                     type: 'confirm', detail: {
                         value: value,
@@ -1408,7 +1400,7 @@ var Textarea = /** @class */ (function (_super) {
         };
         return (h$1("textarea", __assign({ ref: function (input) {
                 if (input) {
-                    _this.textareaRef = input;
+                    _this.ref = input;
                 }
             }, style: __assign(__assign({}, style), cssStyle.taroTextarea), className: 'taroTextareaCore', placeholder: placeholder, name: name, disabled: !!disabled, maxLength: maxLength, autoFocus: autoFocus, onInput: _onInput, onFocus: _onFocus, onBlur: _onBlur, onKeyUp: _onConfirm }, getPropsDataSet(other), nativeProps, otherProps)));
     };
@@ -2153,7 +2145,7 @@ var WebView = /** @class */ (function (_super) {
         var _a = this.props, className = _a.className, style = _a.style, hoverStyle = _a.hoverStyle, id = _a.id, src = _a.src, other = __rest(_a, ["className", "style", "hoverStyle", "id", "src"]);
         var hover = this.state.hover;
         var conStyle = __assign(__assign({}, style), (hover ? hoverStyle : {}));
-        return (h("iframe", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this), onBlur: commonEventHander.bind(this), onFocus: commonEventHander.bind(this), onLoad: commonEventHander.bind(this), onError: commonEventHander.bind(this), onMessage: commonEventHander.bind(this), src: src }, getPropsDataSet(other)), this.props.children));
+        return (h("iframe", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this), onBlur: commonEventHander.bind(this), onFocus: commonEventHander.bind(this), onLoad: commonEventHander.bind(this), src: src }, getPropsDataSet(other)), this.props.children));
     };
     return WebView;
 }(React.Component));
@@ -8294,7 +8286,7 @@ var Container = /** @class */ (function (_super) {
 }(React.Component));
 
 // @ts-ignore
-var version = "0.6.2";
+var version = "0.6.3";
 initVersionLogger('naruse-h5', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {
