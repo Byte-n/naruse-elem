@@ -1,5 +1,12 @@
 # naruse-plugin
 
+## 1.2.3
+
+### Patch Changes
+
+- #FEAET: 规范 H5 端的 ref
+- #FEAT: 完善 WebView
+
 ## 1.2.2
 
 ### Patch Changes
