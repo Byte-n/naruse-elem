@@ -25,7 +25,7 @@ const fixControlledValue = function fixControlledValue(value: any) {
 };
 
 class Input extends Component {
-    inputRef: null;
+    ref: null;
     isOnComposition: boolean;
     onInputExcuted: boolean;
     el: {};
@@ -35,7 +35,7 @@ class Input extends Component {
     _value: any;
     constructor() {
         super();
-        this.inputRef = null;
+        this.ref = null;
         this.isOnComposition = false;
         this.onInputExcuted = false;
         this.el = {};
@@ -47,11 +47,11 @@ class Input extends Component {
             this.fileListener = (e) => {
                 this.props.onInput && this.props.onInput(e);
             };
-            this.inputRef?.addEventListener('change', this.fileListener);
+            this.ref?.addEventListener('change', this.fileListener);
         }
 
         Object.defineProperty(this.el, 'value', {
-            get: () => this.inputRef?.value,
+            get: () => this.ref?.value,
             set: value => {
                 this.setState({
                     _value: value,
@@ -59,7 +59,7 @@ class Input extends Component {
             },
             configurable: true,
         });
-        setTimeout(() => this.props.focus && this.inputRef?.focus());
+        setTimeout(() => this.props.focus && this.ref?.focus());
     }
 
     /** 输入 */
@@ -124,7 +124,7 @@ class Input extends Component {
         return (
             <input
                 ref={(input: null) => {
-                    this.inputRef = input;
+                    this.ref = input;
                 }}
                 className={className}
                 // 受控则只使用外部值，非受控优先使用外部值

@@ -18,6 +18,7 @@ export const enum VnodeType {
     Video = 'video',
     Fragment = 'fragment',
     NaruseComponent = 'naruse-element',
+    WebView = 'web-view',
 }
 
 
