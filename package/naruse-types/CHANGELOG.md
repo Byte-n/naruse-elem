@@ -1,5 +1,12 @@
 # naruse-types
 
+## 0.6.3
+
+### Patch Changes
+
+- #FEAET: 规范 H5 端的 ref
+- #FEAT: 完善 WebView
+
 ## 0.6.2
 
 ### Patch Changes
