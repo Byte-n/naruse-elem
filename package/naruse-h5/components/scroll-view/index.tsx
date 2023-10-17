@@ -113,6 +113,7 @@ class ScrollView extends React.Component<IProps> {
     _scrollTop: any = undefined;
     _scrollLeft: any = undefined;
     container: any = null;
+    ref: any = null;
     lastAnimationName?: string;
 
     onTouchMove = e => {
@@ -248,6 +249,7 @@ class ScrollView extends React.Component<IProps> {
                 className={ `${className} _scrollView` }
                 ref={container => {
                     this.container = container;
+                    this.ref = container;
                 }}
                 style={{ ...cssStyle.scroll, ...style, ...scrollWhere }}
                 onScroll={_onScroll}
