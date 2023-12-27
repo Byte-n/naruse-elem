@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "lib": ["DOM", "ES5", "es2015", "es2017"],
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "removeComments": false,
+    "baseUrl": ".",
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "typeRoots": ["./types", "../naruse-types/"],
+    "rootDir": "../..",
+    "declarationDir": "./dist",
+    "declaration": true
+  },
+  "exclude": [
+    "./dist"
+  ]
+}

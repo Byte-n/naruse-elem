@@ -22,6 +22,7 @@ export const isEmpty = (key) => {
     } else if (typeof (key) === 'undefined') {
         return true;
     } else if (typeof (key) === 'object') {
+        // @ts-ignore
         for (const i in key) {
             return false;
         }
@@ -74,7 +75,8 @@ export const safeJsonParse = (str) => {
  * @author CHC
  * @date 2022-10-12 14:10:29
  */
-export const isEmptyObj = (o) => {
+export const isEmptyObj = (o: any) => {
+    // @ts-ignore
     for (let i in o) {
         return false;
     }
@@ -88,8 +90,8 @@ export const safeToJSON = (obj) => {
         return JSON.stringify({ name: obj.name, message: obj.message, stack: obj.stack });
     }
     // 存储所有对象，判断是有循环引用
-    const cache = [];
-    return JSON.stringify(obj, (key, value) => {
+    const cache: any[] = [];
+    return JSON.stringify(obj, (key: string, value: any) => {
         if (typeof value === 'function' || typeof value === 'bigint' || typeof value === 'symbol') {
             return;
         }

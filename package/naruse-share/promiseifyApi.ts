@@ -9,7 +9,7 @@ import { isFunc } from './utils';
  * @param {*} global 全局对象
  * @param {*} [config={}]
  */
-export const processApis = function processApis (Naruse, global, config = {}) {
+export const processApis = function processApis (Naruse, global, config: any = {}) {
     if (!global) return;
 
     const apis = config.needPromiseApis || [];
@@ -20,7 +20,7 @@ export const processApis = function processApis (Naruse, global, config = {}) {
     // 处理所有需要promisify的api
     apis.forEach(key => {
         const originKey = key;
-        Naruse[originKey] = (options = {}, ...args) => {
+        Naruse[originKey] = (options: any = {}, ...args: any []) => {
             let key = originKey;
 
             // 第一个参数 options 为字符串，单独处理
@@ -42,8 +42,7 @@ export const processApis = function processApis (Naruse, global, config = {}) {
                 }
             }
 
-            let task = null;
-            const obj = Object.assign({}, options);
+            const obj: any = Object.assign({}, options);
 
 
             // Promisify
@@ -59,11 +58,12 @@ export const processApis = function processApis (Naruse, global, config = {}) {
                 obj.complete = res => {
                     isFunc(options.complete) && options.complete(res);
                 };
-                if (args.length) {
-                    task = global[key](obj, ...args);
-                } else {
-                    task = global[key](obj);
-                }
+                // let task;
+                // if (args.length) {
+                //     task = global[key](obj, ...args);
+                // } else {
+                //     task = global[key](obj);
+                // }
             });
 
             return p;

@@ -14,7 +14,7 @@ LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
-/* global Reflect, Promise */
+/* global Reflect, Promise, SuppressedError, Symbol */
 
 var extendStatics$1 = function(d, b) {
     extendStatics$1 = Object.setPrototypeOf ||
@@ -102,6 +102,11 @@ function __spreadArray$1(to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 }
 
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
 var createLogger = function (name) {
     return {
         debug: function () {
@@ -185,6 +190,7 @@ var temporarilyNotSupport = function temporarilyNotSupport(apiName) {
 };
 
 var mitt = function (n) {
+    if (n === void 0) { n = new Map(); }
     return {
         all: n = n || new Map,
         on: function (e, t) {
@@ -305,6 +311,7 @@ var isEmpty = function (key) {
         return true;
     }
     else if (typeof (key) === 'object') {
+        // @ts-ignore
         for (var i in key) {
             return false;
         }
@@ -360,7 +367,9 @@ var getDeferPromise = function () {
         resolve = res;
         reject = rej;
     });
+    // @ts-ignore
     promise.resolve = resolve;
+    // @ts-ignore
     promise.reject = reject;
     return promise;
 };
@@ -371,6 +380,7 @@ var proxyObject = function (obj) {
     return new Proxy(obj, {
         get: function (target, key) {
             if (!target[key]) {
+                // @ts-ignore
                 return obj[key] = getDeferPromise();
             }
             return obj[key];
@@ -1590,14 +1600,14 @@ var dist = {};
 
 Object.defineProperty(dist, '__esModule', { value: true });
 
-function _typeof(obj) {
+function _typeof(o) {
   "@babel/helpers - typeof";
 
-  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-  }, _typeof(obj);
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+    return typeof o;
+  } : function (o) {
+    return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+  }, _typeof(o);
 }
 
 var isProduction = process.env.NODE_ENV === 'production';
@@ -2244,7 +2254,7 @@ LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
-/* global Reflect, Promise */
+/* global Reflect, Promise, SuppressedError, Symbol */
 
 var extendStatics = function(d, b) {
     extendStatics = Object.setPrototypeOf ||
@@ -2270,6 +2280,11 @@ function __spreadArray(to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 }
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
 
 var Identifier = "Identifier";
 var Literal = "Literal";
@@ -7735,6 +7750,8 @@ var LoggerInfoKeyMap = {
 // type ValueOf<T> = T[keyof T];
 // type RequestParamsKey = ValueOf<typeof LoggerInfoKeyMap>;
 
+var log$1 = createLogger('naruse-plugin');
+
 /**
  * 插件,很明显，它是一个插件，它可以做点什么。你必须继承此类，来实现插件
  */
@@ -7748,10 +7765,10 @@ var Plugin = /** @class */ (function () {
         }
     }
     /** 在广告代码运行前，获取到有效的广告数据后 */
-    Plugin.prototype.apply = function (params) {
+    Plugin.prototype.apply = function (_params) {
     };
     /** 解析广告代码错误时、运行广告代码错误时 */
-    Plugin.prototype.onError = function (params) {
+    Plugin.prototype.onError = function (_params) {
     };
     return Plugin;
 }());
@@ -7759,17 +7776,15 @@ var Plugin = /** @class */ (function () {
 var PluginMethodList = ['apply', 'onError'];
 /** 所有的插件 */
 var plugins = {};
-var log$2 = createLogger('PluginMethod');
 // @ts-ignore
 var pluginEvent = new EventBus();
 /** 使用全局事件中心 注册插件的生命周期 */
 PluginMethodList.forEach(function (method) {
     pluginEvent.on(PluginMethod[method], function (params) {
         var keys = Object.keys(plugins);
-        log$2.info("PluginMethod[".concat(method, "]"), keys.length, params);
-        keys
-            .forEach(function (key) {
-            plugins[key][method](params);
+        log$1.info("PluginMethod[".concat(method, "]"), keys.length, params);
+        keys.forEach(function (key) {
+            typeof plugins[key][method] === 'function' && plugins[key][method](params);
         });
     });
 });
@@ -7781,9 +7796,6 @@ function registerPlugin$1(name, pluginConstructor, firstParam) {
     }
     // 构造对象
     var plugin = new (pluginConstructor.bind.apply(pluginConstructor, __spreadArray$1([void 0, firstParam], params, false)))();
-    if (!(plugin instanceof Plugin)) {
-        throw new Error('registerPlugin: pluginConstructor 必须返回一个 Plugin类的实例');
-    }
     if (plugin[name]) {
         throw new Error("".concat(name, " \u6B64\u63D2\u4EF6\uFF0C\u5DF2\u7ECF\u6CE8\u518C\u8FC7\u4E86"));
     }
@@ -7811,7 +7823,7 @@ var nullAdData = function () { return ({
     user_define: { body: undefined },
     version: ""
 }); };
-var log$1 = createLogger('LoggerPlus');
+var log = createLogger('naruser-plugin/logger');
 /** 日志发送类 */
 var LoggerPlus = /** @class */ (function () {
     /**
@@ -7938,7 +7950,7 @@ var LoggerPlus = /** @class */ (function () {
             args[_i - 2] = arguments[_i];
         }
         if (!this.isCanLog(level)) {
-            log$1.debug.apply(log$1, __spreadArray$1(['忽略日志：', level, event], args, false));
+            log.debug.apply(log, __spreadArray$1(['忽略日志：', level, event], args, false));
             return;
         }
         if (typeof this._logNetworkInterface !== 'function') {
@@ -7952,7 +7964,7 @@ var LoggerPlus = /** @class */ (function () {
             coverLoggerInfoToRequestParam(info);
         // 调用接口发送
         this._logNetworkInterface(this.encode(requestParams), this.encodeValue(requestParams), info);
-        log$1.debug('发送日志：', level, event, info);
+        log.debug('发送日志：', level, event, info);
     };
     /** 将obj转 get 请求的字符串，并进行 url 编码 */
     LoggerPlus.prototype.encode = function (obj) {
@@ -8033,7 +8045,6 @@ function coverLoggerInfoToRequestParam(info) {
     }, {});
 }
 
-var log = createLogger('LoggerPlugin');
 var getNullAdData = function () {
     return {
         creative_id: 0,
@@ -8096,7 +8107,7 @@ var LoggerPlugin = /** @class */ (function (_super) {
     /** 修改参数 */
     LoggerPlugin.prototype.updatePublicInfo = function (params, ignoredNull) {
         if (ignoredNull === void 0) { ignoredNull = true; }
-        log.info('updatePublicInfo: params = ', params, 'ignoredNull = ', ignoredNull);
+        log$1.info('updatePublicInfo: params = ', params, 'ignoredNull = ', ignoredNull);
         (ignoredNull) && removeObjectNullValue(params);
         Object.assign(this._initParams, params);
         var config = this.constructorFirstParams.config;
@@ -8113,7 +8124,7 @@ var LoggerPlugin = /** @class */ (function (_super) {
         logger.updatePublicInfo(params, ignoredNull);
     };
     LoggerPlugin.prototype.apply = function (_a) {
-        var context = _a.context; _a.config;
+        var context = _a.context;
         var $adImport = context.$adImport, $adVersion = context.$adVersion;
         var adData = $adImport.adData;
         /** 注入 日志对象 */
@@ -8122,7 +8133,7 @@ var LoggerPlugin = /** @class */ (function (_super) {
             adVer: $adVersion,
         }, this._initParams);
         context.$logger = this.$logger;
-        log.info('apply: context = ', context);
+        log$1.info('apply: context = ', context);
     };
     LoggerPlugin.prototype.onError = function (_a) {
         var context = _a.context, error = _a.error, source = _a.source;
@@ -8140,7 +8151,7 @@ var LoggerPlugin = /** @class */ (function (_super) {
  * @date 2022-06-14 10:06:49
  */
 var getNaruseComponentFromProps = function (props) { return __awaiter(void 0, void 0, void 0, function () {
-    var hotPuller, _a, code, ctx, adProps, e_1;
+    var hotPuller, _a, code, ctx, _props, e_1;
     var _b;
     return __generator(this, function (_c) {
         switch (_c.label) {
@@ -8155,11 +8166,11 @@ var getNaruseComponentFromProps = function (props) { return __awaiter(void 0, vo
                 _c.trys.push([1, 4, , 5]);
                 return [4 /*yield*/, hotPuller(props)];
             case 2:
-                _a = _c.sent(), code = _a.code, ctx = _a.ctx, adProps = _a.adProps;
+                _a = _c.sent(), code = _a.code, ctx = _a.ctx, _props = _a.props;
                 _b = {};
                 return [4 /*yield*/, getNaruseComponentFromCode(code, ctx)];
             case 3: return [2 /*return*/, (_b.Component = _c.sent(),
-                    _b.adProps = adProps,
+                    _b.props = _props,
                     _b)];
             case 4:
                 e_1 = _c.sent();
@@ -8256,8 +8267,8 @@ var Container = /** @class */ (function (_super) {
         var _this = _super.call(this, props) || this;
         _this.state = { loaded: false };
         _this.init(props);
-        // 传递给广告的props
-        _this.adProps = {};
+        // 传递给子组件的props
+        _this._props = {};
         return _this;
     }
     Container.prototype.init = function (props) {
@@ -8269,7 +8280,7 @@ var Container = /** @class */ (function (_super) {
                     case 1:
                         result = _a.sent();
                         this.Component = result === null || result === void 0 ? void 0 : result.Component;
-                        this.adProps = result === null || result === void 0 ? void 0 : result.adProps;
+                        this._props = result === null || result === void 0 ? void 0 : result.props;
                         if (this.Component) {
                             this.setState({ loaded: true });
                         }
@@ -8280,13 +8291,13 @@ var Container = /** @class */ (function (_super) {
     };
     Container.prototype.render = function () {
         // @ts-ignore
-        return this.state.loaded ? Naruse.createElement(this.Component, this.adProps) : null;
+        return this.state.loaded ? Naruse.createElement(this.Component, this._props) : null;
     };
     return Container;
 }(React.Component));
 
 // @ts-ignore
-var version = "0.6.3";
+var version = "0.6.4";
 initVersionLogger('naruse-h5', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {
