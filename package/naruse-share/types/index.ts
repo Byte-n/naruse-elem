@@ -3,7 +3,7 @@ export type NaruseInitParams = Partial<NaruseConfig>
 
 /** naruse 配置项 */
 export type NaruseConfig = {
-    hotPuller: (props: any) => Promise<HotPullerReturn>,
+    hotPuller: (props: any & { unique?: boolean }) => Promise<HotPullerReturn>,
     baseCtx: () => AdRunningContext | {},
     onRunError: (err: Error, source?: RunningCodeErrorSource) => void,
     hotImport: (path: string, ctx: any) => string | Promise<string>,
@@ -12,9 +12,9 @@ export type NaruseConfig = {
 
 /** 热更新方法返回值 */
 export type HotPullerReturn = {
-    code: string,
+    code?: string,
     ctx: Partial<AdRunningContext>,
-    adProps?: Record<string, any>
+    props?: Record<string, any>
 }
 
 /** 广告代码运行时上下文环境对象 */
