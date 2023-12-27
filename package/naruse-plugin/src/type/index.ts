@@ -1,4 +1,4 @@
-import { AdData, AdRunningContext, NaruseConfig, RunningCodeErrorSource } from "naruse-share";
+import { AdData, AdRunningContext, NaruseConfig, RunningCodeErrorSource } from "../../../naruse-share/types/index";
 
 /** 插件 Apply 的参数 */
 export type PluginApplyParams = {

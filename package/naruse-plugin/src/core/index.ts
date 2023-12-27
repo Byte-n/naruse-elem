@@ -44,9 +44,6 @@ PluginMethodList.forEach((method: PluginMethodKey) => {
 export function registerPlugin (name: string, pluginConstructor: typeof Plugin, firstParam: PluginConstructorFirstParma, ...params: any[]): Plugin {
     // 构造对象
     const plugin = new pluginConstructor(firstParam, ...params);
-    if (!(plugin instanceof Plugin)) {
-        throw new Error('registerPlugin: pluginConstructor 必须返回一个 Plugin类的实例');
-    }
     if (plugin[name]) {
         throw new Error(`${name} 此插件，已经注册过了`);
     }
