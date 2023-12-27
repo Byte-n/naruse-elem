@@ -1,6 +1,6 @@
 {
   "name": "react-like-hooks",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "react-like-hooks",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
