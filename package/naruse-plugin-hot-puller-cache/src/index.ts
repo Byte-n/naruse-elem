@@ -4,19 +4,21 @@ import NaruseTemplateCacheManager, {
     RequestManagerConstructor, RequestManagerData, RequestFuncParams,
 } from './NaruseTemplateCacheManager';
 export interface HotPullerCachePluginConfig <Props, RequestData, ResponseResult> {
+    ignoreUniqueComponent?: boolean,
     managerConfig: RequestManagerConstructor<RequestData, ResponseResult>,
     onCreateRequest: (props: Props) => RequestFuncParams<RequestData>;
-    onHotPuller: (props: Props, resp: RequestManagerData<ResponseResult>, req: RequestFuncParams<RequestData>) => ({ ctx: object; adProps: object });
+    onHotPuller: (props: Props, resp: RequestManagerData<ResponseResult>, req: RequestFuncParams<RequestData>) => ({ ctx: object; props: object });
 }
-export default class HotPullerCachePlugin<Props, RequestData, ResponseResult> {
-    private manager: NaruseTemplateCacheManager<RequestData, ResponseResult>;
+export default class HotPullerCachePlugin<Props extends object, RequestData, ResponseResult> {
+    public manager: NaruseTemplateCacheManager<RequestData, ResponseResult>;
     private onCreateRequest: (props: Props) => RequestFuncParams<RequestData>;
-    private onHotPuller: (props: Props,resp: RequestManagerData<ResponseResult>, req: RequestFuncParams<RequestData>) => ({ ctx: object; adProps: object });
+    private onHotPuller: (props: Props,resp: RequestManagerData<ResponseResult>, req: RequestFuncParams<RequestData>) => ({ ctx: object; props: object });
 
+    public ignoreUniqueComponent: boolean = true;
     constructor (
         params: PluginConstructorFirstParma,
         {
-            managerConfig, onCreateRequest, onHotPuller,
+            managerConfig, onCreateRequest, onHotPuller, ignoreUniqueComponent = true,
         }: HotPullerCachePluginConfig<Props, RequestData, ResponseResult>,
     ) {
         const config = params.config;
@@ -24,16 +26,20 @@ export default class HotPullerCachePlugin<Props, RequestData, ResponseResult> {
         this.manager = new NaruseTemplateCacheManager<RequestData, ResponseResult>(managerConfig);
         this.onCreateRequest = onCreateRequest;
         this.onHotPuller = onHotPuller;
+        this.ignoreUniqueComponent = ignoreUniqueComponent;
     }
 
-    hotPuller = async (props: Props): Promise<HotPullerReturn> => {
+    hotPuller = async (props: Props & { unique?: boolean }): Promise<HotPullerReturn> => {
+        if (props.unique && this.ignoreUniqueComponent) {
+            return { props: {}, ctx: {} };
+        }
         const requestParams = this.onCreateRequest(props);
         const resp = await this.manager.request(requestParams);
-        const { ctx, adProps } = this.onHotPuller(props, resp, requestParams);
+        const { ctx, props: _props } = this.onHotPuller(props, resp, requestParams);
         return Promise.resolve({
             code: resp.code,
             ctx,
-            adProps,
+            props: _props,
         });
     }
 }

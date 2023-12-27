@@ -33,9 +33,8 @@ PluginMethodList.forEach((method: PluginMethodKey) => {
     pluginEvent.on(PluginMethod[method], (params) => {
         const keys = Object.keys(plugins);
         log.info(`PluginMethod[${method}]`, keys.length, params);
-        keys
-            .forEach(key => {
-                plugins[key][method](params);
+        keys.forEach(key => {
+            typeof plugins[key][method] === 'function' && plugins[key][method](params);
             })
     })
 });
