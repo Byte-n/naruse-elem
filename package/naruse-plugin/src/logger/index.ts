@@ -7,12 +7,12 @@ import {
     PluginOnErrorParams,
     UpdateAdLoggerPublicInfoParams,
 } from '../type'
-import { AdData, AdRunningContext, createLogger, removeObjectNullValue } from "naruse-share";
+import { AdData, AdRunningContext, removeObjectNullValue } from "naruse-share";
 
 import Plugin from '../core/index'
 import LoggerPlus from "./LoggerPlus";
+import { log } from '../utils/log';
 
-const log = createLogger('LoggerPlugin');
 const getNullAdData: () => AdData = () => {
     return {
         creative_id: 0,

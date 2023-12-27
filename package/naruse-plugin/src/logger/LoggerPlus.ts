@@ -32,7 +32,7 @@ const nullAdData: () => AdData = () => ({
     user_define: { body: undefined },
     version: ""
 });
-const log = createLogger('LoggerPlus');
+const log = createLogger('naruser-plugin/logger');
 /** 日志发送类 */
 export default class LoggerPlus {
     /** 日志的基础信息 */
