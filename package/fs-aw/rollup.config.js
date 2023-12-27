@@ -1,0 +1,63 @@
+// rollup.config.js
+import typescript from '@rollup/plugin-typescript';
+import alias from '@rollup/plugin-alias';
+import { nodeResolve } from '@rollup/plugin-node-resolve'
+const customResolver = nodeResolve({ extensions: ['.mjs', '.js', '.jsx', '.json', '.css'] });
+
+
+const plugins = [
+    typescript(),
+    alias({
+        customResolver
+    }),
+];
+const config = [
+    {
+        input: './src/index.ts',
+        output: [
+            {
+                file: './dist/index.js',
+                format: 'cjs',
+            },
+            {
+                file: './dist/index.es.js',
+                format: 'es',
+            },
+        ]
+    },
+    {
+        input: './src/index.miniapp.ts',
+        output: [
+            {
+                file: './dist/index.miniapp.js',
+                format: 'cjs',
+            },
+            {
+                file: './dist/index.miniapp.es.js',
+                format: 'es',
+            },
+        ]
+    },
+    {
+        input: './src/index.web.ts',
+        output: [
+            {
+                file: './dist/index.web.js',
+                format: 'cjs',
+            },
+            {
+                file: './dist/index.web.es.js',
+                format: 'es',
+            },
+        ]
+    },
+];
+
+const configs = config.map((item) => {
+    return {
+        ...item,
+        plugins,
+    };
+});
+
+export default configs;
