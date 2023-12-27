@@ -1,5 +1,6 @@
 import { PluginApplyParams, PluginConstructorFirstParma, PluginMethod, PluginMethodKey, PluginOnErrorParams } from "../type";
-import { createLogger, EventBus } from "naruse-share";
+import { EventBus } from "naruse-share";
+import { log } from '../utils/log';
 
 /**
  * 插件,很明显，它是一个插件，它可以做点什么。你必须继承此类，来实现插件
@@ -25,7 +26,6 @@ export default class Plugin {
 const PluginMethodList: Array<PluginMethodKey> = ['apply', 'onError'];
 /** 所有的插件 */
 const plugins: Record<string, Plugin> = {};
-const log = createLogger('PluginMethod')
 // @ts-ignore
 export const pluginEvent = new EventBus();
 /** 使用全局事件中心 注册插件的生命周期 */
