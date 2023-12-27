@@ -1,22 +1,22 @@
 
-const createLogger = (name) => {
+const createLogger = (name: string) => {
     return {
-        debug(...args) {
+        debug(...args: any[]) {
             console.debug(`[${name}][debugger]`, ...args);
         },
-        warn(...args) {
+        warn(...args: any[]) {
             console.warn(`[${name}][warn]`, ...args);
         },
-        info(...args) {
+        info(...args: any[]) {
             console.info(`[${name}][info]`, ...args);
         },
-        error(...args) {
+        error(...args: string[]) {
             console.error(`[${name}][error]`, ...args);
         },
     };
 }
 
-export const initVersionLogger = (name, version) => {
+export const initVersionLogger = (name: any, version: any) => {
     console.log(
         `%c naruse %c ${name} v${version} %c`,
         'background:#17c0eb ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
