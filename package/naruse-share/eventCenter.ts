@@ -1,4 +1,4 @@
-const mitt = function (n) {
+const mitt = function (n = new Map()) {
     return {
         all: n = n || new Map,
         on: function (e, t) {
