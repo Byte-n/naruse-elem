@@ -13,10 +13,10 @@ export default class Plugin {
         }
     }
     /** 在广告代码运行前，获取到有效的广告数据后 */
-    apply (params: PluginApplyParams) {
+    apply (_params: PluginApplyParams) {
     }
     /** 解析广告代码错误时、运行广告代码错误时 */
-    onError(params: PluginOnErrorParams): void {
+    onError(_params: PluginOnErrorParams): void {
     }
 }
 

@@ -103,7 +103,7 @@ class LoggerPlugin extends Plugin {
         logger.updatePublicInfo(params, ignoredNull);
     }
 
-    apply({ context, config }: PluginApplyParams) {
+    apply({ context }: PluginApplyParams) {
         const { $adImport, $adVersion } = context
         const { adData } = $adImport;
         /** 注入 日志对象 */

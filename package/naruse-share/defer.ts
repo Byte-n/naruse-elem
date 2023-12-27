@@ -6,7 +6,9 @@ const getDeferPromise = () => {
         resolve = res;
         reject = rej;
     });
+    // @ts-ignore
     promise.resolve = resolve;
+    // @ts-ignore
     promise.reject = reject;
     return promise;
 }
@@ -18,6 +20,7 @@ const proxyObject = (obj) => {
     return new Proxy(obj, {
         get(target, key) {
             if (!target[key]) {
+                // @ts-ignore
                 return obj[key] = getDeferPromise(key);
             }
             return obj[key];
