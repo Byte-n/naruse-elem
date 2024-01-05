@@ -58,12 +58,12 @@ export const processApis = function processApis (Naruse, global, config: any = {
                 obj.complete = res => {
                     isFunc(options.complete) && options.complete(res);
                 };
-                // let task;
-                // if (args.length) {
-                //     task = global[key](obj, ...args);
-                // } else {
-                //     task = global[key](obj);
-                // }
+                let task;
+                if (args.length) {
+                    task = global[key](obj, ...args);
+                } else {
+                    task = global[key](obj);
+                }
             });
 
             return p;
