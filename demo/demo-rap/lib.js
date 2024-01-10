@@ -5919,27 +5919,32 @@ var LoggerPlugin = /** @class */ (function (_super) {
  * @date 2022-06-14 10:06:49
  */
 var getNaruseComponentFromProps = function (props) { return __awaiter(void 0, void 0, void 0, function () {
-    var hotPuller, _a, code, ctx, e_1;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+    var hotPuller, _a, code, ctx, _props, e_1;
+    var _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
                 if (!props || typeof props !== 'object') {
                     logger$1.error('无效参数，无法生成对应naruse组件');
-                    return [2 /*return*/];
+                    return [2 /*return*/, { component: undefined, props: {} }];
                 }
                 hotPuller = getNaruseConfig().hotPuller;
-                _b.label = 1;
+                _c.label = 1;
             case 1:
-                _b.trys.push([1, 3, , 4]);
+                _c.trys.push([1, 4, , 5]);
                 return [4 /*yield*/, hotPuller(props)];
             case 2:
-                _a = (_b.sent()) || {}, code = _a.code, ctx = _a.ctx;
-                return [2 /*return*/, getNaruseComponentFromCode(code, ctx)];
-            case 3:
-                e_1 = _b.sent();
+                _a = (_c.sent()) || {}, code = _a.code, ctx = _a.ctx, _props = _a.props;
+                _b = {};
+                return [4 /*yield*/, getNaruseComponentFromCode(code, ctx)];
+            case 3: return [2 /*return*/, (_b.component = _c.sent(),
+                    _b.props = _props,
+                    _b)];
+            case 4:
+                e_1 = _c.sent();
                 logger$1.error('加载远程代码资源失败', e_1);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); };
@@ -6034,14 +6039,14 @@ var Container = /** @class */ (function (_super) {
     }
     Container.prototype.init = function (props) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a;
+            var _a, component, _props;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0:
-                        _a = this;
-                        return [4 /*yield*/, getNaruseComponentFromProps(props)];
+                    case 0: return [4 /*yield*/, getNaruseComponentFromProps(props)];
                     case 1:
-                        _a.Component = _b.sent();
+                        _a = _b.sent(), component = _a.component, _props = _a.props;
+                        this.Component = component;
+                        this.componentProps = _props;
                         if (this.Component) {
                             this.setState({ loaded: true });
                         }
@@ -6051,13 +6056,13 @@ var Container = /** @class */ (function (_super) {
         });
     };
     Container.prototype.render = function () {
-        return naruseCreateElement(this.state.loaded ? this.Component : emptyElement);
+        return naruseCreateElement(this.state.loaded ? this.Component : emptyElement, this.componentProps);
     };
     return Container;
 }(Component));
 
 // @ts-ignore
-var version = "0.6.4";
+var version = "0.6.5";
 initVersionLogger('naruse-weex', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 var Naruse = __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({}, Hooks), { Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, runCodeWithNaruse: runCodeWithNaruse, globalEvent: globalEvent, withPage: function (Component) { return Component; } }), Storage), Route), Device), System), UI), { getImageInfo: temporarilyNotSupport('getImageInfo'), createAnimation: temporarilyNotSupport('createAnimation') }), elementApi);

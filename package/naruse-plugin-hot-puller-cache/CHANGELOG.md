@@ -1,5 +1,16 @@
 # naruse-plugin-hot-puller-cache
 
+## 0.0.3
+
+### Patch Changes
+
+- #FIX: 小程序 didUnmount 时，主组件未卸载、函数调用无响应
+- #FEAT: weex 支持 props 穿透
+- Updated dependencies
+- Updated dependencies
+  - naruse-plugin@1.2.5
+  - naruse-share@0.6.5
+
 ## 0.0.2
 
 ### Patch Changes
