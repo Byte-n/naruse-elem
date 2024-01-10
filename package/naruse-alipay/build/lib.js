@@ -355,12 +355,12 @@ var processApis = function processApis(Naruse, global, config) {
                 obj.complete = function (res) {
                     isFunc(options.complete) && options.complete(res);
                 };
-                // let task;
-                // if (args.length) {
-                //     task = global[key](obj, ...args);
-                // } else {
-                //     task = global[key](obj);
-                // }
+                if (args.length) {
+                    global[key].apply(global, __spreadArray$1([obj], args, false));
+                }
+                else {
+                    global[key](obj);
+                }
             });
             return p;
         };
@@ -6154,7 +6154,7 @@ var createMiniFactory = function (type, instance, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.6.4";
+var version = "0.6.5";
 initVersionLogger('naruse-alipay', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 // naruse模块内容
@@ -6753,7 +6753,7 @@ var bindRenderEventOnComponent = function (miniComponent) {
     }
     bindedPages[route] = miniComponent;
     miniComponent._naruseEventCenter = globalEvent;
-    globalEvent.on('naruse.renderComponentOnPage', function (pageName, Component) {
+    miniComponent.clearRenderComponentOnPageEnvet = globalEvent.on('naruse.renderComponentOnPage', function (pageName, Component) {
         if (pageName !== route)
             return;
         // 卸载已有组件
@@ -6776,6 +6776,7 @@ var uninstallMainComponentOnSomePage = function (miniComponent) {
     if (!bindedPages[route])
         return;
     delete bindedPages[route];
+    typeof miniComponent.clearRenderComponentOnPageEnvet === 'function' && miniComponent.clearRenderComponentOnPageEnvet();
     miniComponent._naruseEventCenter = null;
 };
 /**
@@ -6929,9 +6930,9 @@ var createMainBehavior = function (option) {
          * @date 2022-03-16 10:03:36
          */
         didUnmount: function () {
+            this.isNaruseMainComponent && uninstallMainComponentOnSomePage(this);
             if (!this.$middware)
                 return;
-            this.isNaruseMainComponent && uninstallMainComponentOnSomePage(this);
             this.$middware.onUnMount(true);
         } });
     return naruseBehavior;
