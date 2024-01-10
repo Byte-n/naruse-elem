@@ -1,5 +1,12 @@
 # naruse-plugin
 
+## 1.2.5
+
+### Patch Changes
+
+- #FIX: 小程序 didUnmount 时，主组件未卸载、函数调用无响应
+- #FEAT: weex 支持 props 穿透
+
 ## 1.2.4
 
 ### Patch Changes

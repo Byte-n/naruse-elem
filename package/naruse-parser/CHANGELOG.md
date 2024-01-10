@@ -1,5 +1,12 @@
 # naruse-parser
 
+## 0.1.16
+
+### Patch Changes
+
+- #FIX: 小程序 didUnmount 时，主组件未卸载、函数调用无响应
+- #FEAT: weex 支持 props 穿透
+
 ## 0.1.15
 
 ### Patch Changes

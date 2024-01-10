@@ -15,8 +15,8 @@ const bindedPages = {};
  * @param {*} page
  * @param {*} Component
  */
-const renderComponentOnPage = (route, Component) => {
-    globalEvent.emit('naruse.renderComponentOnPage', route, Component);
+const renderComponentOnPage = (route, Component, props = {}) => {
+    globalEvent.emit('naruse.renderComponentOnPage', route, Component, props);
 };
 
 
@@ -36,12 +36,12 @@ const bindRenderEventOnComponent = (miniComponent) => {
     }
     bindedPages[route] = miniComponent;
     miniComponent._naruseEventCenter = globalEvent;
-    globalEvent.on('naruse.renderComponentOnPage', (pageName, Component) => {
+    globalEvent.on('naruse.renderComponentOnPage', (pageName, Component, props) => {
         if (pageName !== route) return;
         // 卸载已有组件
         miniComponent.$middware && miniComponent.$middware.onUnMount();
         // 重新加载组件
-        miniComponent.$middware = new Middware(miniComponent, Component, {});
+        miniComponent.$middware = new Middware(miniComponent, Component, { ...props });
         miniComponent.$middware.update();
     });
 }
@@ -54,10 +54,10 @@ const bindRenderEventOnComponent = (miniComponent) => {
  * @param {*} code
  * @param {*} ctx
  */
-const renderComponentOnPageWithCode = async (route, code, ctx) => {
+const renderComponentOnPageWithCode = async (route, code, ctx, props) => {
     if (!route) return;
     const component =  await getNaruseComponentFromCode(code, ctx);
-    renderComponentOnPage(route, component);
+    renderComponentOnPage(route, component, props);
 }
 
 
