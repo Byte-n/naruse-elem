@@ -1,5 +1,18 @@
 # naruse-plugin-hot-puller-cache
 
+## 0.1.0
+
+### Minor Changes
+
+- #FIX: 支付宝小程序中旧 弹窗无法被新弹窗顶掉
+
+### Patch Changes
+
+- Updated dependencies
+  - fs-aw@0.1.0
+  - naruse-plugin@1.3.0
+  - naruse-share@0.7.0
+
 ## 0.0.3
 
 ### Patch Changes
