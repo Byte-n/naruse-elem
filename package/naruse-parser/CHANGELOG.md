@@ -1,5 +1,11 @@
 # naruse-parser
 
+## 0.2.0
+
+### Minor Changes
+
+- #FIX: 支付宝小程序中旧 弹窗无法被新弹窗顶掉
+
 ## 0.1.16
 
 ### Patch Changes
