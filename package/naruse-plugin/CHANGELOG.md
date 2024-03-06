@@ -1,5 +1,11 @@
 # naruse-plugin
 
+## 1.3.0
+
+### Minor Changes
+
+- #FIX: 支付宝小程序中旧 弹窗无法被新弹窗顶掉
+
 ## 1.2.5
 
 ### Patch Changes

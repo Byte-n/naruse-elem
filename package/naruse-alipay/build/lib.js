@@ -5367,7 +5367,7 @@ var getMiniappEventBehavior = function () {
     };
 };
 
-var uid$1 = 0;
+var uid$1 = 1;
 /** 当前在渲染的 */
 var currentRenderMiddawre = {
     current: null
@@ -5400,7 +5400,7 @@ var Middware = /** @class */ (function () {
         /** 存储此 组件下的所有 class 组件的 props */
         this.hub = {};
         /** hub key 的自增id */
-        this.incrId = 0;
+        this.incrId = 1;
         /** 保存 */
         this.saveProps = function (_a) {
             var actuator = _a.actuator, props = _a.props;
@@ -6154,7 +6154,7 @@ var createMiniFactory = function (type, instance, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.6.5";
+var version = "0.7.0";
 initVersionLogger('naruse-alipay', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 // naruse模块内容
@@ -6895,6 +6895,7 @@ var createMainBehavior = function (option) {
          * @date 2022-03-16 10:03:21
          */
         didUpdate: function (prevProps) {
+            var _a;
             // 主组件更新逻辑
             if (this.isNaruseMainComponent) {
                 // 参数不同则重新创建元素
@@ -6909,8 +6910,8 @@ var createMainBehavior = function (option) {
             // 子组件更新逻辑
             if (this.props.propHubKey) {
                 // 从指定的 主组件下获取，
-                var _a = allMiddware[prevProps.parentMiddwareId].parseProps({ propHubKey: prevProps.propHubKey }), propsOld = _a.props, actuatorOld = _a.actuator;
-                var _b = allMiddware[this.props.parentMiddwareId].parseProps({ propHubKey: this.props.propHubKey }), props = _b.props, actuator = _b.actuator;
+                var _b = ((_a = allMiddware[prevProps.parentMiddwareId]) === null || _a === void 0 ? void 0 : _a.parseProps({ propHubKey: prevProps.propHubKey })) || {}, propsOld = _b.props, actuatorOld = _b.actuator;
+                var _c = allMiddware[this.props.parentMiddwareId].parseProps({ propHubKey: this.props.propHubKey }), props = _c.props, actuator = _c.actuator;
                 // FIX: 修复了当切换装载器后不会卸载组件重新渲染
                 // FIX: 修复了当key发生变化后组件不会重新渲染 0615
                 if (actuator === actuatorOld && props.key === propsOld.key) {
