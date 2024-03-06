@@ -1,5 +1,11 @@
 # naruse-alipay
 
+## 0.7.0
+
+### Minor Changes
+
+- #FIX: 支付宝小程序中旧 弹窗无法被新弹窗顶掉
+
 ## 0.6.5
 
 ### Patch Changes
