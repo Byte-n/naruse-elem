@@ -1,5 +1,11 @@
 # fs-aw
 
+## 0.1.1
+
+### Patch Changes
+
+- naruse-plugin-hot-puller-cache 缓存错误
+
 ## 0.1.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # naruse-parser
 
+## 0.2.1
+
+### Patch Changes
+
+- naruse-plugin-hot-puller-cache 缓存错误
+
 ## 0.2.0
 
 ### Minor Changes
