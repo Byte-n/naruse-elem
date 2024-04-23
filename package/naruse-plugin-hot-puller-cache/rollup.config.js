@@ -1,12 +1,12 @@
 import babel from '@rollup/plugin-babel';
+import dts from 'rollup-plugin-dts';
+import resolve from '@rollup/plugin-node-resolve';
 
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const typescript = require('rollup-plugin-typescript2');
-import dts from 'rollup-plugin-dts';
 
 const replace = require('@rollup/plugin-replace');
 const commonjs = require('@rollup/plugin-commonjs');
-import resolve from '@rollup/plugin-node-resolve';
 
 const fs = require('fs');
 const path = require('path');
@@ -21,10 +21,6 @@ const plugins = [
     typescript({ tsconfig: 'tsconfig.json' }),
     customResolver,
     commonjs(),
-    replace({
-        __VERSION__: JSON.stringify(version),
-        'fs-aw/miniapp': 'fs-aw/miniapp',
-    }),
 ];
 
 const tsConfig = [
@@ -34,7 +30,13 @@ const tsConfig = [
             file: './dist/index.alipay.js',
             format: 'es',
         },
-        plugins: plugins,
+        plugins: [
+            ...plugins,
+            replace({
+                __VERSION__: JSON.stringify(version),
+                'fs-aw/miniapp': 'fs-aw/miniapp',
+            }),
+        ],
     },
     {
         input: './src/index.ts',
@@ -42,7 +44,13 @@ const tsConfig = [
             file: './dist/index.h5.js',
             format: 'es',
         },
-        plugins: plugins,
+        plugins: [
+            ...plugins,
+            replace({
+                __VERSION__: JSON.stringify(version),
+                'fs-aw/miniapp': 'fs-aw/web',
+            }),
+        ],
     },
 ];
 
