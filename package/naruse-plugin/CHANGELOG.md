@@ -1,5 +1,11 @@
 # naruse-plugin
 
+## 1.3.1
+
+### Patch Changes
+
+- naruse-plugin-hot-puller-cache 缓存错误
+
 ## 1.3.0
 
 ### Minor Changes
