@@ -1,5 +1,15 @@
 # naruse-plugin-hot-puller-cache
 
+## 0.1.1
+
+### Patch Changes
+
+- naruse-plugin-hot-puller-cache 缓存错误
+- Updated dependencies
+  - fs-aw@0.1.1
+  - naruse-plugin@1.3.1
+  - naruse-share@0.7.1
+
 ## 0.1.0
 
 ### Minor Changes

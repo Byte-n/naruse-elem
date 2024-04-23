@@ -1,5 +1,11 @@
 # naruse-alipay
 
+## 0.7.1
+
+### Patch Changes
+
+- naruse-plugin-hot-puller-cache 缓存错误
+
 ## 0.7.0
 
 ### Minor Changes
