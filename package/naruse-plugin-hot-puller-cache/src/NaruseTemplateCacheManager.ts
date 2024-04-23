@@ -80,7 +80,7 @@ export default class NaruseTemplateCacheManager<
         this.onRequestTemplate = params.onRequestTemplate;
         this.onRequest = params.onRequest;
         this.version = '';
-        
+
         this.initResolve = () => void 0;
         this.initPromise = new Promise(resolve => {
             this.initResolve = resolve;
@@ -108,7 +108,9 @@ export default class NaruseTemplateCacheManager<
                 // 这里理论上应该清除全部版本的缓存，但是因为异步的原因，会导致清楚与读取同时运行，导致读取失败
                 // 但是如果不使用 setTimeout 的话会阻塞主线程，所以这里只清除上一个版本的缓存
                 // 理论上使用测试版本的用户都是我们的测试人员，所以这里允许一部分冗余的情况出现
-                setTimeout(() => fsaw.rmdir(`${templateDirPath}/${oldVersion}`));
+                if (await fsaw.exists(`${templateDirPath}/${oldVersion}`)) {
+                    setTimeout(() => fsaw.rmdir(`${templateDirPath}/${oldVersion}`));
+                }
             }
             this.version = newVersion;
             // 保存版本号（同步）
@@ -129,34 +131,33 @@ export default class NaruseTemplateCacheManager<
 
     private async getCacheData (
         { deps = [], cachePath }: { data: RequestData, deps: string[], cachePath: string },
-    ): Promise<[boolean, (Cache<ResponseResult>) | null]> {
-        const failResult: [boolean, Cache<ResponseResult> | null] = [false, null];
+    ): Promise<(Cache<ResponseResult>) | null> {
         // 判断缓存是否存在
         if (!(await fsaw.exists(cachePath))) {
-            return failResult;
+            return null;
         }
         // 获取缓存的数据
         const cacheAdData = await fsaw.readFile(cachePath, 'utf8');
-        if (!cacheAdData) return failResult;
+        if (!cacheAdData) return null;
         let cacheAdDataObj: Cache<ResponseResult>;
         try {
             cacheAdDataObj = JSON.parse(cacheAdData);
         } catch (err) {
             log.warn('缓存文件解析失败', err);
-            return failResult;
+            return null;
         }
         // 判断缓存是否过期
         if (cacheAdDataObj.expireTime < Date.now()) {
             await fsaw.removeFile(cachePath);
-            return failResult;
+            return null;
         }
         // 如果缓存的依赖项与当前依赖项一致，直接返回缓存数据
         if (cacheAdDataObj.deps &&
             cacheAdDataObj.deps.length === deps.length &&
             cacheAdDataObj.deps.every((item, index) => item === deps[index])) {
-            return [true, cacheAdDataObj];
+            return cacheAdDataObj;
         }
-        return failResult;
+        return null;
     }
 
     /** 获取对应版本的模版列表 */
@@ -180,7 +181,7 @@ export default class NaruseTemplateCacheManager<
             data, deps, forceRefresh, key
         }));
     }
-    
+
     public clearAll () {
         fsaw.rmdirSync('/')
     }
@@ -199,12 +200,11 @@ export default class NaruseTemplateCacheManager<
                 if (!templateVersion) {
                     templateVersion = this.version;
                 }
-                const templateList = this.getTemplateListByVersion(templateVersion);
 
                 const fullPath = `${this.templateDirPath}/${templateVersion}/${templateName}`;
 
                 // 不在 已存在的模版列表中，或 路径不存在
-                if (!templateList.includes(templateName) || !(await fsaw.exists(fullPath))) {
+                if (!(await fsaw.exists(fullPath))) {
                     // 重新获取模版
                     const fileContent = await this.onRequestTemplate(templateName, templateVersion);
                     // 写入缓存
@@ -233,7 +233,7 @@ export default class NaruseTemplateCacheManager<
             templateList: this.getTemplateListByVersion(this.version),
         };
         const { dataFilePath } = this.onRequestBefore(requestData);
-        
+
         const cachePath = `${this.dataDirPath}${ dataFilePath.startsWith('/') ? dataFilePath : `/${dataFilePath}`}`;
 
         let cache: Cache<ResponseResult> | null = null;
@@ -241,10 +241,7 @@ export default class NaruseTemplateCacheManager<
 
         // 缓存处理
         if (!forceRefresh) {
-            let [isCacheAdDataValid, cacheTmp] = await this.getCacheData({ data, deps, cachePath });
-            if (isCacheAdDataValid && cacheTmp) {
-                cache = cacheTmp;
-            }
+            cache = await this.getCacheData({ data, deps, cachePath });
         }
         if (cache?.data) {
             isCache = true;
@@ -255,14 +252,12 @@ export default class NaruseTemplateCacheManager<
                 ...responseResult,
                 deps,
             };
+            await fsaw.writeFile(cachePath, JSON.stringify(cache));
         }
-
-        await fsaw.writeFile(cachePath, JSON.stringify(cache));
 
         // 处理模版
         let { templateVersion, templateName, code } = cache;
-        
-        if (templateName) {
+        if (!templateName) {
             // 没有模版名称，就直接返回
             return { ...cache, cache: isCache };
         }

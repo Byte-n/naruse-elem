@@ -1,5 +1,5 @@
-import { PluginConstructorFirstParma } from '../../naruse-plugin/src/type/index';
-import { HotPullerReturn } from '../../naruse-share/types/index';
+import type { PluginConstructorFirstParma } from '../../naruse-plugin/src/type/index';
+import type { HotPullerReturn } from '../../naruse-share/types/index';
 import NaruseTemplateCacheManager, {
     RequestManagerConstructor, RequestManagerData, RequestFuncParams,
 } from './NaruseTemplateCacheManager';
