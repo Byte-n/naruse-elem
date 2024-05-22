@@ -27,6 +27,7 @@ export interface RequestManagerConstructor<
     onRequestBefore: (request: RData<RequestData>) => OnRequestBeforeReturn,
     onRequest: (request: RData<RequestData>) => Promise<RequestManagerData<ResponseResult>>,
     onRequestTemplate: (path: string, version: string) => Promise<string>,
+    awaiter?: Promise<any>
 }
 
 export interface OnRequestBeforeReturn {
@@ -85,8 +86,12 @@ export default class NaruseTemplateCacheManager<
         this.initPromise = new Promise(resolve => {
             this.initResolve = resolve;
         });
-        // 初始化缓存数据
-        this.initCache();
+        if (params.awaiter instanceof Promise) {
+            params.awaiter.then(() => this.initCache());
+        } else {
+            // 初始化缓存数据
+            this.initCache();
+        }
     }
 
     /** 初始化版本号和模版列表，如果版本号不一致，清空缓存，重新获取模版列表 */
