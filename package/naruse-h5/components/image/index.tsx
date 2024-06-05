@@ -2,10 +2,11 @@ import { commonEventHander } from '../../core/event';
 import React, { Component } from 'react';
 import cssStyle from './index.css'
 import { getPropsDataSet } from '../../utils';
+import { getNaruseConfig } from '../../core/init';
 
 const h = React.createElement;
 
-class Image extends Component<
+class _Image extends Component<
 {
     lazyLoad,
     mode,
@@ -27,7 +28,8 @@ class Image extends Component<
     ref: HTMLImageElement | null;
     constructor(props) {
         super(props);
-        this.state = { isLoaded: false };
+        const { unsafeEnabled: { compatibleWeexElement } } = getNaruseConfig();
+        this.state = { isLoaded: false, imageSize: {}, visible: !compatibleWeexElement };
         this.imageOnLoad = this.imageOnLoad.bind(this);
         this.observer = {};
         this.ref = null;
@@ -44,14 +46,53 @@ class Image extends Component<
             }, { rootMargin: '300px 0px' });
             this.observer.observe(this.ref);
         }
+        this.adaptationWeex();
     }
 
+    componentDidUpdate(prevProps) {
+        if(prevProps.src != this.props.src) {
+            this.adaptationWeex();
+        }
+    }
+    adaptationWeex () {
+        const { unsafeEnabled: { compatibleWeexElement }, convertRpx } = getNaruseConfig();
+        if (compatibleWeexElement) {
+            this.setState({ imageSize: {}, visible: false });
+            const image = new Image()
+            image.src = this.props.src
+            image.onload = () => {
+                this.setState({
+                    imageSize: {
+                        width: convertRpx(image.width) + 'px',
+                        height: convertRpx(image.height)  + 'px',
+                    },
+                    visible: true
+                });
+            }
+            image.onerror = () => {
+                this.setState({ visible: true });
+            }
+            image.onabort = () => {
+                this.setState({ visible: true });
+            }
+        }
+    }
     componentWillUnmount () {
         this.observer.disconnect && this.observer.disconnect();
     }
 
     /** 当图片加载完毕 */
-    imageOnLoad = commonEventHander.bind(this)
+    imageOnLoad = (event) => {
+        const { unsafeEnabled: { compatibleWeexElement }, convertRpx } = getNaruseConfig();
+        if (compatibleWeexElement) {
+            console.log('compatibleWeexElement:', compatibleWeexElement,event.detail, {
+                width: convertRpx(event.target.width) + 'px',
+                height: convertRpx(event.target.height)  + 'px',
+            });
+
+        }
+        commonEventHander.call(this, event);
+    }
 
     render () {
         const {
@@ -64,26 +105,29 @@ class Image extends Component<
             id,
             ...other
         } = this.props;
+        const { imageSize, visible } = this.state;
+        if (!visible) {
+            return null;
+        }
         const divStyle = { ...cssStyle.naruseImg, ...(mode === 'widthFix' ? cssStyle.naruseImg__widthfix : {}) };
         const imgStyle = cssStyle[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
         return (
             <div onClick={commonEventHander.bind(this)} className={className} style={{ ...divStyle, ...style }}>
-                {
-                    <img
-                        ref={img => (this.ref = img)}
-                        id={id}
-                        style={imgStyle}
-                        src={src}
-                        onLoad={this.imageOnLoad}
-                        onError={onError}
-                        onTransitionEnd={commonEventHander.bind(this)}
-                        {...imgProps}
-                        {...getPropsDataSet(other)}
-                    />
-                }
+                <img
+                    key='img'
+                    ref={img => (this.ref = img)}
+                    id={id}
+                    style={{ ...imageSize, ...imgStyle }}
+                    src={src}
+                    onLoad={this.imageOnLoad}
+                    onError={onError}
+                    onTransitionEnd={commonEventHander.bind(this)}
+                    {...imgProps}
+                    {...getPropsDataSet(other)}
+                />
             </div>
         );
     }
 }
 
-export default Image;
+export default _Image;
