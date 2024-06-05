@@ -1,5 +1,11 @@
 # fs-aw
 
+## 0.1.2
+
+### Patch Changes
+
+- #FEAT: H5 新增 compatibleWeexElement
+
 ## 0.1.1
 
 ### Patch Changes

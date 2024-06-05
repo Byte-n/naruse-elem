@@ -1,5 +1,11 @@
 # naruse-plugin
 
+## 1.3.2
+
+### Patch Changes
+
+- #FEAT: H5 新增 compatibleWeexElement
+
 ## 1.3.1
 
 ### Patch Changes

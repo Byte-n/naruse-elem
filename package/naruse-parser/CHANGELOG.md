@@ -1,5 +1,11 @@
 # naruse-parser
 
+## 0.2.2
+
+### Patch Changes
+
+- #FEAT: H5 新增 compatibleWeexElement
+
 ## 0.2.1
 
 ### Patch Changes
