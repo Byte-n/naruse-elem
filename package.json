@@ -99,7 +99,7 @@
         "dev": "pnpm -r --filter=./package/* run dev",
         "preinstall": "npx only-allow pnpm",
         "start": "rollup -c ./rollup.config.js -w",
-        "build": "pnpm -r --filter=./package/* run build",
+        "build": "pnpm -r --filter=* run build",
         "build2": "pnpm -r --filter * run build",
         "version": "changeset version",
         "demo:alipay": "cd ./demo/demo-alipay && npm run dev",

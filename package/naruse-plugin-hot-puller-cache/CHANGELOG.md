@@ -1,5 +1,15 @@
 # naruse-plugin-hot-puller-cache
 
+## 0.1.2
+
+### Patch Changes
+
+- #FEAT: H5 新增 compatibleWeexElement
+- Updated dependencies
+  - fs-aw@0.1.2
+  - naruse-plugin@1.3.2
+  - naruse-share@0.7.2
+
 ## 0.1.1
 
 ### Patch Changes

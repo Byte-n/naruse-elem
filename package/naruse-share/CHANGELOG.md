@@ -1,5 +1,11 @@
 # naruse-share
 
+## 0.7.2
+
+### Patch Changes
+
+- #FEAT: H5 新增 compatibleWeexElement
+
 ## 0.7.1
 
 ### Patch Changes
