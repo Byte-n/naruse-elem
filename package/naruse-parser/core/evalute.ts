@@ -173,10 +173,10 @@ const evaluate_map: baseMap = {
         else if (node.alternate) return evaluate(node.alternate, scope);
     },
     [ForStatement]: function (node: estree.ForStatement, scope: Scope) {
-        for (
-            const new_scope = new Scope(ScopeType.Loop, scope),
+        const new_scope = new Scope(ScopeType.Loop, scope),
             // 只有 var 变量才会被提高到上一作用域
             init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null;
+        for (;
             node.test ? evaluate(node.test, new_scope) : true;
             node.update ? evaluate(node.update, new_scope) : void (0)
         ) {
