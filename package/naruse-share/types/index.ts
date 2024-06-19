@@ -10,6 +10,15 @@ export type NaruseConfig = {
     [k: string]: any,
 }
 
+export type NaruseConfigH5 = {
+    unsafeEnabled: {
+        compatibleWeexElement?: boolean
+        compatibleWeexElementLog?: boolean
+    },
+    convertRpx: (val: number) => (number|string)
+} & NaruseConfig;
+export type NaruseInitParamsH5 = Partial<NaruseConfigH5>
+
 /** 热更新方法返回值 */
 export type HotPullerReturn = {
     code?: string,

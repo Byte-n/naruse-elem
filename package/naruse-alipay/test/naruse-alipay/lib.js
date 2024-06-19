@@ -875,9 +875,10 @@ var evaluate_map = (_b = {},
             return evaluate(node.alternate, scope);
     },
     _b[ForStatement] = function (node, scope) {
-        for (var new_scope = new Scope("loop" /* ScopeType.Loop */, scope), 
+        var new_scope = new Scope("loop" /* ScopeType.Loop */, scope); 
         // 只有 var 变量才会被提高到上一作用域
-        init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
+        node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null;
+        for (; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
             var result = evaluate(node.body, new_scope);
             if (isReturnResult(result))
                 return result;
@@ -6154,7 +6155,7 @@ var createMiniFactory = function (type, instance, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.7.1";
+var version = "0.7.3";
 initVersionLogger('naruse-alipay', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 // naruse模块内容

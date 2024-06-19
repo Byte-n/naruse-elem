@@ -720,20 +720,197 @@ var Checkbox = /** @class */ (function (_super) {
 
 var cssStyle$3 = {"img-empty":{"opacity":"0"},"naruseImg":{"display":"inline-block","overflow":"hidden","position":"relative","fontSize":"0"},"naruseImg__widthfix":{"height":"100%"},"scaletofill":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfit":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfill":{"objectFit":"cover","width":"100%","height":"100%"},"widthfix":{"width":"100%"},"top":{"width":"100%"},"bottom":{"width":"100%","position":"absolute","bottom":"0"},"left":{"height":"100%"},"right":{"position":"absolute","height":"100%","right":"0"},"topright":{"position":"absolute","right":"0"},"bottomleft":{"position":"absolute","bottom":"0"},"bottomright":{"position":"absolute","right":"0","bottom":"0"}};
 
+function withPage(Comp) {
+    return /** @class */ (function (_super) {
+        __extends$1(WithPageComponent, _super);
+        function WithPageComponent() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        WithPageComponent.prototype.render = function () {
+            var page = getCurrentPageInstance();
+            var hashs = location.hash.split('?');
+            var currentPage = {
+                route: hashs[0],
+                param: parseURLParam(hashs[1]),
+                events: {
+                    on: page.on.bind(page),
+                    off: page.off.bind(page),
+                    once: page.once.bind(page),
+                },
+            };
+            return naruseCreateElement(Comp, __assign(__assign({}, this.props), { currentPage: currentPage }));
+        };
+        return WithPageComponent;
+    }(React.Component));
+}
+var pages = [];
+// 获取当前页面的对象
+function getCurrentPageInstance() {
+    var hash = location.hash.substring(1);
+    if (pages[hash]) {
+        return pages[hash];
+    }
+    pages[hash] = new Page();
+    return pages[hash];
+}
+// 页面可用生命周期函数
+var PageEventKey = { onShow: 'onShow', onHide: 'onHide', onPageScroll: 'onPageScroll' };
+var PageEventKeys = Object.keys(PageEventKey);
+var Page = /** @class */ (function () {
+    function Page() {
+        // @ts-ignore 事件中心
+        this.eventCenter = new EventBus();
+    }
+    /**
+     * 检查 event 、 callback 是否合理
+     * @param event
+     * @param callback
+     */
+    Page.prototype.eventCheck = function (event, callback) {
+        if (PageEventKeys.indexOf(event) === -1) {
+            return false;
+        }
+        return typeof callback === 'function';
+    };
+    Page.prototype.on = function (event, callback) {
+        if (!this.eventCheck(event, callback)) {
+            return;
+        }
+        this.eventCenter.on(event, callback);
+    };
+    Page.prototype.off = function (event, callback) {
+        if (PageEventKeys.indexOf(event) === -1) {
+            return;
+        }
+        this.eventCenter.off(event, callback);
+    };
+    Page.prototype.once = function (event, callback) {
+        if (!this.eventCheck(event, callback)) {
+            return;
+        }
+        this.eventCenter.once(event, callback);
+    };
+    // 触发指定 事件
+    Page.prototype.call = function (eventName, e) {
+        this.eventCenter.emit(eventName, e);
+    };
+    return Page;
+}());
+/**
+ * 兼容获取浏览器滚动条位置 ，
+ */
+var getScroll = function () {
+    if (currentPageContainer === window || currentPageContainer === document.body || currentPageContainer === document.documentElement) {
+        return {
+            scrollTop: document.body.scrollTop || document.documentElement.scrollTop || 0,
+            scrollLeft: document.body.scrollLeft || document.documentElement.scrollLeft || 0
+        };
+    }
+    return {
+        scrollTop: currentPageContainer.scrollTop,
+        scrollLeft: currentPageContainer.scrollLeft,
+    };
+};
+/**
+ * 监听地址栏的hash变化
+ */
+window.addEventListener('hashchange', function (event) {
+    var keys = Object.keys(pages);
+    if (keys.length === 0) {
+        return;
+    }
+    var _a = event.oldURL, oldURL = _a === void 0 ? '' : _a, _b = event.newURL, newURL = _b === void 0 ? '' : _b;
+    // 隐藏
+    var prePage = pages[oldURL.split('#')[1]];
+    prePage && prePage.call(PageEventKey.onHide);
+    // 显示
+    var cur = pages[newURL.split('#')[1]];
+    cur && cur.call(PageEventKey.onShow);
+});
+function onPageScrollEvent() {
+    var keys = Object.keys(pages);
+    if (keys.length === 0) {
+        return;
+    }
+    var hash = location.hash.substring(1);
+    pages[hash] && pages[hash].call(PageEventKey.onPageScroll, getScroll());
+}
+// 默认window
+var currentPageContainer = null;
+function withPageInit(_a) {
+    var _b = _a.pageContainer, pageContainer = _b === void 0 ? window : _b;
+    if (pageContainer && pageContainer !== currentPageContainer) {
+        // 切换事件 对象
+        currentPageContainer && currentPageContainer.removeEventListener('scroll', onPageScrollEvent);
+        pageContainer.addEventListener('scroll', onPageScrollEvent);
+        currentPageContainer = pageContainer;
+    }
+}
+
+var _config = {
+    hotPuller: function () {
+        logger.error('未初始化热更新拉取，无法更新组件默认为空');
+        return Promise.resolve({ code: '', ctx: {} });
+    },
+    baseCtx: function () {
+        return {};
+    },
+    onRunError: function (err) {
+        console.error(err);
+    },
+    // 自定义 rpx 的单位转换
+    convertRpx: function (rpx) { return (rpx / 2 * 1.4).toFixed(1); },
+    hotImport: function (_path, _ctx) {
+        logger.error('hotImport 函数尚未初始化！');
+        return Promise.resolve('');
+    },
+    unsafeEnabled: {
+        compatibleWeexElement: false,
+        compatibleWeexElementLog: false,
+    }
+};
+/**
+ * @description 获取初始化
+ * @author CHC
+ * @date 2022-06-14 10:06:50
+ * @returns {{ _config: () => Promise<{ code, ctx }>  }}
+ */
+var getNaruseConfig = function () {
+    return _config;
+};
+/**
+ * @description naruse内部初始化过程
+ * @author CHC
+ * @date 2022-06-14 10:06:36
+ * @param newConfig
+ */
+var naruseInit = function (newConfig) {
+    var unsafeEnabled = newConfig.unsafeEnabled;
+    delete newConfig.unsafeEnabled;
+    Object.assign(_config, newConfig);
+    Object.assign(_config.unsafeEnabled, unsafeEnabled);
+    var pageContainer = _config.pageContainer;
+    withPageInit({ pageContainer: pageContainer });
+};
+
 var h$6 = React.createElement;
-var Image$1 = /** @class */ (function (_super) {
-    __extends$1(Image, _super);
-    function Image(props) {
+var _Image = /** @class */ (function (_super) {
+    __extends$1(_Image, _super);
+    function _Image(props) {
         var _this = _super.call(this, props) || this;
         /** 当图片加载完毕 */
-        _this.imageOnLoad = commonEventHander.bind(_this);
-        _this.state = { isLoaded: false };
+        _this.imageOnLoad = function (event) {
+            commonEventHander.call(_this, event);
+        };
+        var compatibleWeexElement = getNaruseConfig().unsafeEnabled.compatibleWeexElement;
+        _this.state = { isLoaded: false, imageSize: {}, visible: !compatibleWeexElement };
         _this.imageOnLoad = _this.imageOnLoad.bind(_this);
         _this.observer = {};
         _this.ref = null;
+        _this.naturalSize = null;
         return _this;
     }
-    Image.prototype.componentDidMount = function () {
+    _Image.prototype.componentDidMount = function () {
         var _this = this;
         if (this.props.lazyLoad) {
             this.observer = new IntersectionObserver(function (entries) {
@@ -746,18 +923,87 @@ var Image$1 = /** @class */ (function (_super) {
             }, { rootMargin: '300px 0px' });
             this.observer.observe(this.ref);
         }
+        this.computeNaturalSize(function () {
+            _this.adaptationWeex();
+            _this.setState({ visible: true });
+        });
     };
-    Image.prototype.componentWillUnmount = function () {
+    _Image.prototype.computeNaturalSize = function (callback) {
+        var _this = this;
+        var image = new Image();
+        image.src = this.props.src;
+        image.onload = function () {
+            _this.naturalSize = { width: image.width, height: image.height };
+            callback(true);
+        };
+        image.onerror = function () {
+            callback(false);
+            _this.naturalSize = null;
+        };
+        image.onabort = function () {
+            callback(false);
+            _this.naturalSize = null;
+        };
+    };
+    _Image.prototype.componentDidUpdate = function (prevProps) {
+        var _this = this;
+        var _a, _b, _c, _d;
+        if (prevProps.src != this.props.src) {
+            this.computeNaturalSize(function () {
+                _this.adaptationWeex();
+            });
+        }
+        else if (((_a = prevProps.style) === null || _a === void 0 ? void 0 : _a.width) !== ((_b = this.props.style) === null || _b === void 0 ? void 0 : _b.width)
+            || ((_c = prevProps.style) === null || _c === void 0 ? void 0 : _c.height) !== ((_d = this.props.style) === null || _d === void 0 ? void 0 : _d.height)) {
+            this.adaptationWeex();
+        }
+    };
+    _Image.prototype.adaptationWeex = function () {
+        var _a = this.props, _b = _a.style, style = _b === void 0 ? {} : _b, mode = _a.mode;
+        var _c = getNaruseConfig(), _d = _c.unsafeEnabled, compatibleWeexElement = _d.compatibleWeexElement, compatibleWeexElementLog = _d.compatibleWeexElementLog, convertRpx = _c.convertRpx;
+        if (compatibleWeexElementLog) {
+            console.log('compatibleWeexElement:', this.props, this.naturalSize);
+        }
+        if (compatibleWeexElement
+            && (style.height == undefined && style.width === undefined)
+            && this.naturalSize) {
+            switch (mode) {
+                case 'widthFix':
+                    this.setState({
+                        imageSize: {
+                            maxWidth: convertRpx(this.naturalSize.width) + 'px',
+                        }
+                    });
+                    return;
+                case 'heightFix':
+                    this.setState({
+                        imageSize: {
+                            maxHeight: convertRpx(this.naturalSize.height) + 'px',
+                        }
+                    });
+                    return;
+            }
+        }
+        else {
+            this.setState({ imageSize: {} });
+        }
+    };
+    _Image.prototype.componentWillUnmount = function () {
         this.observer.disconnect && this.observer.disconnect();
     };
-    Image.prototype.render = function () {
+    _Image.prototype.render = function () {
         var _this = this;
         var _a = this.props, className = _a.className, src = _a.src, _b = _a.style, style = _b === void 0 ? {} : _b, mode = _a.mode, onError = _a.onError, imgProps = _a.imgProps, id = _a.id, other = __rest(_a, ["className", "src", "style", "mode", "onError", "imgProps", "id"]);
+        var _c = this.state, imageSize = _c.imageSize, visible = _c.visible;
+        if (!visible) {
+            return null;
+        }
         var divStyle = __assign(__assign({}, cssStyle$3.naruseImg), (mode === 'widthFix' ? cssStyle$3.naruseImg__widthfix : {}));
         var imgStyle = cssStyle$3[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
-        return (h$6("div", { onClick: commonEventHander.bind(this), className: className, style: __assign(__assign({}, divStyle), style) }, h$6("img", __assign({ ref: function (img) { return (_this.ref = img); }, id: id, style: imgStyle, src: src, onLoad: this.imageOnLoad, onError: onError, onTransitionEnd: commonEventHander.bind(this) }, imgProps, getPropsDataSet(other)))));
+        return (h$6("div", { onClick: commonEventHander.bind(this), className: className, style: __assign(__assign({}, divStyle), style) },
+            h$6("img", __assign({ key: 'img', ref: function (img) { return (_this.ref = img); }, id: id, style: __assign(__assign({}, imageSize), imgStyle), src: src, onLoad: this.imageOnLoad, onError: onError, onTransitionEnd: commonEventHander.bind(this) }, imgProps, getPropsDataSet(other)))));
     };
-    return Image;
+    return _Image;
 }(React.Component));
 
 var h$5 = React.createElement;
@@ -1426,176 +1672,6 @@ Textarea.defaultProps = {
     controlled: false,
 };
 
-function withPage(Comp) {
-    return /** @class */ (function (_super) {
-        __extends$1(WithPageComponent, _super);
-        function WithPageComponent() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        WithPageComponent.prototype.render = function () {
-            var page = getCurrentPageInstance();
-            var hashs = location.hash.split('?');
-            var currentPage = {
-                route: hashs[0],
-                param: parseURLParam(hashs[1]),
-                events: {
-                    on: page.on.bind(page),
-                    off: page.off.bind(page),
-                    once: page.once.bind(page),
-                },
-            };
-            return naruseCreateElement(Comp, __assign(__assign({}, this.props), { currentPage: currentPage }));
-        };
-        return WithPageComponent;
-    }(React.Component));
-}
-var pages = [];
-// 获取当前页面的对象
-function getCurrentPageInstance() {
-    var hash = location.hash.substring(1);
-    if (pages[hash]) {
-        return pages[hash];
-    }
-    pages[hash] = new Page();
-    return pages[hash];
-}
-// 页面可用生命周期函数
-var PageEventKey = { onShow: 'onShow', onHide: 'onHide', onPageScroll: 'onPageScroll' };
-var PageEventKeys = Object.keys(PageEventKey);
-var Page = /** @class */ (function () {
-    function Page() {
-        // @ts-ignore 事件中心
-        this.eventCenter = new EventBus();
-    }
-    /**
-     * 检查 event 、 callback 是否合理
-     * @param event
-     * @param callback
-     */
-    Page.prototype.eventCheck = function (event, callback) {
-        if (PageEventKeys.indexOf(event) === -1) {
-            return false;
-        }
-        return typeof callback === 'function';
-    };
-    Page.prototype.on = function (event, callback) {
-        if (!this.eventCheck(event, callback)) {
-            return;
-        }
-        this.eventCenter.on(event, callback);
-    };
-    Page.prototype.off = function (event, callback) {
-        if (PageEventKeys.indexOf(event) === -1) {
-            return;
-        }
-        this.eventCenter.off(event, callback);
-    };
-    Page.prototype.once = function (event, callback) {
-        if (!this.eventCheck(event, callback)) {
-            return;
-        }
-        this.eventCenter.once(event, callback);
-    };
-    // 触发指定 事件
-    Page.prototype.call = function (eventName, e) {
-        this.eventCenter.emit(eventName, e);
-    };
-    return Page;
-}());
-/**
- * 兼容获取浏览器滚动条位置 ，
- */
-var getScroll = function () {
-    if (currentPageContainer === window || currentPageContainer === document.body || currentPageContainer === document.documentElement) {
-        return {
-            scrollTop: document.body.scrollTop || document.documentElement.scrollTop || 0,
-            scrollLeft: document.body.scrollLeft || document.documentElement.scrollLeft || 0
-        };
-    }
-    return {
-        scrollTop: currentPageContainer.scrollTop,
-        scrollLeft: currentPageContainer.scrollLeft,
-    };
-};
-/**
- * 监听地址栏的hash变化
- */
-window.addEventListener('hashchange', function (event) {
-    var keys = Object.keys(pages);
-    if (keys.length === 0) {
-        return;
-    }
-    var _a = event.oldURL, oldURL = _a === void 0 ? '' : _a, _b = event.newURL, newURL = _b === void 0 ? '' : _b;
-    // 隐藏
-    var prePage = pages[oldURL.split('#')[1]];
-    prePage && prePage.call(PageEventKey.onHide);
-    // 显示
-    var cur = pages[newURL.split('#')[1]];
-    cur && cur.call(PageEventKey.onShow);
-});
-function onPageScrollEvent() {
-    var keys = Object.keys(pages);
-    if (keys.length === 0) {
-        return;
-    }
-    var hash = location.hash.substring(1);
-    pages[hash] && pages[hash].call(PageEventKey.onPageScroll, getScroll());
-}
-// 默认window
-var currentPageContainer = null;
-function withPageInit(_a) {
-    var _b = _a.pageContainer, pageContainer = _b === void 0 ? window : _b;
-    if (pageContainer && pageContainer !== currentPageContainer) {
-        // 切换事件 对象
-        currentPageContainer && currentPageContainer.removeEventListener('scroll', onPageScrollEvent);
-        pageContainer.addEventListener('scroll', onPageScrollEvent);
-        currentPageContainer = pageContainer;
-    }
-}
-
-var _config = {
-    hotPuller: function () {
-        logger.error('未初始化热更新拉取，无法更新组件默认为空');
-        return Promise.resolve({ code: '', ctx: {} });
-    },
-    baseCtx: function () {
-        return {};
-    },
-    onRunError: function (err) {
-        console.error(err);
-    },
-    // 自定义 rpx 的单位转换
-    convertRpx: function (rpx) { return (rpx / 2 * 1.4).toFixed(1); },
-    hotImport: function (_path, _ctx) {
-        logger.error('hotImport 函数尚未初始化！');
-        return Promise.resolve('');
-    }
-};
-/**
- * @description 获取初始化
- * @author CHC
- * @date 2022-06-14 10:06:50
- * @returns {{ _config: () => Promise<{ code, ctx }>  }}
- */
-var getNaruseConfig = function () {
-    return _config;
-};
-/**
- * @description naruse内部初始化过程
- * @author CHC
- * @date 2022-06-14 10:06:36
- * @param hotPuller 热更新处理、广告加载
- * @param baseCtx 广告运行时的上下文环境
- * @param onRunError 广告运行错误时触发
- * @param convertRpx 自定义 rpx 到 px 的转换
- * @param pageContainer 能获取到页面滚动条偏移量的容器元素
- */
-var naruseInit = function (newConfig) {
-    Object.assign(_config, newConfig);
-    var pageContainer = _config.pageContainer;
-    withPageInit({ pageContainer: pageContainer });
-};
-
 var dist = {};
 
 Object.defineProperty(dist, '__esModule', { value: true });
@@ -2164,7 +2240,7 @@ var WebView = /** @class */ (function (_super) {
 var componentReflectMap = {
     button: Button,
     checkbox: Checkbox,
-    image: Image$1,
+    image: _Image,
     input: Input,
     text: Text,
     view: View,
@@ -2685,9 +2761,10 @@ var evaluate_map = (_b = {},
             return evaluate(node.alternate, scope);
     },
     _b[ForStatement] = function (node, scope) {
-        for (var new_scope = new Scope("loop" /* ScopeType.Loop */, scope), 
+        var new_scope = new Scope("loop" /* ScopeType.Loop */, scope); 
         // 只有 var 变量才会被提高到上一作用域
-        init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
+        node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null;
+        for (; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
             var result = evaluate(node.body, new_scope);
             if (isReturnResult(result))
                 return result;
@@ -8297,7 +8374,7 @@ var Container = /** @class */ (function (_super) {
 }(React.Component));
 
 // @ts-ignore
-var version = "0.7.1";
+var version = "0.7.3";
 initVersionLogger('naruse-h5', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {

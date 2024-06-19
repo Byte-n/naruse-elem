@@ -16,10 +16,22 @@ const isDev = process.env.BUILD === 'development';
 
 const config = {
     input: './index.ts',
-    output: {
-        file: './dist/index.js',
-        format: 'es',
-    },
+    output: [
+        {
+            file: './dist/index.js',
+            format: 'es',
+        },
+        {
+            file: './dist/index.iife.js',
+            format: 'iife', // IIFE 格式适合浏览器环境
+            name: 'Naruse', // 全局变量名
+        },
+        {
+            file: 'dist/index.bundle.js',
+            format: 'umd', // 或 'cjs' 或 'esm'
+            name: 'MyBundle'
+        }
+    ],
     external: ['react'],
     plugins: [
         css(),
