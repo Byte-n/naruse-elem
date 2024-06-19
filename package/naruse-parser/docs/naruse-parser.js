@@ -449,9 +449,10 @@
                 return evaluate(node.alternate, scope);
         },
         _b[ForStatement] = function (node, scope) {
-            for (var new_scope = new Scope("loop" /* ScopeType.Loop */, scope), 
+            var new_scope = new Scope("loop" /* ScopeType.Loop */, scope); 
             // 只有 var 变量才会被提高到上一作用域
-            init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
+            node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null;
+            for (; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
                 var result = evaluate(node.body, new_scope);
                 if (isReturnResult(result))
                     return result;

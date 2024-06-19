@@ -1,5 +1,11 @@
 # rollup-plugin-naruse
 
+## 0.7.3
+
+### Patch Changes
+
+- #FIX: 1688 官方编译不支持部分 for.init 语法、修改 h5 中对 week image 组件的样式兼容
+
 ## 0.7.2
 
 ### Patch Changes

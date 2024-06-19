@@ -865,7 +865,8 @@ var _config = {
         return Promise.resolve('');
     },
     unsafeEnabled: {
-        compatibleWeexElement: false
+        compatibleWeexElement: false,
+        compatibleWeexElementLog: false,
     }
 };
 /**
@@ -899,13 +900,6 @@ var _Image = /** @class */ (function (_super) {
         var _this = _super.call(this, props) || this;
         /** 当图片加载完毕 */
         _this.imageOnLoad = function (event) {
-            var _a = getNaruseConfig(), compatibleWeexElement = _a.unsafeEnabled.compatibleWeexElement, convertRpx = _a.convertRpx;
-            if (compatibleWeexElement) {
-                console.log('compatibleWeexElement:', compatibleWeexElement, event.detail, {
-                    width: convertRpx(event.target.width) + 'px',
-                    height: convertRpx(event.target.height) + 'px',
-                });
-            }
             commonEventHander.call(_this, event);
         };
         var compatibleWeexElement = getNaruseConfig().unsafeEnabled.compatibleWeexElement;
@@ -913,6 +907,7 @@ var _Image = /** @class */ (function (_super) {
         _this.imageOnLoad = _this.imageOnLoad.bind(_this);
         _this.observer = {};
         _this.ref = null;
+        _this.naturalSize = null;
         return _this;
     }
     _Image.prototype.componentDidMount = function () {
@@ -928,35 +923,69 @@ var _Image = /** @class */ (function (_super) {
             }, { rootMargin: '300px 0px' });
             this.observer.observe(this.ref);
         }
-        this.adaptationWeex();
+        this.computeNaturalSize(function () {
+            _this.adaptationWeex();
+            _this.setState({ visible: true });
+        });
+    };
+    _Image.prototype.computeNaturalSize = function (callback) {
+        var _this = this;
+        var image = new Image();
+        image.src = this.props.src;
+        image.onload = function () {
+            _this.naturalSize = { width: image.width, height: image.height };
+            callback(true);
+        };
+        image.onerror = function () {
+            callback(false);
+            _this.naturalSize = null;
+        };
+        image.onabort = function () {
+            callback(false);
+            _this.naturalSize = null;
+        };
     };
     _Image.prototype.componentDidUpdate = function (prevProps) {
+        var _this = this;
+        var _a, _b, _c, _d;
         if (prevProps.src != this.props.src) {
+            this.computeNaturalSize(function () {
+                _this.adaptationWeex();
+            });
+        }
+        else if (((_a = prevProps.style) === null || _a === void 0 ? void 0 : _a.width) !== ((_b = this.props.style) === null || _b === void 0 ? void 0 : _b.width)
+            || ((_c = prevProps.style) === null || _c === void 0 ? void 0 : _c.height) !== ((_d = this.props.style) === null || _d === void 0 ? void 0 : _d.height)) {
             this.adaptationWeex();
         }
     };
     _Image.prototype.adaptationWeex = function () {
-        var _this = this;
-        var _a = getNaruseConfig(), compatibleWeexElement = _a.unsafeEnabled.compatibleWeexElement, convertRpx = _a.convertRpx;
-        if (compatibleWeexElement) {
-            this.setState({ imageSize: {}, visible: false });
-            var image_1 = new Image();
-            image_1.src = this.props.src;
-            image_1.onload = function () {
-                _this.setState({
-                    imageSize: {
-                        width: convertRpx(image_1.width) + 'px',
-                        height: convertRpx(image_1.height) + 'px',
-                    },
-                    visible: true
-                });
-            };
-            image_1.onerror = function () {
-                _this.setState({ visible: true });
-            };
-            image_1.onabort = function () {
-                _this.setState({ visible: true });
-            };
+        var _a = this.props, _b = _a.style, style = _b === void 0 ? {} : _b, mode = _a.mode;
+        var _c = getNaruseConfig(), _d = _c.unsafeEnabled, compatibleWeexElement = _d.compatibleWeexElement, compatibleWeexElementLog = _d.compatibleWeexElementLog, convertRpx = _c.convertRpx;
+        if (compatibleWeexElementLog) {
+            console.log('compatibleWeexElement:', this.props, this.naturalSize);
+        }
+        if (compatibleWeexElement
+            && (style.height == undefined && style.width === undefined)
+            && this.naturalSize) {
+            switch (mode) {
+                case 'widthFix':
+                    this.setState({
+                        imageSize: {
+                            maxWidth: convertRpx(this.naturalSize.width) + 'px',
+                        }
+                    });
+                    return;
+                case 'heightFix':
+                    this.setState({
+                        imageSize: {
+                            maxHeight: convertRpx(this.naturalSize.height) + 'px',
+                        }
+                    });
+                    return;
+            }
+        }
+        else {
+            this.setState({ imageSize: {} });
         }
     };
     _Image.prototype.componentWillUnmount = function () {
@@ -2732,9 +2761,10 @@ var evaluate_map = (_b = {},
             return evaluate(node.alternate, scope);
     },
     _b[ForStatement] = function (node, scope) {
-        for (var new_scope = new Scope("loop" /* ScopeType.Loop */, scope), 
+        var new_scope = new Scope("loop" /* ScopeType.Loop */, scope); 
         // 只有 var 变量才会被提高到上一作用域
-        init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
+        node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null;
+        for (; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
             var result = evaluate(node.body, new_scope);
             if (isReturnResult(result))
                 return result;
@@ -8344,7 +8374,7 @@ var Container = /** @class */ (function (_super) {
 }(React.Component));
 
 // @ts-ignore
-var version = "0.7.2";
+var version = "0.7.3";
 initVersionLogger('naruse-h5', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {
