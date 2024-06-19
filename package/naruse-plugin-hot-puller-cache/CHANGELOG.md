@@ -1,5 +1,25 @@
 # naruse-plugin-hot-puller-cache
 
+## 0.1.3
+
+### Patch Changes
+
+- #FIX: 1688 官方编译不支持部分 for.init 语法、修改 h5 中对 week image 组件的样式兼容
+- Updated dependencies
+  - fs-aw@0.1.3
+  - naruse-plugin@1.3.3
+  - naruse-share@0.7.3
+
+## 0.1.2
+
+### Patch Changes
+
+- #FEAT: H5 新增 compatibleWeexElement
+- Updated dependencies
+  - fs-aw@0.1.2
+  - naruse-plugin@1.3.2
+  - naruse-share@0.7.2
+
 ## 0.1.1
 
 ### Patch Changes

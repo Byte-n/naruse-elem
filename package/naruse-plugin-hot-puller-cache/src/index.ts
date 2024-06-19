@@ -6,19 +6,20 @@ import NaruseTemplateCacheManager, {
 export interface HotPullerCachePluginConfig <Props, RequestData, ResponseResult> {
     ignoreUniqueComponent?: boolean,
     managerConfig: RequestManagerConstructor<RequestData, ResponseResult>,
-    onCreateRequest: (props: Props) => RequestFuncParams<RequestData>;
+    onCreateRequest: (props: Props) => Promise<RequestFuncParams<RequestData>>;
     onHotPuller: (props: Props, resp: RequestManagerData<ResponseResult>, req: RequestFuncParams<RequestData>) => ({ ctx: object; props: object });
 }
 export default class HotPullerCachePlugin<Props extends object, RequestData, ResponseResult> {
     public manager: NaruseTemplateCacheManager<RequestData, ResponseResult>;
-    private onCreateRequest: (props: Props) => RequestFuncParams<RequestData>;
+    private onCreateRequest: (props: Props) => Promise<RequestFuncParams<RequestData>>;
     private onHotPuller: (props: Props,resp: RequestManagerData<ResponseResult>, req: RequestFuncParams<RequestData>) => ({ ctx: object; props: object });
+    private readonly awaiter?: Promise<any> = Promise.resolve();
 
     public ignoreUniqueComponent: boolean = true;
     constructor (
         params: PluginConstructorFirstParma,
         {
-            managerConfig, onCreateRequest, onHotPuller, ignoreUniqueComponent = true,
+            managerConfig, onCreateRequest, onHotPuller, ignoreUniqueComponent = true
         }: HotPullerCachePluginConfig<Props, RequestData, ResponseResult>,
     ) {
         const config = params.config;
@@ -27,13 +28,15 @@ export default class HotPullerCachePlugin<Props extends object, RequestData, Res
         this.onCreateRequest = onCreateRequest;
         this.onHotPuller = onHotPuller;
         this.ignoreUniqueComponent = ignoreUniqueComponent;
+        this.awaiter = managerConfig.awaiter
     }
 
     hotPuller = async (props: Props & { unique?: boolean }): Promise<HotPullerReturn> => {
+        await this.awaiter;
         if (props.unique && this.ignoreUniqueComponent) {
             return { props: {}, ctx: {} };
         }
-        const requestParams = this.onCreateRequest(props);
+        const requestParams = await this.onCreateRequest(props);
         const resp = await this.manager.request(requestParams);
         const { ctx, props: _props } = this.onHotPuller(props, resp, requestParams);
         return Promise.resolve({

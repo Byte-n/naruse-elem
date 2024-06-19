@@ -1,5 +1,17 @@
 # naruse-plugin
 
+## 1.3.3
+
+### Patch Changes
+
+- #FIX: 1688 官方编译不支持部分 for.init 语法、修改 h5 中对 week image 组件的样式兼容
+
+## 1.3.2
+
+### Patch Changes
+
+- #FEAT: H5 新增 compatibleWeexElement
+
 ## 1.3.1
 
 ### Patch Changes
