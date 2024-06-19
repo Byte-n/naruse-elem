@@ -33,6 +33,7 @@ class _Image extends Component<
         this.imageOnLoad = this.imageOnLoad.bind(this);
         this.observer = {};
         this.ref = null;
+        this.naturalSize = null;
     }
     componentDidMount () {
         if (this.props.lazyLoad) {
@@ -46,35 +47,69 @@ class _Image extends Component<
             }, { rootMargin: '300px 0px' });
             this.observer.observe(this.ref);
         }
-        this.adaptationWeex();
+        this.computeNaturalSize(() => {
+            this.adaptationWeex();
+            this.setState({ visible: true });
+        });
     }
 
+    computeNaturalSize (callback) {
+        const image = new Image();
+        image.src = this.props.src;
+        image.onload = () => {
+            this.naturalSize = { width: image.width, height: image.height };
+            callback(true);
+        };
+        image.onerror = () => {
+            callback(false);
+            this.naturalSize = null;
+        };
+        image.onabort = () => {
+            callback(false);
+            this.naturalSize = null;
+        };
+    }
     componentDidUpdate(prevProps) {
         if(prevProps.src != this.props.src) {
+            this.computeNaturalSize(() => {
+                this.adaptationWeex();
+            });
+        } else if (
+            prevProps.style?.width !== this.props.style?.width
+            || prevProps.style?.height !== this.props.style?.height
+        ) {
             this.adaptationWeex();
         }
     }
     adaptationWeex () {
-        const { unsafeEnabled: { compatibleWeexElement }, convertRpx } = getNaruseConfig();
-        if (compatibleWeexElement) {
-            this.setState({ imageSize: {}, visible: false });
-            const image = new Image()
-            image.src = this.props.src
-            image.onload = () => {
-                this.setState({
-                    imageSize: {
-                        width: convertRpx(image.width) + 'px',
-                        height: convertRpx(image.height)  + 'px',
-                    },
-                    visible: true
-                });
+        const { style = {}, mode } = this.props;
+        const { unsafeEnabled: { compatibleWeexElement, compatibleWeexElementLog }, convertRpx } = getNaruseConfig();
+        if (compatibleWeexElementLog) {
+            console.log('compatibleWeexElement:', this.props, this.naturalSize);
+        }
+        if (
+            compatibleWeexElement
+            && (style.height == undefined && style.width === undefined)
+            && this.naturalSize
+        ) {
+            switch (mode) {
+                case 'widthFix':
+                    this.setState({
+                        imageSize: {
+                            maxWidth: convertRpx(this.naturalSize.width) + 'px',
+                        }
+                    });
+                    return;
+                case 'heightFix':
+                    this.setState({
+                        imageSize: {
+                            maxHeight: convertRpx(this.naturalSize.height) + 'px',
+                        }
+                    });
+                    return;
             }
-            image.onerror = () => {
-                this.setState({ visible: true });
-            }
-            image.onabort = () => {
-                this.setState({ visible: true });
-            }
+        } else {
+            this.setState({ imageSize: {} });
         }
     }
     componentWillUnmount () {
@@ -83,14 +118,6 @@ class _Image extends Component<
 
     /** 当图片加载完毕 */
     imageOnLoad = (event) => {
-        const { unsafeEnabled: { compatibleWeexElement }, convertRpx } = getNaruseConfig();
-        if (compatibleWeexElement) {
-            console.log('compatibleWeexElement:', compatibleWeexElement,event.detail, {
-                width: convertRpx(event.target.width) + 'px',
-                height: convertRpx(event.target.height)  + 'px',
-            });
-
-        }
         commonEventHander.call(this, event);
     }
 

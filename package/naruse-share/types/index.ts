@@ -13,6 +13,7 @@ export type NaruseConfig = {
 export type NaruseConfigH5 = {
     unsafeEnabled: {
         compatibleWeexElement?: boolean
+        compatibleWeexElementLog?: boolean
     },
     convertRpx: (val: number) => (number|string)
 } & NaruseConfig;

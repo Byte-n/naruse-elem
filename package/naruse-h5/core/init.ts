@@ -20,7 +20,8 @@ const _config: NaruseConfigH5 = {
         return Promise.resolve('');
     },
     unsafeEnabled: {
-        compatibleWeexElement: false
+        compatibleWeexElement: false,
+        compatibleWeexElementLog: false,
     }
 };
 
