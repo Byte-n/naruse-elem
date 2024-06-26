@@ -2,14 +2,14 @@ import { Component, createElement } from "rax";
 import { Image } from "rax-components";
 import { createCommonEvent } from "../../utils/index";
 
-const rpxReg = /(\d+)\s?r?px/g;
+const rpxReg = /([\d.]+)\s?r?px/g;
 
 /**
  * @description 将rpx 或者 px 转换为 数字
  * @author CHC
  * @date 2022-07-08 14:07:16
  * @param {(string | number)} val
- * @returns {*} 
+ * @returns {*}
  */
 const parseRpxToNumber = (val: string | number): number => {
     if (typeof val !== 'string') return val;

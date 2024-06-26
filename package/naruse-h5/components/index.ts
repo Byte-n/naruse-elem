@@ -57,7 +57,7 @@ const naruseCreateElement = (type: string, props: any, ...children: string[]) =>
 };
 
 
-const rpxReg = /(\d+)\s?rpx/g;
+const rpxReg = /([\d.]+)\s?rpx/g;
 
 const parsePx = val => {
     if (typeof val !== 'string') return val;
