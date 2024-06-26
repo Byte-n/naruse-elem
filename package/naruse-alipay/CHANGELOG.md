@@ -1,5 +1,11 @@
 # naruse-alipay
 
+## 0.7.4
+
+### Patch Changes
+
+- #FIX: rpx\px 有小数时转换错误
+
 ## 0.7.3
 
 ### Patch Changes

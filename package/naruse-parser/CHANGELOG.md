@@ -1,5 +1,11 @@
 # naruse-parser
 
+## 0.2.4
+
+### Patch Changes
+
+- #FIX: rpx\px 有小数时转换错误
+
 ## 0.2.3
 
 ### Patch Changes

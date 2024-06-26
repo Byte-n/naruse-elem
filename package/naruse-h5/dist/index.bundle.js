@@ -2290,7 +2290,7 @@
         }
         logger.warn('不支持的组件类型', type);
     };
-    var rpxReg = /(\d+)\s?rpx/g;
+    var rpxReg = /([\d.]+)\s?rpx/g;
     var parsePx = function (val) {
         if (typeof val !== 'string')
             return val;
@@ -8382,7 +8382,7 @@
     }(React__default["default"].Component));
 
     // @ts-ignore
-    var version = "0.7.3";
+    var version = "0.7.4";
     initVersionLogger('naruse-h5', version);
     var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
     var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React__default["default"].Component, createElement: naruseCreateElement, env: {

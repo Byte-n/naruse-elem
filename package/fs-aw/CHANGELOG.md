@@ -1,5 +1,11 @@
 # fs-aw
 
+## 0.1.4
+
+### Patch Changes
+
+- #FIX: rpx\px 有小数时转换错误
+
 ## 0.1.3
 
 ### Patch Changes
