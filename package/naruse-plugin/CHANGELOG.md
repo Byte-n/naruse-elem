@@ -1,5 +1,11 @@
 # naruse-plugin
 
+## 1.3.4
+
+### Patch Changes
+
+- #FIX: rpx\px 有小数时转换错误
+
 ## 1.3.3
 
 ### Patch Changes
