@@ -11,6 +11,8 @@ import Textarea from './textarea/index'
 import { getNaruseConfig } from "../core/init";
 import { functionalizae } from 'core/Component';
 import WebView from './web-view';
+import Radio from './radio';
+import RadioGroup from './radio-group';
 
 /** 组件映射表 */
 const componentReflectMap = {
@@ -23,6 +25,8 @@ const componentReflectMap = {
     'scroll-view': ScrollView,
     textarea: Textarea,
     'web-view': WebView,
+    'radio': Radio,
+    'radio-group': RadioGroup
 }
 
 /**
