@@ -1,5 +1,25 @@
 # naruse-plugin-hot-puller-cache
 
+## 0.1.5
+
+### Patch Changes
+
+- #FEAT: H5 新增 radio-group、radio
+- Updated dependencies
+  - fs-aw@0.1.5
+  - naruse-plugin@1.3.5
+  - naruse-share@0.7.5
+
+## 0.1.4
+
+### Patch Changes
+
+- #FIX: rpx\px 有小数时转换错误
+- Updated dependencies
+  - fs-aw@0.1.4
+  - naruse-plugin@1.3.4
+  - naruse-share@0.7.4
+
 ## 0.1.3
 
 ### Patch Changes
