@@ -1,6 +1,6 @@
 {
   "name": "naruse-plugin-hot-puller-cache",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "description": "naruse-template-cache-manager",
   "main": "./index.js",
   "scripts": {

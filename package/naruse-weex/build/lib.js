@@ -978,7 +978,7 @@ var _View = /** @class */ (function (_super) {
     return _View;
 }(BaseComponent));
 
-var rpxReg = /(\d+)\s?r?px/g;
+var rpxReg = /([\d.]+)\s?r?px/g;
 /**
  * @description 将rpx 或者 px 转换为 数字
  * @author CHC
@@ -6063,7 +6063,7 @@ var Container = /** @class */ (function (_super) {
 }(Component));
 
 // @ts-ignore
-var version = "0.7.3";
+var version = "0.7.5";
 initVersionLogger('naruse-weex', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 var Naruse = __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({}, Hooks), { Component: NaruseComponent, createElement: naruseCreateElement, getDeferred: getDeferred, EventBus: EventBus, unsafe_run: run, runCodeWithNaruse: runCodeWithNaruse, globalEvent: globalEvent, withPage: function (Component) { return Component; } }), Storage), Route), Device), System), UI), { getImageInfo: temporarilyNotSupport('getImageInfo'), createAnimation: temporarilyNotSupport('createAnimation') }), elementApi);

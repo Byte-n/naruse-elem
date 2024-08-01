@@ -413,86 +413,64 @@ var Naruse = (function (exports, React) {
 
     var logger = createLogger('naruse-h5');
 
+    function baseEventProps(e) {
+        return {
+            type: e.type,
+            /** 阻止冒泡 */
+            stopPropagation: function () {
+                e.stopPropagation();
+            },
+            // 真正触发事件的元素
+            target: e.target,
+            // 当前元素（冒泡）
+            currentTarget: e.currentTarget,
+        };
+    }
     var reflectEventMap = {
         /** 点击事件处理 */
         click: function (e) {
-            return {
-                type: 'click',
-                detail: {
+            return __assign(__assign({}, baseEventProps(e)), { type: 'click', detail: {
                     clientX: e.clientX,
                     clientY: e.clientY,
                     pageX: e.pageX,
                     pageY: e.pageY,
-                },
-                /** 阻止冒泡 */
-                stopPropagation: function () {
-                    e.stopPropagation();
-                },
-                // 真正触发事件的元素
-                target: e.target,
-                // 当前元素（冒泡）
-                currentTarget: e.currentTarget
-            };
+                } });
         },
         /** 加载完毕 */
         load: function (e) {
-            return {
-                type: 'load',
-                detail: {
+            return __assign(__assign({}, baseEventProps(e)), { type: 'load', detail: {
                     width: e.target.width,
                     height: e.target.height,
-                },
-            };
+                } });
         },
         /** 聚焦 */
         focus: function (e) {
-            return {
-                type: 'foucs',
-                detail: { value: e.target.value },
-            };
+            return __assign(__assign({}, baseEventProps(e)), { type: 'foucs', detail: { value: e.target.value } });
         },
         /** 失焦 */
         blur: function (e) {
-            return {
-                type: 'blur',
-                detail: { value: e.target.value },
-            };
+            return __assign(__assign({}, baseEventProps(e)), { type: 'blur', detail: { value: e.target.value } });
         },
         /** 按键 */
         keydown: function (e) {
             var value = e.target.value;
             var keyCode = e.keyCode || e.code;
-            return {
-                type: 'keydown',
-                detail: {
+            return __assign(__assign({}, baseEventProps(e)), { type: 'keydown', detail: {
                     value: value,
                     cursor: value.length,
                     keyCode: keyCode,
-                },
-                stopPropagation: function () {
-                    e.stopPropagation();
-                },
-            };
+                } });
         },
         /** 输入 */
         input: function (e) {
-            return {
-                type: 'input',
-                detail: e.detail,
-            };
+            return __assign(__assign({}, baseEventProps(e)), { type: 'input', detail: e.detail });
         },
         /** 动效结束 */
         transitionend: function (e) {
-            return {
-                type: 'transitionEnd',
-                detail: {
+            return __assign(__assign({}, baseEventProps(e)), { type: 'transitionEnd', detail: {
                     elapsedTime: e.elapsedTime,
                     propertyName: e.propertyName,
-                },
-                stopPropagation: function () {
-                    e.stopPropagation();
-                },
-            };
+                } });
         },
         mouseup: function (e) {
             return __assign(__assign({}, this.click(e)), { type: 'mouseUp' });
@@ -509,6 +487,11 @@ var Naruse = (function (exports, React) {
         touchstart: function (e) {
             return commonTouchEventCreater(e);
         },
+        change: function (e) {
+            return __assign(__assign({}, baseEventProps(e)), { detail: {
+                    value: e.target.value
+                } });
+        }
     };
     /** 事件名称对应处理名称 */
     var reflectEventNameMap = {
@@ -524,6 +507,7 @@ var Naruse = (function (exports, React) {
         touchstart: "onTouchStart",
         touchmove: "onTouchMove",
         touchend: "onTouchEnd",
+        change: "onChange",
     };
     /**
      * @description 通用事件处理
@@ -578,19 +562,15 @@ var Naruse = (function (exports, React) {
      */
     var commonTouchEventCreater = function (event) {
         var type = event.type, changedTouches = event.changedTouches, targetTouches = event.targetTouches, touches = event.touches, detail = event.detail, target = event.target, stopPropagation = event.stopPropagation;
-        return {
-            type: type,
+        return __assign(__assign({}, baseEventProps(event)), { type: type, 
             // 涉及当前(引发)事件的触摸点的列表
-            changedTouches: changedTouches,
+            changedTouches: changedTouches, 
             // 当前对象上所有触摸点的列表;
-            targetTouches: targetTouches,
+            targetTouches: targetTouches, 
             // 当前屏幕上所有触摸点的列表;
-            touches: touches,
-            detail: detail,
+            touches: touches, detail: detail, // 此值是一个数值，可能会有用
             // 真正触发事件的元素
-            target: target,
-            stopPropagation: stopPropagation
-        };
+            target: target, stopPropagation: stopPropagation });
     };
 
     var cssStyle$4 = {"a-button":{"display":"block","outline":"0","WebkitAppearance":"none","boxSizing":"border-box","padding":"0","textAlign":"center","fontSize":"18px","height":"47px","lineHeight":"47px","borderRadius":"2px","overflow":"hidden","textOverflow":"ellipsis","wordBreak":"break-word","whiteSpace":"nowrap","color":"#000","backgroundColor":"#fff","border":"1px solid #eee"},"active":{"backgroundColor":"#ddd","color":"rgba(0,0,0,.3)"},"disabled":{"color":"rgba(0,0,0,.6)","backgroundColor":"rgba(255,255,255,.6)"}};
@@ -609,6 +589,21 @@ var Naruse = (function (exports, React) {
         }
         return per;
     }, {}); };
+    var basePropsKey = ['id', 'className', 'style'];
+    var basePropsKeyU = ['Id', 'ClassName', 'Style'];
+    var getBaseProps = function (props, keyPrefix) {
+        if (keyPrefix === void 0) { keyPrefix = ''; }
+        var obj = {};
+        var keys = keyPrefix ? basePropsKeyU : basePropsKey;
+        for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+            var key = keys_1[_i];
+            if (props[keyPrefix + key] === undefined) {
+                continue;
+            }
+            obj[key] = props[key];
+        }
+        return obj;
+    };
     /**
      * 解析 字符串参数，类型： k=v&k=v&k=v&...
      * 前面没有 ‘？’
@@ -629,7 +624,7 @@ var Naruse = (function (exports, React) {
         return res;
     }
 
-    var h$8 = React__default["default"].createElement;
+    var h$a = React__default["default"].createElement;
     var Button = /** @class */ (function (_super) {
         __extends$1(Button, _super);
         function Button() {
@@ -693,12 +688,12 @@ var Naruse = (function (exports, React) {
             var _a = this.props, type = _a.type, disabled = _a.disabled, style = _a.style, className = _a.className, hoverStyle = _a.hoverStyle, activeStyle = _a.activeStyle, other = __rest(_a, ["type", "disabled", "style", "className", "hoverStyle", "activeStyle"]);
             var _b = this.state, hover = _b.hover, active = _b.active;
             var conStyle = __assign(__assign(__assign(__assign(__assign({}, cssStyle$4['a-button']), (type ? cssStyle$4[type] : {})), style), (hover ? hoverStyle : {})), (active ? __assign(__assign({}, cssStyle$4.active), activeStyle) : {}));
-            return (h$8("button", __assign({ onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), style: conStyle, disabled: disabled, className: className, onClick: commonEventHander.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
+            return (h$a("button", __assign({ onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), style: conStyle, disabled: disabled, className: className, onClick: commonEventHander.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
         };
         return Button;
     }(React__default["default"].Component));
 
-    var h$7 = React__default["default"].createElement;
+    var h$9 = React__default["default"].createElement;
     var Checkbox = /** @class */ (function (_super) {
         __extends$1(Checkbox, _super);
         function Checkbox() {
@@ -712,7 +707,7 @@ var Naruse = (function (exports, React) {
         Checkbox.prototype.render = function () {
             var _this = this;
             var _a = this.props, checked = _a.checked, name = _a.name, color = _a.color, value = _a.value, disabled = _a.disabled, nativeProps = __rest(_a, ["checked", "name", "color", "value", "disabled"]);
-            return (h$7("input", __assign({ ref: function (dom) {
+            return (h$9("input", __assign({ ref: function (dom) {
                     if (!dom)
                         return;
                     _this.inputEl = dom;
@@ -898,7 +893,7 @@ var Naruse = (function (exports, React) {
         withPageInit({ pageContainer: pageContainer });
     };
 
-    var h$6 = React__default["default"].createElement;
+    var h$8 = React__default["default"].createElement;
     var _Image = /** @class */ (function (_super) {
         __extends$1(_Image, _super);
         function _Image(props) {
@@ -1005,13 +1000,13 @@ var Naruse = (function (exports, React) {
             }
             var divStyle = __assign(__assign({}, cssStyle$3.naruseImg), (mode === 'widthFix' ? cssStyle$3.naruseImg__widthfix : {}));
             var imgStyle = cssStyle$3[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
-            return (h$6("div", { onClick: commonEventHander.bind(this), className: className, style: __assign(__assign({}, divStyle), style) },
-                h$6("img", __assign({ key: 'img', ref: function (img) { return (_this.ref = img); }, id: id, style: __assign(__assign({}, imageSize), imgStyle), src: src, onLoad: this.imageOnLoad, onError: onError, onTransitionEnd: commonEventHander.bind(this) }, imgProps, getPropsDataSet(other)))));
+            return (h$8("div", { onClick: commonEventHander.bind(this), className: className, style: __assign(__assign({}, divStyle), style) },
+                h$8("img", __assign({ key: 'img', ref: function (img) { return (_this.ref = img); }, id: id, style: __assign(__assign({}, imageSize), imgStyle), src: src, onLoad: this.imageOnLoad, onError: onError, onTransitionEnd: commonEventHander.bind(this) }, imgProps, getPropsDataSet(other)))));
         };
         return _Image;
     }(React__default["default"].Component));
 
-    var h$5 = React__default["default"].createElement;
+    var h$7 = React__default["default"].createElement;
     /** 是否是支持的type */
     var getTrueType = function getTrueType(type, confirmType, password) {
         if (confirmType === 'search')
@@ -1099,7 +1094,7 @@ var Naruse = (function (exports, React) {
             var _this = this;
             var _a = this.props, type = _a.type, password = _a.password, placeholder = _a.placeholder, disabled = _a.disabled, maxlength = _a.maxlength, confirmType = _a.confirmType, name = _a.name, className = _a.className, value = _a.value, controlled = _a.controlled, other = __rest(_a, ["type", "password", "placeholder", "disabled", "maxlength", "confirmType", "name", "className", "value", "controlled"]);
             var _value = this.state._value;
-            return (h$5("input", __assign({ ref: function (input) {
+            return (h$7("input", __assign({ ref: function (input) {
                     _this.ref = input;
                 }, className: className, 
                 // 受控则只使用外部值，非受控优先使用外部值
@@ -1110,7 +1105,7 @@ var Naruse = (function (exports, React) {
 
     var cssStyle$2 = {"text":{"MozUserSelect":"none","WebkitUserSelect":"none","MsUserSelect":"none","userSelect":"none"},"textSelectable":{"MozUserSelect":"text","WebkitUserSelect":"text","MsUserSelect":"text","userSelect":"text"}};
 
-    var h$4 = React__default["default"].createElement;
+    var h$6 = React__default["default"].createElement;
     var Text = /** @class */ (function (_super) {
         __extends$1(Text, _super);
         function Text() {
@@ -1151,12 +1146,12 @@ var Naruse = (function (exports, React) {
             var _a = this.props, className = _a.className, id = _a.id, _b = _a.selectable, selectable = _b === void 0 ? false : _b, style = _a.style, hoverStyle = _a.hoverStyle, other = __rest(_a, ["className", "id", "selectable", "style", "hoverStyle"]);
             var hover = this.state.hover;
             var cls = __assign(__assign(__assign(__assign({}, cssStyle$2.text), (selectable ? cssStyle$2.textSelectable : {})), style), (hover ? hoverStyle : {}));
-            return (h$4("span", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), style: cls, className: className, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
+            return (h$6("span", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), style: cls, className: className, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
         };
         return Text;
     }(React__default["default"].Component));
 
-    var h$3 = React__default["default"].createElement;
+    var h$5 = React__default["default"].createElement;
     var View = /** @class */ (function (_super) {
         __extends$1(View, _super);
         function View() {
@@ -1293,14 +1288,14 @@ var Naruse = (function (exports, React) {
             var _a = this.props, className = _a.className, style = _a.style, hoverStyle = _a.hoverStyle, id = _a.id, other = __rest(_a, ["className", "style", "hoverStyle", "id"]);
             var hover = this.state.hover;
             var conStyle = __assign(__assign({}, style), (hover ? hoverStyle : {}));
-            return (h$3("div", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
+            return (h$5("div", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
         };
         return View;
     }(React__default["default"].Component));
 
     var cssStyle$1 = {"scroll":{"WebkitOverflowScrolling":"auto"},"scroll::-webkit-scrollbar":{"display":"none"},"scroll-view":{"overflow":"hidden"}};
 
-    var h$2 = React__default["default"].createElement;
+    var h$4 = React__default["default"].createElement;
     function throttle(fn, threshold, scope) {
         if (threshold === void 0) { threshold = 250; }
         var lastTime = 0;
@@ -1512,7 +1507,7 @@ var Naruse = (function (exports, React) {
             var _onTouchMove = function (e) {
                 onTouchMove ? onTouchMove(e) : _this.onTouchMove(e);
             };
-            return (h$2("div", __assign({ id: id, "data-animation": animation, className: "".concat(className, " _scrollView"), ref: function (container) {
+            return (h$4("div", __assign({ id: id, "data-animation": animation, className: "".concat(className, " _scrollView"), ref: function (container) {
                     _this.container = container;
                     _this.ref = container;
                 }, style: __assign(__assign(__assign({}, cssStyle$1.scroll), style), scrollWhere), onScroll: _onScroll, onTouchMove: _onTouchMove, onTransitionEnd: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
@@ -1529,7 +1524,7 @@ var Naruse = (function (exports, React) {
 
     var cssStyle = {"taroTextarea":{"display":"block","appearance":"none","cursor":"auto","lineHeight":"1.5","resize":"none","outline":"none"}};
 
-    var h$1 = React__default["default"].createElement;
+    var h$3 = React__default["default"].createElement;
     var scrollBar = document.createElement('style');
     scrollBar.type = 'text/css';
     scrollBar.id = '_theOnlytextarea';
@@ -1659,7 +1654,7 @@ var Naruse = (function (exports, React) {
                     onConfirm && onConfirm(event_1);
                 }
             };
-            return (h$1("textarea", __assign({ ref: function (input) {
+            return (h$3("textarea", __assign({ ref: function (input) {
                     if (input) {
                         _this.ref = input;
                     }
@@ -2099,7 +2094,7 @@ var Naruse = (function (exports, React) {
         }(React__default["default"].Component));
     };
 
-    var h = React__default["default"].createElement;
+    var h$2 = React__default["default"].createElement;
     var WebView = /** @class */ (function (_super) {
         __extends$1(WebView, _super);
         function WebView() {
@@ -2236,9 +2231,63 @@ var Naruse = (function (exports, React) {
             var _a = this.props, className = _a.className, style = _a.style, hoverStyle = _a.hoverStyle, id = _a.id, src = _a.src, other = __rest(_a, ["className", "style", "hoverStyle", "id", "src"]);
             var hover = this.state.hover;
             var conStyle = __assign(__assign({}, style), (hover ? hoverStyle : {}));
-            return (h("iframe", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this), onBlur: commonEventHander.bind(this), onFocus: commonEventHander.bind(this), onLoad: commonEventHander.bind(this), src: src }, getPropsDataSet(other)), this.props.children));
+            return (h$2("iframe", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this), onBlur: commonEventHander.bind(this), onFocus: commonEventHander.bind(this), onLoad: commonEventHander.bind(this), src: src }, getPropsDataSet(other)), this.props.children));
         };
         return WebView;
+    }(React__default["default"].Component));
+
+    var h$1 = React__default["default"].createElement;
+    /** 单选框 */
+    var Radio = /** @class */ (function (_super) {
+        __extends$1(Radio, _super);
+        function Radio() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.onChange = commonEventHander.bind(_this);
+            _this.setRef = function (ref) { return _this.ref = ref; };
+            return _this;
+        }
+        Radio.prototype.render = function () {
+            var _a = this.props, value = _a.value, checked = _a.checked, disabled = _a.disabled, id = _a.id, children = _a.children;
+            return (h$1("label", __assign({ htmlFor: id }, getBaseProps(this.props, 'label')),
+                h$1("input", __assign({}, getBaseProps(this.props), { ref: this.setRef, type: "radio", value: value, checked: checked, onChange: this.onChange, disabled: disabled })),
+                children));
+        };
+        return Radio;
+    }(React__default["default"].Component));
+
+    var h = React__default["default"].createElement;
+    /** 单选框组 */
+    var RadioGroup = /** @class */ (function (_super) {
+        __extends$1(RadioGroup, _super);
+        function RadioGroup() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.state = { value: null };
+            _this.setRef = function (ref) { return _this.ref = ref; };
+            _this.onChange = function (e) {
+                var value = e.target.value;
+                _this.setState({ value: value });
+                commonEventHander.call(_this, e);
+            };
+            return _this;
+        }
+        RadioGroup.prototype.componentDidMount = function () {
+            var _a;
+            var children = this.props.children;
+            children = children.filter(function (val) { return typeof val === 'object' && val; });
+            var value = ((_a = children.find(function (val) { return val.props.checked; })) === null || _a === void 0 ? void 0 : _a.props.value) || children[0].props.value;
+            this.setState({ value: value });
+        };
+        RadioGroup.prototype.render = function () {
+            var _this = this;
+            var _a = this.props, children = _a.children, name = _a.name;
+            return (h("span", __assign({}, getBaseProps(this.props), { ref: this.setRef }), children.map(function (val) {
+                if (typeof val != 'object' || !val) {
+                    return val;
+                }
+                return __assign(__assign({}, val), { props: __assign(__assign({}, val.props), { name: name, onChange: _this.onChange, checked: val.props.value === _this.state.value }) });
+            })));
+        };
+        return RadioGroup;
     }(React__default["default"].Component));
 
     /** 组件映射表 */
@@ -2252,6 +2301,8 @@ var Naruse = (function (exports, React) {
         'scroll-view': ScrollView,
         textarea: Textarea,
         'web-view': WebView,
+        'radio': Radio,
+        'radio-group': RadioGroup
     };
     /**
      * @description 拦截下来的react.createElement
@@ -2287,7 +2338,7 @@ var Naruse = (function (exports, React) {
         }
         logger.warn('不支持的组件类型', type);
     };
-    var rpxReg = /(\d+)\s?rpx/g;
+    var rpxReg = /([\d.]+)\s?rpx/g;
     var parsePx = function (val) {
         if (typeof val !== 'string')
             return val;
@@ -8379,7 +8430,7 @@ var Naruse = (function (exports, React) {
     }(React__default["default"].Component));
 
     // @ts-ignore
-    var version = "0.7.3";
+    var version = "0.7.5";
     initVersionLogger('naruse-h5', version);
     var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
     var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React__default["default"].Component, createElement: naruseCreateElement, env: {
