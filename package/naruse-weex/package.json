@@ -1,6 +1,6 @@
 {
   "name": "naruse-weex",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "description": "",
   "main": "./build/lib.js",
   "scripts": {
