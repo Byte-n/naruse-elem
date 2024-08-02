@@ -1,5 +1,11 @@
 # naruse-plugin
 
+## 1.4.0
+
+### Minor Changes
+
+- #FEAT: 支付宝小程序支持 radio、radio-group
+
 ## 1.3.5
 
 ### Patch Changes
