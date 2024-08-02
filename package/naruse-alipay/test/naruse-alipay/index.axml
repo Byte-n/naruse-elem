@@ -30,6 +30,21 @@
 <template name="pt">
     <text style="{{style}}" id="{{id}}" class="{{className}}">{{content}}</text>
 </template>
+<template name="radio-group">
+    <radio-group style="{{style}}" id="{{id}}" class="{{className}}" name="{{name}}" onChange="ec" catchTap="ec" catchLongTap="ec" catchTouchStart="ec" catchTouchMove="ec" catchTouchEnd="ec" catchTouchCancel="ec" catchTransitionEnd="ec">
+        <block a:if="{{childNodes}}">
+            <template a:for="{{childNodes}}" is="{{item.naruseType}}" data="{{...item}}"/>
+        </block>
+    </radio-group>
+</template>
+<template name="radio">
+    <label for="{{id}}">
+        <template is="native-radio" data="{{style,id,className,value,checked,disabled,color}}"/>
+        <block a:if="{{childNodes}}">
+            <template a:for="{{childNodes}}" is="{{item.naruseType}}" data="{{...item}}"/>
+        </block>
+    </label>
+</template>
 <template name="fragment">
     <block a:if="{{childNodes}}">
         <template a:for="{{childNodes}}" is="{{item.naruseType}}" data="{{...item}}"/>
