@@ -1,7 +1,4 @@
 const speicalConfig = {
-    attributes: {
-        'class': 'className',
-    },
     // 基础属性
     baseAttributes: {
         'style': 'style',
@@ -104,6 +101,40 @@ const scrollView = {
     ],
     nest: true,
 }
+
+/**
+ * 单选组
+ */
+const radioGroup = {
+    templateName: 'radio-group',
+    reflectTagName: 'radio-group',
+    attributes: [
+        'name',
+    ],
+    events: [
+        'onChange',
+        ...baseElementEvents,
+    ],
+    nest: true,
+}
+
+/**
+ * 原生 单选
+ */
+export const nativeRadio = {
+    templateName: 'native-radio',
+    reflectTagName: 'radio',
+    attributes: [
+        'value',
+        'checked',
+        'disabled',
+        'color',
+    ],
+    events: [
+        ...baseElementEvents,
+    ],
+}
+
 
 const text = {
     templateName: 'text',
@@ -272,6 +303,8 @@ const templateList = [
     pureView,
     pureText,
     webView,
+    nativeRadio,
+    radioGroup,
 ]
 
 
