@@ -1,5 +1,18 @@
 # naruse-plugin-hot-puller-cache
 
+## 0.2.0
+
+### Minor Changes
+
+- #FEAT: 支付宝小程序支持 radio、radio-group
+
+### Patch Changes
+
+- Updated dependencies
+  - fs-aw@0.2.0
+  - naruse-plugin@1.4.0
+  - naruse-share@0.8.0
+
 ## 0.1.5
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # naruse-parser
 
+## 0.3.0
+
+### Minor Changes
+
+- #FEAT: 支付宝小程序支持 radio、radio-group
+
 ## 0.2.5
 
 ### Patch Changes

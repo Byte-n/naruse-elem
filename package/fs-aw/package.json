@@ -1,6 +1,6 @@
 {
   "name": "fs-aw",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "File system abstraction layer for the browser, Node, miniapp",
   "type": "module",
   "main": "dist/index.js",
