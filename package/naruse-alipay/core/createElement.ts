@@ -21,6 +21,10 @@ export const enum VnodeType {
     WebView = 'web-view',
     Radio = 'radio',
     RadioGroup = 'radio-group',
+    Checkbox = 'checkbox',
+    CheckboxGroup = 'checkbox-group',
+    Switch = 'switch',
+    Slider = 'slider',
 }
 
 

@@ -1,7 +1,6 @@
-import React,{ Component } from 'react';
-import { getBaseProps, getPropsDataSet } from '../../utils';
-import { commonEventHander } from 'core/event';
-
+import React, { Component } from "react";
+import { getBaseProps } from "../../utils";
+import { commonEventHander } from "core/event";
 interface CheckboxProps {
     /** id */
     id?: string | number;
@@ -9,8 +8,6 @@ interface CheckboxProps {
     checked?: boolean;
     /** 名称 */
     name?: string;
-    /** 颜色 */
-    color?: string;
     /** 值 */
     value: string | number;
     /** 标签 */
@@ -21,40 +18,34 @@ interface CheckboxProps {
     disabled?: boolean;
     /** 改变事件 */
     onChange?: Function;
+    /** 其他样式 */
+    style: object;
 }
 
-interface CheckboxStates {
-
-}
+interface CheckboxStates {}
 
 const h = React.createElement;
 class Checkbox extends Component<CheckboxProps, CheckboxStates> {
-    // /** 改变事件 */
-    // handleChange (e) {
-    //     const { onChange } = this.props;
-    //     e.stopPropagation();
-    //     onChange && onChange({ value: this.value });
-    // }
     onChange = commonEventHander.bind(this);
-    setRef = (ref: null) => this.ref = ref;
 
-    render () {
-        const { id, checked, name, color, value, label, disabled, children, ...nativeProps } = this.props;
+    render() {
+        const { id, checked, value, disabled, children, ...style } = this.props;
 
         return (
-            <label htmlFor={id}
-                {...getBaseProps(this.props, 'label')}>
+            <label
+                style={{ ...style }}
+                htmlFor={id}
+                {...getBaseProps(this.props, "label")}
+            >
                 <input
-                    ref={this.setRef}
-                    type='checkbox'
+                    {...getBaseProps(this.props)}
+                    type="checkbox"
                     value={value}
-                    style={{ color }}
                     checked={checked}
                     disabled={disabled}
                     onChange={this.onChange}
-                    {...getPropsDataSet(nativeProps)}
                 />
-                {children ? children : (label ? label : value)}
+                {children}
             </label>
         );
     }
