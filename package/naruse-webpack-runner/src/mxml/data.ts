@@ -135,6 +135,85 @@ export const nativeRadio = {
     ],
 }
 
+/**
+ * 复选框组
+ */
+const checkboxGroup = {
+    templateName: 'checkbox-group',
+    reflectTagName: 'checkbox-group',
+    attributes: [
+        'name',
+    ],
+    events: [
+        'onChange',
+        ...baseElementEvents,
+    ],
+    nest: true,
+}
+
+/**
+ * 原生 复选框
+ */
+export const nativeCheckbox = {
+    templateName: 'native-checkbox',
+    reflectTagName: 'checkbox',
+    attributes: [
+        'value',
+        'checked',
+        'disabled',
+        'color',
+    ],
+    events: [
+        'onChange',
+        ...baseElementEvents,
+    ],
+}
+
+/**
+ * 单选开关
+ */
+export const nativeSwitch = {
+    templateName: 'switch',
+    reflectTagName: 'switch',
+    attributes: [
+        'name',
+        'checked',
+        'disabled',
+        'color',
+        'controlled',
+    ],
+    events: [
+        'onChange',
+        ...baseElementEvents,
+    ],
+}
+
+/**
+ * 滑动选择器
+ */
+export const slider = {
+    templateName: 'slider',
+    reflectTagName: 'slider',
+    attributes: [
+        'name',
+        'min',
+        'max',
+        'step',
+        'disabled',
+        'value',
+        'show-value',
+        'active-color',
+        'background-color',
+        'track-size',
+        'handle-size',
+        'handle-color',
+    ],
+    events: [
+        'onChange',
+        'onChanging',
+        ...baseElementEvents,
+    ],
+}
 
 const text = {
     templateName: 'text',
@@ -305,6 +384,10 @@ const templateList = [
     webView,
     nativeRadio,
     radioGroup,
+    checkboxGroup,
+    nativeCheckbox,
+    nativeSwitch,
+    slider,
 ]
 
 
