@@ -63,14 +63,12 @@ export default class Qwer extends Component {
                     </checkbox>
                     <checkbox value={"cc"}>cc选项</checkbox>
                 </checkbox-group>
-                <switch
-                    onChange={(evl) => console.log(evl)}
-                    // color="#000"
-                />
+                
+                <switch onChange={(evl) => console.log(evl)} />
                 <view style={{ width: "80%", margin: "0 auto" }}>
                     <slider
-                        // min={-20}
-                        // max={20}
+                        min={-20}
+                        max={20}
                         // step={5}
                         // value={50}
                         // showValue

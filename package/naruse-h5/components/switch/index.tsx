@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { getBaseProps } from "../../utils";
 import { commonEventHander } from "core/event";
+import Checkbox from "components/checkbox";
 import style from "./index.css";
 
 interface SwitchProps {
@@ -8,7 +9,6 @@ interface SwitchProps {
     checked?: boolean;
     disabled?: boolean;
     color?: string;
-    controls?: boolean;
     onChange?: Function;
 }
 
@@ -49,19 +49,20 @@ class Switch extends Component<SwitchProps, SwitchState> {
      */
     onChange = (e) => {
         e.stopPropagation();
-        const { disabled, onChange } = this.props;
-        if (disabled) return;
+        const { onChange } = this.props;
         const { checked } = e.target;
-        onChange && commonEventHander.call(this, e);
+        const data = {
+            type: "change",
+            detail: {
+                value: checked,
+            },
+        };
+        onChange && commonEventHander.call(this, e, data);
         this.setState({ checked });
     };
 
     render() {
-        const {
-            disabled = false,
-            color = "#ff5000",
-            controls = false,
-        } = this.props;
+        const { disabled = false, color = "#ff5000" } = this.props;
         const { checked = false } = this.state;
         return (
             <label
@@ -72,12 +73,11 @@ class Switch extends Component<SwitchProps, SwitchState> {
                 }}
                 {...getBaseProps(this.props)}
             >
-                <input
+                <Checkbox
+                    disabled={disabled}
                     style={style.input}
-                    type="checkbox"
                     checked={checked}
                     onChange={this.onChange}
-                    aria-controls={controls}
                 />
                 <span
                     ref={(el) => (this.sliderEl = el)}

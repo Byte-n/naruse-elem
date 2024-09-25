@@ -110,11 +110,9 @@ const reflectEventMap = {
     },
     change (e, data) {
         if (!data) {
-            const { value, checked } = e.target;
-            const type = e.nativeEvent?.target?.type;
             data = {
                 detail:{
-                    value: type === 'checkbox' ? checked : value
+                    value: e.target.value
                 }
             }
         }
