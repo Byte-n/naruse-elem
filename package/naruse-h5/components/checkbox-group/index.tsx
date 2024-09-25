@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { getBaseProps } from "../../utils";
+import { commonEventHander } from "core/event";
 
 const h = React.createElement;
 
@@ -27,7 +28,7 @@ export default class CheckBoxGroup extends Component<
     }
 
     onChange = (e) => {
-        // e.stopPropagation();
+        e.stopPropagation();
         const { onChange } = this.props;
         const { selectValue } = this.state;
         const { checked, value } = e.target;
@@ -35,7 +36,13 @@ export default class CheckBoxGroup extends Component<
             ? [...selectValue, value]
             : selectValue.filter((item) => item !== value);
         this.setState({ selectValue: changeSelectValue });
-        onChange && onChange({ ...e, detail: { value: changeSelectValue } });
+        const data = {
+            type: "change",
+            detail: {
+                value: changeSelectValue,
+            },
+        };
+        onChange && commonEventHander.call(this, e, data);
     };
 
     render() {

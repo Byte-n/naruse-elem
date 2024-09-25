@@ -26,11 +26,9 @@ interface CheckboxStates {}
 
 const h = React.createElement;
 class Checkbox extends Component<CheckboxProps, CheckboxStates> {
-    onChange = commonEventHander.bind(this);
 
     render() {
-        const { id, checked, value, disabled, children, ...style } = this.props;
-
+        const { id, checked, value, disabled, children, onChange, ...style } = this.props;
         return (
             <label
                 style={{ ...style }}
@@ -43,7 +41,7 @@ class Checkbox extends Component<CheckboxProps, CheckboxStates> {
                     value={value}
                     checked={checked}
                     disabled={disabled}
-                    onChange={this.onChange}
+                    onChange={onChange}
                 />
                 {children}
             </label>

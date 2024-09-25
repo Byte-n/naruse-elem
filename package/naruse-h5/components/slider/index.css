@@ -6,6 +6,7 @@
 }
 
 .sliderContainer {
+    cursor: pointer;
     flex: 1;
     min-width: 0;
     position: relative;
@@ -14,9 +15,6 @@
 }
 
 .slideActiveValue {
-    position: absolute;
-    left: 0;
-    top: 0;
     z-index: 2;
 }
 

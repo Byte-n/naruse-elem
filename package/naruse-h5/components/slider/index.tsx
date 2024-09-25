@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { getBaseProps, getPropsDataSet } from "../../utils";
+import { getBaseProps } from "../../utils";
 import { commonEventHander } from "core/event";
 import style from "./index.css";
 
@@ -60,10 +60,15 @@ class Slider extends Component<SliderProps, SliderStates> {
         this.state = {
             value: currentValue,
             mouseClientX: 0,
+            isDragging: false,
         };
     }
 
-    onChange = commonEventHander.bind(this);
+    onMouseLeave = (e) => {
+        e.stopPropagation();
+        const { isDragging } = this.state;
+        isDragging && this.onMouseUp(e);
+    };
 
     /**
      * 鼠标按下
@@ -73,9 +78,10 @@ class Slider extends Component<SliderProps, SliderStates> {
         e.stopPropagation();
         this.setState({
             mouseClientX: e.clientX,
+            isDragging: true,
         });
-        window.addEventListener("mousemove", this.onMouseMove);
-        window.addEventListener("mouseup", this.onMouseUp);
+        this.sliderThumbEl.addEventListener("mousemove", this.onMouseMove);
+        this.sliderThumbEl.addEventListener("mouseup", this.onMouseUp);
         this.startDragStyle();
     };
 
@@ -126,11 +132,12 @@ class Slider extends Component<SliderProps, SliderStates> {
      */
     onMouseUp = (e) => {
         e.stopPropagation();
-        const { handleColor = "#fff", onChange } = this.props;
+        const { onChange } = this.props;
         const currentValue = Number(this.valueDisplayEl.textContent);
-        this.endDragStyle(handleColor);
+        this.endDragStyle();
         this.setState({
             value: currentValue,
+            isDragging: false,
         });
         const data = {
             type: "change",
@@ -138,8 +145,8 @@ class Slider extends Component<SliderProps, SliderStates> {
         };
         onChange && commonEventHander.call(this, e, data);
         // 移除事件
-        window.removeEventListener("mousemove", this.onMouseMove);
-        window.removeEventListener("mouseup", this.onMouseUp);
+        this.sliderThumbEl.removeEventListener("mousemove", this.onMouseMove);
+        this.sliderThumbEl.removeEventListener("mouseup", this.onMouseUp);
     };
 
     /**
@@ -155,11 +162,33 @@ class Slider extends Component<SliderProps, SliderStates> {
 
     /**
      * 拖拽滑块元素结束样式
-     * @param handleColor
      * @returns
      */
-    endDragStyle = (handleColor: string) => {
-        this.sliderThumbEl.style.backgroundColor = handleColor;
+    endDragStyle = () => {
+        const { handleColor } = this.props;
+        if (!handleColor) {
+            this.sliderThumbEl.style.backgroundColor = "#fff";
+        }
+    };
+
+    /**
+     * 点击跳转到指定位置
+     * @returns
+     */
+    setSliderValue = (e) => {
+        const { isDragging } = this.state;
+        if (isDragging) return;
+        const { min = 0, max = 100, onChange } = this.props;
+        const { left, width } = e.target.getBoundingClientRect();
+        const offsetX = e.clientX - left; // 鼠标相对于滑动条的水平偏移
+        const percentage = offsetX / width; // 计算百分比
+        const newValue = Math.round(percentage * (max - min) + min); // 转换为数值
+        this.setState({ value: newValue });
+        const data = {
+            type: "change",
+            detail: { value: newValue },
+        };
+        onChange && commonEventHander.call(this, e, data);
     };
 
     render() {
@@ -195,7 +224,11 @@ class Slider extends Component<SliderProps, SliderStates> {
         }
 
         return (
-            <div style={style.slider} {...getBaseProps(this.props)}>
+            <div
+                style={style.slider}
+                onMouseLeave={this.onMouseLeave}
+                {...getBaseProps(this.props)}
+            >
                 <div
                     ref={(self) => (this.sliderContainerEl = self)}
                     style={{
@@ -203,6 +236,7 @@ class Slider extends Component<SliderProps, SliderStates> {
                         backgroundColor: backgroundColor,
                         height: trackSize,
                     }}
+                    onMouseUp={this.setSliderValue}
                 >
                     <div
                         ref={(self) => (this.sliderProgressBarEl = self)}
@@ -216,7 +250,6 @@ class Slider extends Component<SliderProps, SliderStates> {
                         }}
                     />
                     <div
-                        id="sliderThumb"
                         ref={(self) => (this.sliderThumbEl = self)}
                         style={{
                             ...style.sliderThumb,
