@@ -196,7 +196,6 @@ class Slider extends Component<SliderProps, SliderStates> {
         const {
             min = 0,
             max = 100,
-            step = 1,
             disabled = false,
             showValue = false,
             activeColor = "#ff5000",
@@ -205,23 +204,6 @@ class Slider extends Component<SliderProps, SliderStates> {
             handleSize = 18,
             trackSize = 2,
         } = this.props;
-
-        if (step < 0) {
-            console.error("step must be greater than 0");
-            return;
-        }
-        if (min > max) {
-            console.error("min must be less than max");
-            return;
-        }
-        if (handleSize < 0) {
-            console.error("handleSize must be greater than 0");
-            return;
-        }
-        if (trackSize < 0) {
-            console.error("trackSize must be greater than 0");
-            return;
-        }
 
         return (
             <div
