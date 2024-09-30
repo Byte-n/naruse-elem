@@ -109,13 +109,6 @@ const reflectEventMap = {
         return commonTouchEventCreater(e);
     },
     change (e, data) {
-        if (!data) {
-            data = {
-                detail:{
-                    value: e.target.value
-                }
-            }
-        }
         return {
             ...baseEventProps(e),
             ...data
