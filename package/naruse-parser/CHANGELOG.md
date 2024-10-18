@@ -1,5 +1,11 @@
 # naruse-parser
 
+## 0.4.0
+
+### Minor Changes
+
+- 添加 switch、checkbox、radio、slider 组件
+
 ## 0.3.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # naruse-weex
 
+## 0.9.0
+
+### Minor Changes
+
+- 添加 switch、checkbox、radio、slider 组件
+
 ## 0.8.0
 
 ### Minor Changes

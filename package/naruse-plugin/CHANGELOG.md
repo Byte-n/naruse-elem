@@ -1,5 +1,11 @@
 # naruse-plugin
 
+## 1.5.0
+
+### Minor Changes
+
+- 添加 switch、checkbox、radio、slider 组件
+
 ## 1.4.0
 
 ### Minor Changes
