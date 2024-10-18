@@ -1,5 +1,18 @@
 # naruse-plugin-hot-puller-cache
 
+## 0.3.0
+
+### Minor Changes
+
+- 添加 switch、checkbox、radio、slider 组件
+
+### Patch Changes
+
+- Updated dependencies
+  - fs-aw@0.3.0
+  - naruse-plugin@1.5.0
+  - naruse-share@0.9.0
+
 ## 0.2.0
 
 ### Minor Changes
