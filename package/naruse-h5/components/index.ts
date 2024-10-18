@@ -13,11 +13,15 @@ import { functionalizae } from 'core/Component';
 import WebView from './web-view';
 import Radio from './radio';
 import RadioGroup from './radio-group';
+import CheckBoxGroup from './checkbox-group';
+import Switch from './switch';
+import Slider from './slider';
 
 /** 组件映射表 */
 const componentReflectMap = {
     button: Button,
     checkbox: Checkbox,
+    'checkbox-group': CheckBoxGroup,
     image: Image,
     input: Input,
     text: Text,
@@ -26,7 +30,9 @@ const componentReflectMap = {
     textarea: Textarea,
     'web-view': WebView,
     'radio': Radio,
-    'radio-group': RadioGroup
+    'radio-group': RadioGroup,
+    switch: Switch,
+    slider: Slider
 }
 
 /**

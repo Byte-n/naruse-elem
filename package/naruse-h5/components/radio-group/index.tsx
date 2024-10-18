@@ -26,7 +26,13 @@ export default class RadioGroup extends Component<{
     onChange = (e) => {
         const value = e.target.value;
         this.setState({ value });
-        commonEventHander.call(this, e);
+        const data = {
+            type: 'change',
+            detail:{
+                value,
+            }
+        }
+        commonEventHander.call(this, e, data);
     };
 
     render () {
