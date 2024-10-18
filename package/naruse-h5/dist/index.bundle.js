@@ -490,11 +490,12 @@
         touchstart: function (e) {
             return commonTouchEventCreater(e);
         },
-        change: function (e) {
-            return __assign(__assign({}, baseEventProps(e)), { detail: {
-                    value: e.target.value
-                } });
-        }
+        change: function (e, data) {
+            return __assign(__assign({}, baseEventProps(e)), data);
+        },
+        changing: function (e, data) {
+            return __assign(__assign({}, baseEventProps(e)), data);
+        },
     };
     /** 事件名称对应处理名称 */
     var reflectEventNameMap = {
@@ -511,6 +512,7 @@
         touchmove: "onTouchMove",
         touchend: "onTouchEnd",
         change: "onChange",
+        changing: "onChanging"
     };
     /**
      * @description 通用事件处理
@@ -518,14 +520,15 @@
      * @date 2022-03-18 16:03:45
      * @param {React.SyntheticEvent} e
      */
-    var commonEventHander = function (e) {
-        var type = e.type;
+    var commonEventHander = function (e, data) {
+        if (data === void 0) { data = null; }
+        var type = data ? data.type : e.type;
         var key = reflectEventNameMap[type];
         var handler = this.props[key];
         if (!handler || typeof handler !== 'function')
             return;
         var event = reflectEventMap[type];
-        var res = reflectEventMap[type](e);
+        var res = reflectEventMap[type](e, data);
         res.timeStamp = new Date().getTime();
         event && handler(res);
     };
@@ -627,7 +630,7 @@
         return res;
     }
 
-    var h$a = React__default["default"].createElement;
+    var h$d = React__default["default"].createElement;
     var Button = /** @class */ (function (_super) {
         __extends$1(Button, _super);
         function Button() {
@@ -691,32 +694,27 @@
             var _a = this.props, type = _a.type, disabled = _a.disabled, style = _a.style, className = _a.className, hoverStyle = _a.hoverStyle, activeStyle = _a.activeStyle, other = __rest(_a, ["type", "disabled", "style", "className", "hoverStyle", "activeStyle"]);
             var _b = this.state, hover = _b.hover, active = _b.active;
             var conStyle = __assign(__assign(__assign(__assign(__assign({}, cssStyle$4['a-button']), (type ? cssStyle$4[type] : {})), style), (hover ? hoverStyle : {})), (active ? __assign(__assign({}, cssStyle$4.active), activeStyle) : {}));
-            return (h$a("button", __assign({ onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), style: conStyle, disabled: disabled, className: className, onClick: commonEventHander.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
+            return (h$d("button", __assign({ onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), style: conStyle, disabled: disabled, className: className, onClick: commonEventHander.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
         };
         return Button;
     }(React__default["default"].Component));
 
-    var h$9 = React__default["default"].createElement;
+    var h$c = React__default["default"].createElement;
     var Checkbox = /** @class */ (function (_super) {
         __extends$1(Checkbox, _super);
         function Checkbox() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.onChange = function (e) {
+                var onChange = _this.props.onChange;
+                onChange && commonEventHander.call(_this, e);
+            };
+            return _this;
         }
-        /** 改变事件 */
-        Checkbox.prototype.handleChange = function (e) {
-            e.stopPropagation();
-            this.props.onChange && this.props.onChange({ value: this.value });
-        };
         Checkbox.prototype.render = function () {
-            var _this = this;
-            var _a = this.props, checked = _a.checked, name = _a.name, color = _a.color, value = _a.value, disabled = _a.disabled, nativeProps = __rest(_a, ["checked", "name", "color", "value", "disabled"]);
-            return (h$9("input", __assign({ ref: function (dom) {
-                    if (!dom)
-                        return;
-                    _this.inputEl = dom;
-                    if (_this.id)
-                        dom.setAttribute('id', _this.id);
-                }, type: 'checkbox', value: value, name: name, style: { color: color }, checked: checked, disabled: disabled, onChange: this.handleChange.bind(this) }, getPropsDataSet(nativeProps))));
+            var _a = this.props, id = _a.id, checked = _a.checked, value = _a.value, disabled = _a.disabled, children = _a.children, style = __rest(_a, ["id", "checked", "value", "disabled", "children"]);
+            return (h$c("label", __assign({ style: __assign({}, style), htmlFor: id }, getBaseProps(this.props, "label")),
+                h$c("input", __assign({}, getBaseProps(this.props), { type: "checkbox", value: value, checked: checked, disabled: disabled, onChange: this.onChange })),
+                children));
         };
         return Checkbox;
     }(React__default["default"].Component));
@@ -896,7 +894,7 @@
         withPageInit({ pageContainer: pageContainer });
     };
 
-    var h$8 = React__default["default"].createElement;
+    var h$b = React__default["default"].createElement;
     var _Image = /** @class */ (function (_super) {
         __extends$1(_Image, _super);
         function _Image(props) {
@@ -1003,13 +1001,13 @@
             }
             var divStyle = __assign(__assign({}, cssStyle$3.naruseImg), (mode === 'widthFix' ? cssStyle$3.naruseImg__widthfix : {}));
             var imgStyle = cssStyle$3[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
-            return (h$8("div", { onClick: commonEventHander.bind(this), className: className, style: __assign(__assign({}, divStyle), style) },
-                h$8("img", __assign({ key: 'img', ref: function (img) { return (_this.ref = img); }, id: id, style: __assign(__assign({}, imageSize), imgStyle), src: src, onLoad: this.imageOnLoad, onError: onError, onTransitionEnd: commonEventHander.bind(this) }, imgProps, getPropsDataSet(other)))));
+            return (h$b("div", { onClick: commonEventHander.bind(this), className: className, style: __assign(__assign({}, divStyle), style) },
+                h$b("img", __assign({ key: 'img', ref: function (img) { return (_this.ref = img); }, id: id, style: __assign(__assign({}, imageSize), imgStyle), src: src, onLoad: this.imageOnLoad, onError: onError, onTransitionEnd: commonEventHander.bind(this) }, imgProps, getPropsDataSet(other)))));
         };
         return _Image;
     }(React__default["default"].Component));
 
-    var h$7 = React__default["default"].createElement;
+    var h$a = React__default["default"].createElement;
     /** 是否是支持的type */
     var getTrueType = function getTrueType(type, confirmType, password) {
         if (confirmType === 'search')
@@ -1097,7 +1095,7 @@
             var _this = this;
             var _a = this.props, type = _a.type, password = _a.password, placeholder = _a.placeholder, disabled = _a.disabled, maxlength = _a.maxlength, confirmType = _a.confirmType, name = _a.name, className = _a.className, value = _a.value, controlled = _a.controlled, other = __rest(_a, ["type", "password", "placeholder", "disabled", "maxlength", "confirmType", "name", "className", "value", "controlled"]);
             var _value = this.state._value;
-            return (h$7("input", __assign({ ref: function (input) {
+            return (h$a("input", __assign({ ref: function (input) {
                     _this.ref = input;
                 }, className: className, 
                 // 受控则只使用外部值，非受控优先使用外部值
@@ -1108,7 +1106,7 @@
 
     var cssStyle$2 = {"text":{"MozUserSelect":"none","WebkitUserSelect":"none","MsUserSelect":"none","userSelect":"none"},"textSelectable":{"MozUserSelect":"text","WebkitUserSelect":"text","MsUserSelect":"text","userSelect":"text"}};
 
-    var h$6 = React__default["default"].createElement;
+    var h$9 = React__default["default"].createElement;
     var Text = /** @class */ (function (_super) {
         __extends$1(Text, _super);
         function Text() {
@@ -1149,12 +1147,12 @@
             var _a = this.props, className = _a.className, id = _a.id, _b = _a.selectable, selectable = _b === void 0 ? false : _b, style = _a.style, hoverStyle = _a.hoverStyle, other = __rest(_a, ["className", "id", "selectable", "style", "hoverStyle"]);
             var hover = this.state.hover;
             var cls = __assign(__assign(__assign(__assign({}, cssStyle$2.text), (selectable ? cssStyle$2.textSelectable : {})), style), (hover ? hoverStyle : {}));
-            return (h$6("span", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), style: cls, className: className, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
+            return (h$9("span", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), style: cls, className: className, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
         };
         return Text;
     }(React__default["default"].Component));
 
-    var h$5 = React__default["default"].createElement;
+    var h$8 = React__default["default"].createElement;
     var View = /** @class */ (function (_super) {
         __extends$1(View, _super);
         function View() {
@@ -1291,14 +1289,14 @@
             var _a = this.props, className = _a.className, style = _a.style, hoverStyle = _a.hoverStyle, id = _a.id, other = __rest(_a, ["className", "style", "hoverStyle", "id"]);
             var hover = this.state.hover;
             var conStyle = __assign(__assign({}, style), (hover ? hoverStyle : {}));
-            return (h$5("div", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
+            return (h$8("div", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
         };
         return View;
     }(React__default["default"].Component));
 
     var cssStyle$1 = {"scroll":{"WebkitOverflowScrolling":"auto"},"scroll::-webkit-scrollbar":{"display":"none"},"scroll-view":{"overflow":"hidden"}};
 
-    var h$4 = React__default["default"].createElement;
+    var h$7 = React__default["default"].createElement;
     function throttle(fn, threshold, scope) {
         if (threshold === void 0) { threshold = 250; }
         var lastTime = 0;
@@ -1510,7 +1508,7 @@
             var _onTouchMove = function (e) {
                 onTouchMove ? onTouchMove(e) : _this.onTouchMove(e);
             };
-            return (h$4("div", __assign({ id: id, "data-animation": animation, className: "".concat(className, " _scrollView"), ref: function (container) {
+            return (h$7("div", __assign({ id: id, "data-animation": animation, className: "".concat(className, " _scrollView"), ref: function (container) {
                     _this.container = container;
                     _this.ref = container;
                 }, style: __assign(__assign(__assign({}, cssStyle$1.scroll), style), scrollWhere), onScroll: _onScroll, onTouchMove: _onTouchMove, onTransitionEnd: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
@@ -1527,7 +1525,7 @@
 
     var cssStyle = {"taroTextarea":{"display":"block","appearance":"none","cursor":"auto","lineHeight":"1.5","resize":"none","outline":"none"}};
 
-    var h$3 = React__default["default"].createElement;
+    var h$6 = React__default["default"].createElement;
     var scrollBar = document.createElement('style');
     scrollBar.type = 'text/css';
     scrollBar.id = '_theOnlytextarea';
@@ -1657,7 +1655,7 @@
                     onConfirm && onConfirm(event_1);
                 }
             };
-            return (h$3("textarea", __assign({ ref: function (input) {
+            return (h$6("textarea", __assign({ ref: function (input) {
                     if (input) {
                         _this.ref = input;
                     }
@@ -2097,7 +2095,7 @@
         }(React__default["default"].Component));
     };
 
-    var h$2 = React__default["default"].createElement;
+    var h$5 = React__default["default"].createElement;
     var WebView = /** @class */ (function (_super) {
         __extends$1(WebView, _super);
         function WebView() {
@@ -2234,12 +2232,12 @@
             var _a = this.props, className = _a.className, style = _a.style, hoverStyle = _a.hoverStyle, id = _a.id, src = _a.src, other = __rest(_a, ["className", "style", "hoverStyle", "id", "src"]);
             var hover = this.state.hover;
             var conStyle = __assign(__assign({}, style), (hover ? hoverStyle : {}));
-            return (h$2("iframe", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this), onBlur: commonEventHander.bind(this), onFocus: commonEventHander.bind(this), onLoad: commonEventHander.bind(this), src: src }, getPropsDataSet(other)), this.props.children));
+            return (h$5("iframe", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this), onBlur: commonEventHander.bind(this), onFocus: commonEventHander.bind(this), onLoad: commonEventHander.bind(this), src: src }, getPropsDataSet(other)), this.props.children));
         };
         return WebView;
     }(React__default["default"].Component));
 
-    var h$1 = React__default["default"].createElement;
+    var h$4 = React__default["default"].createElement;
     /** 单选框 */
     var Radio = /** @class */ (function (_super) {
         __extends$1(Radio, _super);
@@ -2251,14 +2249,14 @@
         }
         Radio.prototype.render = function () {
             var _a = this.props, value = _a.value, checked = _a.checked, disabled = _a.disabled, id = _a.id, children = _a.children;
-            return (h$1("label", __assign({ htmlFor: id }, getBaseProps(this.props, 'label')),
-                h$1("input", __assign({}, getBaseProps(this.props), { ref: this.setRef, type: "radio", value: value, checked: checked, onChange: this.onChange, disabled: disabled })),
+            return (h$4("label", __assign({ htmlFor: id }, getBaseProps(this.props, 'label')),
+                h$4("input", __assign({}, getBaseProps(this.props), { ref: this.setRef, type: "radio", value: value, checked: checked, onChange: this.onChange, disabled: disabled })),
                 children));
         };
         return Radio;
     }(React__default["default"].Component));
 
-    var h = React__default["default"].createElement;
+    var h$3 = React__default["default"].createElement;
     /** 单选框组 */
     var RadioGroup = /** @class */ (function (_super) {
         __extends$1(RadioGroup, _super);
@@ -2269,7 +2267,13 @@
             _this.onChange = function (e) {
                 var value = e.target.value;
                 _this.setState({ value: value });
-                commonEventHander.call(_this, e);
+                var data = {
+                    type: 'change',
+                    detail: {
+                        value: value,
+                    }
+                };
+                commonEventHander.call(_this, e, data);
             };
             return _this;
         }
@@ -2283,7 +2287,7 @@
         RadioGroup.prototype.render = function () {
             var _this = this;
             var _a = this.props, children = _a.children, name = _a.name;
-            return (h("span", __assign({}, getBaseProps(this.props), { ref: this.setRef }), children.map(function (val) {
+            return (h$3("span", __assign({}, getBaseProps(this.props), { ref: this.setRef }), children.map(function (val) {
                 if (typeof val != 'object' || !val) {
                     return val;
                 }
@@ -2293,10 +2297,255 @@
         return RadioGroup;
     }(React__default["default"].Component));
 
+    var h$2 = React__default["default"].createElement;
+    /** 复选框组 */
+    var CheckBoxGroup = /** @class */ (function (_super) {
+        __extends$1(CheckBoxGroup, _super);
+        function CheckBoxGroup() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.state = { selectValue: [] };
+            _this.setRef = function (ref) { return (_this.ref = ref); };
+            _this.onChange = function (e) {
+                e.stopPropagation();
+                var onChange = _this.props.onChange;
+                var selectValue = _this.state.selectValue;
+                var _a = e.target, checked = _a.checked, value = _a.value;
+                var changeSelectValue = checked
+                    ? __spreadArray$1(__spreadArray$1([], selectValue, true), [value], false) : selectValue.filter(function (item) { return item !== value; });
+                _this.setState({ selectValue: changeSelectValue });
+                var data = {
+                    type: "change",
+                    detail: {
+                        value: changeSelectValue,
+                    },
+                };
+                onChange && commonEventHander.call(_this, e, data);
+            };
+            return _this;
+        }
+        CheckBoxGroup.prototype.componentDidMount = function () {
+            var children = this.props.children;
+            children = children.filter(function (val) { return typeof val === "object" && val; });
+            var selectValue = children
+                .filter(function (el) { return el.props.checked; })
+                .map(function (el) { var _a; return (_a = el.props) === null || _a === void 0 ? void 0 : _a.value; });
+            this.setState({ selectValue: selectValue });
+        };
+        CheckBoxGroup.prototype.render = function () {
+            var _this = this;
+            var _a = this.props, children = _a.children, name = _a.name;
+            var selectValue = this.state.selectValue;
+            return (h$2("span", __assign({ ref: this.setRef }, getBaseProps(this.props)), children.map(function (val) {
+                if (typeof val != "object" || !val) {
+                    return val;
+                }
+                return __assign(__assign({}, val), { props: __assign(__assign({}, val.props), { name: name, onChange: _this.onChange, checked: selectValue.some(function (item) { return item === val.props.value; }) }) });
+            })));
+        };
+        return CheckBoxGroup;
+    }(React__default["default"].Component));
+
+    var style$1 = {"switch":{"position":"relative","display":"inline-block","width":"50px","height":"30px","borderRadius":"30px","cursor":"pointer","transition":"background-color 0.2s","boxShadow":"2px 1px #eee, 1px -1px #eee, -1px 1px #eee, -1px -1px #eee"},"input":{"opacity":"0","width":"0","height":"0"},"slider":{"position":"absolute","top":"2px","left":"0px","width":"26px","height":"26px","backgroundColor":"#fff","borderRadius":"50%","transition":"transform 0.2s"},"switchMask":{"cursor":"not-allowed","position":"absolute","top":"-1px","left":"-1px","width":"52px","height":"32px","backgroundColor":"rgba(255, 255, 255, 0.6)","borderRadius":"30px","zIndex":"10"}};
+
+    var h$1 = React__default["default"].createElement;
+    var Switch = /** @class */ (function (_super) {
+        __extends$1(Switch, _super);
+        function Switch(props) {
+            var _this = _super.call(this, props) || this;
+            /**
+             * @description 更新
+             * @param e {SwitchProps}
+             */
+            _this.onChange = function (e) {
+                e.stopPropagation();
+                var onChange = _this.props.onChange;
+                var checked = e.target.checked;
+                var data = {
+                    type: "change",
+                    detail: {
+                        value: checked,
+                    },
+                };
+                onChange && commonEventHander.call(_this, e, data);
+                _this.setState({ checked: checked });
+            };
+            _this.state = {
+                checked: false,
+            };
+            return _this;
+        }
+        /**
+         * @description 初始化
+         */
+        Switch.prototype.componentDidMount = function () {
+            var checked = this.props.checked;
+            this.setState({ checked: checked });
+        };
+        Switch.prototype.render = function () {
+            var _this = this;
+            var _a = this.props, _b = _a.disabled, disabled = _b === void 0 ? false : _b, _c = _a.color, color = _c === void 0 ? "#ff5000" : _c;
+            var _d = this.state.checked, checked = _d === void 0 ? false : _d;
+            return (h$1("label", __assign({ ref: function (el) { return (_this.switchEl = el); }, style: __assign(__assign({}, style$1.switch), { background: checked ? color : "#fff" }) }, getBaseProps(this.props)),
+                h$1(Checkbox, { disabled: disabled, style: style$1.input, checked: checked, onChange: this.onChange }),
+                h$1("span", { ref: function (el) { return (_this.sliderEl = el); }, style: __assign(__assign({}, style$1.slider), { transform: "translateX(".concat(checked ? 22 : 0, "px)"), boxShadow: checked ? "" : "2px 2px 3px #c2c2c2" }) }),
+                disabled && h$1("span", { style: style$1.switchMask })));
+        };
+        return Switch;
+    }(React__default["default"].Component));
+
+    var style = {"slider":{"position":"relative","display":"flex","justifyContent":"center","alignItems":"center"},"sliderContainer":{"cursor":"pointer","flex":"1","minWidth":"0","position":"relative","backgroundColor":"#ddd","borderRadius":"3px"},"slideActiveValue":{"zIndex":"2"},"sliderThumb":{"position":"absolute","width":"20px","height":"20px","backgroundColor":"#fff","border":"2px solid #ff5000","borderRadius":"50%","cursor":"pointer","zIndex":"2"},"valueDisplay":{"textAlign":"center","fontSize":"16px","color":"#999","zIndex":"1"},"sliderMask":{"cursor":"not-allowed","position":"absolute","width":"100%","height":"100%","backgroundColor":"rgba(255, 255, 255, 0.5)","borderRadius":"3px","zIndex":"10"}};
+
+    var h = React__default["default"].createElement;
+    var Slider = /** @class */ (function (_super) {
+        __extends$1(Slider, _super);
+        function Slider(props) {
+            var _this = _super.call(this, props) || this;
+            _this.onMouseLeave = function (e) {
+                e.stopPropagation();
+                var isDragging = _this.state.isDragging;
+                isDragging && _this.onMouseUp(e);
+            };
+            /**
+             * 鼠标按下
+             * @param e
+             */
+            _this.onMouseDown = function (e) {
+                e.stopPropagation();
+                _this.setState({
+                    mouseClientX: e.clientX,
+                    isDragging: true,
+                });
+                _this.sliderThumbEl.addEventListener("mousemove", _this.onMouseMove);
+                _this.sliderThumbEl.addEventListener("mouseup", _this.onMouseUp);
+                _this.startDragStyle();
+            };
+            /**
+             * 鼠标移动
+             * @param e
+             */
+            _this.onMouseMove = function (e) {
+                e.stopPropagation();
+                var _a = _this.props, _b = _a.min, min = _b === void 0 ? 0 : _b, _c = _a.max, max = _c === void 0 ? 100 : _c, _d = _a.step, step = _d === void 0 ? 1 : _d, _e = _a.handleSize, handleSize = _e === void 0 ? 18 : _e, onChanging = _a.onChanging;
+                var _f = _this.state, mouseClientX = _f.mouseClientX, value = _f.value;
+                var width = _this.sliderContainerEl.getBoundingClientRect().width;
+                // 计算x偏移量
+                var diffValue = e.clientX - mouseClientX;
+                // 计算当前值
+                var currentValue = Math.round((diffValue / width) * (max - min)) + value;
+                if (currentValue <= min)
+                    currentValue = min;
+                if (currentValue >= max)
+                    currentValue = max;
+                var left = "calc(".concat(((currentValue - min) / (max - min)) * 100, "% - ").concat(handleSize / 2, "px)");
+                if (step <= 0)
+                    return;
+                if (currentValue % step === 0) {
+                    _this.sliderProgressBarEl.style.width = "calc(".concat(((currentValue - min) / (max - min)) * 100, "%)");
+                    _this.sliderThumbEl.style.left = left;
+                    _this.valueDisplayEl.textContent = currentValue;
+                    var data = {
+                        type: "changing",
+                        detail: { value: currentValue },
+                    };
+                    onChanging && commonEventHander.call(_this, e, data);
+                }
+            };
+            /**
+             * 释放鼠标
+             * @param e
+             */
+            _this.onMouseUp = function (e) {
+                e.stopPropagation();
+                var onChange = _this.props.onChange;
+                var currentValue = Number(_this.valueDisplayEl.textContent);
+                _this.endDragStyle();
+                _this.setState({
+                    value: currentValue,
+                    isDragging: false,
+                });
+                var data = {
+                    type: "change",
+                    detail: { value: currentValue },
+                };
+                onChange && commonEventHander.call(_this, e, data);
+                // 移除事件
+                _this.sliderThumbEl.removeEventListener("mousemove", _this.onMouseMove);
+                _this.sliderThumbEl.removeEventListener("mouseup", _this.onMouseUp);
+            };
+            /**
+             * 拖拽滑块元素开始样式
+             * @returns
+             */
+            _this.startDragStyle = function () {
+                var handleColor = _this.props.handleColor;
+                if (!handleColor) {
+                    _this.sliderThumbEl.style.backgroundColor = "#ff5000";
+                }
+            };
+            /**
+             * 拖拽滑块元素结束样式
+             * @returns
+             */
+            _this.endDragStyle = function () {
+                var handleColor = _this.props.handleColor;
+                if (!handleColor) {
+                    _this.sliderThumbEl.style.backgroundColor = "#fff";
+                }
+            };
+            /**
+             * 点击跳转到指定位置
+             * @returns
+             */
+            _this.setSliderValue = function (e) {
+                var isDragging = _this.state.isDragging;
+                if (isDragging)
+                    return;
+                var _a = _this.props, _b = _a.min, min = _b === void 0 ? 0 : _b, _c = _a.max, max = _c === void 0 ? 100 : _c, onChange = _a.onChange;
+                var _d = e.target.getBoundingClientRect(), left = _d.left, width = _d.width;
+                var offsetX = e.clientX - left; // 鼠标相对于滑动条的水平偏移
+                var percentage = offsetX / width; // 计算百分比
+                var newValue = Math.round(percentage * (max - min) + min); // 转换为数值
+                _this.setState({ value: newValue });
+                var data = {
+                    type: "change",
+                    detail: { value: newValue },
+                };
+                onChange && commonEventHander.call(_this, e, data);
+            };
+            var currentValue = 0;
+            var _a = _this.props, _b = _a.value, value = _b === void 0 ? 0 : _b, _c = _a.min, min = _c === void 0 ? 0 : _c, _d = _a.max, max = _d === void 0 ? 100 : _d;
+            if (value < min || value > max) {
+                currentValue = value > max ? max : min;
+            }
+            else {
+                currentValue = value;
+            }
+            _this.state = {
+                value: currentValue,
+                mouseClientX: 0,
+                isDragging: false,
+            };
+            return _this;
+        }
+        Slider.prototype.render = function () {
+            var _this = this;
+            var value = this.state.value;
+            var _a = this.props, _b = _a.min, min = _b === void 0 ? 0 : _b, _c = _a.max, max = _c === void 0 ? 100 : _c, _d = _a.disabled, disabled = _d === void 0 ? false : _d, _e = _a.showValue, showValue = _e === void 0 ? false : _e, _f = _a.activeColor, activeColor = _f === void 0 ? "#ff5000" : _f, _g = _a.backgroundColor, backgroundColor = _g === void 0 ? "#ddd" : _g, _h = _a.handleColor, handleColor = _h === void 0 ? "#fff" : _h, _j = _a.handleSize, handleSize = _j === void 0 ? 18 : _j, _k = _a.trackSize, trackSize = _k === void 0 ? 2 : _k;
+            return (h("div", __assign({ style: style.slider, onMouseLeave: this.onMouseLeave }, getBaseProps(this.props)),
+                h("div", { ref: function (self) { return (_this.sliderContainerEl = self); }, style: __assign(__assign({}, style.sliderContainer), { backgroundColor: backgroundColor, height: trackSize }), onMouseUp: this.setSliderValue },
+                    h("div", { ref: function (self) { return (_this.sliderProgressBarEl = self); }, style: __assign(__assign({}, style.slideActiveValue), { backgroundColor: activeColor, height: trackSize, width: "calc(".concat(((value - min) / (max - min)) * 100, "%)") }) }),
+                    h("div", { ref: function (self) { return (_this.sliderThumbEl = self); }, style: __assign(__assign({}, style.sliderThumb), { backgroundColor: handleColor, borderColor: activeColor, width: handleSize, height: handleSize, top: "calc(50% - ".concat(2 + handleSize / 2, "px)"), left: "calc(".concat(((value - min) / (max - min)) * 100, "% - ").concat(handleSize / 2, "px)") }), onMouseDown: this.onMouseDown })),
+                h("div", { ref: function (self) { return (_this.valueDisplayEl = self); }, style: __assign(__assign({}, style.valueDisplay), { width: showValue ? "30px" : 0, marginLeft: showValue ? "8px" : 0, opacity: showValue ? 1 : 0 }) }, value),
+                disabled && h("div", { style: style.sliderMask })));
+        };
+        return Slider;
+    }(React__default["default"].Component));
+
     /** 组件映射表 */
     var componentReflectMap = {
         button: Button,
         checkbox: Checkbox,
+        'checkbox-group': CheckBoxGroup,
         image: _Image,
         input: Input,
         text: Text,
@@ -2305,7 +2554,9 @@
         textarea: Textarea,
         'web-view': WebView,
         'radio': Radio,
-        'radio-group': RadioGroup
+        'radio-group': RadioGroup,
+        switch: Switch,
+        slider: Slider
     };
     /**
      * @description 拦截下来的react.createElement
@@ -8433,7 +8684,7 @@
     }(React__default["default"].Component));
 
     // @ts-ignore
-    var version = "0.8.0";
+    var version = "0.9.0";
     initVersionLogger('naruse-h5', version);
     var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
     var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React__default["default"].Component, createElement: naruseCreateElement, env: {

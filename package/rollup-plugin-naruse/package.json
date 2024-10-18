@@ -1,7 +1,7 @@
 {
   "name": "rollup-plugin-naruse",
   "description": "将标准的react类组件 转换为  naruse-element 运行的代码",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "main": "index.js",
   "devDependencies": {
     "@babel/plugin-transform-block-scoping": "^7.21.0",
