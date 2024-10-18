@@ -6,7 +6,7 @@ import { initVnodeTree } from './domEvents';
 import { Naruse } from './naurse';
 import { logger, NOOP, propsEquals } from './uitl';
 
-let uid = 0;
+let uid = 1;
 
 /** 当前在渲染的 */
 export const currentRenderMiddawre: { current?: Middware } = {
@@ -66,7 +66,7 @@ export class Middware {
     /** 存储此 组件下的所有 class 组件的 props */
     hub = {};
     /** hub key 的自增id */
-    incrId = 0;
+    incrId = 1;
 
     /** 保存 */
     saveProps = ({ actuator, props }:{ actuator: typeof NaruseComponent, props: any }) => {

@@ -3,35 +3,33 @@ export type NaruseInitParams = Partial<NaruseConfig>
 
 /** naruse 配置项 */
 export type NaruseConfig = {
-    hotPuller: (props: any) => HotPullerReturn,
+    hotPuller: (props: any & { unique?: boolean }) => Promise<HotPullerReturn>,
     baseCtx: () => AdRunningContext | {},
     onRunError: (err: Error, source?: RunningCodeErrorSource) => void,
     hotImport: (path: string, ctx: any) => string | Promise<string>,
     [k: string]: any,
 }
 
+export type NaruseConfigH5 = {
+    unsafeEnabled: {
+        compatibleWeexElement?: boolean
+        compatibleWeexElementLog?: boolean
+    },
+    convertRpx: (val: number) => (number|string)
+} & NaruseConfig;
+export type NaruseInitParamsH5 = Partial<NaruseConfigH5>
+
 /** 热更新方法返回值 */
-export type HotPullerReturn = Promise<{
-    code: string,
-    ctx: AdRunningContext | {},
-    adProps?: Record<string, any>
-}>
+export type HotPullerReturn = {
+    code?: string,
+    ctx: Partial<AdRunningContext>,
+    props?: Record<string, any>
+}
 
 /** 广告代码运行时上下文环境对象 */
 export type AdRunningContext = {
     h:  (type: any, props: any, ...children: any[]) => any,
     Naruse: any,
-    my?: any,
-    window?: any,
-    RAP?: any,
-    $adImport: { adData: AdDataResponse, callback: () => (AdDataResponse|void) },
-    $uninstall,
-    $logger?: any,
-    // 广告版本
-    $adVersion?: string,
-    $webpack?: any,
-    $$import?: any,
-    // todo: 待补充
 } & Record<string, any>;
 
 export type AdDataResponse = {

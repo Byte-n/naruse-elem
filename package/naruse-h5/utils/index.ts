@@ -15,6 +15,19 @@ export const getPropsDataSet = (props) => Object.keys(props || {}).reduce((per: 
     }
     return per;
 }, {})
+const basePropsKey = ['id', 'className', 'style'];
+const basePropsKeyU = ['Id', 'ClassName', 'Style'];
+export const getBaseProps = (props, keyPrefix = '') => {
+    const obj = {};
+    const keys = keyPrefix ? basePropsKeyU : basePropsKey;
+    for (const key of keys) {
+        if (props[keyPrefix + key] === undefined) {
+            continue;
+        }
+        obj[key] = props[key];
+    }
+    return obj;
+}
 
 /**
  * 解析 字符串参数，类型： k=v&k=v&k=v&...

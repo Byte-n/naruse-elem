@@ -7,12 +7,12 @@ import {
     PluginOnErrorParams,
     UpdateAdLoggerPublicInfoParams,
 } from '../type'
-import { AdData, AdRunningContext, createLogger, removeObjectNullValue } from "naruse-share";
+import { AdData, AdRunningContext, removeObjectNullValue } from "naruse-share";
 
 import Plugin from '../core/index'
 import LoggerPlus from "./LoggerPlus";
+import { log } from '../utils/log';
 
-const log = createLogger('LoggerPlugin');
 const getNullAdData: () => AdData = () => {
     return {
         creative_id: 0,
@@ -103,7 +103,7 @@ class LoggerPlugin extends Plugin {
         logger.updatePublicInfo(params, ignoredNull);
     }
 
-    apply({ context, config }: PluginApplyParams) {
+    apply({ context }: PluginApplyParams) {
         const { $adImport, $adVersion } = context
         const { adData } = $adImport;
         /** 注入 日志对象 */

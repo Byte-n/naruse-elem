@@ -12,81 +12,86 @@ LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
-/* global Reflect, Promise */
+/* global Reflect, Promise, SuppressedError, Symbol */
 
 var extendStatics$1 = function(d, b) {
-    extendStatics$1 = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-    return extendStatics$1(d, b);
+  extendStatics$1 = Object.setPrototypeOf ||
+      ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+      function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+  return extendStatics$1(d, b);
 };
 
 function __extends$1(d, b) {
-    if (typeof b !== "function" && b !== null)
-        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-    extendStatics$1(d, b);
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  if (typeof b !== "function" && b !== null)
+      throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+  extendStatics$1(d, b);
+  function __() { this.constructor = d; }
+  d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 }
 
 var __assign = function() {
-    __assign = Object.assign || function __assign(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
+  __assign = Object.assign || function __assign(t) {
+      for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+      }
+      return t;
+  };
+  return __assign.apply(this, arguments);
 };
 
 function __awaiter(thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
+  function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+  return new (P || (P = Promise))(function (resolve, reject) {
+      function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+      function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+      function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+      step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
 }
 
 function __generator(thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
+  var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+  return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+  function verb(n) { return function (v) { return step([n, v]); }; }
+  function step(op) {
+      if (f) throw new TypeError("Generator is already executing.");
+      while (g && (g = 0, op[0] && (_ = 0)), _) try {
+          if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+          if (y = 0, t) op = [op[0] & 2, t.value];
+          switch (op[0]) {
+              case 0: case 1: t = op; break;
+              case 4: _.label++; return { value: op[1], done: false };
+              case 5: _.label++; y = op[1]; op = [0]; continue;
+              case 7: op = _.ops.pop(); _.trys.pop(); continue;
+              default:
+                  if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                  if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                  if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                  if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                  if (t[2]) _.ops.pop();
+                  _.trys.pop(); continue;
+          }
+          op = body.call(thisArg, _);
+      } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+      if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+  }
 }
 
 function __spreadArray$1(to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
+  if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+      if (ar || !(i in from)) {
+          if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+          ar[i] = from[i];
+      }
+  }
+  return to.concat(ar || Array.prototype.slice.call(from));
 }
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+  var e = new Error(message);
+  return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
 
 var createLogger = function (name) {
     return {
@@ -141,6 +146,7 @@ var temporarilyNotSupport = function temporarilyNotSupport(apiName) {
 };
 
 var mitt = function (n) {
+    if (n === void 0) { n = new Map(); }
     return {
         all: n = n || new Map,
         on: function (e, t) {
@@ -224,6 +230,7 @@ var isEmpty = function (key) {
         return true;
     }
     else if (typeof (key) === 'object') {
+        // @ts-ignore
         for (var i in key) {
             return false;
         }
@@ -260,6 +267,7 @@ var isObj = function (obj) { return obj !== null && typeof obj === 'object'; };
  * @date 2022-10-12 14:10:29
  */
 var isEmptyObj = function (o) {
+    // @ts-ignore
     for (var i in o) {
         return false;
     }
@@ -383,7 +391,9 @@ var getDeferPromise = function () {
         resolve = res;
         reject = rej;
     });
+    // @ts-ignore
     promise.resolve = resolve;
+    // @ts-ignore
     promise.reject = reject;
     return promise;
 };
@@ -394,6 +404,7 @@ var proxyObject = function (obj) {
     return new Proxy(obj, {
         get: function (target, key) {
             if (!target[key]) {
+                // @ts-ignore
                 return obj[key] = getDeferPromise();
             }
             return obj[key];
@@ -433,7 +444,7 @@ LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
-/* global Reflect, Promise */
+/* global Reflect, Promise, SuppressedError, Symbol */
 
 var extendStatics = function(d, b) {
     extendStatics = Object.setPrototypeOf ||
@@ -459,6 +470,11 @@ function __spreadArray(to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 }
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
 
 var Identifier = "Identifier";
 var Literal = "Literal";
@@ -859,9 +875,10 @@ var evaluate_map = (_b = {},
             return evaluate(node.alternate, scope);
     },
     _b[ForStatement] = function (node, scope) {
-        for (var new_scope = new Scope("loop" /* ScopeType.Loop */, scope), 
+        var new_scope = new Scope("loop" /* ScopeType.Loop */, scope); 
         // 只有 var 变量才会被提高到上一作用域
-        init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
+        node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null;
+        for (; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
             var result = evaluate(node.body, new_scope);
             if (isReturnResult(result))
                 return result;
@@ -4592,14 +4609,14 @@ var naruseInit = function (params) {
     Object.assign(_config, params);
 };
 
-function _typeof(obj) {
+function _typeof(o) {
   "@babel/helpers - typeof";
 
-  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-  }, _typeof(obj);
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+    return typeof o;
+  } : function (o) {
+    return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+  }, _typeof(o);
 }
 
 var isProduction = process.env.NODE_ENV === 'production';
@@ -5351,7 +5368,7 @@ var getMiniappEventBehavior = function () {
     };
 };
 
-var uid$1 = 0;
+var uid$1 = 1;
 /** 当前在渲染的 */
 var currentRenderMiddawre = {
     current: null
@@ -5384,7 +5401,7 @@ var Middware = /** @class */ (function () {
         /** 存储此 组件下的所有 class 组件的 props */
         this.hub = {};
         /** hub key 的自增id */
-        this.incrId = 0;
+        this.incrId = 1;
         /** 保存 */
         this.saveProps = function (_a) {
             var actuator = _a.actuator, props = _a.props;
@@ -6091,9 +6108,9 @@ var isValidElement = function (element) {
 };
 
 var elementApi = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    cloneElement: cloneElement,
-    isValidElement: isValidElement
+  __proto__: null,
+  cloneElement: cloneElement,
+  isValidElement: isValidElement
 });
 
 /**
@@ -6138,7 +6155,7 @@ var createMiniFactory = function (type, instance, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.6.3";
+var version = "0.9.0";
 initVersionLogger('naruse-alipay', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 // naruse模块内容
@@ -6203,6 +6220,8 @@ var LoggerInfoKeyMap = {
 // type ValueOf<T> = T[keyof T];
 // type RequestParamsKey = ValueOf<typeof LoggerInfoKeyMap>;
 
+var log$1 = createLogger('naruse-plugin');
+
 /**
  * 插件,很明显，它是一个插件，它可以做点什么。你必须继承此类，来实现插件
  */
@@ -6216,10 +6235,10 @@ var Plugin = /** @class */ (function () {
         }
     }
     /** 在广告代码运行前，获取到有效的广告数据后 */
-    Plugin.prototype.apply = function (params) {
+    Plugin.prototype.apply = function (_params) {
     };
     /** 解析广告代码错误时、运行广告代码错误时 */
-    Plugin.prototype.onError = function (params) {
+    Plugin.prototype.onError = function (_params) {
     };
     return Plugin;
 }());
@@ -6227,17 +6246,15 @@ var Plugin = /** @class */ (function () {
 var PluginMethodList = ['apply', 'onError'];
 /** 所有的插件 */
 var plugins = {};
-var log$2 = createLogger('PluginMethod');
 // @ts-ignore
 var pluginEvent = new EventBus();
 /** 使用全局事件中心 注册插件的生命周期 */
 PluginMethodList.forEach(function (method) {
     pluginEvent.on(PluginMethod[method], function (params) {
         var keys = Object.keys(plugins);
-        log$2.info("PluginMethod[".concat(method, "]"), keys.length, params);
-        keys
-            .forEach(function (key) {
-            plugins[key][method](params);
+        log$1.info("PluginMethod[".concat(method, "]"), keys.length, params);
+        keys.forEach(function (key) {
+            typeof plugins[key][method] === 'function' && plugins[key][method](params);
         });
     });
 });
@@ -6249,9 +6266,6 @@ function registerPlugin$1(name, pluginConstructor, firstParam) {
     }
     // 构造对象
     var plugin = new (pluginConstructor.bind.apply(pluginConstructor, __spreadArray$1([void 0, firstParam], params, false)))();
-    if (!(plugin instanceof Plugin)) {
-        throw new Error('registerPlugin: pluginConstructor 必须返回一个 Plugin类的实例');
-    }
     if (plugin[name]) {
         throw new Error("".concat(name, " \u6B64\u63D2\u4EF6\uFF0C\u5DF2\u7ECF\u6CE8\u518C\u8FC7\u4E86"));
     }
@@ -6279,7 +6293,7 @@ var nullAdData = function () { return ({
     user_define: { body: undefined },
     version: ""
 }); };
-var log$1 = createLogger('LoggerPlus');
+var log = createLogger('naruser-plugin/logger');
 /** 日志发送类 */
 var LoggerPlus = /** @class */ (function () {
     /**
@@ -6406,7 +6420,7 @@ var LoggerPlus = /** @class */ (function () {
             args[_i - 2] = arguments[_i];
         }
         if (!this.isCanLog(level)) {
-            log$1.debug.apply(log$1, __spreadArray$1(['忽略日志：', level, event], args, false));
+            log.debug.apply(log, __spreadArray$1(['忽略日志：', level, event], args, false));
             return;
         }
         if (typeof this._logNetworkInterface !== 'function') {
@@ -6420,7 +6434,7 @@ var LoggerPlus = /** @class */ (function () {
             coverLoggerInfoToRequestParam(info);
         // 调用接口发送
         this._logNetworkInterface(this.encode(requestParams), this.encodeValue(requestParams), info);
-        log$1.debug('发送日志：', level, event, info);
+        log.debug('发送日志：', level, event, info);
     };
     /** 将obj转 get 请求的字符串，并进行 url 编码 */
     LoggerPlus.prototype.encode = function (obj) {
@@ -6501,7 +6515,6 @@ function coverLoggerInfoToRequestParam(info) {
     }, {});
 }
 
-var log = createLogger('LoggerPlugin');
 var getNullAdData = function () {
     return {
         creative_id: 0,
@@ -6564,7 +6577,7 @@ var LoggerPlugin = /** @class */ (function (_super) {
     /** 修改参数 */
     LoggerPlugin.prototype.updatePublicInfo = function (params, ignoredNull) {
         if (ignoredNull === void 0) { ignoredNull = true; }
-        log.info('updatePublicInfo: params = ', params, 'ignoredNull = ', ignoredNull);
+        log$1.info('updatePublicInfo: params = ', params, 'ignoredNull = ', ignoredNull);
         (ignoredNull) && removeObjectNullValue(params);
         Object.assign(this._initParams, params);
         var config = this.constructorFirstParams.config;
@@ -6581,7 +6594,7 @@ var LoggerPlugin = /** @class */ (function (_super) {
         logger.updatePublicInfo(params, ignoredNull);
     };
     LoggerPlugin.prototype.apply = function (_a) {
-        var context = _a.context; _a.config;
+        var context = _a.context;
         var $adImport = context.$adImport, $adVersion = context.$adVersion;
         var adData = $adImport.adData;
         /** 注入 日志对象 */
@@ -6590,7 +6603,7 @@ var LoggerPlugin = /** @class */ (function (_super) {
             adVer: $adVersion,
         }, this._initParams);
         context.$logger = this.$logger;
-        log.info('apply: context = ', context);
+        log$1.info('apply: context = ', context);
     };
     LoggerPlugin.prototype.onError = function (_a) {
         var context = _a.context, error = _a.error, source = _a.source;
@@ -6741,7 +6754,7 @@ var bindRenderEventOnComponent = function (miniComponent) {
     }
     bindedPages[route] = miniComponent;
     miniComponent._naruseEventCenter = globalEvent;
-    globalEvent.on('naruse.renderComponentOnPage', function (pageName, Component) {
+    miniComponent.clearRenderComponentOnPageEnvet = globalEvent.on('naruse.renderComponentOnPage', function (pageName, Component) {
         if (pageName !== route)
             return;
         // 卸载已有组件
@@ -6764,6 +6777,7 @@ var uninstallMainComponentOnSomePage = function (miniComponent) {
     if (!bindedPages[route])
         return;
     delete bindedPages[route];
+    typeof miniComponent.clearRenderComponentOnPageEnvet === 'function' && miniComponent.clearRenderComponentOnPageEnvet();
     miniComponent._naruseEventCenter = null;
 };
 /**
@@ -6882,6 +6896,7 @@ var createMainBehavior = function (option) {
          * @date 2022-03-16 10:03:21
          */
         didUpdate: function (prevProps) {
+            var _a;
             // 主组件更新逻辑
             if (this.isNaruseMainComponent) {
                 // 参数不同则重新创建元素
@@ -6896,8 +6911,8 @@ var createMainBehavior = function (option) {
             // 子组件更新逻辑
             if (this.props.propHubKey) {
                 // 从指定的 主组件下获取，
-                var _a = allMiddware[prevProps.parentMiddwareId].parseProps({ propHubKey: prevProps.propHubKey }), propsOld = _a.props, actuatorOld = _a.actuator;
-                var _b = allMiddware[this.props.parentMiddwareId].parseProps({ propHubKey: this.props.propHubKey }), props = _b.props, actuator = _b.actuator;
+                var _b = ((_a = allMiddware[prevProps.parentMiddwareId]) === null || _a === void 0 ? void 0 : _a.parseProps({ propHubKey: prevProps.propHubKey })) || {}, propsOld = _b.props, actuatorOld = _b.actuator;
+                var _c = allMiddware[this.props.parentMiddwareId].parseProps({ propHubKey: this.props.propHubKey }), props = _c.props, actuator = _c.actuator;
                 // FIX: 修复了当切换装载器后不会卸载组件重新渲染
                 // FIX: 修复了当key发生变化后组件不会重新渲染 0615
                 if (actuator === actuatorOld && props.key === propsOld.key) {
@@ -6917,9 +6932,9 @@ var createMainBehavior = function (option) {
          * @date 2022-03-16 10:03:36
          */
         didUnmount: function () {
+            this.isNaruseMainComponent && uninstallMainComponentOnSomePage(this);
             if (!this.$middware)
                 return;
-            this.isNaruseMainComponent && uninstallMainComponentOnSomePage(this);
             this.$middware.onUnMount(true);
         } });
     return naruseBehavior;

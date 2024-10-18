@@ -38,7 +38,7 @@ const bindRenderEventOnComponent = (miniComponent: any) => {
     }
     bindedPages[route] = miniComponent;
     miniComponent._naruseEventCenter = globalEvent;
-    globalEvent.on('naruse.renderComponentOnPage', (pageName: string, Component: typeof NaruseComponent) => {
+    miniComponent.clearRenderComponentOnPageEnvet = globalEvent.on('naruse.renderComponentOnPage', (pageName: string, Component: typeof NaruseComponent) => {
         if (pageName !== route) return;
         // 卸载已有组件
         miniComponent.$middware && miniComponent.$middware.onUnMount();
@@ -59,6 +59,7 @@ export const uninstallMainComponentOnSomePage = (miniComponent: any) => {
     const { route } = miniComponent.$page;
     if (!bindedPages[route]) return;
     delete bindedPages[route];
+    typeof miniComponent.clearRenderComponentOnPageEnvet === 'function' && miniComponent.clearRenderComponentOnPageEnvet();
     miniComponent._naruseEventCenter = null;
 }
 

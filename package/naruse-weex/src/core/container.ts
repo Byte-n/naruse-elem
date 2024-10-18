@@ -25,12 +25,15 @@ import RAP from 'rap-sdk';
 export const getNaruseComponentFromProps = async (props: any) => {
     if (!props || typeof props !== 'object') {
         logger.error('无效参数，无法生成对应naruse组件');
-        return;
+        return { component: undefined, props: {} };
     }
     const { hotPuller } = getNaruseConfig();
     try {
-        const { code, ctx } = (await hotPuller(props)) || {};
-        return getNaruseComponentFromCode(code, ctx as AdRunningContext);
+        const { code, ctx, props: _props } = (await hotPuller(props)) || {};
+        return {
+            component: await getNaruseComponentFromCode(code, ctx as AdRunningContext),
+            props: _props
+        };
     } catch (e) {
         logger.error('加载远程代码资源失败', e);
     }
@@ -126,6 +129,7 @@ export const getNaruseComponentFromCode = async (code: string, ctx: AdRunningCon
  */
 class Container extends Component<{}, { loaded: boolean }> {
     private Component: any;
+    private componentProps: any;
     constructor(props) {
         super(props);
         this.state = { loaded: false };
@@ -133,14 +137,16 @@ class Container extends Component<{}, { loaded: boolean }> {
     }
 
     async init(props) {
-        this.Component = await getNaruseComponentFromProps(props);
+        const { component, props: _props } = await getNaruseComponentFromProps(props);
+        this.Component = component;
+        this.componentProps = _props;
         if (this.Component) {
             this.setState({ loaded: true });
         }
     }
 
     render(): RaxNode {
-        return naruseCreateElement(this.state.loaded ? this.Component : emptyElement);
+        return naruseCreateElement(this.state.loaded ? this.Component : emptyElement, this.componentProps);
     }
 }
 

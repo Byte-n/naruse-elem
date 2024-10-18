@@ -18,10 +18,10 @@ export const getNaruseComponentFromProps = async (props) => {
     }
     const { hotPuller } = getNaruseConfig();
     try {
-        const { code, ctx, adProps } = await hotPuller(props);
+        const { code, ctx, props: _props } = await hotPuller(props);
         return {
             Component: await getNaruseComponentFromCode(code, ctx),
-            adProps,
+            props: _props,
         };
     } catch (e) {
         logger.error('加载远程代码资源失败', e);
@@ -116,8 +116,8 @@ class Container extends Component {
         super(props);
         this.state = { loaded: false };
         this.init(props);
-        // 传递给广告的props
-        this.adProps = {};
+        // 传递给子组件的props
+        this._props = {};
     }
 
     Component: any;
@@ -125,7 +125,7 @@ class Container extends Component {
     async init(props) {
         const result = await getNaruseComponentFromProps(props);
         this.Component = result?.Component;
-        this.adProps = result?.adProps;
+        this._props = result?.props;
         if (this.Component) {
             this.setState({ loaded: true });
         }
@@ -133,7 +133,7 @@ class Container extends Component {
 
     render() {
         // @ts-ignore
-        return this.state.loaded ? Naruse.createElement(this.Component, this.adProps) : null;
+        return this.state.loaded ? Naruse.createElement(this.Component, this._props) : null;
     }
 }
 

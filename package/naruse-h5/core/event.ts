@@ -1,8 +1,23 @@
 
+function baseEventProps (e: Event) {
+    return {
+        type: e.type,
+        /** 阻止冒泡 */
+        stopPropagation() {
+            e.stopPropagation();
+        },
+        // 真正触发事件的元素
+        target: e.target,
+        // 当前元素（冒泡）
+        currentTarget: e.currentTarget,
+    }
+}
+
 const reflectEventMap = {
     /** 点击事件处理 */
     click(e) {
         return {
+            ...baseEventProps(e),
             type: 'click',
             detail: {
                 clientX: e.clientX,
@@ -10,19 +25,12 @@ const reflectEventMap = {
                 pageX: e.pageX,
                 pageY: e.pageY,
             },
-            /** 阻止冒泡 */
-            stopPropagation() {
-                e.stopPropagation();
-            },
-            // 真正触发事件的元素
-            target: e.target,
-            // 当前元素（冒泡）
-            currentTarget: e.currentTarget
         };
     },
     /** 加载完毕 */
     load(e) {
         return {
+            ...baseEventProps(e),
             type: 'load',
             detail: {
                 width: e.target.width,
@@ -33,6 +41,7 @@ const reflectEventMap = {
     /** 聚焦 */
     focus(e) {
         return {
+            ...baseEventProps(e),
             type: 'foucs',
             detail: { value: e.target.value },
         };
@@ -40,6 +49,7 @@ const reflectEventMap = {
     /** 失焦 */
     blur(e) {
         return {
+            ...baseEventProps(e),
             type: 'blur',
             detail: { value: e.target.value },
         };
@@ -49,20 +59,19 @@ const reflectEventMap = {
         const { value } = e.target;
         const keyCode = e.keyCode || e.code;
         return {
+            ...baseEventProps(e),
             type: 'keydown',
             detail: {
                 value,
                 cursor: value.length,
                 keyCode,
             },
-            stopPropagation() {
-                e.stopPropagation();
-            },
         };
     },
     /** 输入 */
     input(e) {
         return {
+            ...baseEventProps(e),
             type: 'input',
             detail: e.detail,
         };
@@ -70,14 +79,12 @@ const reflectEventMap = {
     /** 动效结束 */
     transitionend  (e) {
         return {
+            ...baseEventProps(e),
             type: 'transitionEnd',
             detail: {
                 elapsedTime: e.elapsedTime,
                 propertyName: e.propertyName,
-            },
-            stopPropagation() {
-                e.stopPropagation();
-            },
+            }
         };
     },
     mouseup (e) {
@@ -101,6 +108,18 @@ const reflectEventMap = {
     touchstart (e) {
         return commonTouchEventCreater(e);
     },
+    change (e, data) {
+        return {
+            ...baseEventProps(e),
+            ...data
+        }
+    },
+    changing (e, data) {
+        return {
+            ...baseEventProps(e),
+            ...data
+        }
+    },
 };
 
 /** 事件名称对应处理名称 */
@@ -117,6 +136,8 @@ const reflectEventNameMap = {
     touchstart:"onTouchStart",
     touchmove:"onTouchMove",
     touchend:"onTouchEnd",
+    change:"onChange",
+    changing:"onChanging"
 };
 
 
@@ -126,13 +147,13 @@ const reflectEventNameMap = {
  * @date 2022-03-18 16:03:45
  * @param {React.SyntheticEvent} e
  */
-export const commonEventHander = function (e) {
-    const type = e.type;
+export const commonEventHander = function (e, data: { type: string, detail: object } | null = null) {
+    const type = data ? data.type: e.type;
     const key = reflectEventNameMap[type];
     const handler = this.props[key];
     if (!handler || typeof handler !== 'function') return;
     const event = reflectEventMap[type];
-    const res = reflectEventMap[type](e);
+    const res = reflectEventMap[type](e, data);
     res.timeStamp = new Date().getTime();
     event && handler(res);
 };
@@ -167,6 +188,7 @@ export const commonMouseEventCreater = (event) => {
 export const commonTouchEventCreater = (event) => {
     const { type, changedTouches, targetTouches, touches, detail, target, stopPropagation } = event;
     return {
+        ...baseEventProps(event),
         type,
         // 涉及当前(引发)事件的触摸点的列表
         changedTouches,

@@ -19,6 +19,12 @@ export const enum VnodeType {
     Fragment = 'fragment',
     NaruseComponent = 'naruse-element',
     WebView = 'web-view',
+    Radio = 'radio',
+    RadioGroup = 'radio-group',
+    Checkbox = 'checkbox',
+    CheckboxGroup = 'checkbox-group',
+    Switch = 'switch',
+    Slider = 'slider',
 }
 
 

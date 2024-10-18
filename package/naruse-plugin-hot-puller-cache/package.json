@@ -1,0 +1,17 @@
+{
+  "name": "naruse-plugin-hot-puller-cache",
+  "version": "0.3.0",
+  "description": "naruse-template-cache-manager",
+  "main": "./index.js",
+  "scripts": {
+    "build": "rollup -c --environment BUILD:production,TYPE:ts && rollup -c --environment BUILD:production,TYPE:dts && rd /s /q .\\dist\\package",
+    "dev": "rollup -c --watch --environment BUILD:development",
+    "tsc": "tsc",
+    "test": "mocha ./__test__/*.test.js"
+  },
+  "dependencies": {
+    "fs-aw": "workspace:*",
+    "naruse-share": "workspace:*",
+    "naruse-plugin": "workspace:*"
+  }
+}

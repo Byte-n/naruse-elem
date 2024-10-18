@@ -1,7 +1,7 @@
 // 根据数据队列生成axml模版
 import { js2xml } from 'xml-js';
 import humps from 'humps';
-import { eventCenterEventName } from './data';
+import { eventCenterEventName, nativeCheckbox, nativeRadio, speicalConfig } from './data';
 
 const camelCase = humps.camelize;
 
@@ -28,15 +28,15 @@ function getNestElement() {
 
 function generateTemplate(template, speicalConfig) {
     const { templateName, reflectTagName, attributes, events, nest, children } = template;
-    const { events: speicalEvent, attributes: speicalAttributes, baseAttributes, bubblingEvents } = speicalConfig;
+    const { baseAttributes, bubblingEvents } = speicalConfig;
     let templateObj: Record<string, any> = {};
     templateObj._attributes = {};
     Object.keys(baseAttributes).forEach(attribute => {
         templateObj._attributes[attribute] = genDoubleBracket(camelCase(baseAttributes[attribute]));
     });
     attributes.forEach(attribute => {
-        if (speicalAttributes && speicalAttributes[attribute]) {
-            attribute = speicalAttributes[attribute];
+        if (baseAttributes && baseAttributes[attribute]) {
+            attribute = baseAttributes[attribute];
         }
         templateObj._attributes[attribute] = genDoubleBracket(camelCase(attribute));
     });
@@ -89,10 +89,13 @@ function getBaseTemplate() {
     })
     // 生成可迭代模版
     const newRecursiveTemplateList = recursiveTemplate.map((item) => generateTemplate(item, speicalConfig));
-    // 其他三个需要迭代的模版也要加入
+    // 其他需要迭代的模版也要加入
+    newRecursiveTemplateList.push(getCheckboxTemplate());
+    newRecursiveTemplateList.push(getRadioTemplate());
     newRecursiveTemplateList.push(getFramentTemplate());
     newRecursiveTemplateList.push(getNaruseSelfTemplate());
     newRecursiveTemplateList.push(getBaseNaruseTemplate());
+
     // 生成不可迭代模版
     const newNonRecursiveTemplateList = nonRecursiveTemplate.map((item) => generateTemplate(item, speicalConfig));
     // 生成对应的axml模版
@@ -111,6 +114,60 @@ function getFramentTemplate () {
                 name: 'fragment',
             },
             ...getNestElement(),
+        }
+    }
+}
+/**
+ * 自定义 单选 组件
+ * label > radio, ...children
+ * */
+function getRadioTemplate () {
+    return {
+        template: {
+            _attributes: {
+                name: "radio"
+            },
+            label:{
+                _attributes: {
+                    for: genDoubleBracket('id'),
+                },
+                template: {
+                    _attributes: {
+                        is: nativeRadio.templateName,
+                        data: genDoubleBracket(
+                            [...Object.values(speicalConfig.baseAttributes), ...nativeRadio.attributes].join(',')
+                        ),
+                    }
+                },
+                ...getNestElement(),
+            },
+        }
+    }
+}
+/**
+ * 自定义 复选框 组件
+ * label > checkbox, ...children
+ * */
+function getCheckboxTemplate () {
+    return {
+        template: {
+            _attributes: {
+                name: "checkbox"
+            },
+            label:{
+                _attributes: {
+                    for: genDoubleBracket('id'),
+                },
+                template: {
+                    _attributes: {
+                        is: nativeCheckbox.templateName,
+                        data: genDoubleBracket(
+                            [...Object.values(speicalConfig.baseAttributes), ...nativeCheckbox.attributes].join(',')
+                        ),
+                    }
+                },
+                ...getNestElement(),
+            },
         }
     }
 }

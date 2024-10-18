@@ -14,7 +14,7 @@ LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
-/* global Reflect, Promise */
+/* global Reflect, Promise, SuppressedError, Symbol */
 
 var extendStatics$1 = function(d, b) {
     extendStatics$1 = Object.setPrototypeOf ||
@@ -102,6 +102,11 @@ function __spreadArray$1(to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 }
 
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
 var createLogger = function (name) {
     return {
         debug: function () {
@@ -185,6 +190,7 @@ var temporarilyNotSupport = function temporarilyNotSupport(apiName) {
 };
 
 var mitt = function (n) {
+    if (n === void 0) { n = new Map(); }
     return {
         all: n = n || new Map,
         on: function (e, t) {
@@ -305,6 +311,7 @@ var isEmpty = function (key) {
         return true;
     }
     else if (typeof (key) === 'object') {
+        // @ts-ignore
         for (var i in key) {
             return false;
         }
@@ -360,7 +367,9 @@ var getDeferPromise = function () {
         resolve = res;
         reject = rej;
     });
+    // @ts-ignore
     promise.resolve = resolve;
+    // @ts-ignore
     promise.reject = reject;
     return promise;
 };
@@ -371,6 +380,7 @@ var proxyObject = function (obj) {
     return new Proxy(obj, {
         get: function (target, key) {
             if (!target[key]) {
+                // @ts-ignore
                 return obj[key] = getDeferPromise();
             }
             return obj[key];
@@ -398,86 +408,64 @@ var RunningCodeErrorSource;
 
 var logger = createLogger('naruse-h5');
 
+function baseEventProps(e) {
+    return {
+        type: e.type,
+        /** 阻止冒泡 */
+        stopPropagation: function () {
+            e.stopPropagation();
+        },
+        // 真正触发事件的元素
+        target: e.target,
+        // 当前元素（冒泡）
+        currentTarget: e.currentTarget,
+    };
+}
 var reflectEventMap = {
     /** 点击事件处理 */
     click: function (e) {
-        return {
-            type: 'click',
-            detail: {
+        return __assign(__assign({}, baseEventProps(e)), { type: 'click', detail: {
                 clientX: e.clientX,
                 clientY: e.clientY,
                 pageX: e.pageX,
                 pageY: e.pageY,
-            },
-            /** 阻止冒泡 */
-            stopPropagation: function () {
-                e.stopPropagation();
-            },
-            // 真正触发事件的元素
-            target: e.target,
-            // 当前元素（冒泡）
-            currentTarget: e.currentTarget
-        };
+            } });
     },
     /** 加载完毕 */
     load: function (e) {
-        return {
-            type: 'load',
-            detail: {
+        return __assign(__assign({}, baseEventProps(e)), { type: 'load', detail: {
                 width: e.target.width,
                 height: e.target.height,
-            },
-        };
+            } });
     },
     /** 聚焦 */
     focus: function (e) {
-        return {
-            type: 'foucs',
-            detail: { value: e.target.value },
-        };
+        return __assign(__assign({}, baseEventProps(e)), { type: 'foucs', detail: { value: e.target.value } });
     },
     /** 失焦 */
     blur: function (e) {
-        return {
-            type: 'blur',
-            detail: { value: e.target.value },
-        };
+        return __assign(__assign({}, baseEventProps(e)), { type: 'blur', detail: { value: e.target.value } });
     },
     /** 按键 */
     keydown: function (e) {
         var value = e.target.value;
         var keyCode = e.keyCode || e.code;
-        return {
-            type: 'keydown',
-            detail: {
+        return __assign(__assign({}, baseEventProps(e)), { type: 'keydown', detail: {
                 value: value,
                 cursor: value.length,
                 keyCode: keyCode,
-            },
-            stopPropagation: function () {
-                e.stopPropagation();
-            },
-        };
+            } });
     },
     /** 输入 */
     input: function (e) {
-        return {
-            type: 'input',
-            detail: e.detail,
-        };
+        return __assign(__assign({}, baseEventProps(e)), { type: 'input', detail: e.detail });
     },
     /** 动效结束 */
     transitionend: function (e) {
-        return {
-            type: 'transitionEnd',
-            detail: {
+        return __assign(__assign({}, baseEventProps(e)), { type: 'transitionEnd', detail: {
                 elapsedTime: e.elapsedTime,
                 propertyName: e.propertyName,
-            },
-            stopPropagation: function () {
-                e.stopPropagation();
-            },
-        };
+            } });
     },
     mouseup: function (e) {
         return __assign(__assign({}, this.click(e)), { type: 'mouseUp' });
@@ -494,6 +482,12 @@ var reflectEventMap = {
     touchstart: function (e) {
         return commonTouchEventCreater(e);
     },
+    change: function (e, data) {
+        return __assign(__assign({}, baseEventProps(e)), data);
+    },
+    changing: function (e, data) {
+        return __assign(__assign({}, baseEventProps(e)), data);
+    },
 };
 /** 事件名称对应处理名称 */
 var reflectEventNameMap = {
@@ -509,6 +503,8 @@ var reflectEventNameMap = {
     touchstart: "onTouchStart",
     touchmove: "onTouchMove",
     touchend: "onTouchEnd",
+    change: "onChange",
+    changing: "onChanging"
 };
 /**
  * @description 通用事件处理
@@ -516,14 +512,15 @@ var reflectEventNameMap = {
  * @date 2022-03-18 16:03:45
  * @param {React.SyntheticEvent} e
  */
-var commonEventHander = function (e) {
-    var type = e.type;
+var commonEventHander = function (e, data) {
+    if (data === void 0) { data = null; }
+    var type = data ? data.type : e.type;
     var key = reflectEventNameMap[type];
     var handler = this.props[key];
     if (!handler || typeof handler !== 'function')
         return;
     var event = reflectEventMap[type];
-    var res = reflectEventMap[type](e);
+    var res = reflectEventMap[type](e, data);
     res.timeStamp = new Date().getTime();
     event && handler(res);
 };
@@ -563,19 +560,15 @@ var commonMouseEventCreater = function (event) {
  */
 var commonTouchEventCreater = function (event) {
     var type = event.type, changedTouches = event.changedTouches, targetTouches = event.targetTouches, touches = event.touches, detail = event.detail, target = event.target, stopPropagation = event.stopPropagation;
-    return {
-        type: type,
+    return __assign(__assign({}, baseEventProps(event)), { type: type, 
         // 涉及当前(引发)事件的触摸点的列表
-        changedTouches: changedTouches,
+        changedTouches: changedTouches, 
         // 当前对象上所有触摸点的列表;
-        targetTouches: targetTouches,
+        targetTouches: targetTouches, 
         // 当前屏幕上所有触摸点的列表;
-        touches: touches,
-        detail: detail,
+        touches: touches, detail: detail, // 此值是一个数值，可能会有用
         // 真正触发事件的元素
-        target: target,
-        stopPropagation: stopPropagation
-    };
+        target: target, stopPropagation: stopPropagation });
 };
 
 var cssStyle$4 = {"a-button":{"display":"block","outline":"0","WebkitAppearance":"none","boxSizing":"border-box","padding":"0","textAlign":"center","fontSize":"18px","height":"47px","lineHeight":"47px","borderRadius":"2px","overflow":"hidden","textOverflow":"ellipsis","wordBreak":"break-word","whiteSpace":"nowrap","color":"#000","backgroundColor":"#fff","border":"1px solid #eee"},"active":{"backgroundColor":"#ddd","color":"rgba(0,0,0,.3)"},"disabled":{"color":"rgba(0,0,0,.6)","backgroundColor":"rgba(255,255,255,.6)"}};
@@ -594,6 +587,21 @@ var getPropsDataSet = function (props) { return Object.keys(props || {}).reduce(
     }
     return per;
 }, {}); };
+var basePropsKey = ['id', 'className', 'style'];
+var basePropsKeyU = ['Id', 'ClassName', 'Style'];
+var getBaseProps = function (props, keyPrefix) {
+    if (keyPrefix === void 0) { keyPrefix = ''; }
+    var obj = {};
+    var keys = keyPrefix ? basePropsKeyU : basePropsKey;
+    for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+        var key = keys_1[_i];
+        if (props[keyPrefix + key] === undefined) {
+            continue;
+        }
+        obj[key] = props[key];
+    }
+    return obj;
+};
 /**
  * 解析 字符串参数，类型： k=v&k=v&k=v&...
  * 前面没有 ‘？’
@@ -614,7 +622,7 @@ function parseURLParam(url) {
     return res;
 }
 
-var h$8 = React.createElement;
+var h$d = React.createElement;
 var Button = /** @class */ (function (_super) {
     __extends$1(Button, _super);
     function Button() {
@@ -678,52 +686,224 @@ var Button = /** @class */ (function (_super) {
         var _a = this.props, type = _a.type, disabled = _a.disabled, style = _a.style, className = _a.className, hoverStyle = _a.hoverStyle, activeStyle = _a.activeStyle, other = __rest(_a, ["type", "disabled", "style", "className", "hoverStyle", "activeStyle"]);
         var _b = this.state, hover = _b.hover, active = _b.active;
         var conStyle = __assign(__assign(__assign(__assign(__assign({}, cssStyle$4['a-button']), (type ? cssStyle$4[type] : {})), style), (hover ? hoverStyle : {})), (active ? __assign(__assign({}, cssStyle$4.active), activeStyle) : {}));
-        return (h$8("button", __assign({ onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), style: conStyle, disabled: disabled, className: className, onClick: commonEventHander.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
+        return (h$d("button", __assign({ onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), style: conStyle, disabled: disabled, className: className, onClick: commonEventHander.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
     };
     return Button;
 }(React.Component));
 
-var h$7 = React.createElement;
+var h$c = React.createElement;
 var Checkbox = /** @class */ (function (_super) {
     __extends$1(Checkbox, _super);
     function Checkbox() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.onChange = function (e) {
+            var onChange = _this.props.onChange;
+            onChange && commonEventHander.call(_this, e);
+        };
+        return _this;
     }
-    /** 改变事件 */
-    Checkbox.prototype.handleChange = function (e) {
-        e.stopPropagation();
-        this.props.onChange && this.props.onChange({ value: this.value });
-    };
     Checkbox.prototype.render = function () {
-        var _this = this;
-        var _a = this.props, checked = _a.checked, name = _a.name, color = _a.color, value = _a.value, disabled = _a.disabled, nativeProps = __rest(_a, ["checked", "name", "color", "value", "disabled"]);
-        return (h$7("input", __assign({ ref: function (dom) {
-                if (!dom)
-                    return;
-                _this.inputEl = dom;
-                if (_this.id)
-                    dom.setAttribute('id', _this.id);
-            }, type: 'checkbox', value: value, name: name, style: { color: color }, checked: checked, disabled: disabled, onChange: this.handleChange.bind(this) }, getPropsDataSet(nativeProps))));
+        var _a = this.props, id = _a.id, checked = _a.checked, value = _a.value, disabled = _a.disabled, children = _a.children, style = __rest(_a, ["id", "checked", "value", "disabled", "children"]);
+        return (h$c("label", __assign({ style: __assign({}, style), htmlFor: id }, getBaseProps(this.props, "label")),
+            h$c("input", __assign({}, getBaseProps(this.props), { type: "checkbox", value: value, checked: checked, disabled: disabled, onChange: this.onChange })),
+            children));
     };
     return Checkbox;
 }(React.Component));
 
 var cssStyle$3 = {"img-empty":{"opacity":"0"},"naruseImg":{"display":"inline-block","overflow":"hidden","position":"relative","fontSize":"0"},"naruseImg__widthfix":{"height":"100%"},"scaletofill":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfit":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfill":{"objectFit":"cover","width":"100%","height":"100%"},"widthfix":{"width":"100%"},"top":{"width":"100%"},"bottom":{"width":"100%","position":"absolute","bottom":"0"},"left":{"height":"100%"},"right":{"position":"absolute","height":"100%","right":"0"},"topright":{"position":"absolute","right":"0"},"bottomleft":{"position":"absolute","bottom":"0"},"bottomright":{"position":"absolute","right":"0","bottom":"0"}};
 
-var h$6 = React.createElement;
-var Image$1 = /** @class */ (function (_super) {
-    __extends$1(Image, _super);
-    function Image(props) {
+function withPage(Comp) {
+    return /** @class */ (function (_super) {
+        __extends$1(WithPageComponent, _super);
+        function WithPageComponent() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        WithPageComponent.prototype.render = function () {
+            var page = getCurrentPageInstance();
+            var hashs = location.hash.split('?');
+            var currentPage = {
+                route: hashs[0],
+                param: parseURLParam(hashs[1]),
+                events: {
+                    on: page.on.bind(page),
+                    off: page.off.bind(page),
+                    once: page.once.bind(page),
+                },
+            };
+            return naruseCreateElement(Comp, __assign(__assign({}, this.props), { currentPage: currentPage }));
+        };
+        return WithPageComponent;
+    }(React.Component));
+}
+var pages = [];
+// 获取当前页面的对象
+function getCurrentPageInstance() {
+    var hash = location.hash.substring(1);
+    if (pages[hash]) {
+        return pages[hash];
+    }
+    pages[hash] = new Page();
+    return pages[hash];
+}
+// 页面可用生命周期函数
+var PageEventKey = { onShow: 'onShow', onHide: 'onHide', onPageScroll: 'onPageScroll' };
+var PageEventKeys = Object.keys(PageEventKey);
+var Page = /** @class */ (function () {
+    function Page() {
+        // @ts-ignore 事件中心
+        this.eventCenter = new EventBus();
+    }
+    /**
+     * 检查 event 、 callback 是否合理
+     * @param event
+     * @param callback
+     */
+    Page.prototype.eventCheck = function (event, callback) {
+        if (PageEventKeys.indexOf(event) === -1) {
+            return false;
+        }
+        return typeof callback === 'function';
+    };
+    Page.prototype.on = function (event, callback) {
+        if (!this.eventCheck(event, callback)) {
+            return;
+        }
+        this.eventCenter.on(event, callback);
+    };
+    Page.prototype.off = function (event, callback) {
+        if (PageEventKeys.indexOf(event) === -1) {
+            return;
+        }
+        this.eventCenter.off(event, callback);
+    };
+    Page.prototype.once = function (event, callback) {
+        if (!this.eventCheck(event, callback)) {
+            return;
+        }
+        this.eventCenter.once(event, callback);
+    };
+    // 触发指定 事件
+    Page.prototype.call = function (eventName, e) {
+        this.eventCenter.emit(eventName, e);
+    };
+    return Page;
+}());
+/**
+ * 兼容获取浏览器滚动条位置 ，
+ */
+var getScroll = function () {
+    if (currentPageContainer === window || currentPageContainer === document.body || currentPageContainer === document.documentElement) {
+        return {
+            scrollTop: document.body.scrollTop || document.documentElement.scrollTop || 0,
+            scrollLeft: document.body.scrollLeft || document.documentElement.scrollLeft || 0
+        };
+    }
+    return {
+        scrollTop: currentPageContainer.scrollTop,
+        scrollLeft: currentPageContainer.scrollLeft,
+    };
+};
+/**
+ * 监听地址栏的hash变化
+ */
+window.addEventListener('hashchange', function (event) {
+    var keys = Object.keys(pages);
+    if (keys.length === 0) {
+        return;
+    }
+    var _a = event.oldURL, oldURL = _a === void 0 ? '' : _a, _b = event.newURL, newURL = _b === void 0 ? '' : _b;
+    // 隐藏
+    var prePage = pages[oldURL.split('#')[1]];
+    prePage && prePage.call(PageEventKey.onHide);
+    // 显示
+    var cur = pages[newURL.split('#')[1]];
+    cur && cur.call(PageEventKey.onShow);
+});
+function onPageScrollEvent() {
+    var keys = Object.keys(pages);
+    if (keys.length === 0) {
+        return;
+    }
+    var hash = location.hash.substring(1);
+    pages[hash] && pages[hash].call(PageEventKey.onPageScroll, getScroll());
+}
+// 默认window
+var currentPageContainer = null;
+function withPageInit(_a) {
+    var _b = _a.pageContainer, pageContainer = _b === void 0 ? window : _b;
+    if (pageContainer && pageContainer !== currentPageContainer) {
+        // 切换事件 对象
+        currentPageContainer && currentPageContainer.removeEventListener('scroll', onPageScrollEvent);
+        pageContainer.addEventListener('scroll', onPageScrollEvent);
+        currentPageContainer = pageContainer;
+    }
+}
+
+var _config = {
+    hotPuller: function () {
+        logger.error('未初始化热更新拉取，无法更新组件默认为空');
+        return Promise.resolve({ code: '', ctx: {} });
+    },
+    baseCtx: function () {
+        return {};
+    },
+    onRunError: function (err) {
+        console.error(err);
+    },
+    // 自定义 rpx 的单位转换
+    convertRpx: function (rpx) { return (rpx / 2 * 1.4).toFixed(1); },
+    hotImport: function (_path, _ctx) {
+        logger.error('hotImport 函数尚未初始化！');
+        return Promise.resolve('');
+    },
+    unsafeEnabled: {
+        compatibleWeexElement: false,
+        compatibleWeexElementLog: false,
+    }
+};
+/**
+ * @description 获取初始化
+ * @author CHC
+ * @date 2022-06-14 10:06:50
+ * @returns {{ _config: () => Promise<{ code, ctx }>  }}
+ */
+var getNaruseConfig = function () {
+    return _config;
+};
+/**
+ * @description naruse内部初始化过程
+ * @author CHC
+ * @date 2022-06-14 10:06:36
+ * @param newConfig
+ */
+var naruseInit = function (newConfig) {
+    var unsafeEnabled = newConfig.unsafeEnabled;
+    delete newConfig.unsafeEnabled;
+    Object.assign(_config, newConfig);
+    Object.assign(_config.unsafeEnabled, unsafeEnabled);
+    var pageContainer = _config.pageContainer;
+    withPageInit({ pageContainer: pageContainer });
+};
+
+var h$b = React.createElement;
+var _Image = /** @class */ (function (_super) {
+    __extends$1(_Image, _super);
+    function _Image(props) {
         var _this = _super.call(this, props) || this;
         /** 当图片加载完毕 */
-        _this.imageOnLoad = commonEventHander.bind(_this);
-        _this.state = { isLoaded: false };
+        _this.imageOnLoad = function (event) {
+            commonEventHander.call(_this, event);
+        };
+        var compatibleWeexElement = getNaruseConfig().unsafeEnabled.compatibleWeexElement;
+        _this.state = { isLoaded: false, imageSize: {}, visible: !compatibleWeexElement };
         _this.imageOnLoad = _this.imageOnLoad.bind(_this);
         _this.observer = {};
         _this.ref = null;
+        _this.naturalSize = null;
         return _this;
     }
-    Image.prototype.componentDidMount = function () {
+    _Image.prototype.componentDidMount = function () {
         var _this = this;
         if (this.props.lazyLoad) {
             this.observer = new IntersectionObserver(function (entries) {
@@ -736,21 +916,90 @@ var Image$1 = /** @class */ (function (_super) {
             }, { rootMargin: '300px 0px' });
             this.observer.observe(this.ref);
         }
+        this.computeNaturalSize(function () {
+            _this.adaptationWeex();
+            _this.setState({ visible: true });
+        });
     };
-    Image.prototype.componentWillUnmount = function () {
+    _Image.prototype.computeNaturalSize = function (callback) {
+        var _this = this;
+        var image = new Image();
+        image.src = this.props.src;
+        image.onload = function () {
+            _this.naturalSize = { width: image.width, height: image.height };
+            callback(true);
+        };
+        image.onerror = function () {
+            callback(false);
+            _this.naturalSize = null;
+        };
+        image.onabort = function () {
+            callback(false);
+            _this.naturalSize = null;
+        };
+    };
+    _Image.prototype.componentDidUpdate = function (prevProps) {
+        var _this = this;
+        var _a, _b, _c, _d;
+        if (prevProps.src != this.props.src) {
+            this.computeNaturalSize(function () {
+                _this.adaptationWeex();
+            });
+        }
+        else if (((_a = prevProps.style) === null || _a === void 0 ? void 0 : _a.width) !== ((_b = this.props.style) === null || _b === void 0 ? void 0 : _b.width)
+            || ((_c = prevProps.style) === null || _c === void 0 ? void 0 : _c.height) !== ((_d = this.props.style) === null || _d === void 0 ? void 0 : _d.height)) {
+            this.adaptationWeex();
+        }
+    };
+    _Image.prototype.adaptationWeex = function () {
+        var _a = this.props, _b = _a.style, style = _b === void 0 ? {} : _b, mode = _a.mode;
+        var _c = getNaruseConfig(), _d = _c.unsafeEnabled, compatibleWeexElement = _d.compatibleWeexElement, compatibleWeexElementLog = _d.compatibleWeexElementLog, convertRpx = _c.convertRpx;
+        if (compatibleWeexElementLog) {
+            console.log('compatibleWeexElement:', this.props, this.naturalSize);
+        }
+        if (compatibleWeexElement
+            && (style.height == undefined && style.width === undefined)
+            && this.naturalSize) {
+            switch (mode) {
+                case 'widthFix':
+                    this.setState({
+                        imageSize: {
+                            maxWidth: convertRpx(this.naturalSize.width) + 'px',
+                        }
+                    });
+                    return;
+                case 'heightFix':
+                    this.setState({
+                        imageSize: {
+                            maxHeight: convertRpx(this.naturalSize.height) + 'px',
+                        }
+                    });
+                    return;
+            }
+        }
+        else {
+            this.setState({ imageSize: {} });
+        }
+    };
+    _Image.prototype.componentWillUnmount = function () {
         this.observer.disconnect && this.observer.disconnect();
     };
-    Image.prototype.render = function () {
+    _Image.prototype.render = function () {
         var _this = this;
         var _a = this.props, className = _a.className, src = _a.src, _b = _a.style, style = _b === void 0 ? {} : _b, mode = _a.mode, onError = _a.onError, imgProps = _a.imgProps, id = _a.id, other = __rest(_a, ["className", "src", "style", "mode", "onError", "imgProps", "id"]);
+        var _c = this.state, imageSize = _c.imageSize, visible = _c.visible;
+        if (!visible) {
+            return null;
+        }
         var divStyle = __assign(__assign({}, cssStyle$3.naruseImg), (mode === 'widthFix' ? cssStyle$3.naruseImg__widthfix : {}));
         var imgStyle = cssStyle$3[(mode || 'scaleToFill').toLowerCase().replace(/\s/g, '')];
-        return (h$6("div", { onClick: commonEventHander.bind(this), className: className, style: __assign(__assign({}, divStyle), style) }, h$6("img", __assign({ ref: function (img) { return (_this.ref = img); }, id: id, style: imgStyle, src: src, onLoad: this.imageOnLoad, onError: onError, onTransitionEnd: commonEventHander.bind(this) }, imgProps, getPropsDataSet(other)))));
+        return (h$b("div", { onClick: commonEventHander.bind(this), className: className, style: __assign(__assign({}, divStyle), style) },
+            h$b("img", __assign({ key: 'img', ref: function (img) { return (_this.ref = img); }, id: id, style: __assign(__assign({}, imageSize), imgStyle), src: src, onLoad: this.imageOnLoad, onError: onError, onTransitionEnd: commonEventHander.bind(this) }, imgProps, getPropsDataSet(other)))));
     };
-    return Image;
+    return _Image;
 }(React.Component));
 
-var h$5 = React.createElement;
+var h$a = React.createElement;
 /** 是否是支持的type */
 var getTrueType = function getTrueType(type, confirmType, password) {
     if (confirmType === 'search')
@@ -838,7 +1087,7 @@ var Input = /** @class */ (function (_super) {
         var _this = this;
         var _a = this.props, type = _a.type, password = _a.password, placeholder = _a.placeholder, disabled = _a.disabled, maxlength = _a.maxlength, confirmType = _a.confirmType, name = _a.name, className = _a.className, value = _a.value, controlled = _a.controlled, other = __rest(_a, ["type", "password", "placeholder", "disabled", "maxlength", "confirmType", "name", "className", "value", "controlled"]);
         var _value = this.state._value;
-        return (h$5("input", __assign({ ref: function (input) {
+        return (h$a("input", __assign({ ref: function (input) {
                 _this.ref = input;
             }, className: className, 
             // 受控则只使用外部值，非受控优先使用外部值
@@ -849,7 +1098,7 @@ var Input = /** @class */ (function (_super) {
 
 var cssStyle$2 = {"text":{"MozUserSelect":"none","WebkitUserSelect":"none","MsUserSelect":"none","userSelect":"none"},"textSelectable":{"MozUserSelect":"text","WebkitUserSelect":"text","MsUserSelect":"text","userSelect":"text"}};
 
-var h$4 = React.createElement;
+var h$9 = React.createElement;
 var Text = /** @class */ (function (_super) {
     __extends$1(Text, _super);
     function Text() {
@@ -890,12 +1139,12 @@ var Text = /** @class */ (function (_super) {
         var _a = this.props, className = _a.className, id = _a.id, _b = _a.selectable, selectable = _b === void 0 ? false : _b, style = _a.style, hoverStyle = _a.hoverStyle, other = __rest(_a, ["className", "id", "selectable", "style", "hoverStyle"]);
         var hover = this.state.hover;
         var cls = __assign(__assign(__assign(__assign({}, cssStyle$2.text), (selectable ? cssStyle$2.textSelectable : {})), style), (hover ? hoverStyle : {}));
-        return (h$4("span", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), style: cls, className: className, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
+        return (h$9("span", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onTouchStart.bind(this), onMouseLeave: this.onTouchEnd.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchEnd: this.onTouchEnd.bind(this), style: cls, className: className, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
     };
     return Text;
 }(React.Component));
 
-var h$3 = React.createElement;
+var h$8 = React.createElement;
 var View = /** @class */ (function (_super) {
     __extends$1(View, _super);
     function View() {
@@ -1032,14 +1281,14 @@ var View = /** @class */ (function (_super) {
         var _a = this.props, className = _a.className, style = _a.style, hoverStyle = _a.hoverStyle, id = _a.id, other = __rest(_a, ["className", "style", "hoverStyle", "id"]);
         var hover = this.state.hover;
         var conStyle = __assign(__assign({}, style), (hover ? hoverStyle : {}));
-        return (h$3("div", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
+        return (h$8("div", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
     };
     return View;
 }(React.Component));
 
 var cssStyle$1 = {"scroll":{"WebkitOverflowScrolling":"auto"},"scroll::-webkit-scrollbar":{"display":"none"},"scroll-view":{"overflow":"hidden"}};
 
-var h$2 = React.createElement;
+var h$7 = React.createElement;
 function throttle(fn, threshold, scope) {
     if (threshold === void 0) { threshold = 250; }
     var lastTime = 0;
@@ -1251,7 +1500,7 @@ var ScrollView = /** @class */ (function (_super) {
         var _onTouchMove = function (e) {
             onTouchMove ? onTouchMove(e) : _this.onTouchMove(e);
         };
-        return (h$2("div", __assign({ id: id, "data-animation": animation, className: "".concat(className, " _scrollView"), ref: function (container) {
+        return (h$7("div", __assign({ id: id, "data-animation": animation, className: "".concat(className, " _scrollView"), ref: function (container) {
                 _this.container = container;
                 _this.ref = container;
             }, style: __assign(__assign(__assign({}, cssStyle$1.scroll), style), scrollWhere), onScroll: _onScroll, onTouchMove: _onTouchMove, onTransitionEnd: commonEventHander.bind(this) }, getPropsDataSet(other)), this.props.children));
@@ -1268,7 +1517,7 @@ ScrollView.defaultProps = {
 
 var cssStyle = {"taroTextarea":{"display":"block","appearance":"none","cursor":"auto","lineHeight":"1.5","resize":"none","outline":"none"}};
 
-var h$1 = React.createElement;
+var h$6 = React.createElement;
 var scrollBar = document.createElement('style');
 scrollBar.type = 'text/css';
 scrollBar.id = '_theOnlytextarea';
@@ -1398,7 +1647,7 @@ var Textarea = /** @class */ (function (_super) {
                 onConfirm && onConfirm(event_1);
             }
         };
-        return (h$1("textarea", __assign({ ref: function (input) {
+        return (h$6("textarea", __assign({ ref: function (input) {
                 if (input) {
                     _this.ref = input;
                 }
@@ -1416,188 +1665,18 @@ Textarea.defaultProps = {
     controlled: false,
 };
 
-function withPage(Comp) {
-    return /** @class */ (function (_super) {
-        __extends$1(WithPageComponent, _super);
-        function WithPageComponent() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        WithPageComponent.prototype.render = function () {
-            var page = getCurrentPageInstance();
-            var hashs = location.hash.split('?');
-            var currentPage = {
-                route: hashs[0],
-                param: parseURLParam(hashs[1]),
-                events: {
-                    on: page.on.bind(page),
-                    off: page.off.bind(page),
-                    once: page.once.bind(page),
-                },
-            };
-            return naruseCreateElement(Comp, __assign(__assign({}, this.props), { currentPage: currentPage }));
-        };
-        return WithPageComponent;
-    }(React.Component));
-}
-var pages = [];
-// 获取当前页面的对象
-function getCurrentPageInstance() {
-    var hash = location.hash.substring(1);
-    if (pages[hash]) {
-        return pages[hash];
-    }
-    pages[hash] = new Page();
-    return pages[hash];
-}
-// 页面可用生命周期函数
-var PageEventKey = { onShow: 'onShow', onHide: 'onHide', onPageScroll: 'onPageScroll' };
-var PageEventKeys = Object.keys(PageEventKey);
-var Page = /** @class */ (function () {
-    function Page() {
-        // @ts-ignore 事件中心
-        this.eventCenter = new EventBus();
-    }
-    /**
-     * 检查 event 、 callback 是否合理
-     * @param event
-     * @param callback
-     */
-    Page.prototype.eventCheck = function (event, callback) {
-        if (PageEventKeys.indexOf(event) === -1) {
-            return false;
-        }
-        return typeof callback === 'function';
-    };
-    Page.prototype.on = function (event, callback) {
-        if (!this.eventCheck(event, callback)) {
-            return;
-        }
-        this.eventCenter.on(event, callback);
-    };
-    Page.prototype.off = function (event, callback) {
-        if (PageEventKeys.indexOf(event) === -1) {
-            return;
-        }
-        this.eventCenter.off(event, callback);
-    };
-    Page.prototype.once = function (event, callback) {
-        if (!this.eventCheck(event, callback)) {
-            return;
-        }
-        this.eventCenter.once(event, callback);
-    };
-    // 触发指定 事件
-    Page.prototype.call = function (eventName, e) {
-        this.eventCenter.emit(eventName, e);
-    };
-    return Page;
-}());
-/**
- * 兼容获取浏览器滚动条位置 ，
- */
-var getScroll = function () {
-    if (currentPageContainer === window || currentPageContainer === document.body || currentPageContainer === document.documentElement) {
-        return {
-            scrollTop: document.body.scrollTop || document.documentElement.scrollTop || 0,
-            scrollLeft: document.body.scrollLeft || document.documentElement.scrollLeft || 0
-        };
-    }
-    return {
-        scrollTop: currentPageContainer.scrollTop,
-        scrollLeft: currentPageContainer.scrollLeft,
-    };
-};
-/**
- * 监听地址栏的hash变化
- */
-window.addEventListener('hashchange', function (event) {
-    var keys = Object.keys(pages);
-    if (keys.length === 0) {
-        return;
-    }
-    var _a = event.oldURL, oldURL = _a === void 0 ? '' : _a, _b = event.newURL, newURL = _b === void 0 ? '' : _b;
-    // 隐藏
-    var prePage = pages[oldURL.split('#')[1]];
-    prePage && prePage.call(PageEventKey.onHide);
-    // 显示
-    var cur = pages[newURL.split('#')[1]];
-    cur && cur.call(PageEventKey.onShow);
-});
-function onPageScrollEvent() {
-    var keys = Object.keys(pages);
-    if (keys.length === 0) {
-        return;
-    }
-    var hash = location.hash.substring(1);
-    pages[hash] && pages[hash].call(PageEventKey.onPageScroll, getScroll());
-}
-// 默认window
-var currentPageContainer = null;
-function withPageInit(_a) {
-    var _b = _a.pageContainer, pageContainer = _b === void 0 ? window : _b;
-    if (pageContainer && pageContainer !== currentPageContainer) {
-        // 切换事件 对象
-        currentPageContainer && currentPageContainer.removeEventListener('scroll', onPageScrollEvent);
-        pageContainer.addEventListener('scroll', onPageScrollEvent);
-        currentPageContainer = pageContainer;
-    }
-}
-
-var _config = {
-    hotPuller: function () {
-        logger.error('未初始化热更新拉取，无法更新组件默认为空');
-        return Promise.resolve({ code: '', ctx: {} });
-    },
-    baseCtx: function () {
-        return {};
-    },
-    onRunError: function (err) {
-        console.error(err);
-    },
-    // 自定义 rpx 的单位转换
-    convertRpx: function (rpx) { return (rpx / 2 * 1.4).toFixed(1); },
-    hotImport: function (_path, _ctx) {
-        logger.error('hotImport 函数尚未初始化！');
-        return Promise.resolve('');
-    }
-};
-/**
- * @description 获取初始化
- * @author CHC
- * @date 2022-06-14 10:06:50
- * @returns {{ _config: () => Promise<{ code, ctx }>  }}
- */
-var getNaruseConfig = function () {
-    return _config;
-};
-/**
- * @description naruse内部初始化过程
- * @author CHC
- * @date 2022-06-14 10:06:36
- * @param hotPuller 热更新处理、广告加载
- * @param baseCtx 广告运行时的上下文环境
- * @param onRunError 广告运行错误时触发
- * @param convertRpx 自定义 rpx 到 px 的转换
- * @param pageContainer 能获取到页面滚动条偏移量的容器元素
- */
-var naruseInit = function (newConfig) {
-    Object.assign(_config, newConfig);
-    var pageContainer = _config.pageContainer;
-    withPageInit({ pageContainer: pageContainer });
-};
-
 var dist = {};
 
 Object.defineProperty(dist, '__esModule', { value: true });
 
-function _typeof(obj) {
+function _typeof(o) {
   "@babel/helpers - typeof";
 
-  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-  }, _typeof(obj);
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+    return typeof o;
+  } : function (o) {
+    return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+  }, _typeof(o);
 }
 
 var isProduction = process.env.NODE_ENV === 'production';
@@ -2008,7 +2087,7 @@ var functionalizae = function (fn) {
     }(React.Component));
 };
 
-var h = React.createElement;
+var h$5 = React.createElement;
 var WebView = /** @class */ (function (_super) {
     __extends$1(WebView, _super);
     function WebView() {
@@ -2145,22 +2224,331 @@ var WebView = /** @class */ (function (_super) {
         var _a = this.props, className = _a.className, style = _a.style, hoverStyle = _a.hoverStyle, id = _a.id, src = _a.src, other = __rest(_a, ["className", "style", "hoverStyle", "id", "src"]);
         var hover = this.state.hover;
         var conStyle = __assign(__assign({}, style), (hover ? hoverStyle : {}));
-        return (h("iframe", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this), onBlur: commonEventHander.bind(this), onFocus: commonEventHander.bind(this), onLoad: commonEventHander.bind(this), src: src }, getPropsDataSet(other)), this.props.children));
+        return (h$5("iframe", __assign({ id: id, ref: function (ref) { return _this.ref = ref; }, onMouseEnter: this.onMouseEnter.bind(this), onMouseLeave: this.onMouseLeave.bind(this), onMouseMove: this.onMouseMove.bind(this), onTouchStart: this.onTouchStart.bind(this), onTouchMove: commonEventHander.bind(this), onTouchEnd: this.onTouchEnd.bind(this), onTransitionEnd: commonEventHander.bind(this), onMouseDown: commonEventHander.bind(this), onMouseUp: commonEventHander.bind(this), className: className, style: conStyle, onClick: commonEventHander.bind(this), onBlur: commonEventHander.bind(this), onFocus: commonEventHander.bind(this), onLoad: commonEventHander.bind(this), src: src }, getPropsDataSet(other)), this.props.children));
     };
     return WebView;
+}(React.Component));
+
+var h$4 = React.createElement;
+/** 单选框 */
+var Radio = /** @class */ (function (_super) {
+    __extends$1(Radio, _super);
+    function Radio() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.onChange = commonEventHander.bind(_this);
+        _this.setRef = function (ref) { return _this.ref = ref; };
+        return _this;
+    }
+    Radio.prototype.render = function () {
+        var _a = this.props, value = _a.value, checked = _a.checked, disabled = _a.disabled, id = _a.id, children = _a.children;
+        return (h$4("label", __assign({ htmlFor: id }, getBaseProps(this.props, 'label')),
+            h$4("input", __assign({}, getBaseProps(this.props), { ref: this.setRef, type: "radio", value: value, checked: checked, onChange: this.onChange, disabled: disabled })),
+            children));
+    };
+    return Radio;
+}(React.Component));
+
+var h$3 = React.createElement;
+/** 单选框组 */
+var RadioGroup = /** @class */ (function (_super) {
+    __extends$1(RadioGroup, _super);
+    function RadioGroup() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.state = { value: null };
+        _this.setRef = function (ref) { return _this.ref = ref; };
+        _this.onChange = function (e) {
+            var value = e.target.value;
+            _this.setState({ value: value });
+            var data = {
+                type: 'change',
+                detail: {
+                    value: value,
+                }
+            };
+            commonEventHander.call(_this, e, data);
+        };
+        return _this;
+    }
+    RadioGroup.prototype.componentDidMount = function () {
+        var _a;
+        var children = this.props.children;
+        children = children.filter(function (val) { return typeof val === 'object' && val; });
+        var value = ((_a = children.find(function (val) { return val.props.checked; })) === null || _a === void 0 ? void 0 : _a.props.value) || children[0].props.value;
+        this.setState({ value: value });
+    };
+    RadioGroup.prototype.render = function () {
+        var _this = this;
+        var _a = this.props, children = _a.children, name = _a.name;
+        return (h$3("span", __assign({}, getBaseProps(this.props), { ref: this.setRef }), children.map(function (val) {
+            if (typeof val != 'object' || !val) {
+                return val;
+            }
+            return __assign(__assign({}, val), { props: __assign(__assign({}, val.props), { name: name, onChange: _this.onChange, checked: val.props.value === _this.state.value }) });
+        })));
+    };
+    return RadioGroup;
+}(React.Component));
+
+var h$2 = React.createElement;
+/** 复选框组 */
+var CheckBoxGroup = /** @class */ (function (_super) {
+    __extends$1(CheckBoxGroup, _super);
+    function CheckBoxGroup() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.state = { selectValue: [] };
+        _this.setRef = function (ref) { return (_this.ref = ref); };
+        _this.onChange = function (e) {
+            e.stopPropagation();
+            var onChange = _this.props.onChange;
+            var selectValue = _this.state.selectValue;
+            var _a = e.target, checked = _a.checked, value = _a.value;
+            var changeSelectValue = checked
+                ? __spreadArray$1(__spreadArray$1([], selectValue, true), [value], false) : selectValue.filter(function (item) { return item !== value; });
+            _this.setState({ selectValue: changeSelectValue });
+            var data = {
+                type: "change",
+                detail: {
+                    value: changeSelectValue,
+                },
+            };
+            onChange && commonEventHander.call(_this, e, data);
+        };
+        return _this;
+    }
+    CheckBoxGroup.prototype.componentDidMount = function () {
+        var children = this.props.children;
+        children = children.filter(function (val) { return typeof val === "object" && val; });
+        var selectValue = children
+            .filter(function (el) { return el.props.checked; })
+            .map(function (el) { var _a; return (_a = el.props) === null || _a === void 0 ? void 0 : _a.value; });
+        this.setState({ selectValue: selectValue });
+    };
+    CheckBoxGroup.prototype.render = function () {
+        var _this = this;
+        var _a = this.props, children = _a.children, name = _a.name;
+        var selectValue = this.state.selectValue;
+        return (h$2("span", __assign({ ref: this.setRef }, getBaseProps(this.props)), children.map(function (val) {
+            if (typeof val != "object" || !val) {
+                return val;
+            }
+            return __assign(__assign({}, val), { props: __assign(__assign({}, val.props), { name: name, onChange: _this.onChange, checked: selectValue.some(function (item) { return item === val.props.value; }) }) });
+        })));
+    };
+    return CheckBoxGroup;
+}(React.Component));
+
+var style$1 = {"switch":{"position":"relative","display":"inline-block","width":"50px","height":"30px","borderRadius":"30px","cursor":"pointer","transition":"background-color 0.2s","boxShadow":"2px 1px #eee, 1px -1px #eee, -1px 1px #eee, -1px -1px #eee"},"input":{"opacity":"0","width":"0","height":"0"},"slider":{"position":"absolute","top":"2px","left":"0px","width":"26px","height":"26px","backgroundColor":"#fff","borderRadius":"50%","transition":"transform 0.2s"},"switchMask":{"cursor":"not-allowed","position":"absolute","top":"-1px","left":"-1px","width":"52px","height":"32px","backgroundColor":"rgba(255, 255, 255, 0.6)","borderRadius":"30px","zIndex":"10"}};
+
+var h$1 = React.createElement;
+var Switch = /** @class */ (function (_super) {
+    __extends$1(Switch, _super);
+    function Switch(props) {
+        var _this = _super.call(this, props) || this;
+        /**
+         * @description 更新
+         * @param e {SwitchProps}
+         */
+        _this.onChange = function (e) {
+            e.stopPropagation();
+            var onChange = _this.props.onChange;
+            var checked = e.target.checked;
+            var data = {
+                type: "change",
+                detail: {
+                    value: checked,
+                },
+            };
+            onChange && commonEventHander.call(_this, e, data);
+            _this.setState({ checked: checked });
+        };
+        _this.state = {
+            checked: false,
+        };
+        return _this;
+    }
+    /**
+     * @description 初始化
+     */
+    Switch.prototype.componentDidMount = function () {
+        var checked = this.props.checked;
+        this.setState({ checked: checked });
+    };
+    Switch.prototype.render = function () {
+        var _this = this;
+        var _a = this.props, _b = _a.disabled, disabled = _b === void 0 ? false : _b, _c = _a.color, color = _c === void 0 ? "#ff5000" : _c;
+        var _d = this.state.checked, checked = _d === void 0 ? false : _d;
+        return (h$1("label", __assign({ ref: function (el) { return (_this.switchEl = el); }, style: __assign(__assign({}, style$1.switch), { background: checked ? color : "#fff" }) }, getBaseProps(this.props)),
+            h$1(Checkbox, { disabled: disabled, style: style$1.input, checked: checked, onChange: this.onChange }),
+            h$1("span", { ref: function (el) { return (_this.sliderEl = el); }, style: __assign(__assign({}, style$1.slider), { transform: "translateX(".concat(checked ? 22 : 0, "px)"), boxShadow: checked ? "" : "2px 2px 3px #c2c2c2" }) }),
+            disabled && h$1("span", { style: style$1.switchMask })));
+    };
+    return Switch;
+}(React.Component));
+
+var style = {"slider":{"position":"relative","display":"flex","justifyContent":"center","alignItems":"center"},"sliderContainer":{"cursor":"pointer","flex":"1","minWidth":"0","position":"relative","backgroundColor":"#ddd","borderRadius":"3px"},"slideActiveValue":{"zIndex":"2"},"sliderThumb":{"position":"absolute","width":"20px","height":"20px","backgroundColor":"#fff","border":"2px solid #ff5000","borderRadius":"50%","cursor":"pointer","zIndex":"2"},"valueDisplay":{"textAlign":"center","fontSize":"16px","color":"#999","zIndex":"1"},"sliderMask":{"cursor":"not-allowed","position":"absolute","width":"100%","height":"100%","backgroundColor":"rgba(255, 255, 255, 0.5)","borderRadius":"3px","zIndex":"10"}};
+
+var h = React.createElement;
+var Slider = /** @class */ (function (_super) {
+    __extends$1(Slider, _super);
+    function Slider(props) {
+        var _this = _super.call(this, props) || this;
+        _this.onMouseLeave = function (e) {
+            e.stopPropagation();
+            var isDragging = _this.state.isDragging;
+            isDragging && _this.onMouseUp(e);
+        };
+        /**
+         * 鼠标按下
+         * @param e
+         */
+        _this.onMouseDown = function (e) {
+            e.stopPropagation();
+            _this.setState({
+                mouseClientX: e.clientX,
+                isDragging: true,
+            });
+            _this.sliderThumbEl.addEventListener("mousemove", _this.onMouseMove);
+            _this.sliderThumbEl.addEventListener("mouseup", _this.onMouseUp);
+            _this.startDragStyle();
+        };
+        /**
+         * 鼠标移动
+         * @param e
+         */
+        _this.onMouseMove = function (e) {
+            e.stopPropagation();
+            var _a = _this.props, _b = _a.min, min = _b === void 0 ? 0 : _b, _c = _a.max, max = _c === void 0 ? 100 : _c, _d = _a.step, step = _d === void 0 ? 1 : _d, _e = _a.handleSize, handleSize = _e === void 0 ? 18 : _e, onChanging = _a.onChanging;
+            var _f = _this.state, mouseClientX = _f.mouseClientX, value = _f.value;
+            var width = _this.sliderContainerEl.getBoundingClientRect().width;
+            // 计算x偏移量
+            var diffValue = e.clientX - mouseClientX;
+            // 计算当前值
+            var currentValue = Math.round((diffValue / width) * (max - min)) + value;
+            if (currentValue <= min)
+                currentValue = min;
+            if (currentValue >= max)
+                currentValue = max;
+            var left = "calc(".concat(((currentValue - min) / (max - min)) * 100, "% - ").concat(handleSize / 2, "px)");
+            if (step <= 0)
+                return;
+            if (currentValue % step === 0) {
+                _this.sliderProgressBarEl.style.width = "calc(".concat(((currentValue - min) / (max - min)) * 100, "%)");
+                _this.sliderThumbEl.style.left = left;
+                _this.valueDisplayEl.textContent = currentValue;
+                var data = {
+                    type: "changing",
+                    detail: { value: currentValue },
+                };
+                onChanging && commonEventHander.call(_this, e, data);
+            }
+        };
+        /**
+         * 释放鼠标
+         * @param e
+         */
+        _this.onMouseUp = function (e) {
+            e.stopPropagation();
+            var onChange = _this.props.onChange;
+            var currentValue = Number(_this.valueDisplayEl.textContent);
+            _this.endDragStyle();
+            _this.setState({
+                value: currentValue,
+                isDragging: false,
+            });
+            var data = {
+                type: "change",
+                detail: { value: currentValue },
+            };
+            onChange && commonEventHander.call(_this, e, data);
+            // 移除事件
+            _this.sliderThumbEl.removeEventListener("mousemove", _this.onMouseMove);
+            _this.sliderThumbEl.removeEventListener("mouseup", _this.onMouseUp);
+        };
+        /**
+         * 拖拽滑块元素开始样式
+         * @returns
+         */
+        _this.startDragStyle = function () {
+            var handleColor = _this.props.handleColor;
+            if (!handleColor) {
+                _this.sliderThumbEl.style.backgroundColor = "#ff5000";
+            }
+        };
+        /**
+         * 拖拽滑块元素结束样式
+         * @returns
+         */
+        _this.endDragStyle = function () {
+            var handleColor = _this.props.handleColor;
+            if (!handleColor) {
+                _this.sliderThumbEl.style.backgroundColor = "#fff";
+            }
+        };
+        /**
+         * 点击跳转到指定位置
+         * @returns
+         */
+        _this.setSliderValue = function (e) {
+            var isDragging = _this.state.isDragging;
+            if (isDragging)
+                return;
+            var _a = _this.props, _b = _a.min, min = _b === void 0 ? 0 : _b, _c = _a.max, max = _c === void 0 ? 100 : _c, onChange = _a.onChange;
+            var _d = e.target.getBoundingClientRect(), left = _d.left, width = _d.width;
+            var offsetX = e.clientX - left; // 鼠标相对于滑动条的水平偏移
+            var percentage = offsetX / width; // 计算百分比
+            var newValue = Math.round(percentage * (max - min) + min); // 转换为数值
+            _this.setState({ value: newValue });
+            var data = {
+                type: "change",
+                detail: { value: newValue },
+            };
+            onChange && commonEventHander.call(_this, e, data);
+        };
+        var currentValue = 0;
+        var _a = _this.props, _b = _a.value, value = _b === void 0 ? 0 : _b, _c = _a.min, min = _c === void 0 ? 0 : _c, _d = _a.max, max = _d === void 0 ? 100 : _d;
+        if (value < min || value > max) {
+            currentValue = value > max ? max : min;
+        }
+        else {
+            currentValue = value;
+        }
+        _this.state = {
+            value: currentValue,
+            mouseClientX: 0,
+            isDragging: false,
+        };
+        return _this;
+    }
+    Slider.prototype.render = function () {
+        var _this = this;
+        var value = this.state.value;
+        var _a = this.props, _b = _a.min, min = _b === void 0 ? 0 : _b, _c = _a.max, max = _c === void 0 ? 100 : _c, _d = _a.disabled, disabled = _d === void 0 ? false : _d, _e = _a.showValue, showValue = _e === void 0 ? false : _e, _f = _a.activeColor, activeColor = _f === void 0 ? "#ff5000" : _f, _g = _a.backgroundColor, backgroundColor = _g === void 0 ? "#ddd" : _g, _h = _a.handleColor, handleColor = _h === void 0 ? "#fff" : _h, _j = _a.handleSize, handleSize = _j === void 0 ? 18 : _j, _k = _a.trackSize, trackSize = _k === void 0 ? 2 : _k;
+        return (h("div", __assign({ style: style.slider, onMouseLeave: this.onMouseLeave }, getBaseProps(this.props)),
+            h("div", { ref: function (self) { return (_this.sliderContainerEl = self); }, style: __assign(__assign({}, style.sliderContainer), { backgroundColor: backgroundColor, height: trackSize }), onMouseUp: this.setSliderValue },
+                h("div", { ref: function (self) { return (_this.sliderProgressBarEl = self); }, style: __assign(__assign({}, style.slideActiveValue), { backgroundColor: activeColor, height: trackSize, width: "calc(".concat(((value - min) / (max - min)) * 100, "%)") }) }),
+                h("div", { ref: function (self) { return (_this.sliderThumbEl = self); }, style: __assign(__assign({}, style.sliderThumb), { backgroundColor: handleColor, borderColor: activeColor, width: handleSize, height: handleSize, top: "calc(50% - ".concat(2 + handleSize / 2, "px)"), left: "calc(".concat(((value - min) / (max - min)) * 100, "% - ").concat(handleSize / 2, "px)") }), onMouseDown: this.onMouseDown })),
+            h("div", { ref: function (self) { return (_this.valueDisplayEl = self); }, style: __assign(__assign({}, style.valueDisplay), { width: showValue ? "30px" : 0, marginLeft: showValue ? "8px" : 0, opacity: showValue ? 1 : 0 }) }, value),
+            disabled && h("div", { style: style.sliderMask })));
+    };
+    return Slider;
 }(React.Component));
 
 /** 组件映射表 */
 var componentReflectMap = {
     button: Button,
     checkbox: Checkbox,
-    image: Image$1,
+    'checkbox-group': CheckBoxGroup,
+    image: _Image,
     input: Input,
     text: Text,
     view: View,
     'scroll-view': ScrollView,
     textarea: Textarea,
     'web-view': WebView,
+    'radio': Radio,
+    'radio-group': RadioGroup,
+    switch: Switch,
+    slider: Slider
 };
 /**
  * @description 拦截下来的react.createElement
@@ -2196,7 +2584,7 @@ var naruseCreateElement = function (type, props) {
     }
     logger.warn('不支持的组件类型', type);
 };
-var rpxReg = /(\d+)\s?rpx/g;
+var rpxReg = /([\d.]+)\s?rpx/g;
 var parsePx = function (val) {
     if (typeof val !== 'string')
         return val;
@@ -2244,7 +2632,7 @@ LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
-/* global Reflect, Promise */
+/* global Reflect, Promise, SuppressedError, Symbol */
 
 var extendStatics = function(d, b) {
     extendStatics = Object.setPrototypeOf ||
@@ -2270,6 +2658,11 @@ function __spreadArray(to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 }
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
 
 var Identifier = "Identifier";
 var Literal = "Literal";
@@ -2670,9 +3063,10 @@ var evaluate_map = (_b = {},
             return evaluate(node.alternate, scope);
     },
     _b[ForStatement] = function (node, scope) {
-        for (var new_scope = new Scope("loop" /* ScopeType.Loop */, scope), 
+        var new_scope = new Scope("loop" /* ScopeType.Loop */, scope); 
         // 只有 var 变量才会被提高到上一作用域
-        init_val = node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
+        node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null;
+        for (; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
             var result = evaluate(node.body, new_scope);
             if (isReturnResult(result))
                 return result;
@@ -7735,6 +8129,8 @@ var LoggerInfoKeyMap = {
 // type ValueOf<T> = T[keyof T];
 // type RequestParamsKey = ValueOf<typeof LoggerInfoKeyMap>;
 
+var log$1 = createLogger('naruse-plugin');
+
 /**
  * 插件,很明显，它是一个插件，它可以做点什么。你必须继承此类，来实现插件
  */
@@ -7748,10 +8144,10 @@ var Plugin = /** @class */ (function () {
         }
     }
     /** 在广告代码运行前，获取到有效的广告数据后 */
-    Plugin.prototype.apply = function (params) {
+    Plugin.prototype.apply = function (_params) {
     };
     /** 解析广告代码错误时、运行广告代码错误时 */
-    Plugin.prototype.onError = function (params) {
+    Plugin.prototype.onError = function (_params) {
     };
     return Plugin;
 }());
@@ -7759,17 +8155,15 @@ var Plugin = /** @class */ (function () {
 var PluginMethodList = ['apply', 'onError'];
 /** 所有的插件 */
 var plugins = {};
-var log$2 = createLogger('PluginMethod');
 // @ts-ignore
 var pluginEvent = new EventBus();
 /** 使用全局事件中心 注册插件的生命周期 */
 PluginMethodList.forEach(function (method) {
     pluginEvent.on(PluginMethod[method], function (params) {
         var keys = Object.keys(plugins);
-        log$2.info("PluginMethod[".concat(method, "]"), keys.length, params);
-        keys
-            .forEach(function (key) {
-            plugins[key][method](params);
+        log$1.info("PluginMethod[".concat(method, "]"), keys.length, params);
+        keys.forEach(function (key) {
+            typeof plugins[key][method] === 'function' && plugins[key][method](params);
         });
     });
 });
@@ -7781,9 +8175,6 @@ function registerPlugin$1(name, pluginConstructor, firstParam) {
     }
     // 构造对象
     var plugin = new (pluginConstructor.bind.apply(pluginConstructor, __spreadArray$1([void 0, firstParam], params, false)))();
-    if (!(plugin instanceof Plugin)) {
-        throw new Error('registerPlugin: pluginConstructor 必须返回一个 Plugin类的实例');
-    }
     if (plugin[name]) {
         throw new Error("".concat(name, " \u6B64\u63D2\u4EF6\uFF0C\u5DF2\u7ECF\u6CE8\u518C\u8FC7\u4E86"));
     }
@@ -7811,7 +8202,7 @@ var nullAdData = function () { return ({
     user_define: { body: undefined },
     version: ""
 }); };
-var log$1 = createLogger('LoggerPlus');
+var log = createLogger('naruser-plugin/logger');
 /** 日志发送类 */
 var LoggerPlus = /** @class */ (function () {
     /**
@@ -7938,7 +8329,7 @@ var LoggerPlus = /** @class */ (function () {
             args[_i - 2] = arguments[_i];
         }
         if (!this.isCanLog(level)) {
-            log$1.debug.apply(log$1, __spreadArray$1(['忽略日志：', level, event], args, false));
+            log.debug.apply(log, __spreadArray$1(['忽略日志：', level, event], args, false));
             return;
         }
         if (typeof this._logNetworkInterface !== 'function') {
@@ -7952,7 +8343,7 @@ var LoggerPlus = /** @class */ (function () {
             coverLoggerInfoToRequestParam(info);
         // 调用接口发送
         this._logNetworkInterface(this.encode(requestParams), this.encodeValue(requestParams), info);
-        log$1.debug('发送日志：', level, event, info);
+        log.debug('发送日志：', level, event, info);
     };
     /** 将obj转 get 请求的字符串，并进行 url 编码 */
     LoggerPlus.prototype.encode = function (obj) {
@@ -8033,7 +8424,6 @@ function coverLoggerInfoToRequestParam(info) {
     }, {});
 }
 
-var log = createLogger('LoggerPlugin');
 var getNullAdData = function () {
     return {
         creative_id: 0,
@@ -8096,7 +8486,7 @@ var LoggerPlugin = /** @class */ (function (_super) {
     /** 修改参数 */
     LoggerPlugin.prototype.updatePublicInfo = function (params, ignoredNull) {
         if (ignoredNull === void 0) { ignoredNull = true; }
-        log.info('updatePublicInfo: params = ', params, 'ignoredNull = ', ignoredNull);
+        log$1.info('updatePublicInfo: params = ', params, 'ignoredNull = ', ignoredNull);
         (ignoredNull) && removeObjectNullValue(params);
         Object.assign(this._initParams, params);
         var config = this.constructorFirstParams.config;
@@ -8113,7 +8503,7 @@ var LoggerPlugin = /** @class */ (function (_super) {
         logger.updatePublicInfo(params, ignoredNull);
     };
     LoggerPlugin.prototype.apply = function (_a) {
-        var context = _a.context; _a.config;
+        var context = _a.context;
         var $adImport = context.$adImport, $adVersion = context.$adVersion;
         var adData = $adImport.adData;
         /** 注入 日志对象 */
@@ -8122,7 +8512,7 @@ var LoggerPlugin = /** @class */ (function (_super) {
             adVer: $adVersion,
         }, this._initParams);
         context.$logger = this.$logger;
-        log.info('apply: context = ', context);
+        log$1.info('apply: context = ', context);
     };
     LoggerPlugin.prototype.onError = function (_a) {
         var context = _a.context, error = _a.error, source = _a.source;
@@ -8140,7 +8530,7 @@ var LoggerPlugin = /** @class */ (function (_super) {
  * @date 2022-06-14 10:06:49
  */
 var getNaruseComponentFromProps = function (props) { return __awaiter(void 0, void 0, void 0, function () {
-    var hotPuller, _a, code, ctx, adProps, e_1;
+    var hotPuller, _a, code, ctx, _props, e_1;
     var _b;
     return __generator(this, function (_c) {
         switch (_c.label) {
@@ -8155,11 +8545,11 @@ var getNaruseComponentFromProps = function (props) { return __awaiter(void 0, vo
                 _c.trys.push([1, 4, , 5]);
                 return [4 /*yield*/, hotPuller(props)];
             case 2:
-                _a = _c.sent(), code = _a.code, ctx = _a.ctx, adProps = _a.adProps;
+                _a = _c.sent(), code = _a.code, ctx = _a.ctx, _props = _a.props;
                 _b = {};
                 return [4 /*yield*/, getNaruseComponentFromCode(code, ctx)];
             case 3: return [2 /*return*/, (_b.Component = _c.sent(),
-                    _b.adProps = adProps,
+                    _b.props = _props,
                     _b)];
             case 4:
                 e_1 = _c.sent();
@@ -8256,8 +8646,8 @@ var Container = /** @class */ (function (_super) {
         var _this = _super.call(this, props) || this;
         _this.state = { loaded: false };
         _this.init(props);
-        // 传递给广告的props
-        _this.adProps = {};
+        // 传递给子组件的props
+        _this._props = {};
         return _this;
     }
     Container.prototype.init = function (props) {
@@ -8269,7 +8659,7 @@ var Container = /** @class */ (function (_super) {
                     case 1:
                         result = _a.sent();
                         this.Component = result === null || result === void 0 ? void 0 : result.Component;
-                        this.adProps = result === null || result === void 0 ? void 0 : result.adProps;
+                        this._props = result === null || result === void 0 ? void 0 : result.props;
                         if (this.Component) {
                             this.setState({ loaded: true });
                         }
@@ -8280,13 +8670,13 @@ var Container = /** @class */ (function (_super) {
     };
     Container.prototype.render = function () {
         // @ts-ignore
-        return this.state.loaded ? Naruse.createElement(this.Component, this.adProps) : null;
+        return this.state.loaded ? Naruse.createElement(this.Component, this._props) : null;
     };
     return Container;
 }(React.Component));
 
 // @ts-ignore
-var version = "0.6.3";
+var version = "0.9.0";
 initVersionLogger('naruse-h5', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {

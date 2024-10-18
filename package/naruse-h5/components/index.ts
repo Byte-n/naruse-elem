@@ -11,11 +11,17 @@ import Textarea from './textarea/index'
 import { getNaruseConfig } from "../core/init";
 import { functionalizae } from 'core/Component';
 import WebView from './web-view';
+import Radio from './radio';
+import RadioGroup from './radio-group';
+import CheckBoxGroup from './checkbox-group';
+import Switch from './switch';
+import Slider from './slider';
 
 /** 组件映射表 */
 const componentReflectMap = {
     button: Button,
     checkbox: Checkbox,
+    'checkbox-group': CheckBoxGroup,
     image: Image,
     input: Input,
     text: Text,
@@ -23,6 +29,10 @@ const componentReflectMap = {
     'scroll-view': ScrollView,
     textarea: Textarea,
     'web-view': WebView,
+    'radio': Radio,
+    'radio-group': RadioGroup,
+    switch: Switch,
+    slider: Slider
 }
 
 /**
@@ -57,7 +67,7 @@ const naruseCreateElement = (type: string, props: any, ...children: string[]) =>
 };
 
 
-const rpxReg = /(\d+)\s?rpx/g;
+const rpxReg = /([\d.]+)\s?rpx/g;
 
 const parsePx = val => {
     if (typeof val !== 'string') return val;

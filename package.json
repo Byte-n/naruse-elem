@@ -91,14 +91,16 @@
         "webpack-chain": "6.5.1",
         "webpack-format-messages": "^2.0.6",
         "webpackbar": "^5.0.2",
-        "xml-js": "^1.6.11"
+        "xml-js": "^1.6.11",
+        "rollup-plugin-typescript2": "^0.36.0"
     },
     "scripts": {
         "dev:miniapp-pages": "pnpm concurrently --kill-others-on-fail \"pnpm --filter naruse-webpack-runner dev:demo\" \"pnpm --filter naruse-alipay dev\"",
         "dev": "pnpm -r --filter=./package/* run dev",
         "preinstall": "npx only-allow pnpm",
         "start": "rollup -c ./rollup.config.js -w",
-        "build": "pnpm -r --filter=./package/* run build",
+        "build": "pnpm -r --filter=* run build",
+        "build2": "pnpm -r --filter * run build",
         "version": "changeset version",
         "demo:alipay": "cd ./demo/demo-alipay && npm run dev",
         "demo:h5": "cd ./demo/demo-h5 && npm run dev",

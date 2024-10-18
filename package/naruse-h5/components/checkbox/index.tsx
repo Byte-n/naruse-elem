@@ -1,33 +1,55 @@
-import React,{ Component } from 'react';
-import { getPropsDataSet } from '../../utils';
+import React, { Component } from "react";
+import { getBaseProps } from "../../utils";
+import { commonEventHander } from "core/event";
+interface CheckboxProps {
+    /** id */
+    id?: string | number;
+    /** 是否选中 */
+    checked?: boolean;
+    /** 名称 */
+    name?: string;
+    /** 值 */
+    value: string | number;
+    /** 标签 */
+    label: string | number;
+    /** 子元素 */
+    children?: any;
+    /** 是否禁用 */
+    disabled?: boolean;
+    /** 改变事件 */
+    onChange?: Function;
+    /** 其他样式 */
+    style: object;
+}
+
+interface CheckboxStates {}
 
 const h = React.createElement;
-class Checkbox extends Component {
-    /** 改变事件 */
-    handleChange (e) {
-        e.stopPropagation();
-        this.props.onChange && this.props.onChange({ value: this.value });
+class Checkbox extends Component<CheckboxProps, CheckboxStates> {
+
+    onChange = (e) => {
+        const { onChange } = this.props;
+        onChange && commonEventHander.call(this, e);
     }
 
-    render () {
-        const { checked, name, color, value, disabled, ...nativeProps } = this.props;
-
+    render() {
+        const { id, checked, value, disabled, children, ...style } = this.props;
         return (
-            <input
-                ref={dom => {
-                    if (!dom) return;
-                    this.inputEl = dom;
-                    if (this.id) dom.setAttribute('id', this.id);
-                }}
-                type='checkbox'
-                value={value}
-                name={name}
-                style={{ color }}
-                checked={checked}
-                disabled={disabled}
-                onChange={this.handleChange.bind(this)}
-                {...getPropsDataSet(nativeProps)}
-            />
+            <label
+                style={{ ...style }}
+                htmlFor={id}
+                {...getBaseProps(this.props, "label")}
+            >
+                <input
+                    {...getBaseProps(this.props)}
+                    type="checkbox"
+                    value={value}
+                    checked={checked}
+                    disabled={disabled}
+                    onChange={this.onChange}
+                />
+                {children}
+            </label>
         );
     }
 }

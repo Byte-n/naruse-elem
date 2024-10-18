@@ -1,5 +1,68 @@
 # naruse-plugin
 
+## 1.5.0
+
+### Minor Changes
+
+- 添加 switch、checkbox、radio、slider 组件
+
+## 1.4.0
+
+### Minor Changes
+
+- #FEAT: 支付宝小程序支持 radio、radio-group
+
+## 1.3.5
+
+### Patch Changes
+
+- #FEAT: H5 新增 radio-group、radio
+
+## 1.3.4
+
+### Patch Changes
+
+- #FIX: rpx\px 有小数时转换错误
+
+## 1.3.3
+
+### Patch Changes
+
+- #FIX: 1688 官方编译不支持部分 for.init 语法、修改 h5 中对 week image 组件的样式兼容
+
+## 1.3.2
+
+### Patch Changes
+
+- #FEAT: H5 新增 compatibleWeexElement
+
+## 1.3.1
+
+### Patch Changes
+
+- naruse-plugin-hot-puller-cache 缓存错误
+
+## 1.3.0
+
+### Minor Changes
+
+- #FIX: 支付宝小程序中旧 弹窗无法被新弹窗顶掉
+
+## 1.2.5
+
+### Patch Changes
+
+- #FIX: 小程序 didUnmount 时，主组件未卸载、函数调用无响应
+- #FEAT: weex 支持 props 穿透
+
+## 1.2.4
+
+### Patch Changes
+
+- 插件生命周期可选、h5 中 adProps 改为 props
+- 新增 fs-aw 子模块
+- 新增 hot-puller-cache 插件
+
 ## 1.2.3
 
 ### Patch Changes

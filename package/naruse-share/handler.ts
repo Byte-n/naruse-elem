@@ -1,5 +1,9 @@
 
 export class MethodHandler {
+    private methodName: any;
+    private __success: any;
+    private __fail: any;
+    private __complete: any;
     constructor ({ name, success, fail, complete }) {
         this.methodName = name;
         this.__success = success;
@@ -8,7 +12,7 @@ export class MethodHandler {
     }
 
     /** 成功 */
-    success (res = {}, resolve = Promise.resolve.bind(Promise)) {
+    success (res: { errMsg?: string } = {}, resolve = Promise.resolve.bind(Promise)) {
         if (!res.errMsg) {
             res.errMsg = `${this.methodName}:ok`;
         }
@@ -18,7 +22,7 @@ export class MethodHandler {
     }
 
     /** 失败 */
-    fail (res = {}, reject = Promise.reject.bind(Promise)) {
+    fail (res: { errMsg?: string } = {}, reject = Promise.reject.bind(Promise)) {
         if (!res.errMsg) {
             res.errMsg = `${this.methodName}:fail`;
         } else {

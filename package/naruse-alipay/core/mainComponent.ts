@@ -115,7 +115,7 @@ const createMainBehavior = (option = {}) => {
             // 子组件更新逻辑
             if (this.props.propHubKey) {
                 // 从指定的 主组件下获取，
-                const { props: propsOld, actuator: actuatorOld } = allMiddware[prevProps.parentMiddwareId].parseProps({ propHubKey: prevProps.propHubKey })
+                const { props: propsOld, actuator: actuatorOld } = allMiddware[prevProps.parentMiddwareId]?.parseProps({ propHubKey: prevProps.propHubKey }) || {};
                 const { props, actuator } = allMiddware[this.props.parentMiddwareId].parseProps({ propHubKey: this.props.propHubKey });
                 // FIX: 修复了当切换装载器后不会卸载组件重新渲染
                 // FIX: 修复了当key发生变化后组件不会重新渲染 0615
@@ -135,8 +135,8 @@ const createMainBehavior = (option = {}) => {
          * @date 2022-03-16 10:03:36
          */
         didUnmount() {
-            if (!this.$middware) return;
             this.isNaruseMainComponent && uninstallMainComponentOnSomePage(this);
+            if (!this.$middware) return;
             this.$middware.onUnMount(true);
         },
     };
