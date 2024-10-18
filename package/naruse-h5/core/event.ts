@@ -108,14 +108,18 @@ const reflectEventMap = {
     touchstart (e) {
         return commonTouchEventCreater(e);
     },
-    change (e) {
+    change (e, data) {
         return {
             ...baseEventProps(e),
-            detail:{
-                value:e.target.value
-            }
+            ...data
         }
-    }
+    },
+    changing (e, data) {
+        return {
+            ...baseEventProps(e),
+            ...data
+        }
+    },
 };
 
 /** 事件名称对应处理名称 */
@@ -133,6 +137,7 @@ const reflectEventNameMap = {
     touchmove:"onTouchMove",
     touchend:"onTouchEnd",
     change:"onChange",
+    changing:"onChanging"
 };
 
 
@@ -142,13 +147,13 @@ const reflectEventNameMap = {
  * @date 2022-03-18 16:03:45
  * @param {React.SyntheticEvent} e
  */
-export const commonEventHander = function (e) {
-    const type = e.type;
+export const commonEventHander = function (e, data: { type: string, detail: object } | null = null) {
+    const type = data ? data.type: e.type;
     const key = reflectEventNameMap[type];
     const handler = this.props[key];
     if (!handler || typeof handler !== 'function') return;
     const event = reflectEventMap[type];
-    const res = reflectEventMap[type](e);
+    const res = reflectEventMap[type](e, data);
     res.timeStamp = new Date().getTime();
     event && handler(res);
 };

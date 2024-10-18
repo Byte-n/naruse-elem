@@ -1,7 +1,7 @@
 // 根据数据队列生成axml模版
 import { js2xml } from 'xml-js';
 import humps from 'humps';
-import { eventCenterEventName, nativeRadio, speicalConfig } from './data';
+import { eventCenterEventName, nativeCheckbox, nativeRadio, speicalConfig } from './data';
 
 const camelCase = humps.camelize;
 
@@ -90,6 +90,7 @@ function getBaseTemplate() {
     // 生成可迭代模版
     const newRecursiveTemplateList = recursiveTemplate.map((item) => generateTemplate(item, speicalConfig));
     // 其他需要迭代的模版也要加入
+    newRecursiveTemplateList.push(getCheckboxTemplate());
     newRecursiveTemplateList.push(getRadioTemplate());
     newRecursiveTemplateList.push(getFramentTemplate());
     newRecursiveTemplateList.push(getNaruseSelfTemplate());
@@ -135,6 +136,33 @@ function getRadioTemplate () {
                         is: nativeRadio.templateName,
                         data: genDoubleBracket(
                             [...Object.values(speicalConfig.baseAttributes), ...nativeRadio.attributes].join(',')
+                        ),
+                    }
+                },
+                ...getNestElement(),
+            },
+        }
+    }
+}
+/**
+ * 自定义 复选框 组件
+ * label > checkbox, ...children
+ * */
+function getCheckboxTemplate () {
+    return {
+        template: {
+            _attributes: {
+                name: "checkbox"
+            },
+            label:{
+                _attributes: {
+                    for: genDoubleBracket('id'),
+                },
+                template: {
+                    _attributes: {
+                        is: nativeCheckbox.templateName,
+                        data: genDoubleBracket(
+                            [...Object.values(speicalConfig.baseAttributes), ...nativeCheckbox.attributes].join(',')
                         ),
                     }
                 },
