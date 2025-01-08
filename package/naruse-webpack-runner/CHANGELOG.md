@@ -1,5 +1,11 @@
 # naruse-webpack-runner
 
+## 0.10.0
+
+### Minor Changes
+
+- #FIX: 修复函数组件每次渲染都会被卸载
+
 ## 0.9.0
 
 ### Minor Changes
