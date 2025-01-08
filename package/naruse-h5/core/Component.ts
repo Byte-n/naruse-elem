@@ -47,9 +47,16 @@ export const getHooks = () => {
  * 将函数组件转换为类组件
  */
 export const functionalizae = (fn: Function) => {
-    return class extends React.Component {
-        render() {
+    if (fn.__NARUSE_CLASS__) {
+        return fn.__NARUSE_CLASS__;
+    }
+
+    class FunClass extends React.Component {
+        render () {
             return fn(this.props);
         }
     }
-}
+
+    fn.__NARUSE_CLASS__ = FunClass;
+    return FunClass;
+};
