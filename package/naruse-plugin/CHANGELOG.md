@@ -1,5 +1,11 @@
 # naruse-plugin
 
+## 1.6.0
+
+### Minor Changes
+
+- #FIX: 修复函数组件每次渲染都会被卸载
+
 ## 1.5.0
 
 ### Minor Changes

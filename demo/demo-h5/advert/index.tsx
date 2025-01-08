@@ -1,60 +1,47 @@
-import { Component } from "Naruse";
+import { Component, useState, useEffect, useCallback } from 'Naruse';
 
-export default class Qwer extends Component {
-    async componentDidMount() {
-        const qq = await import("./qwer.css");
-    }
-    render() {
-        return (
-            <view>
-                <radio-group onChange={(evl) => console.log(evl.detail)}>
-                    <radio name="a" value={"a"} checked>
-                        aaa
-                    </radio>
-                    <radio name="a" value={"b"}>
-                        bbb
-                    </radio>
-                </radio-group>
-                <checkbox
-                    value="dsad"
-                    label="d1111"
-                    checked
-                    color="#eee"
-                    onChange={(evl) => console.log(evl.detail)}
-                >
-                    你好
-                </checkbox>
-                <view></view>
+export default function App () {
+    const [value, setValue] = useState();
+    useEffect(() => {
+        setInterval(() => {
+            setValue(Math.random());
+        }, 2000);
+    }, [])
+      return (
+          <view>
+              <view>A: {value}</view>
+              <B/>
+              <Counter/>
+          </view>
+      );
+}
 
-                <checkbox-group onChange={(evl) => console.log(evl)}>
-                    <checkbox value={"aa"}>aa选项</checkbox>
-                    <checkbox value={"bb"} checked>
-                        bb选项
-                    </checkbox>
-                    <checkbox value={"cc"}>cc选项</checkbox>
-                </checkbox-group>
+function B () {
+    useEffect(() => {
+        return () => {
+            console.error('unmount');
+        }
+    }, []);
+    return (
+        <view>每次渲染我并不会被卸载</view>
+    );
+}
 
-                <switch
-                    onChange={(evl) => console.log(evl)}
-                    // color="#000"
-                />
-                <view style={{ width: "80%", margin: "0 auto" }}>
-                    <slider
-                        // min={-20}
-                        // max={20}
-                        // step={5}
-                        // value={50}
-                        // showValue
-                        // activeColor="#000"
-                        // backgroundColor="#fff"
-                        // trackSize={60}
-                        // handleSize={50}
-                        // handleColor="#eee"
-                        onChanging={(evl) => console.log(evl)}
-                        onChange={(evl) => console.log(evl)}
-                    />
-                </view>
+function Counter () {
+    const [count, setCount] = useState(0);
+    const add = useCallback(() => setCount(count + 1), [count]);
+    const sub = useCallback(() => setCount(count - 1), [count]);
+    useEffect(() => {
+        console.log('count', count);
+    }, [count]);
+    return (
+        <view>
+            <view>计数器示例</view>
+            <view>{count}</view>
+            <view style={{ display: 'flex', width: 120 }}>
+                <button onClick={add} style={{ flex: 1 }}>++</button>
+                <button onClick={sub} style={{ flex: 1 }}>--</button>
             </view>
-        );
-    }
+        </view>
+    );
 }

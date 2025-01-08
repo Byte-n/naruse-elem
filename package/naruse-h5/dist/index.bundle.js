@@ -2083,16 +2083,21 @@
      * 将函数组件转换为类组件
      */
     var functionalizae = function (fn) {
-        return /** @class */ (function (_super) {
-            __extends$1(class_1, _super);
-            function class_1() {
+        if (fn.__NARUSE_CLASS__) {
+            return fn.__NARUSE_CLASS__;
+        }
+        var FunClass = /** @class */ (function (_super) {
+            __extends$1(FunClass, _super);
+            function FunClass() {
                 return _super !== null && _super.apply(this, arguments) || this;
             }
-            class_1.prototype.render = function () {
+            FunClass.prototype.render = function () {
                 return fn(this.props);
             };
-            return class_1;
+            return FunClass;
         }(React__default["default"].Component));
+        fn.__NARUSE_CLASS__ = FunClass;
+        return FunClass;
     };
 
     var h$5 = React__default["default"].createElement;
@@ -8684,7 +8689,7 @@
     }(React__default["default"].Component));
 
     // @ts-ignore
-    var version = "0.9.0";
+    var version = "0.10.0";
     initVersionLogger('naruse-h5', version);
     var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
     var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React__default["default"].Component, createElement: naruseCreateElement, env: {

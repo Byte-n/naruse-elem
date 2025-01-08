@@ -1,5 +1,11 @@
 # naruse-parser
 
+## 0.5.0
+
+### Minor Changes
+
+- #FIX: 修复函数组件每次渲染都会被卸载
+
 ## 0.4.0
 
 ### Minor Changes
