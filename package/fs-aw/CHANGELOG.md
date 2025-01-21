@@ -1,5 +1,11 @@
 # fs-aw
 
+## 0.4.1
+
+### Patch Changes
+
+- #FIX: h5 的 image 中 mode=widthFix 与小程序端表现不一致。
+
 ## 0.4.0
 
 ### Minor Changes
