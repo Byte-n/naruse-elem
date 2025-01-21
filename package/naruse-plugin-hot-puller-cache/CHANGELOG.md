@@ -1,5 +1,15 @@
 # naruse-plugin-hot-puller-cache
 
+## 0.4.1
+
+### Patch Changes
+
+- #FIX: h5 的 image 中 mode=widthFix 与小程序端表现不一致。
+- Updated dependencies
+  - fs-aw@0.4.1
+  - naruse-plugin@1.6.1
+  - naruse-share@0.10.1
+
 ## 0.4.0
 
 ### Minor Changes
