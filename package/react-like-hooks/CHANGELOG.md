@@ -1,5 +1,11 @@
 # react-like-hooks
 
+## 0.10.2
+
+### Patch Changes
+
+- #FIX: 补充 h5 input 属性
+
 ## 0.10.1
 
 ### Patch Changes

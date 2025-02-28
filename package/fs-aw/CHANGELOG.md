@@ -1,5 +1,11 @@
 # fs-aw
 
+## 0.4.2
+
+### Patch Changes
+
+- #FIX: 补充 h5 input 属性
+
 ## 0.4.1
 
 ### Patch Changes

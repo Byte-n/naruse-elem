@@ -1,5 +1,15 @@
 # naruse-plugin-hot-puller-cache
 
+## 0.4.2
+
+### Patch Changes
+
+- #FIX: 补充 h5 input 属性
+- Updated dependencies
+  - fs-aw@0.4.2
+  - naruse-plugin@1.6.2
+  - naruse-share@0.10.2
+
 ## 0.4.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # naruse-plugin
 
+## 1.6.2
+
+### Patch Changes
+
+- #FIX: 补充 h5 input 属性
+
 ## 1.6.1
 
 ### Patch Changes

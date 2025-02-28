@@ -1,5 +1,11 @@
 # naruse-parser
 
+## 0.5.2
+
+### Patch Changes
+
+- #FIX: 补充 h5 input 属性
+
 ## 0.5.1
 
 ### Patch Changes
