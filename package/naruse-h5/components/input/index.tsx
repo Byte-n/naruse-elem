@@ -1,6 +1,6 @@
 import { commonEventHander } from '../../core/event';
 import React, { Component } from 'react';
-import { getPropsDataSet } from '../../utils';
+import { getBaseProps, getPropsDataSet } from '../../utils';
 
 const h = React.createElement;
 
@@ -116,6 +116,8 @@ class Input extends Component {
             className,
             value,
             controlled,
+            minLength,
+            max, min,
             ...other
         } = this.props;
 
@@ -132,7 +134,10 @@ class Input extends Component {
                 type={getTrueType(type, confirmType, password)}
                 placeholder={placeholder}
                 disabled={disabled}
+                minLength={minLength}
                 maxLength={maxlength}
+                max={max}
+                min={min}
                 name={name}
                 onInput={this.handleInput.bind(this)}
                 onFocus={this.handleFocus.bind(this)}
@@ -140,6 +145,7 @@ class Input extends Component {
                 onChange={this.handleChange.bind(this)}
                 onKeyDown={this.handleKeyDown.bind(this)}
                 {...getPropsDataSet(other)}
+                {...getBaseProps(this.props)}
             />
         );
     }
