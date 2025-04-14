@@ -1,6 +1,6 @@
 {
   "name": "naruse-webpack-runner",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "description": "naruse-webpack-runner",
   "main": "index.js",
   "scripts": {

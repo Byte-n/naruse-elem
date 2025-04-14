@@ -1,5 +1,15 @@
 # naruse-plugin-hot-puller-cache
 
+## 0.4.3
+
+### Patch Changes
+
+- #FEAT: h5 Input 增加 size,readonly,accept,step,autofocus 属性，修复 safeToJSON 多个 null 序列化错误、补充解释器全局变量
+- Updated dependencies
+  - fs-aw@0.4.3
+  - naruse-plugin@1.6.3
+  - naruse-share@0.10.3
+
 ## 0.4.2
 
 ### Patch Changes

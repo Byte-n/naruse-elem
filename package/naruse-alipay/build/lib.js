@@ -285,6 +285,9 @@ var safeToJSON = function (obj) {
         if (typeof value === 'function' || typeof value === 'bigint' || typeof value === 'symbol') {
             return;
         }
+        if (value === undefined || value === null) {
+            return value;
+        }
         // object
         if (typeof value === 'object') {
             // 循环引用了
@@ -4494,6 +4497,15 @@ var default_api = {
 if (typeof Symbol !== 'undefined') {
     default_api['Symbol'] = Symbol;
 }
+if (typeof FormData !== 'undefined') {
+    default_api['FormData'] = FormData;
+}
+if (typeof BigInt !== 'undefined') {
+    default_api['BigInt'] = BigInt;
+}
+if (typeof Blob !== 'undefined') {
+    default_api['Blob'] = Blob;
+}
 var Runner = /** @class */ (function () {
     function Runner() {
         this.source = '';
@@ -6160,7 +6172,7 @@ var createMiniFactory = function (type, instance, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.10.2";
+var version = "0.10.3";
 initVersionLogger('naruse-alipay', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 // naruse模块内容

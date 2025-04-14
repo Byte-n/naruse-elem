@@ -346,6 +346,9 @@ var safeToJSON = function (obj) {
         if (typeof value === 'function' || typeof value === 'bigint' || typeof value === 'symbol') {
             return;
         }
+        if (value === undefined || value === null) {
+            return value;
+        }
         // object
         if (typeof value === 'object') {
             // 循环引用了
@@ -1024,6 +1027,7 @@ var Input = /** @class */ (function (_super) {
     __extends$1(Input, _super);
     function Input() {
         var _this = _super.call(this) || this;
+        _this.ref = null;
         /** 聚焦 */
         _this.handleFocus = commonEventHander.bind(_this);
         /** 脱焦 */
@@ -1085,13 +1089,13 @@ var Input = /** @class */ (function (_super) {
     };
     Input.prototype.render = function () {
         var _this = this;
-        var _a = this.props, type = _a.type, password = _a.password, placeholder = _a.placeholder, disabled = _a.disabled, maxlength = _a.maxlength, confirmType = _a.confirmType, name = _a.name, className = _a.className, value = _a.value, controlled = _a.controlled, minLength = _a.minLength, max = _a.max, min = _a.min, other = __rest(_a, ["type", "password", "placeholder", "disabled", "maxlength", "confirmType", "name", "className", "value", "controlled", "minLength", "max", "min"]);
+        var _a = this.props, type = _a.type, password = _a.password, placeholder = _a.placeholder, disabled = _a.disabled, maxlength = _a.maxlength, confirmType = _a.confirmType, name = _a.name, className = _a.className, value = _a.value, controlled = _a.controlled, minLength = _a.minLength, max = _a.max, min = _a.min, size = _a.size, readonly = _a.readonly, accept = _a.accept, step = _a.step, autofocus = _a.autofocus, other = __rest(_a, ["type", "password", "placeholder", "disabled", "maxlength", "confirmType", "name", "className", "value", "controlled", "minLength", "max", "min", "size", "readonly", "accept", "step", "autofocus"]);
         var _value = this.state._value;
         return (h$a("input", __assign({ ref: function (input) {
                 _this.ref = input;
             }, className: className, 
             // 受控则只使用外部值，非受控优先使用外部值
-            value: fixControlledValue(controlled ? value : (value !== null && value !== void 0 ? value : _value)), type: getTrueType(type, confirmType, password), placeholder: placeholder, disabled: disabled, minLength: minLength, maxLength: maxlength, max: max, min: min, name: name, onInput: this.handleInput.bind(this), onFocus: this.handleFocus.bind(this), onBlur: this.handleBlur.bind(this), onChange: this.handleChange.bind(this), onKeyDown: this.handleKeyDown.bind(this) }, getPropsDataSet(other), getBaseProps(this.props))));
+            value: fixControlledValue(controlled ? value : (value !== null && value !== void 0 ? value : _value)), type: getTrueType(type, confirmType, password), placeholder: placeholder, disabled: disabled, minLength: minLength, maxLength: maxlength, step: step, max: max, min: min, size: size, readonly: readonly, autofocus: autofocus, accept: accept, name: name, onInput: this.handleInput.bind(this), onFocus: this.handleFocus.bind(this), onBlur: this.handleBlur.bind(this), onChange: this.handleChange.bind(this), onKeyDown: this.handleKeyDown.bind(this) }, getPropsDataSet(other), getBaseProps(this.props))));
     };
     return Input;
 }(React.Component));
@@ -6687,6 +6691,15 @@ var default_api = {
 if (typeof Symbol !== 'undefined') {
     default_api['Symbol'] = Symbol;
 }
+if (typeof FormData !== 'undefined') {
+    default_api['FormData'] = FormData;
+}
+if (typeof BigInt !== 'undefined') {
+    default_api['BigInt'] = BigInt;
+}
+if (typeof Blob !== 'undefined') {
+    default_api['Blob'] = Blob;
+}
 var Runner = /** @class */ (function () {
     function Runner() {
         this.source = '';
@@ -8681,7 +8694,7 @@ var Container = /** @class */ (function (_super) {
 }(React.Component));
 
 // @ts-ignore
-var version = "0.10.2";
+var version = "0.10.3";
 initVersionLogger('naruse-h5', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {

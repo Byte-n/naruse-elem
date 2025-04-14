@@ -4068,6 +4068,15 @@
     if (typeof Symbol !== 'undefined') {
         default_api['Symbol'] = Symbol;
     }
+    if (typeof FormData !== 'undefined') {
+        default_api['FormData'] = FormData;
+    }
+    if (typeof BigInt !== 'undefined') {
+        default_api['BigInt'] = BigInt;
+    }
+    if (typeof Blob !== 'undefined') {
+        default_api['Blob'] = Blob;
+    }
     var Runner = /** @class */ (function () {
         function Runner() {
             this.source = '';

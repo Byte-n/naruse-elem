@@ -1,5 +1,11 @@
 # naruse-alipay
 
+## 0.10.3
+
+### Patch Changes
+
+- #FEAT: h5 Input 增加 size,readonly,accept,step,autofocus 属性，修复 safeToJSON 多个 null 序列化错误、补充解释器全局变量
+
 ## 0.10.2
 
 ### Patch Changes
