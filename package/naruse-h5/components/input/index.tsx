@@ -25,7 +25,7 @@ const fixControlledValue = function fixControlledValue(value: any) {
 };
 
 class Input extends Component {
-    ref: null;
+    ref: HTMLInputElement | null = null;
     isOnComposition: boolean;
     onInputExcuted: boolean;
     el: {};
@@ -117,7 +117,11 @@ class Input extends Component {
             value,
             controlled,
             minLength,
-            max, min,
+            max, min, size,
+            readonly,
+            accept,
+            step,
+            autofocus,
             ...other
         } = this.props;
 
@@ -136,8 +140,13 @@ class Input extends Component {
                 disabled={disabled}
                 minLength={minLength}
                 maxLength={maxlength}
+                step={step}
                 max={max}
                 min={min}
+                size={size}
+                readonly={readonly}
+                autofocus={autofocus}
+                accept={accept}
                 name={name}
                 onInput={this.handleInput.bind(this)}
                 onFocus={this.handleFocus.bind(this)}
