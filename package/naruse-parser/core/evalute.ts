@@ -63,7 +63,7 @@ import {
     ConditionalExpression,
     ImportExpression
 } from '../expressionType/index'
-import { createError, errorMessageList, EvaluateError } from './error';
+import { buildNodeErrorMessage, createError, errorMessageList, EvaluateError } from './error';
 import { BREAK_SIGNAL, CONTINUE_SIGNAL, RETURN_SIGNAL, YIELD_SIGNAL, isGeneratorFunction, isYieldResult, isReturnResult, isContinueResult, isBreakResult, isPromoteStatement, isVarPromoteStatement, THIS } from './signal';
 import { Scope, Kind, indexGeneratorStackDecorate, ScopeType, getScopeRunner } from './scope';
 
@@ -728,6 +728,11 @@ export const evaluate = (node: any, scope: Scope) => {
         }
         // 错误已经处理过了，直接抛出
         if ((err as EvaluateError).isEvaluateError) {
+            if ("CallExpression" === node.type) {
+                err.codeStack.push(
+                    buildNodeErrorMessage(scope, node)
+                );
+            }
             throw err;
         }
         throw createError(errorMessageList.runTimeError, (err as Error)?.message, node, scope)

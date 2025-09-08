@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES3",
     "baseUrl": "./src",
     "outDir": "dist",
     "rootDir": "./src",
