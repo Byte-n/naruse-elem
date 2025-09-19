@@ -301,6 +301,7 @@
         function EvaluateError() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.isEvaluateError = true;
+            _this.codeStack = [];
             return _this;
         }
         return EvaluateError;
@@ -320,32 +321,47 @@
         return EvaluateReferenceError;
     }(EvaluateError));
     var errorMessageList = {
-        notYetDefined: [1000, "未定义的变量: %0", EvaluateReferenceError],
-        duplicateDefinition: [1001, "变量重复定义: %0", EvaluateReferenceError],
-        notCallableFunction: [1002, "不是可调用的函数: %0", EvaluateReferenceError],
-        notSupportNode: [1003, "尚未支持的node类型: %0", EvaluateError],
-        notHasSomeProperty: [1004, "对象不存在对应属性: %0", EvaluateReferenceError],
-        runTimeError: [1005, "运行错误 %0", EvaluateError],
-        deconstructNotArray: [1006, "解构应为一个数组: %0", EvaluateReferenceError],
-        deconstructNotObject: [1007, "解构应为一个对象: %0", EvaluateReferenceError],
-        notHasImport: [1008, "未初始化函数: %0", EvaluateReferenceError],
-        notGeneratorFunction: [1009, "无法在非迭代函数内使用yield: %0", EvaluateReferenceError],
+        notYetDefined: [1000, '未定义的变量: %0', EvaluateReferenceError],
+        duplicateDefinition: [1001, '变量重复定义: %0', EvaluateReferenceError],
+        notCallableFunction: [1002, '不是可调用的函数: %0', EvaluateReferenceError],
+        notSupportNode: [1003, '尚未支持的node类型: %0', EvaluateError],
+        notHasSomeProperty: [1004, '对象不存在对应属性: %0', EvaluateReferenceError],
+        runTimeError: [1005, '运行错误 %0', EvaluateError],
+        deconstructNotArray: [1006, '解构应为一个数组: %0', EvaluateReferenceError],
+        deconstructNotObject: [1007, '解构应为一个对象: %0', EvaluateReferenceError],
+        notHasImport: [1008, '未初始化函数: %0', EvaluateReferenceError],
+        notGeneratorFunction: [1009, '无法在非迭代函数内使用yield: %0', EvaluateReferenceError],
     };
     var createError = function (msg, value, node, scope) {
         var _a;
         var source = (_a = getScopeRunner(scope)) === null || _a === void 0 ? void 0 : _a.source;
-        var message = msg[1].replace("%0", String(value));
+        var message = msg[1].replace('%0', String(value));
+        var codeStack = [];
         if (node && source) {
-            var errorNodeLoc = node.loc;
-            var errorCode = source.slice(node.start, node.end);
-            var errorMsg = "\u9519\u8BEF\u4EE3\u7801: ".concat(errorCode);
-            if (errorNodeLoc) {
-                errorMsg += " [".concat(errorNodeLoc.start.line, ":").concat(errorNodeLoc.start.column, "-").concat(errorNodeLoc.end.line, ":").concat(errorNodeLoc.end.column, "]");
-            }
-            message = "".concat(message, " \n ").concat(errorMsg);
+            var cm = buildNodeErrorMessage(scope, node);
+            codeStack.push(cm);
+            message = "".concat(message, " \n \u9519\u8BEF\u4EE3\u7801\uFF1A").concat(cm);
         }
         var err = new msg[2](message);
-        return err.nodeLoc = node, err;
+        err.nodeLoc = node;
+        err.codeStack = codeStack;
+        return err;
+    };
+    var buildNodeErrorMessage = function (scope, node) {
+        var _a;
+        if (!node || !scope) {
+            return '';
+        }
+        var source = (_a = getScopeRunner(scope)) === null || _a === void 0 ? void 0 : _a.source;
+        if (!source) {
+            return '';
+        }
+        var errorMsg = source.slice(node.start, node.end);
+        var errorNodeLoc = node.loc;
+        if (errorNodeLoc) {
+            errorMsg += " [".concat(errorNodeLoc.start.line, ":").concat(errorNodeLoc.start.column, "-").concat(errorNodeLoc.end.line, ":").concat(errorNodeLoc.end.column, "]");
+        }
+        return errorMsg;
     };
 
     var _a, _b;
@@ -449,7 +465,7 @@
                 return evaluate(node.alternate, scope);
         },
         _b[ForStatement] = function (node, scope) {
-            var new_scope = new Scope("loop" /* ScopeType.Loop */, scope); 
+            var new_scope = new Scope("loop" /* ScopeType.Loop */, scope);
             // 只有 var 变量才会被提高到上一作用域
             node.init ? evaluate(node.init, isVarPromoteStatement(node.init) ? scope : new_scope) : null;
             for (; node.test ? evaluate(node.test, new_scope) : true; node.update ? evaluate(node.update, new_scope) : void (0)) {
@@ -1077,6 +1093,9 @@
             }
             // 错误已经处理过了，直接抛出
             if (err.isEvaluateError) {
+                if ("CallExpression" === node.type) {
+                    err.codeStack.push(buildNodeErrorMessage(scope, node));
+                }
                 throw err;
             }
             throw createError(errorMessageList.runTimeError, err === null || err === void 0 ? void 0 : err.message, node, scope);
@@ -3887,7 +3906,7 @@
                 node.specifiers = null;
                 node.source = null;
             }
-            else 
+            else
             // export default ...;
             if (eat(_default)) {
                 var expr = parseMaybeAssign();
