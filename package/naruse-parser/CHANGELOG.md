@@ -1,5 +1,29 @@
 # naruse-parser
 
+## 0.5.3
+
+### Patch Changes
+
+- #FEAT: h5 Input 增加 size,readonly,accept,step,autofocus 属性，修复 safeToJSON 多个 null 序列化错误、补充解释器全局变量
+
+## 0.5.2
+
+### Patch Changes
+
+- #FIX: 补充 h5 input 属性
+
+## 0.5.1
+
+### Patch Changes
+
+- #FIX: h5 的 image 中 mode=widthFix 与小程序端表现不一致。
+
+## 0.5.0
+
+### Minor Changes
+
+- #FIX: 修复函数组件每次渲染都会被卸载
+
 ## 0.4.0
 
 ### Minor Changes

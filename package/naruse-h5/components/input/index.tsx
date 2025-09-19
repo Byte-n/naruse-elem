@@ -1,6 +1,6 @@
 import { commonEventHander } from '../../core/event';
 import React, { Component } from 'react';
-import { getPropsDataSet } from '../../utils';
+import { getBaseProps, getPropsDataSet } from '../../utils';
 
 const h = React.createElement;
 
@@ -25,7 +25,7 @@ const fixControlledValue = function fixControlledValue(value: any) {
 };
 
 class Input extends Component {
-    ref: null;
+    ref: HTMLInputElement | null = null;
     isOnComposition: boolean;
     onInputExcuted: boolean;
     el: {};
@@ -116,6 +116,12 @@ class Input extends Component {
             className,
             value,
             controlled,
+            minLength,
+            max, min, size,
+            readonly,
+            accept,
+            step,
+            autofocus,
             ...other
         } = this.props;
 
@@ -132,7 +138,15 @@ class Input extends Component {
                 type={getTrueType(type, confirmType, password)}
                 placeholder={placeholder}
                 disabled={disabled}
+                minLength={minLength}
                 maxLength={maxlength}
+                step={step}
+                max={max}
+                min={min}
+                size={size}
+                readonly={readonly}
+                autofocus={autofocus}
+                accept={accept}
                 name={name}
                 onInput={this.handleInput.bind(this)}
                 onFocus={this.handleFocus.bind(this)}
@@ -140,6 +154,7 @@ class Input extends Component {
                 onChange={this.handleChange.bind(this)}
                 onKeyDown={this.handleKeyDown.bind(this)}
                 {...getPropsDataSet(other)}
+                {...getBaseProps(this.props)}
             />
         );
     }

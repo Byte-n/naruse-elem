@@ -94,10 +94,17 @@ export const isNaruseComponent = (obj: any) => obj instanceof NaruseComponent;
  * 将函数组件转换为类组件
  */
 export const functionalizae = (fn: Function) => {
-    return class extends NaruseComponent {
-        render() {
+    if (fn.__NARUSE_CLASS__) {
+        return fn.__NARUSE_CLASS__;
+    }
+
+    class FunClass extends NaruseComponent {
+        render () {
             return fn(this.props);
         }
     }
+
+    fn.__NARUSE_CLASS__ = FunClass;
+    return FunClass;
 }
 

@@ -71,23 +71,63 @@ export default class SingleHotComponentPlugin {
                     return true;
                 });
 
-            // 最后一步，将入口文件的内容替换为 export defaul
+            // 最后一步，将入口文件的内容替换为 export default
+            // 使用更早的阶段来避免破坏已生成的 source map
             compilation.hooks.processAssets.tap({
                 name: 'SingleHotComponentPlugin',
-                stage: Compilation.PROCESS_ASSETS_STAGE_ADDITIONS
+                stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE
             }, () => {
-                // 获取出口文件内容
-                let entryContent = compilation.assets[this.fileName].source().toString();
-                // 将 webpack 导出的东西重新导出到 exports
-                entryContent += 'for(var i in $outer)exports[i] = $outer[i];';
-                // 在头部默认添加上 $webpack 防止不存在
-                entryContent = `var $webpack=(typeof $webpack)[0]=='u'?{}:$webpack;var $outer={};${entryContent}`;
-                if (this.isExportDefaultString) {
-                    // 清理出口文件中不支持转译为模版字符串的内容
-                    entryContent = entryContent.toString().replace(/`/g, '\\`');
-                    entryContent = `export default ${JSON.stringify(entryContent)}`;
+                const originalAsset = compilation.assets[this.fileName];
+
+                // 判断是否为 SourceMapSource 类型
+                if (originalAsset.sourceAndMap && originalAsset.map) {
+                    // 情况1：有 source map，使用 ReplaceSource 保持映射
+                    const { source, map } = originalAsset.sourceAndMap();
+                    const replaceSource = new sources.ReplaceSource(
+                        new sources.SourceMapSource(source, this.fileName, map)
+                    );
+
+                    // 在头部插入 $webpack 和 $outer 变量声明
+                    const headerCode = 'var $webpack=(typeof $webpack)[0]==\'u\'?{}:$webpack;var $outer={};';
+                    replaceSource.insert(0, headerCode);
+
+                    // 在末尾插入导出逻辑
+                    const footerCode = 'for(var i in $outer)exports[i] = $outer[i];';
+                    const sourceLength = typeof source === 'string' ? source.length : 0;
+                    replaceSource.insert(sourceLength, footerCode);
+
+                    let finalContent = replaceSource.source();
+
+                    // 处理 isExportDefaultString 逻辑
+                    if (this.isExportDefaultString) {
+                        // 清理出口文件中不支持转译为模版字符串的内容
+                        finalContent = finalContent.toString().replace(/`/g, '\\`');
+                        finalContent = `export default ${JSON.stringify(finalContent)}`;
+
+                        // 创建最终的 SourceMapSource
+                        compilation.assets[this.fileName] = new sources.SourceMapSource(
+                            finalContent,
+                            this.fileName,
+                            map
+                        );
+                    } else {
+                        // 直接使用 ReplaceSource
+                        compilation.assets[this.fileName] = replaceSource;
+                    }
+                } else {
+                    // 情况2：没有 source map，按原来的方式处理
+                    let entryContent = originalAsset.source().toString();
+                    // 将 webpack 导出的东西重新导出到 exports
+                    entryContent += 'for(var i in $outer)exports[i] = $outer[i];';
+                    // 在头部默认添加上 $webpack 防止不存在
+                    entryContent = `var $webpack=(typeof $webpack)[0]=='u'?{}:$webpack;var $outer={};${entryContent}`;
+                    if (this.isExportDefaultString) {
+                        // 清理出口文件中不支持转译为模版字符串的内容
+                        entryContent = entryContent.toString().replace(/`/g, '\\`');
+                        entryContent = `export default ${JSON.stringify(entryContent)}`;
+                    }
+                    compilation.assets[this.fileName] = new sources.RawSource(entryContent);
                 }
-                compilation.assets[this.fileName] = new sources.RawSource(entryContent);
             })
         })
     }

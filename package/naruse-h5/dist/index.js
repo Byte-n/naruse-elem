@@ -346,6 +346,9 @@ var safeToJSON = function (obj) {
         if (typeof value === 'function' || typeof value === 'bigint' || typeof value === 'symbol') {
             return;
         }
+        if (value === undefined || value === null) {
+            return value;
+        }
         // object
         if (typeof value === 'object') {
             // 循环引用了
@@ -711,7 +714,7 @@ var Checkbox = /** @class */ (function (_super) {
     return Checkbox;
 }(React.Component));
 
-var cssStyle$3 = {"img-empty":{"opacity":"0"},"naruseImg":{"display":"inline-block","overflow":"hidden","position":"relative","fontSize":"0"},"naruseImg__widthfix":{"height":"100%"},"scaletofill":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfit":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfill":{"objectFit":"cover","width":"100%","height":"100%"},"widthfix":{"width":"100%"},"top":{"width":"100%"},"bottom":{"width":"100%","position":"absolute","bottom":"0"},"left":{"height":"100%"},"right":{"position":"absolute","height":"100%","right":"0"},"topright":{"position":"absolute","right":"0"},"bottomleft":{"position":"absolute","bottom":"0"},"bottomright":{"position":"absolute","right":"0","bottom":"0"}};
+var cssStyle$3 = {"img-empty":{"opacity":"0"},"naruseImg":{"display":"inline-block","overflow":"hidden","position":"relative","fontSize":"0"},"naruseImg__widthfix":{"height":"auto"},"scaletofill":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfit":{"objectFit":"contain","width":"100%","height":"100%"},"aspectfill":{"objectFit":"cover","width":"100%","height":"100%"},"widthfix":{"width":"100%"},"top":{"width":"100%"},"bottom":{"width":"100%","position":"absolute","bottom":"0"},"left":{"height":"100%"},"right":{"position":"absolute","height":"100%","right":"0"},"topright":{"position":"absolute","right":"0"},"bottomleft":{"position":"absolute","bottom":"0"},"bottomright":{"position":"absolute","right":"0","bottom":"0"}};
 
 function withPage(Comp) {
     return /** @class */ (function (_super) {
@@ -1024,6 +1027,7 @@ var Input = /** @class */ (function (_super) {
     __extends$1(Input, _super);
     function Input() {
         var _this = _super.call(this) || this;
+        _this.ref = null;
         /** 聚焦 */
         _this.handleFocus = commonEventHander.bind(_this);
         /** 脱焦 */
@@ -1085,13 +1089,13 @@ var Input = /** @class */ (function (_super) {
     };
     Input.prototype.render = function () {
         var _this = this;
-        var _a = this.props, type = _a.type, password = _a.password, placeholder = _a.placeholder, disabled = _a.disabled, maxlength = _a.maxlength, confirmType = _a.confirmType, name = _a.name, className = _a.className, value = _a.value, controlled = _a.controlled, other = __rest(_a, ["type", "password", "placeholder", "disabled", "maxlength", "confirmType", "name", "className", "value", "controlled"]);
+        var _a = this.props, type = _a.type, password = _a.password, placeholder = _a.placeholder, disabled = _a.disabled, maxlength = _a.maxlength, confirmType = _a.confirmType, name = _a.name, className = _a.className, value = _a.value, controlled = _a.controlled, minLength = _a.minLength, max = _a.max, min = _a.min, size = _a.size, readonly = _a.readonly, accept = _a.accept, step = _a.step, autofocus = _a.autofocus, other = __rest(_a, ["type", "password", "placeholder", "disabled", "maxlength", "confirmType", "name", "className", "value", "controlled", "minLength", "max", "min", "size", "readonly", "accept", "step", "autofocus"]);
         var _value = this.state._value;
         return (h$a("input", __assign({ ref: function (input) {
                 _this.ref = input;
             }, className: className, 
             // 受控则只使用外部值，非受控优先使用外部值
-            value: fixControlledValue(controlled ? value : (value !== null && value !== void 0 ? value : _value)), type: getTrueType(type, confirmType, password), placeholder: placeholder, disabled: disabled, maxLength: maxlength, name: name, onInput: this.handleInput.bind(this), onFocus: this.handleFocus.bind(this), onBlur: this.handleBlur.bind(this), onChange: this.handleChange.bind(this), onKeyDown: this.handleKeyDown.bind(this) }, getPropsDataSet(other))));
+            value: fixControlledValue(controlled ? value : (value !== null && value !== void 0 ? value : _value)), type: getTrueType(type, confirmType, password), placeholder: placeholder, disabled: disabled, minLength: minLength, maxLength: maxlength, step: step, max: max, min: min, size: size, readonly: readonly, autofocus: autofocus, accept: accept, name: name, onInput: this.handleInput.bind(this), onFocus: this.handleFocus.bind(this), onBlur: this.handleBlur.bind(this), onChange: this.handleChange.bind(this), onKeyDown: this.handleKeyDown.bind(this) }, getPropsDataSet(other), getBaseProps(this.props))));
     };
     return Input;
 }(React.Component));
@@ -2075,16 +2079,21 @@ var getHooks = function () {
  * 将函数组件转换为类组件
  */
 var functionalizae = function (fn) {
-    return /** @class */ (function (_super) {
-        __extends$1(class_1, _super);
-        function class_1() {
+    if (fn.__NARUSE_CLASS__) {
+        return fn.__NARUSE_CLASS__;
+    }
+    var FunClass = /** @class */ (function (_super) {
+        __extends$1(FunClass, _super);
+        function FunClass() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        class_1.prototype.render = function () {
+        FunClass.prototype.render = function () {
             return fn(this.props);
         };
-        return class_1;
+        return FunClass;
     }(React.Component));
+    fn.__NARUSE_CLASS__ = FunClass;
+    return FunClass;
 };
 
 var h$5 = React.createElement;
@@ -6682,6 +6691,15 @@ var default_api = {
 if (typeof Symbol !== 'undefined') {
     default_api['Symbol'] = Symbol;
 }
+if (typeof FormData !== 'undefined') {
+    default_api['FormData'] = FormData;
+}
+if (typeof BigInt !== 'undefined') {
+    default_api['BigInt'] = BigInt;
+}
+if (typeof Blob !== 'undefined') {
+    default_api['Blob'] = Blob;
+}
 var Runner = /** @class */ (function () {
     function Runner() {
         this.source = '';
@@ -8676,7 +8694,7 @@ var Container = /** @class */ (function (_super) {
 }(React.Component));
 
 // @ts-ignore
-var version = "0.9.0";
+var version = "0.10.3";
 initVersionLogger('naruse-h5', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 var Naruse = __assign(__assign(__assign({}, api), getHooks()), { Component: React.Component, createElement: naruseCreateElement, env: {

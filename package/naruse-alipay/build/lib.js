@@ -285,6 +285,9 @@ var safeToJSON = function (obj) {
         if (typeof value === 'function' || typeof value === 'bigint' || typeof value === 'symbol') {
             return;
         }
+        if (value === undefined || value === null) {
+            return value;
+        }
         // object
         if (typeof value === 'object') {
             // 循环引用了
@@ -4494,6 +4497,15 @@ var default_api = {
 if (typeof Symbol !== 'undefined') {
     default_api['Symbol'] = Symbol;
 }
+if (typeof FormData !== 'undefined') {
+    default_api['FormData'] = FormData;
+}
+if (typeof BigInt !== 'undefined') {
+    default_api['BigInt'] = BigInt;
+}
+if (typeof Blob !== 'undefined') {
+    default_api['Blob'] = Blob;
+}
 var Runner = /** @class */ (function () {
     function Runner() {
         this.source = '';
@@ -5036,16 +5048,21 @@ var isNaruseComponent = function (obj) { return obj instanceof NaruseComponent; 
  * 将函数组件转换为类组件
  */
 var functionalizae = function (fn) {
-    return /** @class */ (function (_super) {
-        __extends$1(class_1, _super);
-        function class_1() {
+    if (fn.__NARUSE_CLASS__) {
+        return fn.__NARUSE_CLASS__;
+    }
+    var FunClass = /** @class */ (function (_super) {
+        __extends$1(FunClass, _super);
+        function FunClass() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        class_1.prototype.render = function () {
+        FunClass.prototype.render = function () {
             return fn(this.props);
         };
-        return class_1;
+        return FunClass;
     }(NaruseComponent));
+    fn.__NARUSE_CLASS__ = FunClass;
+    return FunClass;
 };
 
 var apiDiff = {
@@ -6155,7 +6172,7 @@ var createMiniFactory = function (type, instance, config) {
 
 var apis = initNaruseAlipayApi();
 // @ts-ignore
-var version = "0.9.0";
+var version = "0.10.3";
 initVersionLogger('naruse-alipay', version);
 var runCodeWithNaruse = function (code, ctx) { return getNaruseComponentFromCode(code, ctx); };
 // naruse模块内容

@@ -1,19 +1,20 @@
-import { Component } from "Naruse";
+import { Component, useState, useEffect } from 'Naruse';
 
 export default class Qwer extends Component {
-    async componentDidMount() {
-        // const qq = await import('./qwer.css');
-        // console.log('ccc', qq.ccc);
-    }
 
-    render() {
-        return (
-            <view>
-                {this.renderRadio()}
-                {this.renderOnFirstAppear()}
-            </view>
-        );
-    }
+  async componentDidMount () {
+    // const qq = await import('./qwer.css');
+    // console.log('ccc', qq.ccc);
+  }
+
+  render () {
+    return (
+      <view>
+        {this.renderRadio()}
+        {this.renderOnFirstAppear()}
+      </view>
+    );
+  }
 
     renderOnFirstAppear() {
         return (
@@ -63,7 +64,7 @@ export default class Qwer extends Component {
                     </checkbox>
                     <checkbox value={"cc"}>cc选项</checkbox>
                 </checkbox-group>
-                
+
                 <switch onChange={(evl) => console.log(evl)} />
                 <view style={{ width: "80%", margin: "0 auto" }}>
                     <slider

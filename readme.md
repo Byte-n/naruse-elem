@@ -59,10 +59,3 @@ pnpm build
 
 # 4. 合并到主分支
 ```
-## JetBrains 开源证书
-
-感谢Jetbrains提供的免费开源许可, WebStorm 为编程开发带来了良好的体验.
-
-
-
-<a href="https://www.jetbrains.com/?from=GoFilm" target="_blank"><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" alt="JetBrains Logo (Main) logo."></a>

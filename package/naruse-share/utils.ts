@@ -95,6 +95,9 @@ export const safeToJSON = (obj) => {
         if (typeof value === 'function' || typeof value === 'bigint' || typeof value === 'symbol') {
             return;
         }
+        if (value === undefined || value === null) {
+          return value;
+        }
         // object
         if (typeof value === 'object') {
             // 循环引用了
